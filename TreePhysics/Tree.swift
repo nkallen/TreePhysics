@@ -12,10 +12,19 @@ class Tree {
 var i = 0
 
 class Branch {
-    let position: float3 = float3(0,0.5,0)
     var children: [Branch] = []
-    weak var parent: Branch?
+    weak var parent: Branch? {
+        didSet {
+            self.angle = -Float.pi / 4
+        }
+    }
     let name: String
+
+    var angle: Float = 0 {
+        didSet {
+            node.simdRotation = float4(0, 0, 1, self.angle)
+        }
+    }
 
     init() {
         self.name = "Branch[\(i)]"
@@ -29,11 +38,8 @@ class Branch {
 
         node.pivot = SCNMatrix4MakeTranslation(0, -0.5, 0)
 
-        node.simdPosition = position
+        node.simdPosition = float3(0,0.5,0)
 
-        if parent != nil {
-            node.simdRotation = float4(0, 0, -Float.pi / 4, 1)
-        }
         return node
     }()
 

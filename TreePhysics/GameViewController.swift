@@ -37,8 +37,9 @@ class GameViewController: NSViewController {
         b1.add(b2)
         let tree = Tree(root)
 
+
         scene.rootNode.addChildNode(tree.root.node)
-        
+
         let scnView = self.view as! SCNView
         scnView.scene = scene
         scnView.allowsCameraControl = true
