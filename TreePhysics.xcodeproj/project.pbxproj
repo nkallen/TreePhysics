@@ -13,7 +13,18 @@
 		9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
 		9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA922DDDC6E00535997 /* Main.storyboard */; };
 		9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBB322DDDCCB00535997 /* Tree.swift */; };
+		9EE7EBBC22DE1AD100535997 /* TreePhysicsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBBB22DE1AD100535997 /* TreePhysicsTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9EE7EBBE22DE1AD100535997 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9EE7EB9622DDDC6C00535997 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9EE7EB9D22DDDC6C00535997;
+			remoteInfo = TreePhysics;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -25,10 +36,20 @@
 		9EE7EBAC22DDDC6E00535997 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TreePhysics.entitlements; sourceTree = "<group>"; };
 		9EE7EBB322DDDCCB00535997 /* Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
+		9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TreePhysicsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EE7EBBB22DE1AD100535997 /* TreePhysicsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePhysicsTests.swift; sourceTree = "<group>"; };
+		9EE7EBBD22DE1AD100535997 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		9EE7EB9B22DDDC6C00535997 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EE7EBB622DE1AD100535997 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -42,6 +63,7 @@
 			isa = PBXGroup;
 			children = (
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
+				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
 				9EE7EB9F22DDDC6C00535997 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */,
+				9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -67,6 +90,15 @@
 				9EE7EBB322DDDCCB00535997 /* Tree.swift */,
 			);
 			path = TreePhysics;
+			sourceTree = "<group>";
+		};
+		9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */ = {
+			isa = PBXGroup;
+			children = (
+				9EE7EBBB22DE1AD100535997 /* TreePhysicsTests.swift */,
+				9EE7EBBD22DE1AD100535997 /* Info.plist */,
+			);
+			path = TreePhysicsTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -89,6 +121,24 @@
 			productReference = 9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */;
 			productType = "com.apple.product-type.application";
 		};
+		9EE7EBB822DE1AD100535997 /* TreePhysicsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9EE7EBC022DE1AD100535997 /* Build configuration list for PBXNativeTarget "TreePhysicsTests" */;
+			buildPhases = (
+				9EE7EBB522DE1AD100535997 /* Sources */,
+				9EE7EBB622DE1AD100535997 /* Frameworks */,
+				9EE7EBB722DE1AD100535997 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9EE7EBBF22DE1AD100535997 /* PBXTargetDependency */,
+			);
+			name = TreePhysicsTests;
+			productName = TreePhysicsTests;
+			productReference = 9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -101,6 +151,10 @@
 				TargetAttributes = {
 					9EE7EB9D22DDDC6C00535997 = {
 						CreatedOnToolsVersion = 10.2.1;
+					};
+					9EE7EBB822DE1AD100535997 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 9EE7EB9D22DDDC6C00535997;
 					};
 				};
 			};
@@ -118,6 +172,7 @@
 			projectRoot = "";
 			targets = (
 				9EE7EB9D22DDDC6C00535997 /* TreePhysics */,
+				9EE7EBB822DE1AD100535997 /* TreePhysicsTests */,
 			);
 		};
 /* End PBXProject section */
@@ -130,6 +185,13 @@
 				9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */,
 				9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */,
 				9EE7EBA622DDDC6C00535997 /* art.scnassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EE7EBB722DE1AD100535997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,7 +208,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9EE7EBB522DE1AD100535997 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9EE7EBBC22DE1AD100535997 /* TreePhysicsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9EE7EBBF22DE1AD100535997 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9EE7EB9D22DDDC6C00535997 /* TreePhysics */;
+			targetProxy = 9EE7EBBE22DE1AD100535997 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		9EE7EBA922DDDC6E00535997 /* Main.storyboard */ = {
@@ -313,6 +391,46 @@
 			};
 			name = Release;
 		};
+		9EE7EBC122DE1AD100535997 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = G3GUW83N5R;
+				INFOPLIST_FILE = TreePhysicsTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysicsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreePhysics.app/Contents/MacOS/TreePhysics";
+			};
+			name = Debug;
+		};
+		9EE7EBC222DE1AD100535997 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = G3GUW83N5R;
+				INFOPLIST_FILE = TreePhysicsTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysicsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreePhysics.app/Contents/MacOS/TreePhysics";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -330,6 +448,15 @@
 			buildConfigurations = (
 				9EE7EBB122DDDC6E00535997 /* Debug */,
 				9EE7EBB222DDDC6E00535997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9EE7EBC022DE1AD100535997 /* Build configuration list for PBXNativeTarget "TreePhysicsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EE7EBC122DE1AD100535997 /* Debug */,
+				9EE7EBC222DE1AD100535997 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

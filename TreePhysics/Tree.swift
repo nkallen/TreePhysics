@@ -59,7 +59,7 @@ class Branch {
     // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
     func apply(force: float2, at distance: Float) {
         self.force += force
-        self.torque += cross(force, distance * float2(0, 1))
+        self.torque += cross(force, convert(position: float2(0, distance)) - worldPosition)
     }
 
     // of composite body:
@@ -76,11 +76,16 @@ class Branch {
     var compositeTorque: float3 = float3.zero
 
     func updateComposite() {
+        print(self.name, self.force, self.torque)
         for child in children {
             child.updateComposite()
+            print(child.name, self.force, child.torque, child.compositeTorque)
         }
         self.compositeMass = mass + children.map { $0.compositeMass }.sum
-        self.compositeForce = force + children.map { $0.rotation * $0.compositeForce }.sum
+        self.compositeForce = force + children.map { $0.compositeForce }.sum
+        self.compositeTorque = torque + children.map { child in
+            return cross(child.compositeForce, child.worldPosition - self.worldPosition) + child.compositeTorque
+            }.sum
     }
 
     func reset() {
@@ -90,8 +95,40 @@ class Branch {
         self.compositeTorque = float3.zero
     }
 
-    var rotation: float2x2 {
-        return matrix2x2_rotation(radians: angle)
+    var rotation: float3x3 {
+        return matrix3x3_rotation(radians: angle)
+    }
+
+    var translation: float3x3 {
+        if parent != nil {
+            return matrix3x3_translation(0, 1)
+        } else {
+            return matrix_identity_float3x3
+        }
+    }
+
+    var transform: float3x3 {
+        return translation * rotation
+    }
+
+    var worldTransform: float3x3 {
+        if let parent = parent {
+            return parent.worldTransform * transform
+        } else {
+            return transform
+        }
+    }
+
+    var position: float2 {
+        return (transform * float3(0,0,1)).xy
+    }
+
+    var worldPosition: float2 {
+        return (worldTransform * float3(0,0,1)).xy
+    }
+
+    func convert(position: float2) -> float2 {
+        return (worldTransform * float3(position, 1)).xy
     }
 }
 
@@ -107,11 +144,33 @@ extension Array where Element == float2 {
     }
 }
 
-func matrix2x2_rotation(radians: Float) -> float2x2 {
-    let cs = cosf(radians)
-    let sn = sinf(radians)
-    return matrix_float2x2.init(columns:
-        (float2(cs, sn),
-         float2(-sn, cs)))
+extension Array where Element == float3 {
+    var sum: float3 {
+        return reduce(float3.zero, +)
+    }
 }
 
+func matrix3x3_rotation(radians: Float) -> float3x3 {
+    let cs = cosf(radians)
+    let sn = sinf(radians)
+    return matrix_float3x3.init(columns:
+        (float3(cs, sn, 0),
+         float3(-sn, cs, 0),
+         float3(0, 0, 1)))
+}
+
+func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> float3x3 {
+    return matrix_float3x3.init(columns:(vector_float3(1, 0, 0),
+                                         vector_float3(0, 1, 0),
+                                         vector_float3(translationX, translationY, 1)))
+}
+
+extension float3 {
+    init(_ float2: float2, _ z: Float) {
+        self = float3(float2.x, float2.y, z)
+    }
+
+    var xy: float2 {
+        return float2(x, y)
+    }
+}

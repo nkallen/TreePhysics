@@ -29,21 +29,21 @@ class GameViewController: NSViewController {
         scene.rootNode.addChildNode(ambientLightNode)
         
         // add the tree
-        let root = Branch()
-        let b1 = Branch()
-        let b2 = Branch()
+//        let root = Branch()
+//        let b1 = Branch()
+//        let b2 = Branch()
 
-        root.add(b1)
-        b1.add(b2)
-        let tree = Tree(root)
+//        root.add(b1)
+//        b1.add(b2)
+//        let tree = Tree(root)
 
-        b2.apply(force: float2(-1,0), at: 1)
-        tree.root.updateComposite()
-        for branch in [tree.root, b1, b2] {
-            print(branch.name, branch.compositeMass, branch.compositeForce)
-        }
+//        b2.apply(force: float2(-1,0), at: 1)
+//        tree.root.updateComposite()
+//        for branch in [tree.root, b1, b2] {
+//            print(branch.name, branch.compositeMass, branch.compositeForce, branch.compositeTorque)
+//        }
 
-        scene.rootNode.addChildNode(tree.root.node)
+//        scene.rootNode.addChildNode(tree.root.node)
 
         let scnView = self.view as! SCNView
         scnView.scene = scene
