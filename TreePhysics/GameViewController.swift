@@ -37,17 +37,18 @@ class GameViewController: NSViewController {
         b1.add(b2)
         let tree = Tree(root)
 
+        b2.apply(force: float2(-1,0), at: 1)
+        tree.root.updateComposite()
+        for branch in [tree.root, b1, b2] {
+            print(branch.name, branch.compositeMass, branch.compositeForce)
+        }
 
         scene.rootNode.addChildNode(tree.root.node)
 
         let scnView = self.view as! SCNView
         scnView.scene = scene
         scnView.allowsCameraControl = true
-
-        // show statistics such as fps and timing information
         scnView.showsStatistics = true
-        
-        // configure the view
         scnView.backgroundColor = NSColor.black
     }
 }
