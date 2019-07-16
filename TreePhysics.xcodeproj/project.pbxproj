@@ -12,6 +12,7 @@
 		9EE7EBA622DDDC6C00535997 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA522DDDC6C00535997 /* art.scnassets */; };
 		9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
 		9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA922DDDC6E00535997 /* Main.storyboard */; };
+		9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBB322DDDCCB00535997 /* Tree.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		9EE7EBAA22DDDC6E00535997 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9EE7EBAC22DDDC6E00535997 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TreePhysics.entitlements; sourceTree = "<group>"; };
+		9EE7EBB322DDDCCB00535997 /* Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				9EE7EBA922DDDC6E00535997 /* Main.storyboard */,
 				9EE7EBAC22DDDC6E00535997 /* Info.plist */,
 				9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */,
+				9EE7EBB322DDDCCB00535997 /* Tree.swift */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -137,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */,
 				9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */,
 				9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */,
 			);
