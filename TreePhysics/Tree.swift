@@ -26,15 +26,31 @@ class Branch {
     var children: [Branch] = []
     weak var parent: Branch? {
         didSet {
-            self.angle = -Float.pi / 4
+            self.branchAngle = -Float.pi / 4
         }
     }
     let name: String
 
-    var angle: Float = 0 {
+    // NOTE: the branch, in its resting state, might sprout off its parent at an angle. Thus, the
+    // joint angle (which is 0 in the resting state) is not the same as the branch angle.
+
+    var branchAngle: Float = 0 {
         didSet {
-            node.simdRotation = float4(0, 0, 1, self.angle)
+            node.simdRotation = float4(0, 0, 1, self.netAngle)
         }
+    }
+
+    var jointAngle: Float = 0 {
+        didSet {
+            node.simdRotation = float4(0, 0, 1, self.netAngle)
+        }
+    }
+
+    var jointAngularAcceleration: Float = 0
+    var jointAngularVelocity: Float = 0
+
+    var netAngle: Float {
+        return self.jointAngle + self.branchAngle
     }
 
     init() {
@@ -106,7 +122,7 @@ class Branch {
     }
 
     var rotation: float3x3 {
-        return matrix3x3_rotation(radians: angle)
+        return matrix3x3_rotation(radians: branchAngle)
     }
 
     private var centerOfMass: float2 {
@@ -159,9 +175,13 @@ class Branch {
 
 
         // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
+        // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
 
-        // Characteristic equation: ar^2 + br + c = 0
-        let solution = solve_quadratic(a: compositeInertiaRelativeToJoint, b: Tree.BK, c: Tree.K)
+        let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.BK, c: Tree.K, g: compositeTorque.z, y_0: jointAngle, y_ddt_0: jointAngularAcceleration)
+        let thetas = evaluate(differential: solution, at: Float(delta))
+        self.jointAngle = thetas.x
+        self.jointAngularVelocity = thetas.y
+        self.jointAngularAcceleration = thetas.z
     }
 }
 
@@ -195,19 +215,19 @@ func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     }
 }
 
-func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, dydt_0: Float) -> DifferentialSolution {
+func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_ddt_0: Float) -> DifferentialSolution {
     switch solve_quadratic(a: a, b: b, c: c) {
     case let .complex(real, imaginary):
         let c1 = y_0
-        let c2 = (dydt_0 - real * c1) / imaginary
+        let c2 = (y_ddt_0 - real * c1) / imaginary
         return .complex(c1: c1, c2: c2, lambda: real, mu: imaginary, k: g/c)
     case let .real(r):
         let system = float2x2(columns: (float2(1, r), float2(0, 1)))
-        let solution = system.inverse * float2(y_0, dydt_0)
+        let solution = system.inverse * float2(y_0, y_ddt_0)
         return .real(c1: solution.x, c2: solution.y, r: r, k: g/c)
     case let .realDistinct(r1, r2):
         let system = float2x2(columns: (float2(1, r1), float2(1, r2)))
-        let solution = system.inverse * float2(y_0, dydt_0)
+        let solution = system.inverse * float2(y_0, y_ddt_0)
         return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2, k: g/c)
     }
 }
