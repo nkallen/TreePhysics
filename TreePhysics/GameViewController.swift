@@ -24,7 +24,6 @@ class GameViewController: NSViewController {
         scnView.allowsCameraControl = true
         scnView.showsStatistics = true
         scnView.backgroundColor = NSColor.black
-        scnView.delegate = self
     }
 
     override func viewDidAppear() {
@@ -35,11 +34,10 @@ class GameViewController: NSViewController {
         root.add(b1)
         b1.add(b2)
         self.tree = Tree(root)
+        scnView.scene!.rootNode.addChildNode(tree.root.node)
+        scnView.delegate = self
 
         b2.apply(force: float2(0,1), at: 1)
-        tree.root.updateCompositeBodyState()
-
-        scnView.scene!.rootNode.addChildNode(tree.root.node)
     }
 
     var scnView: SCNView {
@@ -53,5 +51,6 @@ extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let delta = time - (previousTime ?? time)
         tree.update(delta: delta)
+        renderer.isPlaying = true
     }
 }

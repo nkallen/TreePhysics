@@ -38,6 +38,7 @@ class Branch {
 
     var jointAngle: Float = 0 {
         didSet {
+            print("setting joint angle to", self.jointAngle, "with net angle", self.netAngle)
             node.simdRotation = float4(0, 0, 1, self.netAngle)
         }
     }
@@ -155,6 +156,15 @@ class Branch {
         updateCompositeBodyState()
         updateSpringState(delta: delta)
         updateRigidBodyState()
+        reset()
+    }
+
+    func reset() {
+        self.force = float2.zero
+        self.torque = float3.zero
+        for child in children {
+            child.reset()
+        }
     }
 
     func updateSpringState(delta: TimeInterval) {
@@ -187,6 +197,10 @@ class Branch {
 
         let localCenterOfMass = float2(0, 1) * length / 2
         self.worldCenterOfMass = convert(position: localCenterOfMass)
+
+        for child in children {
+            child.updateRigidBodyState()
+        }
     }
 }
 
