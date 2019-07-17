@@ -217,28 +217,28 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
     switch differential {
     case let .complex(c1: c1, c2: c2, lambda: lambda, mu: mu, k: k):
         let y = c1*powf(.e,lambda*t)*cos(mu*t) + c2*powf(.e,lambda*t)*sin(mu*t) + k
-        let dydt = lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*c1*powf(.e,lambda*t)*sin(mu*t) +
+        let y_ddt = lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*c1*powf(.e,lambda*t)*sin(mu*t) +
             lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*c2*powf(.e,lambda*t)*cos(mu*t)
-        let d2ydt = lambda*lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*lambda*c1*powf(.e,lambda*t)*sin(mu*t) -
+        let y_d2dt = lambda*lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*lambda*c1*powf(.e,lambda*t)*sin(mu*t) -
             (lambda*mu*c1*powf(.e,lambda*t)*sin(mu*t) + mu*mu*c1*powf(.e,lambda*t)*cos(mu*t)) +
             lambda*lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*lambda*c2*powf(.e,lambda*t)*cos(mu*t) +
             lambda*mu*c2*powf(.e,lambda*t)*cos(mu*t) - mu*mu*c2*powf(.e,lambda*t)*sin(mu*t)
-        return float3(y, dydt, d2ydt)
+        return float3(y, y_ddt, y_d2dt)
     case let .real(c1: c1, c2: c2, r: r, k: k):
         let y = c1*powf(.e,r*t) + c2*t*powf(.e,r*t) + k
-        let dydt = r*c1*powf(.e,r*t) +
+        let y_ddt = r*c1*powf(.e,r*t) +
             c2*powf(.e,r*t) + r*c2*t*powf(.e,r*t)
-        let d2ydt = r*r*c1*powf(.e,r*t) +
+        let y_d2dt = r*r*c1*powf(.e,r*t) +
             r*c2*powf(.e,r*t) +
             r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
-        return float3(y, dydt, d2ydt)
+        return float3(y, y_ddt, y_d2dt)
     case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
         let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
-        let dydt = r1*c1*powf(.e,r1*t) +
+        let y_ddt = r1*c1*powf(.e,r1*t) +
             r2*c2 * powf(.e,r2*t)
-        let d2ydt = r1*r1*c1 * powf(.e,r1*t) +
+        let y_d2dt = r1*r1*c1 * powf(.e,r1*t) +
             r2*r2*c2 * powf(.e,r2*t)
-        return float3(y, dydt, d2ydt)
+        return float3(y, y_ddt, y_d2dt)
     }
 }
 
