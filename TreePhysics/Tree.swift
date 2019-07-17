@@ -3,7 +3,7 @@ import SceneKit
 import Darwin
 
 extension Tree {
-    static let K: Float = 1
+    static let K: Float = 20
     static let B: Float = 1
     static let BK: Float = B*K
 }
@@ -38,7 +38,7 @@ class Branch {
 
     var jointAngle: Float = 0 {
         didSet {
-            print("setting joint angle to", self.jointAngle, "with net angle", self.netAngle)
+            print("\(name): setting joint angle to", self.jointAngle, "with net angle", self.netAngle)
             node.simdRotation = float4(0, 0, 1, self.netAngle)
         }
     }
@@ -76,7 +76,17 @@ class Branch {
 
     // on rigid body:
 
-    let mass: Float = 1
+    var depth: Int {
+        if let parent = parent {
+            return parent.depth + 1
+        } else {
+            return 0
+        }
+    }
+
+    var mass: Float {
+        return 1.0 / Float(depth)
+    }
     let length: Float = 1
     var force: float2 = float2.zero
     var torque: float3 = float3.zero
@@ -167,17 +177,28 @@ class Branch {
         }
     }
 
+    var bk: Float {
+        return Tree.B * k
+    }
+
+    var k: Float {
+        return Tree.K / pow(3.5, Float(depth))
+    }
+
     func updateSpringState(delta: TimeInterval) {
-        let compositeInertiaRelativeToJoint = compositeInertia + compositeMass * square(distance(compositeCenterOfMass, jointPosition))
+        if parent != nil {
+            print("\(name) stiffness:", k)
+            let compositeInertiaRelativeToJoint = compositeInertia + compositeMass * square(distance(compositeCenterOfMass, jointPosition))
 
-        // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
-        // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
+            // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
+            // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
 
-        let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.BK, c: Tree.K, g: compositeTorque.z, y_0: jointAngle, y_ddt_0: jointAngularAcceleration)
-        let thetas = evaluate(differential: solution, at: Float(delta))
-        self.jointAngle = thetas.x
-        self.jointAngularVelocity = thetas.y
-        self.jointAngularAcceleration = thetas.z
+            let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: bk, c: k, g: compositeTorque.z, y_0: jointAngle, y_ddt_0: jointAngularVelocity)
+            let thetas = evaluate(differential: solution, at: Float(delta))
+            self.jointAngle = thetas.x
+            self.jointAngularVelocity = thetas.y
+            self.jointAngularAcceleration = thetas.z
+        }
 
         for child in children {
             child.updateSpringState(delta: delta)

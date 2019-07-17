@@ -37,7 +37,7 @@ class GameViewController: NSViewController {
         scnView.scene!.rootNode.addChildNode(tree.root.node)
         scnView.delegate = self
 
-        b2.apply(force: float2(0,1), at: 1)
+        b2.apply(force: float2(0,-5), at: 1)
     }
 
     var scnView: SCNView {
@@ -50,7 +50,9 @@ var previousTime: TimeInterval? = nil
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let delta = time - (previousTime ?? time)
+        print(delta)
         tree.update(delta: delta)
         renderer.isPlaying = true
+        previousTime = time
     }
 }
