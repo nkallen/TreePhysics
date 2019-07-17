@@ -3,8 +3,8 @@ import SceneKit
 import Darwin
 
 extension Tree {
-    static let K: Float = 20
-    static let B: Float = 1
+    static let K: Float = 100
+    static let B: Float = 0.02
     static let BK: Float = B*K
 }
 
@@ -67,7 +67,7 @@ class Branch {
         return node
     }()
 
-    func add(_ child: Branch, at angle: Float = -Float.pi / 4) {
+    func add(_ child: Branch, at angle: Float = -Float.pi / 8) {
         child.parent = self
         child.branchAngle = angle
         self.children.append(child)
@@ -182,12 +182,18 @@ class Branch {
     }
 
     var k: Float {
-        return Tree.K / pow(3.5, Float(depth))
+        switch depth {
+        case 0: return Float.infinity
+        case 1: return 1000 * Tree.K
+        case 2: return 100 * Tree.K
+        case 3: return 10 * Tree.K
+        default: return Tree.K
+        }
     }
 
     func updateSpringState(delta: TimeInterval) {
+        print("\(name) stiffness:", k)
         if parent != nil {
-            print("\(name) stiffness:", k)
             let compositeInertiaRelativeToJoint = compositeInertia + compositeMass * square(distance(compositeCenterOfMass, jointPosition))
 
             // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
