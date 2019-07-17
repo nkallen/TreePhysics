@@ -1,5 +1,6 @@
 import Foundation
 import SceneKit
+import Darwin
 
 extension Tree {
     static let K: Float = 1
@@ -171,9 +172,9 @@ enum QuadraticSolution: Equatable {
 }
 
 enum DifferentialSolution: Equatable {
-    case real(c1: Float, c2: Float, r: Float)
-    case realDistinct(c1: Float, c2: Float, r1: Float, r2: Float)
-    case complex(c1: Float, c2: Float, lambda: Float, mu: Float)
+    case real(c1: Float, c2: Float, r: Float, k: Float)
+    case realDistinct(c1: Float, c2: Float, r1: Float, r2: Float, k: Float)
+    case complex(c1: Float, c2: Float, lambda: Float, mu: Float, k: Float)
 }
 
 func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
@@ -194,20 +195,50 @@ func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     }
 }
 
-func solve_differential(a: Float, b: Float, c: Float, y_0: Float, dydt_0: Float) -> DifferentialSolution {
+func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, dydt_0: Float) -> DifferentialSolution {
     switch solve_quadratic(a: a, b: b, c: c) {
     case let .complex(real, imaginary):
         let c1 = y_0
         let c2 = (dydt_0 - real * c1) / imaginary
-        return .complex(c1: c1, c2: c2, lambda: real, mu: imaginary)
+        return .complex(c1: c1, c2: c2, lambda: real, mu: imaginary, k: g/c)
     case let .real(r):
         let system = float2x2(columns: (float2(1, r), float2(0, 1)))
         let solution = system.inverse * float2(y_0, dydt_0)
-        return .real(c1: solution.x, c2: solution.y, r: r)
+        return .real(c1: solution.x, c2: solution.y, r: r, k: g/c)
     case let .realDistinct(r1, r2):
         let system = float2x2(columns: (float2(1, r1), float2(1, r2)))
         let solution = system.inverse * float2(y_0, dydt_0)
-        return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2)
+        return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2, k: g/c)
+    }
+}
+
+// Evaluate 2nd-order differential equation given its analytic solution
+func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
+    switch differential {
+    case let .complex(c1: c1, c2: c2, lambda: lambda, mu: mu, k: k):
+        let y = c1*powf(.e,lambda*t)*cos(mu*t) + c2*powf(.e,lambda*t)*sin(mu*t) + k
+        let dydt = lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*c1*powf(.e,lambda*t)*sin(mu*t) +
+            lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*c2*powf(.e,lambda*t)*cos(mu*t)
+        let d2ydt = lambda*lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*lambda*c1*powf(.e,lambda*t)*sin(mu*t) -
+            (lambda*mu*c1*powf(.e,lambda*t)*sin(mu*t) + mu*mu*c1*powf(.e,lambda*t)*cos(mu*t)) +
+            lambda*lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*lambda*c2*powf(.e,lambda*t)*cos(mu*t) +
+            lambda*mu*c2*powf(.e,lambda*t)*cos(mu*t) - mu*mu*c2*powf(.e,lambda*t)*sin(mu*t)
+        return float3(y, dydt, d2ydt)
+    case let .real(c1: c1, c2: c2, r: r, k: k):
+        let y = c1*powf(.e,r*t) + c2*t*powf(.e,r*t) + k
+        let dydt = r*c1*powf(.e,r*t) +
+            c2*powf(.e,r*t) + r*c2*t*powf(.e,r*t)
+        let d2ydt = r*r*c1*powf(.e,r*t) +
+            r*c2*powf(.e,r*t) +
+            r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
+        return float3(y, dydt, d2ydt)
+    case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
+        let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
+        let dydt = r1*c1*powf(.e,r1*t) +
+            r2*c2 * powf(.e,r2*t)
+        let d2ydt = r1*r1*c1 * powf(.e,r1*t) +
+            r2*r2*c2 * powf(.e,r2*t)
+        return float3(y, dydt, d2ydt)
     }
 }
 
@@ -256,4 +287,8 @@ extension float3 {
 
 func square(_ x: Float) -> Float {
     return x * x
+}
+
+extension Float {
+    static let e: Float = Float(Darwin.M_E)
 }
