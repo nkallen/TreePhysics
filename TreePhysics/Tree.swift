@@ -1,11 +1,21 @@
 import Foundation
 import SceneKit
 
+extension Tree {
+    static let K: Float = 1
+    static let B: Float = 1
+    static let BK: Float = B*K
+}
+
 class Tree {
     let root: Branch
 
     init(_ root: Branch) {
         self.root = root
+    }
+
+    func update(delta: TimeInterval) {
+        root.update(delta: delta)
     }
 }
 
@@ -94,13 +104,6 @@ class Branch {
             children.map { $0.compositeInertia + $0.compositeMass * square(distance(self.compositeCenterOfMass, $0.compositeCenterOfMass)) }.sum
     }
 
-    func reset() {
-        self.compositeMass = 0
-        self.compositeInertia = 0
-        self.compositeForce = float2.zero
-        self.compositeTorque = float3.zero
-    }
-
     var rotation: float3x3 {
         return matrix3x3_rotation(radians: angle)
     }
@@ -143,6 +146,52 @@ class Branch {
 
     func convert(position: float2) -> float2 {
         return (worldTransform * float3(position, 1)).xy
+    }
+
+    func update(delta: TimeInterval) {
+        updateComposite()
+        updateSpring(delta: delta)
+    }
+
+    func updateSpring(delta: TimeInterval) {
+        let compositeInertiaRelativeToJoint = compositeInertia + compositeMass * square(distance(compositeCenterOfMass, worldPosition))
+
+
+        // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
+
+        // Characteristic equation: ar^2 + br + c = 0
+        let solution = quadratic(a: compositeInertiaRelativeToJoint, b: Tree.BK, c: Tree.K)
+        switch solution {
+        case let .complex(r1, r2): ()
+        case let .real(r): ()
+        case let .realDistinct(r1, r2): ()
+        }
+    }
+}
+
+enum QuadraticSolution: Equatable {
+    case real(Float)
+    case realDistinct(Float, Float)
+    case complex(float2, float2)
+}
+
+func quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
+    //    -b +/- sqrt(b^2 - 4ac)
+    //    /
+    //    2a
+    let b2_4ac = b*b - 4*a*c
+    let _2a = 1.0 / (2*a)
+    if b2_4ac == 0 {
+        let b_2a = -b * _2a
+        return .real(b_2a)
+    } else if b2_4ac > 0 {
+        let b_2a = -b * _2a
+        let sqrt_b2_4ac_2a = sqrt(b2_4ac) * _2a
+        return .realDistinct(b_2a + sqrt_b2_4ac_2a, b_2a - sqrt_b2_4ac_2a)
+    } else {
+        let complexPart = sqrt(-b2_4ac) * _2a
+        let realPart = -b * _2a
+        return .complex(float2(realPart, complexPart), float2(realPart, -complexPart))
     }
 }
 

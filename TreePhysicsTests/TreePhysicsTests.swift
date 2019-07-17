@@ -67,6 +67,23 @@ class TreePhysicsTests: XCTestCase {
     }
 }
 
+class QuadraticTests: XCTestCase {
+    func testRealDistinct() {
+        XCTAssertEqual(quadratic(a: 1, b: 11, c: 24),
+                       .realDistinct(-3, -8))
+    }
+
+    func testReal() {
+        XCTAssertEqual(quadratic(a: 1, b: -4, c: 4),
+                       .real(2))
+    }
+
+    func testComplex() {
+        XCTAssertEqual(quadratic(a: 1, b: -4, c: 9),
+                       .complex(float2(2, sqrt(5)), float2(2, -sqrt(5))))
+    }
+}
+
 func XCTAssertEqual(_ x: float2, _ y: float2, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(x.x, y.x, accuracy: accuracy, file: file, line: line)
     XCTAssertEqual(x.y, y.y, accuracy: accuracy, file: file, line: line)
