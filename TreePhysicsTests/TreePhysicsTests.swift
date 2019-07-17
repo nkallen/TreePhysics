@@ -16,20 +16,19 @@ class TreePhysicsTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float2(0, 1) in local coordinates
         XCTAssertEqual(b2.mass, 1)
         XCTAssertEqual(b2.force, force)
-        let r_b2 = r_world - b2.worldPosition
+        let r_b2 = r_world - b2.jointPosition
         XCTAssertEqual(r_b2, float2(1, 0), accuracy: 0.0001)
         XCTAssertEqual(b2.torque, cross(force, r_b2))
         XCTAssertEqual(b2.inertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
         XCTAssertEqual(b2.worldCenterOfMass, float2(0.5 + 1/sqrt(2), 1 + 1/sqrt(2)), accuracy: 0.0001)
+        XCTAssertEqual(b1.worldCenterOfMass, float2(0.5/sqrt(2), 1 + 0.5/sqrt(2)), accuracy: 0.0001)
+        XCTAssertEqual(root.worldCenterOfMass, float2(0, 0.5), accuracy: 0.0001)
 
         // position
-        XCTAssertEqual(b2.position, float2(0,1))
-        XCTAssertEqual(b2.worldPosition, float2(1/sqrt(2), 1 + 1/sqrt(2)))
-        XCTAssertEqual(b1.position, float2(0,1))
-        XCTAssertEqual(b1.worldPosition, float2(0,1))
-        XCTAssertEqual(root.position, float2.zero)
+        XCTAssertEqual(b2.jointPosition, float2(1/sqrt(2), 1 + 1/sqrt(2)))
+        XCTAssertEqual(b1.jointPosition, float2(0,1))
 
-        root.updateComposite()
+        root.updateCompositeBodyState()
 
         // mass
         XCTAssertEqual(b2.compositeMass, 1)
@@ -43,9 +42,9 @@ class TreePhysicsTests: XCTestCase {
 
         // torque
         XCTAssertEqual(b2.compositeTorque, b2.torque)
-        let r_b1 = r_world - b1.worldPosition
+        let r_b1 = r_world - b1.jointPosition
         XCTAssertEqual(b1.compositeTorque, cross(force, r_b1))
-        let r_root = r_world - root.worldPosition
+        let r_root = r_world - root.jointPosition
         XCTAssertEqual(root.compositeTorque, cross(force, r_root))
 
         // center of mass

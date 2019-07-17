@@ -24,11 +24,7 @@ var i = 0
 
 class Branch {
     var children: [Branch] = []
-    weak var parent: Branch? {
-        didSet {
-            self.branchAngle = -Float.pi / 4
-        }
-    }
+    weak var parent: Branch?
     let name: String
 
     // NOTE: the branch, in its resting state, might sprout off its parent at an angle. Thus, the
@@ -70,8 +66,9 @@ class Branch {
         return node
     }()
 
-    func add(_ child: Branch) {
+    func add(_ child: Branch, at angle: Float = -Float.pi / 4) {
         child.parent = self
+        child.branchAngle = angle
         self.children.append(child)
         self.node.addChildNode(child.node)
     }
@@ -89,7 +86,7 @@ class Branch {
     func apply(force: float2, at distance: Float) {
         precondition(distance >= 0 && distance <= 1)
         self.force += force
-        self.torque += cross(force, convert(position: float2(0, 1) * distance * length) - worldPosition)
+        self.torque += cross(force, convert(position: float2(0, 1) * distance * length) - jointPosition)
     }
 
     var compositeMass: Float = 0
@@ -98,9 +95,9 @@ class Branch {
     var compositeTorque: float3 = float3.zero
     var compositeCenterOfMass: float2 = float2.zero
 
-    func updateComposite() {
+    func updateCompositeBodyState() {
         for child in children {
-            child.updateComposite()
+            child.updateCompositeBodyState()
         }
 
         self.compositeMass = mass + children.map { $0.compositeMass }.sum
@@ -108,7 +105,7 @@ class Branch {
 
         // this is due to distributivity of cross product
         self.compositeTorque = torque + children.map { child in
-            return cross(child.compositeForce, child.worldPosition - self.worldPosition) + child.compositeTorque
+            return cross(child.compositeForce, child.jointPosition - self.jointPosition) + child.compositeTorque
             }.sum
 
         self.compositeCenterOfMass = (mass * worldCenterOfMass + children.map { $0.compositeMass * $0.compositeCenterOfMass }.sum) / (mass + children.map { $0.compositeMass }.sum)
@@ -121,58 +118,47 @@ class Branch {
             children.map { $0.compositeInertia + $0.compositeMass * square(distance(self.compositeCenterOfMass, $0.compositeCenterOfMass)) }.sum
     }
 
-    var rotation: float3x3 {
-        return matrix3x3_rotation(radians: branchAngle)
-    }
 
-    private var centerOfMass: float2 {
-        return float2(0, 1) * length / 2
-    }
-
-    var worldCenterOfMass: float2 {
-        return convert(position: centerOfMass)
-    }
-
-    var translation: float3x3 {
+    // FIXME really we should have three objects, including the joint, and our position is (0,0) relative to the joint
+    lazy var translation: float3x3 = {
         if parent != nil {
             return matrix3x3_translation(0, 1)
         } else {
             return matrix_identity_float3x3
         }
-    }
+    }()
 
     var transform: float3x3 {
         return translation * rotation
     }
 
-    var worldTransform: float3x3 {
+    lazy var rotation: float3x3 = matrix3x3_rotation(radians: self.branchAngle)
+    lazy var worldTransform: float3x3 = {
         if let parent = parent {
             return parent.worldTransform * transform
         } else {
             return transform
         }
-    }
+    }()
+    lazy var jointPosition: float2 = convert(position: float2.zero)
 
-    var position: float2 {
-        return (transform * float3(0,0,1)).xy
-    }
-
-    var worldPosition: float2 {
-        return (worldTransform * float3(0,0,1)).xy
-    }
+    lazy var worldCenterOfMass: float2 = {
+        let localCenterOfMass = float2(0, 1) * length / 2
+        return convert(position: localCenterOfMass)
+    }()
 
     func convert(position: float2) -> float2 {
         return (worldTransform * float3(position, 1)).xy
     }
 
     func update(delta: TimeInterval) {
-        updateComposite()
-        updateSpring(delta: delta)
+        updateCompositeBodyState()
+        updateSpringState(delta: delta)
+        updateRigidBodyState()
     }
 
-    func updateSpring(delta: TimeInterval) {
-        let compositeInertiaRelativeToJoint = compositeInertia + compositeMass * square(distance(compositeCenterOfMass, worldPosition))
-
+    func updateSpringState(delta: TimeInterval) {
+        let compositeInertiaRelativeToJoint = compositeInertia + compositeMass * square(distance(compositeCenterOfMass, jointPosition))
 
         // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
         // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
@@ -182,6 +168,25 @@ class Branch {
         self.jointAngle = thetas.x
         self.jointAngularVelocity = thetas.y
         self.jointAngularAcceleration = thetas.z
+
+        for child in children {
+            child.updateSpringState(delta: delta)
+        }
+    }
+
+    func updateRigidBodyState() {
+        // translation is in local coordinates and never changes. But, we need to
+        // update rotation, worldTransform, jointPosition, worldCenterOfMass
+        self.rotation = matrix3x3_rotation(radians: self.netAngle)
+        if let parent = parent {
+            self.worldTransform = parent.worldTransform * transform
+        } else {
+            self.worldTransform = transform
+        }
+        self.jointPosition = convert(position: float2.zero)
+
+        let localCenterOfMass = float2(0, 1) * length / 2
+        self.worldCenterOfMass = convert(position: localCenterOfMass)
     }
 }
 

@@ -37,7 +37,7 @@ class GameViewController: NSViewController {
         self.tree = Tree(root)
 
         b2.apply(force: float2(0,1), at: 1)
-        tree.root.updateComposite()
+        tree.root.updateCompositeBodyState()
 
         scnView.scene!.rootNode.addChildNode(tree.root.node)
     }
@@ -52,6 +52,6 @@ var previousTime: TimeInterval? = nil
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let delta = time - (previousTime ?? time)
-//        tree.update(delta: delta)
+        tree.update(delta: delta)
     }
 }
