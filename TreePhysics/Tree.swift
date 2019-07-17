@@ -160,14 +160,14 @@ class Branch {
         // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
 
         // Characteristic equation: ar^2 + br + c = 0
-        let solution = quadratic(a: compositeInertiaRelativeToJoint, b: Tree.BK, c: Tree.K)
+        let solution = solve_quadratic(a: compositeInertiaRelativeToJoint, b: Tree.BK, c: Tree.K)
     }
 }
 
 enum QuadraticSolution: Equatable {
     case real(Float)
     case realDistinct(Float, Float)
-    case complex(float2, float2)
+    case complex(Float, Float)
 }
 
 enum DifferentialSolution: Equatable {
@@ -176,7 +176,7 @@ enum DifferentialSolution: Equatable {
     case complex(c1: Float, c2: Float, lambda: Float, mu: Float)
 }
 
-func quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
+func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     //    (-b +/- sqrt(b^2 - 4ac)) / 2a
     let b2_4ac = b*b - 4*a*c
     let _2a = 1.0 / (2*a)
@@ -188,19 +188,23 @@ func quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
         let sqrt_b2_4ac_2a = sqrt(b2_4ac) * _2a
         return .realDistinct(b_2a + sqrt_b2_4ac_2a, b_2a - sqrt_b2_4ac_2a)
     } else {
-        let complexPart = sqrt(-b2_4ac) * _2a
+        let imaginaryPart = sqrt(-b2_4ac) * _2a
         let realPart = -b * _2a
-        return .complex(float2(realPart, complexPart), float2(realPart, -complexPart))
+        return .complex(realPart, imaginaryPart)
     }
 }
 
-func differential(a: Float, b: Float, c: Float, y_0: Float, dydt_0: Float) -> DifferentialSolution {
-    switch quadratic(a: a, b: b, c: c) {
-    case let .complex(r1, r2): fatalError()
-    case let .real(r): fatalError()
+func solve_differential(a: Float, b: Float, c: Float, y_0: Float, dydt_0: Float) -> DifferentialSolution {
+    switch solve_quadratic(a: a, b: b, c: c) {
+    case let .complex(real, imaginary):
+        let c1 = y_0
+        let c2 = (dydt_0 - real * c1) / imaginary
+        return .complex(c1: c1, c2: c2, lambda: real, mu: imaginary)
+    case let .real(r):
+        let system = float2x2(columns: (float2(1, r), float2(0, 1)))
+        let solution = system.inverse * float2(y_0, dydt_0)
+        return .real(c1: solution.x, c2: solution.y, r: r)
     case let .realDistinct(r1, r2):
-        let c1: Float = 0.0
-        let c2: Float = 0.0
         let system = float2x2(columns: (float2(1, r1), float2(1, r2)))
         let solution = system.inverse * float2(y_0, dydt_0)
         return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2)

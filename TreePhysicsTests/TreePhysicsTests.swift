@@ -69,18 +69,18 @@ class TreePhysicsTests: XCTestCase {
 
 class QuadraticTests: XCTestCase {
     func testRealDistinct() {
-        XCTAssertEqual(quadratic(a: 1, b: 11, c: 24),
+        XCTAssertEqual(solve_quadratic(a: 1, b: 11, c: 24),
                        .realDistinct(-3, -8))
     }
 
     func testReal() {
-        XCTAssertEqual(quadratic(a: 1, b: -4, c: 4),
+        XCTAssertEqual(solve_quadratic(a: 1, b: -4, c: 4),
                        .real(2))
     }
 
     func testComplex() {
-        XCTAssertEqual(quadratic(a: 1, b: -4, c: 9),
-                       .complex(float2(2, sqrt(5)), float2(2, -sqrt(5))))
+        XCTAssertEqual(solve_quadratic(a: 1, b: -4, c: 9),
+                       .complex(2, sqrt(5)))
     }
 }
 
@@ -91,7 +91,17 @@ func XCTAssertEqual(_ x: float2, _ y: float2, accuracy: Float, file: StaticStrin
 
 class DifferentialTests: XCTestCase {
     func testRealDistinct() {
-        XCTAssertEqual(differential(a: 1, b: 11, c: 24, y_0: 0, dydt_0: -7),
+        XCTAssertEqual(solve_differential(a: 1, b: 11, c: 24, y_0: 0, dydt_0: -7),
                        .realDistinct(c1: -7.0/5, c2: 7.0/5, r1: -3, r2: -8))
+    }
+
+    func testReal() {
+        XCTAssertEqual(solve_differential(a: 1, b: -4, c: 4, y_0: 12, dydt_0: -3),
+                       .real(c1: 12, c2: -27, r: 2))
+    }
+
+    func testComplex() {
+        XCTAssertEqual(solve_differential(a: 1, b: -4, c: 9, y_0: 0, dydt_0: -8),
+                       .complex(c1: 0, c2: -8/sqrt(5), lambda: 2, mu: sqrt(5)))
     }
 }
