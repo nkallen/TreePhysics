@@ -56,7 +56,7 @@ class Branch {
     }
 
     lazy var node: SCNNode = {
-        let cylinder = SCNCylinder(radius: CGFloat(0.1), height: CGFloat(length))
+        let cylinder = SCNCylinder(radius: CGFloat(0.01), height: CGFloat(length))
         let node = SCNNode(geometry: cylinder)
         node.name = name
 
@@ -87,7 +87,7 @@ class Branch {
     var mass: Float {
         return 1.0 / Float(depth)
     }
-    let length: Float = 1
+    let length: Float = 0.1
     var force: float2 = float2.zero
     var torque: float3 = float3.zero
     lazy var inertia: Float = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
@@ -184,9 +184,9 @@ class Branch {
     var k: Float {
         switch depth {
         case 0: return Float.infinity
-        case 1: return 1000 * Tree.K
-        case 2: return 100 * Tree.K
-        case 3: return 10 * Tree.K
+        case 1: return 5 * Tree.K
+        case 2: return 5 * Tree.K
+        case 3: return 5 * Tree.K
         default: return Tree.K
         }
     }

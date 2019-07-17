@@ -9,11 +9,13 @@ class GameViewController: NSViewController {
         let scene = SCNScene()
         
         let cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
+        let camera = SCNCamera()
+        camera.zNear = 0
+        cameraNode.camera = camera
         scene.rootNode.addChildNode(cameraNode)
-        cameraNode.position = SCNVector3(x: 0, y: 2, z: 5)
+        cameraNode.position = SCNVector3(x: 0, y: 0.3, z: 0.75)
         cameraNode.name = "Camera"
-        
+
         let ambientLightNode = SCNNode()
         ambientLightNode.light = SCNLight()
         ambientLightNode.light!.type = .ambient
@@ -81,14 +83,14 @@ extension GameViewController: SCNSceneRendererDelegate {
         let delta = time - (previousTime ?? time)
         print(delta)
         if toggle {
-            let gravity: Float = 50*9.81
+            let gravity: Float = 9.81
             b1.apply(force: float2(0,gravity * b1.mass), at: 0.5) // FIXME direction is wrong
             b2.apply(force: float2(0,gravity * b2.mass), at: 0.5) // FIXME direction is wrong
             b3.apply(force: float2(0,gravity * b3.mass), at: 0.5) // FIXME direction is wrong
             b4.apply(force: float2(0,gravity * b4.mass), at: 0.5) // FIXME direction is wrong
         }
 
-        tree.update(delta: delta / 10)
+        tree.update(delta: delta)
         renderer.isPlaying = true
         previousTime = time
     }
