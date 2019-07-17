@@ -88,3 +88,10 @@ func XCTAssertEqual(_ x: float2, _ y: float2, accuracy: Float, file: StaticStrin
     XCTAssertEqual(x.x, y.x, accuracy: accuracy, file: file, line: line)
     XCTAssertEqual(x.y, y.y, accuracy: accuracy, file: file, line: line)
 }
+
+class DifferentialTests: XCTestCase {
+    func testRealDistinct() {
+        XCTAssertEqual(differential(a: 1, b: 11, c: 24, y_0: 0, dydt_0: -7),
+                       .realDistinct(c1: -7.0/5, c2: 7.0/5, r1: -3, r2: -8))
+    }
+}

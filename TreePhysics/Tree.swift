@@ -161,11 +161,6 @@ class Branch {
 
         // Characteristic equation: ar^2 + br + c = 0
         let solution = quadratic(a: compositeInertiaRelativeToJoint, b: Tree.BK, c: Tree.K)
-        switch solution {
-        case let .complex(r1, r2): ()
-        case let .real(r): ()
-        case let .realDistinct(r1, r2): ()
-        }
     }
 }
 
@@ -175,10 +170,14 @@ enum QuadraticSolution: Equatable {
     case complex(float2, float2)
 }
 
+enum DifferentialSolution: Equatable {
+    case real(c1: Float, c2: Float, r: Float)
+    case realDistinct(c1: Float, c2: Float, r1: Float, r2: Float)
+    case complex(c1: Float, c2: Float, lambda: Float, mu: Float)
+}
+
 func quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
-    //    -b +/- sqrt(b^2 - 4ac)
-    //    /
-    //    2a
+    //    (-b +/- sqrt(b^2 - 4ac)) / 2a
     let b2_4ac = b*b - 4*a*c
     let _2a = 1.0 / (2*a)
     if b2_4ac == 0 {
@@ -192,6 +191,19 @@ func quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
         let complexPart = sqrt(-b2_4ac) * _2a
         let realPart = -b * _2a
         return .complex(float2(realPart, complexPart), float2(realPart, -complexPart))
+    }
+}
+
+func differential(a: Float, b: Float, c: Float, y_0: Float, dydt_0: Float) -> DifferentialSolution {
+    switch quadratic(a: a, b: b, c: c) {
+    case let .complex(r1, r2): fatalError()
+    case let .real(r): fatalError()
+    case let .realDistinct(r1, r2):
+        let c1: Float = 0.0
+        let c2: Float = 0.0
+        let system = float2x2(columns: (float2(1, r1), float2(1, r2)))
+        let solution = system.inverse * float2(y_0, dydt_0)
+        return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2)
     }
 }
 
