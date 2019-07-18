@@ -39,10 +39,6 @@ class Joint: HasTransform {
         return parentRigidBody.depth
     }
 
-    var bk: Float {
-        return Tree.B * k
-    }
-
     var k: Float {
         switch depth {
         case 0: return Float.infinity
@@ -75,7 +71,7 @@ class Joint: HasTransform {
             // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
             // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
 
-            let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: bk, c: k, g: childRigidBody.composite.torque.z, y_0: angle, y_ddt_0: angularVelocity)
+            let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.B * k, c: k, g: childRigidBody.composite.torque.z, y_0: angle, y_ddt_0: angularVelocity)
             let thetas = evaluate(differential: solution, at: Float(delta))
             self.angle = thetas.x
             self.angularVelocity = thetas.y
