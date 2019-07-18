@@ -36,7 +36,7 @@ class Joint: HasTransform {
     }
 
     var depth: Int {
-        return parentRigidBody.depth
+        return parentRigidBody.depth + 1
     }
 
     var k: Float {
