@@ -39,11 +39,11 @@ class GameViewController: NSViewController {
     var b1: RigidBody!
 
     override func viewDidAppear() {
-        let root = RigidBody(mass: 1, length: 0.1)
-        let b1 = RigidBody(mass: 0.5, length: 0.1)
-        let b2 = RigidBody(mass: 1.0/2, length: 0.1)
-        let b3 = RigidBody(mass: 1.0/3, length: 0.1)
-        let b4 = RigidBody(mass: 1.0/4, length: 0.1)
+        let root = RigidBody(mass: 1, length: 1)
+        let b1 = RigidBody(mass: 1, length: 1)
+        let b2 = RigidBody(mass: 1.0/2, length: 1)
+        let b3 = RigidBody(mass: 1.0/3, length: 1)
+        let b4 = RigidBody(mass: 1.0/4, length: 1)
 
         self.b4 = b4
         self.b3 = b3

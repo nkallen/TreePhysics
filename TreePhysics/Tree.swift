@@ -42,9 +42,9 @@ class Joint: HasTransform {
     var k: Float {
         switch depth {
         case 0: return Float.infinity
-        case 1: return 5 * Tree.K
-        case 2: return 5 * Tree.K
-        case 3: return 5 * Tree.K
+        case 1: return Tree.K * 20
+        case 2: return Tree.K * 10
+        case 3: return Tree.K * 5
         default: return Tree.K
         }
     }
