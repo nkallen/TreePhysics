@@ -66,7 +66,7 @@ class Joint: HasTransform {
     }
 
     func updateSpringState(delta: TimeInterval) {
-        let compositeInertiaRelativeToJoint = childRigidBody.composite.inertia +
+        let compositeInertiaRelativeToJoint = childRigidBody.composite.momentOfInertia +
             childRigidBody.composite.mass * square(distance(childRigidBody.composite.centerOfMass, self.position))
 
         // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
@@ -97,7 +97,7 @@ class RigidBody: HasTransform {
 
     let mass: Float
     let length: Float
-    let inertia: Float
+    let momentOfInertia: Float
 
     var transform: matrix_float3x3 = matrix_identity_float3x3 {
         didSet {
@@ -133,7 +133,7 @@ class RigidBody: HasTransform {
 
         self.mass = mass
         self.length = length
-        self.inertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
+        self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
 
         let cylinder = SCNCylinder(radius: CGFloat(0.01), height: CGFloat(length))
         let node = SCNNode(geometry: cylinder)
@@ -205,7 +205,7 @@ class CompositeBody {
     unowned let parentRigidBody: RigidBody
 
     var mass: Float = 0
-    var inertia: Float = 0
+    var momentOfInertia: Float = 0
     var force: float2 = float2.zero
     var torque: float3 = float3.zero
     var centerOfMass: float2 = float2.zero
@@ -232,8 +232,8 @@ class CompositeBody {
         // using the parallel axis theorem I' = I + md^2, calculate inertia of this body about the
         // center of mass of the composite body, then add the child inertia's (also relative to the
         // center of mass of the composite)
-        self.inertia = parentRigidBody.inertia +
+        self.momentOfInertia = parentRigidBody.momentOfInertia +
             parentRigidBody.mass * square(distance(parentRigidBody.centerOfMass, self.centerOfMass)) +
-            parentRigidBody.childJoints.map { $0.childRigidBody.composite.inertia + $0.childRigidBody.composite.mass * square(distance(self.centerOfMass, $0.childRigidBody.composite.centerOfMass)) }.sum
+            parentRigidBody.childJoints.map { $0.childRigidBody.composite.momentOfInertia + $0.childRigidBody.composite.mass * square(distance(self.centerOfMass, $0.childRigidBody.composite.centerOfMass)) }.sum
     }
 }
