@@ -34,17 +34,17 @@ class GameViewController: NSViewController {
         scnView.gestureRecognizers = gestureRecognizers
     }
 
-    var b4: Branch!
-    var b3: Branch!
-    var b2: Branch!
-    var b1: Branch!
+    var b4: RigidBody!
+    var b3: RigidBody!
+    var b2: RigidBody!
+    var b1: RigidBody!
 
     override func viewDidAppear() {
-        let root = Branch(mass: 1, length: 0.1)
-        let b1 = Branch(mass: 0.5, length: 0.1)
-        let b2 = Branch(mass: 1.0/2, length: 0.1)
-        let b3 = Branch(mass: 1.0/3, length: 0.1)
-        let b4 = Branch(mass: 1.0/4, length: 0.1)
+        let root = RigidBody(mass: 1, length: 0.1)
+        let b1 = RigidBody(mass: 0.5, length: 0.1)
+        let b2 = RigidBody(mass: 1.0/2, length: 0.1)
+        let b3 = RigidBody(mass: 1.0/3, length: 0.1)
+        let b4 = RigidBody(mass: 1.0/4, length: 0.1)
 
         self.b4 = b4
         self.b3 = b3

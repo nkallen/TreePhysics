@@ -14,6 +14,8 @@
 		9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA922DDDC6E00535997 /* Main.storyboard */; };
 		9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBB322DDDCCB00535997 /* Tree.swift */; };
 		9EE7EBBC22DE1AD100535997 /* TreePhysicsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBBB22DE1AD100535997 /* TreePhysicsTests.swift */; };
+		9EE7EBC422E08E4000535997 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
+		9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC522E0972400535997 /* HasTransform.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +41,8 @@
 		9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TreePhysicsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBBB22DE1AD100535997 /* TreePhysicsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePhysicsTests.swift; sourceTree = "<group>"; };
 		9EE7EBBD22DE1AD100535997 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9EE7EBC322E08E4000535997 /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
+		9EE7EBC522E0972400535997 /* HasTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasTransform.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +92,8 @@
 				9EE7EBAC22DDDC6E00535997 /* Info.plist */,
 				9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */,
 				9EE7EBB322DDDCCB00535997 /* Tree.swift */,
+				9EE7EBC322E08E4000535997 /* Math.swift */,
+				9EE7EBC522E0972400535997 /* HasTransform.swift */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -202,9 +208,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */,
 				9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */,
 				9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */,
 				9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */,
+				9EE7EBC422E08E4000535997 /* Math.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

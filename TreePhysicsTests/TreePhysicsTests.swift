@@ -4,9 +4,9 @@ import MetalKit
 
 class TreePhysicsTests: XCTestCase {
     func testComposite() {
-        let root = Branch()
-        let b1 = Branch()
-        let b2 = Branch()
+        let root = RigidBody()
+        let b1 = RigidBody()
+        let b2 = RigidBody()
         root.add(b1, at: -Float.pi/4)
         b1.add(b2, at: -Float.pi/4)
 
@@ -16,52 +16,51 @@ class TreePhysicsTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float2(0, 1) in local coordinates
         XCTAssertEqual(b2.mass, 1)
         XCTAssertEqual(b2.force, force)
-        let r_b2 = r_world - b2.jointPosition
+        let r_b2 = r_world - b2.parentJoint!.position
         XCTAssertEqual(r_b2, float2(1, 0), accuracy: 0.0001)
         XCTAssertEqual(b2.torque, cross(r_b2, force))
         XCTAssertEqual(b2.inertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
-        XCTAssertEqual(b2.worldCenterOfMass, float2(0.5 + 1/sqrt(2), 1 + 1/sqrt(2)), accuracy: 0.0001)
-        XCTAssertEqual(b1.worldCenterOfMass, float2(0.5/sqrt(2), 1 + 0.5/sqrt(2)), accuracy: 0.0001)
-        XCTAssertEqual(root.worldCenterOfMass, float2(0, 0.5), accuracy: 0.0001)
+        XCTAssertEqual(b2.centerOfMass, float2(0.5 + 1/sqrt(2), 1 + 1/sqrt(2)), accuracy: 0.0001)
+        XCTAssertEqual(b1.centerOfMass, float2(0.5/sqrt(2), 1 + 0.5/sqrt(2)), accuracy: 0.0001)
+        XCTAssertEqual(root.centerOfMass, float2(0, 0.5), accuracy: 0.0001)
 
         // position
-        XCTAssertEqual(b2.jointPosition, float2(1/sqrt(2), 1 + 1/sqrt(2)))
-        XCTAssertEqual(b1.jointPosition, float2(0,1))
+        XCTAssertEqual(b2.parentJoint!.position, float2(1/sqrt(2), 1 + 1/sqrt(2)))
+        XCTAssertEqual(b1.parentJoint!.position, float2(0,1))
 
-        root.updateCompositeBodyState()
+        root.composite.update()
 
         // mass
-        XCTAssertEqual(b2.compositeMass, 1)
-        XCTAssertEqual(b1.compositeMass, 2)
-        XCTAssertEqual(root.compositeMass, 3)
+        XCTAssertEqual(b2.composite.mass, 1)
+        XCTAssertEqual(b1.composite.mass, 2)
+        XCTAssertEqual(root.composite.mass, 3)
 
         // force
-        XCTAssertEqual(b2.compositeForce, force)
-        XCTAssertEqual(b1.compositeForce, force)
-        XCTAssertEqual(root.compositeForce, force)
+        XCTAssertEqual(b2.composite.force, force)
+        XCTAssertEqual(b1.composite.force, force)
+        XCTAssertEqual(root.composite.force, force)
 
         // torque
-        XCTAssertEqual(b2.compositeTorque, b2.torque)
-        let r_b1 = r_world - b1.jointPosition
-        XCTAssertEqual(b1.compositeTorque, cross(r_b1, force))
-        let r_root = r_world - root.jointPosition
-        XCTAssertEqual(root.compositeTorque, cross(r_root, force))
+        XCTAssertEqual(b2.composite.torque, b2.torque)
+        let r_b1 = r_world - b1.parentJoint!.position
+        XCTAssertEqual(b1.composite.torque, cross(r_b1, force))
+        XCTAssertEqual(root.composite.torque, float3.zero)
 
         // center of mass
-        XCTAssertEqual(b2.compositeCenterOfMass, b2.worldCenterOfMass)
-        XCTAssertEqual(b1.compositeCenterOfMass, (b1.worldCenterOfMass + b2.worldCenterOfMass)/2)
-        XCTAssertEqual(root.compositeCenterOfMass, (b1.worldCenterOfMass + b2.worldCenterOfMass + root.worldCenterOfMass) / 3)
+        XCTAssertEqual(b2.composite.centerOfMass, b2.centerOfMass)
+        XCTAssertEqual(b1.composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass)/2)
+        XCTAssertEqual(root.composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass + root.centerOfMass) / 3)
 
         // inertia
-        XCTAssertEqual(b2.compositeInertia, b2.inertia)
-        XCTAssertEqual(b1.compositeInertia,
-                       b1.inertia + b1.mass * square(distance(b1.worldCenterOfMass, b1.compositeCenterOfMass)) +
-                        b2.inertia + b2.mass * square(distance(b2.worldCenterOfMass, b1.compositeCenterOfMass)),
+        XCTAssertEqual(b2.composite.inertia, b2.inertia)
+        XCTAssertEqual(b1.composite.inertia,
+                       b1.inertia + b1.mass * square(distance(b1.centerOfMass, b1.composite.centerOfMass)) +
+                        b2.inertia + b2.mass * square(distance(b2.centerOfMass, b1.composite.centerOfMass)),
                        accuracy: 0.0001)
-        XCTAssertEqual(root.compositeInertia,
-                       root.inertia + root.mass * square(distance(root.worldCenterOfMass, root.compositeCenterOfMass)) +
-                        b1.inertia + b1.mass * square(distance(b1.worldCenterOfMass, root.compositeCenterOfMass)) +
-                        b2.inertia + b2.mass * square(distance(b2.worldCenterOfMass, root.compositeCenterOfMass)),
+        XCTAssertEqual(root.composite.inertia,
+                       root.inertia + root.mass * square(distance(root.centerOfMass, root.composite.centerOfMass)) +
+                        b1.inertia + b1.mass * square(distance(b1.centerOfMass, root.composite.centerOfMass)) +
+                        b2.inertia + b2.mass * square(distance(b2.centerOfMass, root.composite.centerOfMass)),
                        accuracy: 0.0001)
     }
 }
