@@ -17,6 +17,7 @@
 		9EE7EBC422E08E4000535997 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
 		9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC522E0972400535997 /* HasTransform.swift */; };
 		9EE7EBCA22E0F27900535997 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
+		9EE7EBCC22E1078200535997 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBCB22E1078200535997 /* NOTES */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		9EE7EBC322E08E4000535997 /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		9EE7EBC522E0972400535997 /* HasTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasTransform.swift; sourceTree = "<group>"; };
 		9EE7EBC922E0F27900535997 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		9EE7EBCB22E1078200535997 /* NOTES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 				9EE7EBC322E08E4000535997 /* Math.swift */,
 				9EE7EBC522E0972400535997 /* HasTransform.swift */,
 				9EE7EBC922E0F27900535997 /* main.swift */,
+				9EE7EBCB22E1078200535997 /* NOTES */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -193,6 +196,7 @@
 			files = (
 				9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */,
 				9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */,
+				9EE7EBCC22E1078200535997 /* NOTES in Resources */,
 				9EE7EBA622DDDC6C00535997 /* art.scnassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

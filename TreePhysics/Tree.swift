@@ -4,7 +4,9 @@ import Darwin
 
 extension Tree {
     static let K: Float = 100
-    static let B: Float = 0.02
+    static let B: Float = 0.03
+
+    static var gravity = float2.zero
 }
 
 class Tree {
@@ -42,9 +44,20 @@ class Joint: HasTransform {
     var k: Float {
         switch depth {
         case 0: return Float.infinity
-        case 1: return Tree.K * 20
-        case 2: return Tree.K * 10
-        case 3: return Tree.K * 5
+        case 1: return Tree.K * 4096
+        case 2: return Tree.K * 4096
+        case 3: return Tree.K * 4096
+        case 4: return Tree.K * 2048
+        case 5: return Tree.K * 2048
+        case 6: return Tree.K * 2048
+        case 7: return Tree.K * 64
+        case 8: return Tree.K * 64
+        case 9: return Tree.K * 64
+        case 10: return Tree.K * 8
+        case 11: return Tree.K * 8
+        case 12: return Tree.K * 8
+        case 13: return Tree.K
+        case 14: return Tree.K
         default: return Tree.K
         }
     }
@@ -121,7 +134,7 @@ class RigidBody: HasTransform {
 
     var depth: Int {
         if let parentJoint = parentJoint {
-            return parentJoint.depth + 1
+            return parentJoint.parentRigidBody.depth + 1
         } else {
             return 0
         }
@@ -218,6 +231,8 @@ class CompositeBody {
         for joint in parentRigidBody.childJoints {
             joint.childRigidBody.composite.update()
         }
+
+        parentRigidBody.apply(force: Tree.gravity, at: 0.5)
 
         self.mass = parentRigidBody.mass + parentRigidBody.childJoints.map { $0.childRigidBody.composite.mass }.sum
         self.force = parentRigidBody.force + parentRigidBody.childJoints.map { $0.childRigidBody.composite.force }.sum

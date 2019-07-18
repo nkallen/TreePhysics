@@ -39,23 +39,7 @@ class GameViewController: NSViewController {
     var b1: RigidBody!
 
     override func viewDidAppear() {
-        let root = RigidBody(mass: 1, length: 1)
-        let b1 = RigidBody(mass: 1, length: 1)
-        let b2 = RigidBody(mass: 1.0/2, length: 1)
-        let b3 = RigidBody(mass: 1.0/3, length: 1)
-        let b4 = RigidBody(mass: 1.0/4, length: 1)
-
-        self.b4 = b4
-        self.b3 = b3
-        self.b2 = b2
-        self.b1 = b1
-
-
-        root.add(b1, at: -Float.pi / 8)
-        b1.add(b2, at: -Float.pi / 8)
-        b2.add(b3, at: -Float.pi / 8)
-        b3.add(b4, at: -Float.pi / 8)
-        self.tree = Tree(root)
+        self.tree = TreeMaker().make()
         scnView.scene!.rootNode.addChildNode(tree.root.node)
         scnView.delegate = self
     }
@@ -81,15 +65,45 @@ extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let delta = time - (previousTime ?? time)
         if toggle {
-            let gravity: Float = -9.81
-            b1.apply(force: float2(0, gravity * b1.mass), at: 0.5)
-            b2.apply(force: float2(0, gravity * b2.mass), at: 0.5)
-            b3.apply(force: float2(0, gravity * b3.mass), at: 0.5)
-            b4.apply(force: float2(0, gravity * b4.mass), at: 0.5)
+            Tree.gravity = float2(0, -9.81)
+        } else {
+            Tree.gravity = float2.zero
         }
 
-        tree.update(delta: delta)
+        tree.update(delta: 1.0/30)
         renderer.isPlaying = true
         previousTime = time
+    }
+}
+
+class TreeMaker {
+    let depth = 4
+    let branchAngles: [Float] = [Float.pi / 4, 0.1, -Float.pi / 3]
+    let segments = 3
+
+    let lengthInitial: Float = 3.2
+    let widthInitial: Float = 0.3
+    let lengthFactor: Float = 0.6
+    let widthFactor: Float = 0.4
+
+    func make() -> Tree {
+        let root = RigidBody(mass: 1, length: lengthInitial)
+        make(parent: root, depth: depth, length: lengthInitial * lengthFactor, width: widthInitial * widthFactor)
+        return Tree(root)
+    }
+
+    private func make(parent: RigidBody, depth: Int, length: Float, width: Float) {
+        guard depth >= 0 else { return }
+        for branchAngle in branchAngles {
+            let branch = RigidBody(mass: 1, length: length / Float(segments))
+            parent.add(branch, at: branchAngle)
+            var segment = branch
+            for i in 1..<segments {
+                let branch = RigidBody(mass: 1, length: length / Float(segments))
+                segment.add(branch, at: 0)
+                segment = branch
+            }
+            make(parent: segment, depth: depth - 1, length: length * lengthFactor, width: width * widthFactor)
+        }
     }
 }
