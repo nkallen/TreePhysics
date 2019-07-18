@@ -1,6 +1,6 @@
 import XCTest
 @testable import TreePhysics
-import MetalKit
+import simd
 
 class TreePhysicsTests: XCTestCase {
     func testComposite() {
@@ -44,7 +44,8 @@ class TreePhysicsTests: XCTestCase {
         XCTAssertEqual(b2.composite.torque, b2.torque)
         let r_b1 = r_world - b1.parentJoint!.position
         XCTAssertEqual(b1.composite.torque, cross(r_b1, force))
-        XCTAssertEqual(root.composite.torque, float3.zero)
+        let r_root = r_world - root.position
+        XCTAssertEqual(root.composite.torque, cross(r_root, force))
 
         // center of mass
         XCTAssertEqual(b2.composite.centerOfMass, b2.centerOfMass)
@@ -62,6 +63,7 @@ class TreePhysicsTests: XCTestCase {
                         b1.inertia + b1.mass * square(distance(b1.centerOfMass, root.composite.centerOfMass)) +
                         b2.inertia + b2.mass * square(distance(b2.centerOfMass, root.composite.centerOfMass)),
                        accuracy: 0.0001)
+        print("=============")
     }
 }
 

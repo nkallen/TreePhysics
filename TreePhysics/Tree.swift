@@ -59,6 +59,7 @@ class Joint: HasTransform {
         self.parentRigidBody = parent
         self.childRigidBody = child
         self.node = SCNNode()
+        parent.childJoints.append(self)
         child.parentJoint = self
         updateTransform()
     }
@@ -142,7 +143,6 @@ class RigidBody: HasTransform {
     func add(_ child: RigidBody, at angle: Float = -Float.pi / 4) {
         let joint = Joint(parent: self, child: child)
         child.angle = angle
-        self.childJoints.append(joint)
         self.node.addChildNode(joint.node)
         joint.node.simdPosition = float3(0, length, 0)
     }
@@ -150,11 +150,10 @@ class RigidBody: HasTransform {
     // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
     // distance is in normalize [0..1] coordinates
     func apply(force: float2, at distance: Float) {
-        guard let parentJoint = parentJoint else { fatalError("Cannot apply force to a root") }
         guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
 
         self.force += force
-        self.torque += cross(convert(position: float2(0, 1) * distance * length) - parentJoint.position, force)
+        self.torque += cross(convert(position: float2(0, 1) * distance * length) - self.position, force)
     }
 
     lazy var centerOfMass: float2 = {
@@ -210,8 +209,6 @@ class CompositeBody {
     }
 
     func update() {
-        guard let parentJoint = parentRigidBody.parentJoint else { return }
-
         for joint in parentRigidBody.childJoints {
             joint.childRigidBody.composite.update()
         }
@@ -221,7 +218,7 @@ class CompositeBody {
 
         // this is due to distributivity of cross product
         self.torque = parentRigidBody.torque + parentRigidBody.childJoints.map {
-            cross($0.position - parentJoint.position, $0.childRigidBody.composite.force) + $0.childRigidBody.composite.torque
+            cross($0.position - parentRigidBody.position, $0.childRigidBody.composite.force) + $0.childRigidBody.composite.torque
             }.sum
 
         self.centerOfMass = (parentRigidBody.mass * parentRigidBody.centerOfMass + parentRigidBody.childJoints.map { $0.childRigidBody.composite.mass * $0.childRigidBody.composite.centerOfMass }.sum) / (parentRigidBody.mass + parentRigidBody.childJoints.map { $0.childRigidBody.composite.mass }.sum)
