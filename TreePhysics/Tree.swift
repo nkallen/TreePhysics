@@ -58,7 +58,11 @@ class Joint: HasTransform {
     init(parent: RigidBody, child: RigidBody) {
         self.parentRigidBody = parent
         self.childRigidBody = child
-        self.node = SCNNode()
+        let node = SCNNode()
+        node.addChildNode(child.node)
+        node.name = "Joint"
+        node.simdPosition = float3(0, parent.length/2, 0)
+        self.node = node
         parent.childJoints.append(self)
         child.parentJoint = self
         updateTransform()
@@ -83,7 +87,7 @@ class Joint: HasTransform {
     }
 
     func updateTransform() {
-        self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length)
+        self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length/2)
     }
 }
 
@@ -134,7 +138,6 @@ class RigidBody: HasTransform {
         let node = SCNNode(geometry: cylinder)
         node.name = name
         node.pivot = SCNMatrix4MakeTranslation(0, CGFloat(-length / 2), 0)
-        node.simdPosition = float3(0, length / 2, 0)
         self.node = node
 
         self.composite = CompositeBody(parent: self)
@@ -144,7 +147,6 @@ class RigidBody: HasTransform {
         let joint = Joint(parent: self, child: child)
         child.angle = angle
         self.node.addChildNode(joint.node)
-        joint.node.simdPosition = float3(0, length, 0)
     }
 
     // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end

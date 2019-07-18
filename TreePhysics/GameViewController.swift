@@ -81,7 +81,6 @@ var previousTime: TimeInterval? = nil
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let delta = time - (previousTime ?? time)
-        print(delta)
         if toggle {
             let gravity: Float = -9.81
             b1.apply(force: float2(0,gravity * b1.mass), at: 0.5) // FIXME direction is wrong
