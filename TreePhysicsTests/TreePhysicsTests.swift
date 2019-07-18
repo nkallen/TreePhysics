@@ -20,6 +20,11 @@ class TreePhysicsTests: XCTestCase {
         XCTAssertEqual(r_b2, float2(1, 0), accuracy: 0.0001)
         XCTAssertEqual(b2.torque, cross(r_b2, force))
         XCTAssertEqual(b2.inertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
+
+        XCTAssertEqual(root.position, float2(0,0))
+        XCTAssertEqual(b1.parentJoint!.position, float2(0,1))
+        XCTAssertEqual(b1.position, float2(0,1))
+
         XCTAssertEqual(b2.centerOfMass, float2(0.5 + 1/sqrt(2), 1 + 1/sqrt(2)), accuracy: 0.0001)
         XCTAssertEqual(b1.centerOfMass, float2(0.5/sqrt(2), 1 + 0.5/sqrt(2)), accuracy: 0.0001)
         XCTAssertEqual(root.centerOfMass, float2(0, 0.5), accuracy: 0.0001)
@@ -63,7 +68,6 @@ class TreePhysicsTests: XCTestCase {
                         b1.inertia + b1.mass * square(distance(b1.centerOfMass, root.composite.centerOfMass)) +
                         b2.inertia + b2.mass * square(distance(b2.centerOfMass, root.composite.centerOfMass)),
                        accuracy: 0.0001)
-        print("=============")
     }
 }
 

@@ -27,7 +27,6 @@ class GameViewController: NSViewController {
         scnView.showsStatistics = true
         scnView.backgroundColor = NSColor.black
 
-        // Add a click gesture recognizer
         let clickGesture = NSClickGestureRecognizer(target: self, action: #selector(handleClick(_:)))
         var gestureRecognizers = scnView.gestureRecognizers
         gestureRecognizers.insert(clickGesture, at: 0)
@@ -83,10 +82,10 @@ extension GameViewController: SCNSceneRendererDelegate {
         let delta = time - (previousTime ?? time)
         if toggle {
             let gravity: Float = -9.81
-            b1.apply(force: float2(0,gravity * b1.mass), at: 0.5) // FIXME direction is wrong
-            b2.apply(force: float2(0,gravity * b2.mass), at: 0.5) // FIXME direction is wrong
-            b3.apply(force: float2(0,gravity * b3.mass), at: 0.5) // FIXME direction is wrong
-            b4.apply(force: float2(0,gravity * b4.mass), at: 0.5) // FIXME direction is wrong
+            b1.apply(force: float2(0, gravity * b1.mass), at: 0.5)
+            b2.apply(force: float2(0, gravity * b2.mass), at: 0.5)
+            b3.apply(force: float2(0, gravity * b3.mass), at: 0.5)
+            b4.apply(force: float2(0, gravity * b4.mass), at: 0.5)
         }
 
         tree.update(delta: delta)

@@ -5,7 +5,6 @@ import Darwin
 extension Tree {
     static let K: Float = 100
     static let B: Float = 0.02
-    static let BK: Float = B*K
 }
 
 class Tree {
@@ -32,6 +31,7 @@ class Joint: HasTransform {
     var angle: Float = 0 {
         didSet {
             node.simdRotation = float4(0, 0, 1, angle)
+            updateTransform()
         }
     }
 
@@ -57,6 +57,7 @@ class Joint: HasTransform {
         let node = SCNNode()
         node.addChildNode(child.node)
         node.name = "Joint"
+        // SceneKit's cylinder's (0,0) is at its center, so the joint is at length/2 on the y axis
         node.simdPosition = float3(0, parent.length/2, 0)
         self.node = node
         parent.childJoints.append(self)
@@ -65,17 +66,17 @@ class Joint: HasTransform {
     }
 
     func updateSpringState(delta: TimeInterval) {
-            let compositeInertiaRelativeToJoint = childRigidBody.composite.inertia +
-                childRigidBody.composite.mass * square(distance(childRigidBody.composite.centerOfMass, self.position))
+        let compositeInertiaRelativeToJoint = childRigidBody.composite.inertia +
+            childRigidBody.composite.mass * square(distance(childRigidBody.composite.centerOfMass, self.position))
 
-            // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
-            // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
+        // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
+        // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
 
-            let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.B * k, c: k, g: childRigidBody.composite.torque.z, y_0: angle, y_ddt_0: angularVelocity)
-            let thetas = evaluate(differential: solution, at: Float(delta))
-            self.angle = thetas.x
-            self.angularVelocity = thetas.y
-            self.angularAcceleration = thetas.z
+        let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.B * k, c: k, g: childRigidBody.composite.torque.z, y_0: angle, y_ddt_0: angularVelocity)
+        let thetas = evaluate(differential: solution, at: Float(delta))
+        self.angle = thetas.x
+        self.angularVelocity = thetas.y
+        self.angularAcceleration = thetas.z
 
         for joint in childRigidBody.childJoints {
             joint.updateSpringState(delta: delta)
@@ -83,7 +84,7 @@ class Joint: HasTransform {
     }
 
     func updateTransform() {
-        self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length/2)
+        self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length) * matrix3x3_rotation(radians: self.angle)
     }
 }
 
@@ -98,7 +99,12 @@ class RigidBody: HasTransform {
     let length: Float
     let inertia: Float
 
-    var transform: matrix_float3x3 = matrix_identity_float3x3
+    var transform: matrix_float3x3 = matrix_identity_float3x3 {
+        didSet {
+            updateCenterOfMass()
+        }
+    }
+    var centerOfMass: float2 = float2.zero
     var force: float2 = float2.zero
     var torque: float3 = float3.zero
 
@@ -108,15 +114,14 @@ class RigidBody: HasTransform {
     // joint angle (which is 0 in the resting state) is not the same as the branch angle.
     var angle: Float = 0 {
         didSet {
-            guard let parentJoint = parentJoint else { fatalError("A root cannot have an angle") }
-            self.transform = parentJoint.transform * matrix3x3_rotation(radians: self.angle)
+            updateTransform()
             node.simdRotation = float4(0, 0, 1, self.angle)
         }
     }
 
     var depth: Int {
-        if let parent = parentJoint {
-            return parent.depth + 1
+        if let parentJoint = parentJoint {
+            return parentJoint.depth + 1
         } else {
             return 0
         }
@@ -137,6 +142,8 @@ class RigidBody: HasTransform {
         self.node = node
 
         self.composite = CompositeBody(parent: self)
+
+        updateCenterOfMass()
     }
 
     func add(_ child: RigidBody, at angle: Float = -Float.pi / 4) {
@@ -153,11 +160,6 @@ class RigidBody: HasTransform {
         self.force += force
         self.torque += cross(convert(position: float2(0, 1) * distance * length) - self.position, force)
     }
-
-    lazy var centerOfMass: float2 = {
-        let localCenterOfMass = float2(0, 1) * length / 2
-        return convert(position: localCenterOfMass)
-    }()
 
     func update(delta: TimeInterval) {
         composite.update()
@@ -177,19 +179,25 @@ class RigidBody: HasTransform {
     }
 
     private func updateRigidBodyState() {
-        if let parent = parentJoint {
-            self.transform = parent.transform
-        } else {
-            self.transform = matrix_identity_float3x3
-        }
-
-        let localCenterOfMass = float2(0, 1) * length / 2
-        self.centerOfMass = convert(position: localCenterOfMass)
+        updateTransform()
 
         for joint in childJoints {
             joint.updateTransform()
             joint.childRigidBody.updateRigidBodyState()
         }
+    }
+
+    private func updateTransform() {
+        if let parentJoint = parentJoint {
+            self.transform = parentJoint.transform * matrix3x3_rotation(radians: self.angle)
+        } else {
+            self.transform = matrix_identity_float3x3
+        }
+    }
+
+    private func updateCenterOfMass() {
+        let localCenterOfMass = float2(0, 1) * length / 2
+        self.centerOfMass = convert(position: localCenterOfMass)
     }
 }
 
