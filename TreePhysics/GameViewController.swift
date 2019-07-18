@@ -13,7 +13,7 @@ class GameViewController: NSViewController {
         camera.zNear = 0
         cameraNode.camera = camera
         scene.rootNode.addChildNode(cameraNode)
-        cameraNode.position = SCNVector3(x: 0, y: 0.3, z: 0.75)
+        cameraNode.position = SCNVector3(x: 0, y: 0.3, z: 0.5)
         cameraNode.name = "Camera"
 
         let ambientLightNode = SCNNode()
@@ -40,11 +40,11 @@ class GameViewController: NSViewController {
     var b1: Branch!
 
     override func viewDidAppear() {
-        let root = Branch()
-        let b1 = Branch()
-        let b2 = Branch()
-        let b3 = Branch()
-        let b4 = Branch()
+        let root = Branch(mass: 1, length: 0.1)
+        let b1 = Branch(mass: 0.5, length: 0.1)
+        let b2 = Branch(mass: 1.0/2, length: 0.1)
+        let b3 = Branch(mass: 1.0/3, length: 0.1)
+        let b4 = Branch(mass: 1.0/4, length: 0.1)
 
         self.b4 = b4
         self.b3 = b3
@@ -52,10 +52,10 @@ class GameViewController: NSViewController {
         self.b1 = b1
 
 
-        root.add(b1)
-        b1.add(b2)
-        b2.add(b3)
-        b3.add(b4)
+        root.add(b1, at: -Float.pi / 8)
+        b1.add(b2, at: -Float.pi / 8)
+        b2.add(b3, at: -Float.pi / 8)
+        b3.add(b4, at: -Float.pi / 8)
         self.tree = Tree(root)
         scnView.scene!.rootNode.addChildNode(tree.root.node)
         scnView.delegate = self
@@ -83,7 +83,7 @@ extension GameViewController: SCNSceneRendererDelegate {
         let delta = time - (previousTime ?? time)
         print(delta)
         if toggle {
-            let gravity: Float = 9.81
+            let gravity: Float = -9.81
             b1.apply(force: float2(0,gravity * b1.mass), at: 0.5) // FIXME direction is wrong
             b2.apply(force: float2(0,gravity * b2.mass), at: 0.5) // FIXME direction is wrong
             b3.apply(force: float2(0,gravity * b3.mass), at: 0.5) // FIXME direction is wrong

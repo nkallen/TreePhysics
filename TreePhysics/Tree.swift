@@ -26,6 +26,8 @@ class Branch {
     var children: [Branch] = []
     weak var parent: Branch?
     let name: String
+    let mass: Float
+    let length: Float
 
     // NOTE: the branch, in its resting state, might sprout off its parent at an angle. Thus, the
     // joint angle (which is 0 in the resting state) is not the same as the branch angle.
@@ -38,7 +40,6 @@ class Branch {
 
     var jointAngle: Float = 0 {
         didSet {
-            print("\(name): setting joint angle to", self.jointAngle, "with net angle", self.netAngle)
             node.simdRotation = float4(0, 0, 1, self.netAngle)
         }
     }
@@ -50,9 +51,12 @@ class Branch {
         return self.jointAngle + self.branchAngle
     }
 
-    init() {
+    init(mass: Float = 1.0, length: Float = 1.0) {
         self.name = "Branch[\(i)]"
         i += 1
+
+        self.mass = mass
+        self.length = length
     }
 
     lazy var node: SCNNode = {
@@ -67,7 +71,7 @@ class Branch {
         return node
     }()
 
-    func add(_ child: Branch, at angle: Float = -Float.pi / 8) {
+    func add(_ child: Branch, at angle: Float = -Float.pi / 4) {
         child.parent = self
         child.branchAngle = angle
         self.children.append(child)
@@ -84,10 +88,6 @@ class Branch {
         }
     }
 
-    var mass: Float {
-        return 1.0 / Float(depth)
-    }
-    let length: Float = 0.1
     var force: float2 = float2.zero
     var torque: float3 = float3.zero
     lazy var inertia: Float = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
@@ -97,7 +97,7 @@ class Branch {
     func apply(force: float2, at distance: Float) {
         precondition(distance >= 0 && distance <= 1)
         self.force += force
-        self.torque += cross(force, convert(position: float2(0, 1) * distance * length) - jointPosition)
+        self.torque += cross(convert(position: float2(0, 1) * distance * length) - jointPosition, force)
     }
 
     var compositeMass: Float = 0
@@ -116,7 +116,7 @@ class Branch {
 
         // this is due to distributivity of cross product
         self.compositeTorque = torque + children.map { child in
-            return cross(child.compositeForce, child.jointPosition - self.jointPosition) + child.compositeTorque
+            return cross(child.jointPosition - self.jointPosition, child.compositeForce) + child.compositeTorque
             }.sum
 
         self.compositeCenterOfMass = (mass * worldCenterOfMass + children.map { $0.compositeMass * $0.compositeCenterOfMass }.sum) / (mass + children.map { $0.compositeMass }.sum)
@@ -127,6 +127,9 @@ class Branch {
         self.compositeInertia = inertia +
             mass * square(distance(self.worldCenterOfMass, self.compositeCenterOfMass)) +
             children.map { $0.compositeInertia + $0.compositeMass * square(distance(self.compositeCenterOfMass, $0.compositeCenterOfMass)) }.sum
+
+        print("\(name) :", compositeForce, compositeTorque)
+
     }
 
 
@@ -192,7 +195,6 @@ class Branch {
     }
 
     func updateSpringState(delta: TimeInterval) {
-        print("\(name) stiffness:", k)
         if parent != nil {
             let compositeInertiaRelativeToJoint = compositeInertia + compositeMass * square(distance(compositeCenterOfMass, jointPosition))
 
