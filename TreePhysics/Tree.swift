@@ -178,7 +178,6 @@ class RigidBody: HasTransform {
     }
 
     func update(delta: TimeInterval) {
-        composite.update()
         for joint in childJoints {
             joint.updateSpringState(delta: delta)
         }
@@ -228,30 +227,5 @@ class CompositeBody {
 
     init(parent: RigidBody) {
         self.parentRigidBody = parent
-    }
-
-    func update() {
-        for joint in parentRigidBody.childJoints {
-            joint.childRigidBody.composite.update()
-        }
-
-        parentRigidBody.apply(force: Tree.gravity, at: 0.5)
-
-        self.mass = parentRigidBody.mass + parentRigidBody.childJoints.map { $0.childRigidBody.composite.mass }.sum
-        self.force = parentRigidBody.force + parentRigidBody.childJoints.map { $0.childRigidBody.composite.force }.sum
-
-        // this is due to distributivity of cross product
-        self.torque = parentRigidBody.torque + parentRigidBody.childJoints.map {
-            cross($0.position - parentRigidBody.position, $0.childRigidBody.composite.force) + $0.childRigidBody.composite.torque
-            }.sum
-
-        self.centerOfMass = (parentRigidBody.mass * parentRigidBody.centerOfMass + parentRigidBody.childJoints.map { $0.childRigidBody.composite.mass * $0.childRigidBody.composite.centerOfMass }.sum) / (parentRigidBody.mass + parentRigidBody.childJoints.map { $0.childRigidBody.composite.mass }.sum)
-
-        // using the parallel axis theorem I' = I + md^2, calculate inertia of this body about the
-        // center of mass of the composite body, then add the child inertia's (also relative to the
-        // center of mass of the composite)
-        self.momentOfInertia = parentRigidBody.momentOfInertia +
-            parentRigidBody.mass * square(distance(parentRigidBody.centerOfMass, self.centerOfMass)) +
-            parentRigidBody.childJoints.map { $0.childRigidBody.composite.momentOfInertia + $0.childRigidBody.composite.mass * square(distance(self.centerOfMass, $0.childRigidBody.composite.centerOfMass)) }.sum
     }
 }

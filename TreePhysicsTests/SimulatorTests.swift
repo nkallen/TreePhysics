@@ -2,24 +2,33 @@ import XCTest
 @testable import TreePhysics
 import simd
 
-class TreePhysicsTests: XCTestCase {
-    func testComposite() {
-        let root = RigidBody()
-        let b1 = RigidBody()
-        let b2 = RigidBody()
+class SimulatorTests: XCTestCase {
+    var simulator: Simulator!
+    var root: RigidBody!
+    var b1: RigidBody!
+    var b2: RigidBody!
+    let force = float2(0, 1) // world coordinates
+
+    override func setUp() {
+        super.setUp()
+
+        root = RigidBody()
+        b1 = RigidBody()
+        b2 = RigidBody()
         root.add(b1, at: -Float.pi/4)
         b1.add(b2, at: -Float.pi/4)
 
-        let force = float2(0, 1) // world coordinates
-        let r_local = float2(0, 1)
-        let r_world = b2.convert(position: r_local)
+        simulator = Simulator(tree: Tree(root))
+
         b2.apply(force: force, at: 1) // ie at float2(0, 1) in local coordinates
+    }
+
+    func testApplyForce() {
         XCTAssertEqual(b2.mass, 1)
         XCTAssertEqual(b2.force, force)
-        let r_b2 = r_world - b2.parentJoint!.position
-        XCTAssertEqual(r_b2, float2(1, 0), accuracy: 0.0001)
-        XCTAssertEqual(b2.torque, cross(r_b2, force))
-        XCTAssertEqual(b2.inertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
+
+        XCTAssertEqual(b2.torque, cross(float2(0, 1), force))
+        XCTAssertEqual(b2.momentOfInertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
 
         XCTAssertEqual(root.position, float2(0,0))
         XCTAssertEqual(b1.parentJoint!.position, float2(0,1))
@@ -29,11 +38,14 @@ class TreePhysicsTests: XCTestCase {
         XCTAssertEqual(b1.centerOfMass, float2(0.5/sqrt(2), 1 + 0.5/sqrt(2)), accuracy: 0.0001)
         XCTAssertEqual(root.centerOfMass, float2(0, 0.5), accuracy: 0.0001)
 
-        // position
         XCTAssertEqual(b2.parentJoint!.position, float2(1/sqrt(2), 1 + 1/sqrt(2)))
         XCTAssertEqual(b1.parentJoint!.position, float2(0,1))
+    }
 
-        root.composite.update()
+    func testComposite() {
+        simulator.update(at: 0)
+
+        let forceAppliedPosition = b2.convert(position: float2(0, 1))
 
         // mass
         XCTAssertEqual(b2.composite.mass, 1)
@@ -47,9 +59,9 @@ class TreePhysicsTests: XCTestCase {
 
         // torque
         XCTAssertEqual(b2.composite.torque, b2.torque)
-        let r_b1 = r_world - b1.parentJoint!.position
+        let r_b1 = forceAppliedPosition - b1.parentJoint!.position
         XCTAssertEqual(b1.composite.torque, cross(r_b1, force))
-        let r_root = r_world - root.position
+        let r_root = forceAppliedPosition - root.position
         XCTAssertEqual(root.composite.torque, cross(r_root, force))
 
         // center of mass
@@ -58,16 +70,39 @@ class TreePhysicsTests: XCTestCase {
         XCTAssertEqual(root.composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass + root.centerOfMass) / 3)
 
         // inertia
-        XCTAssertEqual(b2.composite.inertia, b2.inertia)
-        XCTAssertEqual(b1.composite.inertia,
-                       b1.inertia + b1.mass * square(distance(b1.centerOfMass, b1.composite.centerOfMass)) +
-                        b2.inertia + b2.mass * square(distance(b2.centerOfMass, b1.composite.centerOfMass)),
+        XCTAssertEqual(b2.composite.momentOfInertia, b2.momentOfInertia)
+        XCTAssertEqual(b1.composite.momentOfInertia,
+                       b1.momentOfInertia + b1.mass * square(distance(b1.centerOfMass, b1.composite.centerOfMass)) +
+                        b2.momentOfInertia + b2.mass * square(distance(b2.centerOfMass, b1.composite.centerOfMass)),
                        accuracy: 0.0001)
-        XCTAssertEqual(root.composite.inertia,
-                       root.inertia + root.mass * square(distance(root.centerOfMass, root.composite.centerOfMass)) +
-                        b1.inertia + b1.mass * square(distance(b1.centerOfMass, root.composite.centerOfMass)) +
-                        b2.inertia + b2.mass * square(distance(b2.centerOfMass, root.composite.centerOfMass)),
+        XCTAssertEqual(root.composite.momentOfInertia,
+                       root.momentOfInertia + root.mass * square(distance(root.centerOfMass, root.composite.centerOfMass)) +
+                        b1.momentOfInertia + b1.mass * square(distance(b1.centerOfMass, root.composite.centerOfMass)) +
+                        b2.momentOfInertia + b2.mass * square(distance(b2.centerOfMass, root.composite.centerOfMass)),
                        accuracy: 0.0001)
+    }
+}
+
+class TreeTests: XCTestCase {
+    func testFlattenIsBreadthFirst() {
+        let root = RigidBody()
+        let b1 = RigidBody()
+        let b2 = RigidBody()
+        let b3 = RigidBody()
+        let b4 = RigidBody()
+        let b5 = RigidBody()
+        let b6 = RigidBody()
+        let b7 = RigidBody()
+        root.add(b1)
+        root.add(b2)
+        b1.add(b3)
+        b1.add(b4)
+        b4.add(b5)
+        b2.add(b6)
+        b2.add(b7)
+
+        XCTAssertEqual(Tree(root).flatten,
+                       [root, b1, b2, b3, b4, b6, b7, b5])
     }
 }
 
