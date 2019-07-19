@@ -59,11 +59,8 @@ extension GameViewController {
 
 }
 
-var previousTime: TimeInterval? = nil
-
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        let delta = time - (previousTime ?? time)
         if toggle {
             Tree.gravity = float2(0, -9.81)
         } else {
@@ -72,7 +69,6 @@ extension GameViewController: SCNSceneRendererDelegate {
 
         tree.update(delta: 1.0/30)
         renderer.isPlaying = true
-        previousTime = time
     }
 }
 
@@ -98,7 +94,7 @@ class TreeMaker {
             let branch = RigidBody(mass: 1 * length * length, length: length / Float(segments))
             parent.add(branch, at: branchAngle)
             var segment = branch
-            for i in 1..<segments {
+            for _ in 1..<segments {
                 let branch = RigidBody(mass: 1 * length * length, length: length / Float(segments))
                 segment.add(branch, at: 0)
                 segment = branch
