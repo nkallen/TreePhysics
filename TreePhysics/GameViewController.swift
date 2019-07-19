@@ -1,7 +1,7 @@
 import SceneKit
 
 class GameViewController: NSViewController {
-    var tree: Tree!
+    var simulator: Simulator!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,13 +33,9 @@ class GameViewController: NSViewController {
         scnView.gestureRecognizers = gestureRecognizers
     }
 
-    var b4: RigidBody!
-    var b3: RigidBody!
-    var b2: RigidBody!
-    var b1: RigidBody!
-
     override func viewDidAppear() {
-        self.tree = TreeMaker().make()
+        let tree = TreeMaker().make()
+        self.simulator = Simulator(tree: tree)
         scnView.scene!.rootNode.addChildNode(tree.root.node)
         scnView.delegate = self
     }
@@ -67,7 +63,7 @@ extension GameViewController: SCNSceneRendererDelegate {
             Tree.gravity = float2.zero
         }
 
-        tree.update(delta: 1.0/30)
+        simulator.update(at: 1.0/30)
         renderer.isPlaying = true
     }
 }

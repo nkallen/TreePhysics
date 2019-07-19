@@ -43,7 +43,7 @@ class SimulatorTests: XCTestCase {
     }
 
     func testComposite() {
-        simulator.update(at: 0)
+        simulator.updateCompositeBodies()
 
         let forceAppliedPosition = b2.convert(position: float2(0, 1))
 

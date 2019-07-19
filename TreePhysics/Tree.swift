@@ -17,10 +17,6 @@ class Tree {
     init(_ root: RigidBody) {
         self.root = root
     }
-
-    func update(delta: TimeInterval) {
-        root.update(delta: delta)
-    }
 }
 
 var i = 0
@@ -159,29 +155,12 @@ class RigidBody: HasTransform {
         self.torque += cross(convert(position: float2(0, 1) * distance * length) - self.position, force)
     }
 
-    func update(delta: TimeInterval) {
-        updateRigidBodyState()
-        reset()
-    }
-
-    func reset() {
+    func resetForces() {
         self.force = float2.zero
         self.torque = float3.zero
-        for joint in childJoints {
-            joint.childRigidBody.reset()
-        }
     }
 
-    private func updateRigidBodyState() {
-        updateTransform()
-
-        for joint in childJoints {
-            joint.updateTransform()
-            joint.childRigidBody.updateRigidBodyState()
-        }
-    }
-
-    private func updateTransform() {
+    func updateTransform() {
         if let parentJoint = parentJoint {
             self.transform = parentJoint.transform * matrix3x3_rotation(radians: self.angle)
         } else {

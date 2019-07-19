@@ -18,7 +18,7 @@ class Simulator {
         updateRigidBodies()
     }
 
-    private func updateCompositeBodies() {
+    func updateCompositeBodies() {
         for rigidBody in rigidBodiesReverseLevelOrder {
             rigidBody.apply(force: Tree.gravity, at: 0.5) // FIXME
 
@@ -41,7 +41,7 @@ class Simulator {
         }
     }
 
-    private func updateSprings(at time: TimeInterval) {
+    func updateSprings(at time: TimeInterval) {
         for rigidBody in rigidBodiesLevelOrder { // Order does not matter
             if let parentJoint = rigidBody.parentJoint {
                 let compositeInertiaRelativeToJoint = rigidBody.composite.momentOfInertia +
@@ -59,8 +59,14 @@ class Simulator {
         }
     }
 
-    private func updateRigidBodies() {
-
+    func updateRigidBodies() {
+        for rigidBody in rigidBodiesLevelOrder {
+            rigidBody.updateTransform()
+            for joint in rigidBody.childJoints {
+                joint.updateTransform()
+            }
+            rigidBody.resetForces()
+        }
     }
 }
 
