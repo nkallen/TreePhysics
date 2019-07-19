@@ -87,7 +87,7 @@ class TreeMaker {
     let widthFactor: Float = 0.4
 
     func make() -> Tree {
-        let root = RigidBody(mass: 1, length: lengthInitial)
+        let root = RigidBody(mass: 10, length: lengthInitial)
         make(parent: root, depth: depth, length: lengthInitial * lengthFactor, width: widthInitial * widthFactor)
         return Tree(root)
     }
@@ -95,11 +95,11 @@ class TreeMaker {
     private func make(parent: RigidBody, depth: Int, length: Float, width: Float) {
         guard depth >= 0 else { return }
         for branchAngle in branchAngles {
-            let branch = RigidBody(mass: 1, length: length / Float(segments))
+            let branch = RigidBody(mass: 1 * length * length, length: length / Float(segments))
             parent.add(branch, at: branchAngle)
             var segment = branch
             for i in 1..<segments {
-                let branch = RigidBody(mass: 1, length: length / Float(segments))
+                let branch = RigidBody(mass: 1 * length * length, length: length / Float(segments))
                 segment.add(branch, at: 0)
                 segment = branch
             }

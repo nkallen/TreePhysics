@@ -5,6 +5,8 @@ import Darwin
 extension Tree {
     static let K: Float = 100
     static let B: Float = 0.03
+    static let maxAngle: Float = Float.pi / 3
+    static let minAngle: Float = -Float.pi / 3
 
     static var gravity = float2.zero
 }
@@ -50,12 +52,12 @@ class Joint: HasTransform {
         case 4: return Tree.K * 2048
         case 5: return Tree.K * 2048
         case 6: return Tree.K * 2048
-        case 7: return Tree.K * 64
-        case 8: return Tree.K * 64
-        case 9: return Tree.K * 64
-        case 10: return Tree.K * 8
-        case 11: return Tree.K * 8
-        case 12: return Tree.K * 8
+        case 7: return Tree.K * 8
+        case 8: return Tree.K * 8
+        case 9: return Tree.K * 8
+        case 10: return Tree.K * 4
+        case 11: return Tree.K * 4
+        case 12: return Tree.K * 4
         case 13: return Tree.K
         case 14: return Tree.K
         default: return Tree.K
@@ -87,7 +89,7 @@ class Joint: HasTransform {
 
         let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.B * k, c: k, g: childRigidBody.composite.torque.z, y_0: angle, y_ddt_0: angularVelocity)
         let thetas = evaluate(differential: solution, at: Float(delta))
-        self.angle = thetas.x
+        self.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.x))
         self.angularVelocity = thetas.y
         self.angularAcceleration = thetas.z
 
@@ -143,6 +145,7 @@ class RigidBody: HasTransform {
     init(mass: Float = 1.0, length: Float = 1.0) {
         self.name = "Branch[\(i)]"
         i += 1
+        print(i)
 
         self.mass = mass
         self.length = length
