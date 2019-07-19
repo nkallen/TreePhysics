@@ -22,22 +22,40 @@ class Simulator {
         for rigidBody in rigidBodiesReverseLevelOrder {
             rigidBody.apply(force: Tree.gravity, at: 0.5) // FIXME
 
-            rigidBody.composite.mass = rigidBody.mass + rigidBody.childJoints.map { $0.childRigidBody.composite.mass }.sum
-            rigidBody.composite.force = rigidBody.force + rigidBody.childJoints.map { $0.childRigidBody.composite.force }.sum
+            let composite = rigidBody.composite
 
-            // this is due to distributivity of cross product
-            rigidBody.composite.torque = rigidBody.torque + rigidBody.childJoints.map {
-                cross($0.position - rigidBody.position, $0.childRigidBody.composite.force) + $0.childRigidBody.composite.torque
-                }.sum
+            composite.mass = rigidBody.mass
+            composite.force = rigidBody.force
+            composite.torque = rigidBody.torque
+            composite.centerOfMass = rigidBody.mass * rigidBody.centerOfMass
 
-            rigidBody.composite.centerOfMass = (rigidBody.mass * rigidBody.centerOfMass + rigidBody.childJoints.map { $0.childRigidBody.composite.mass * $0.childRigidBody.composite.centerOfMass }.sum) / (rigidBody.mass + rigidBody.childJoints.map { $0.childRigidBody.composite.mass }.sum)
+            for childJoint in rigidBody.childJoints {
+                let childRigidBody = childJoint.childRigidBody
+                let childComposite = childRigidBody.composite
 
-            // using the parallel axis theorem I' = I + md^2, calculate inertia of this body about the
-            // center of mass of the composite body, then add the child inertia's (also relative to the
-            // center of mass of the composite)
-            rigidBody.composite.momentOfInertia = rigidBody.momentOfInertia +
-                rigidBody.mass * square(distance(rigidBody.centerOfMass, rigidBody.composite.centerOfMass)) +
-                rigidBody.childJoints.map { $0.childRigidBody.composite.momentOfInertia + $0.childRigidBody.composite.mass * square(distance(rigidBody.composite.centerOfMass, $0.childRigidBody.composite.centerOfMass)) }.sum
+                composite.mass += childComposite.mass
+                composite.force += childComposite.force
+
+                // this is due to distributivity of cross product
+                composite.torque +=
+                    cross(childJoint.position - rigidBody.position, childComposite.force) + childComposite.torque
+
+                composite.centerOfMass += childComposite.mass * childComposite.centerOfMass
+            }
+            composite.centerOfMass /= composite.mass
+
+            composite.momentOfInertia = rigidBody.momentOfInertia + rigidBody.mass * square(distance(rigidBody.centerOfMass, composite.centerOfMass))
+            for childJoint in rigidBody.childJoints {
+                let childRigidBody = childJoint.childRigidBody
+                let childComposite = childRigidBody.composite
+
+                // using the parallel axis theorem I' = I + md^2, calculate inertia of this body about the
+                // center of mass of the composite body, then add the child inertia's (also relative to the
+                // center of mass of the composite). NOTE: This is in a separate loop because of the
+                // dependency on the composite.centerOfMass /= composite.mass step
+                composite.momentOfInertia += childComposite.momentOfInertia +
+                    childComposite.mass * square(distance(composite.centerOfMass, childComposite.centerOfMass))
+            }
         }
     }
 

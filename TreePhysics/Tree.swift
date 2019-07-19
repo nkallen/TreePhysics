@@ -86,7 +86,7 @@ class RigidBody: HasTransform {
     weak var parentJoint: Joint?
     var childJoints: [Joint] = []
 
-    var composite: CompositeBody!
+    let composite: CompositeBody
 
     let mass: Float
     let length: Float
