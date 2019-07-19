@@ -27,7 +27,7 @@ class SimulatorTests: XCTestCase {
         XCTAssertEqual(b2.mass, 1)
         XCTAssertEqual(b2.force, force)
 
-        XCTAssertEqual(b2.torque, cross(float2(0, 1), force))
+        XCTAssertEqual(b2.torque, cross(b2.convert(position: float2(0, 1)) - b2.position, force))
         XCTAssertEqual(b2.momentOfInertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
 
         XCTAssertEqual(root.position, float2(0,0))

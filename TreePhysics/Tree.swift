@@ -157,7 +157,7 @@ class RigidBody: HasTransform {
         node.pivot = SCNMatrix4MakeTranslation(0, CGFloat(-length / 2), 0)
         self.node = node
 
-        self.composite = CompositeBody(parent: self)
+        self.composite = CompositeBody()
 
         updateCenterOfMass()
     }
@@ -217,15 +217,9 @@ class RigidBody: HasTransform {
 }
 
 class CompositeBody {
-    unowned let parentRigidBody: RigidBody
-
     var mass: Float = 0
     var momentOfInertia: Float = 0
     var force: float2 = float2.zero
     var torque: float3 = float3.zero
     var centerOfMass: float2 = float2.zero
-
-    init(parent: RigidBody) {
-        self.parentRigidBody = parent
-    }
 }
