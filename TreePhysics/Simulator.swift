@@ -14,7 +14,7 @@ class Simulator {
 
     func update(at time: TimeInterval) {
         updateCompositeBodies()
-        updateSprings()
+        updateSprings(at: time)
         updateRigidBodies()
     }
 
@@ -41,8 +41,22 @@ class Simulator {
         }
     }
 
-    private func updateSprings() {
+    private func updateSprings(at time: TimeInterval) {
+        for rigidBody in rigidBodiesLevelOrder { // Order does not matter
+            if let parentJoint = rigidBody.parentJoint {
+                let compositeInertiaRelativeToJoint = rigidBody.composite.momentOfInertia +
+                    rigidBody.composite.mass * square(distance(rigidBody.composite.centerOfMass, parentJoint.position))
 
+                // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
+                // θ(0) = joint's angle, θ'(0) = joint's angular velocity
+
+                let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.B * parentJoint.k, c: parentJoint.k, g: rigidBody.composite.torque.z, y_0: parentJoint.angle, y_ddt_0: parentJoint.angularVelocity)
+                let thetas = evaluate(differential: solution, at: Float(time))
+                parentJoint.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.x))
+                parentJoint.angularVelocity = thetas.y
+                parentJoint.angularAcceleration = thetas.z
+            }
+        }
     }
 
     private func updateRigidBodies() {

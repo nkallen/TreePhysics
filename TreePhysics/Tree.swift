@@ -80,24 +80,6 @@ class Joint: HasTransform {
         updateTransform()
     }
 
-    func updateSpringState(delta: TimeInterval) {
-        let compositeInertiaRelativeToJoint = childRigidBody.composite.momentOfInertia +
-            childRigidBody.composite.mass * square(distance(childRigidBody.composite.centerOfMass, self.position))
-
-        // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
-        // θ(0) = joint's angle, θ'(0) = joint's angular acceleration
-
-        let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.B * k, c: k, g: childRigidBody.composite.torque.z, y_0: angle, y_ddt_0: angularVelocity)
-        let thetas = evaluate(differential: solution, at: Float(delta))
-        self.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.x))
-        self.angularVelocity = thetas.y
-        self.angularAcceleration = thetas.z
-
-        for joint in childRigidBody.childJoints {
-            joint.updateSpringState(delta: delta)
-        }
-    }
-
     func updateTransform() {
         self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length) * matrix3x3_rotation(radians: self.angle)
     }
@@ -178,9 +160,6 @@ class RigidBody: HasTransform {
     }
 
     func update(delta: TimeInterval) {
-        for joint in childJoints {
-            joint.updateSpringState(delta: delta)
-        }
         updateRigidBodyState()
         reset()
     }
