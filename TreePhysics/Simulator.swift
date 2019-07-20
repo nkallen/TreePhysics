@@ -1,7 +1,7 @@
 import Foundation
 import simd
 
-class Simulator {
+final class Simulator {
     let tree: Tree
     let rigidBodiesLevelOrder: [RigidBody]
     let rigidBodiesReverseLevelOrder: [RigidBody]
@@ -12,10 +12,16 @@ class Simulator {
         self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
     }
 
+    var i = 0
     func update(at time: TimeInterval) {
+        i += 1
+        let start = Date()
         updateCompositeBodies()
         updateSprings(at: time)
         updateRigidBodies()
+        if i % 10 == 0 {
+            print(Date().timeIntervalSince(start))
+        }
     }
 
     func updateCompositeBodies() {

@@ -4,14 +4,14 @@ import Darwin
 
 extension Tree {
     static let K: Float = 100
-    static let B: Float = 0.03
+    static let B: Float = 0.02
     static let maxAngle: Float = Float.pi / 3
     static let minAngle: Float = -Float.pi / 3
 
     static var gravity = float2.zero
 }
 
-class Tree {
+final class Tree {
     let root: RigidBody
 
     init(_ root: RigidBody) {
@@ -21,7 +21,7 @@ class Tree {
 
 var i = 0
 
-class Joint: HasTransform {
+final class Joint: HasTransform {
     unowned let parentRigidBody: RigidBody
     let childRigidBody: RigidBody
 
@@ -31,40 +31,20 @@ class Joint: HasTransform {
     var angle: Float = 0 {
         didSet {
             node.simdRotation = float4(0, 0, 1, angle)
-            updateTransform()
+            self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length) * matrix3x3_rotation(radians: self.angle)
         }
     }
 
-    var depth: Int {
-        return parentRigidBody.depth + 1
-    }
-
-    var k: Float {
-        switch depth {
-        case 0: return Float.infinity
-        case 1: return Tree.K * 4096
-        case 2: return Tree.K * 4096
-        case 3: return Tree.K * 4096
-        case 4: return Tree.K * 2048
-        case 5: return Tree.K * 2048
-        case 6: return Tree.K * 2048
-        case 7: return Tree.K * 8
-        case 8: return Tree.K * 8
-        case 9: return Tree.K * 8
-        case 10: return Tree.K * 4
-        case 11: return Tree.K * 4
-        case 12: return Tree.K * 4
-        case 13: return Tree.K
-        case 14: return Tree.K
-        default: return Tree.K
-        }
-    }
+    let k: Float
 
     let node: SCNNode
 
     init(parent: RigidBody, child: RigidBody) {
         self.parentRigidBody = parent
         self.childRigidBody = child
+        self.k = Joint.computeK(radius: parent.radius)
+        print(parent.radius, self.k)
+
         let node = SCNNode()
         node.addChildNode(child.node)
         node.name = "Joint"
@@ -79,9 +59,29 @@ class Joint: HasTransform {
     func updateTransform() {
         self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length) * matrix3x3_rotation(radians: self.angle)
     }
+
+    private static func computeK(radius: Float) -> Float {
+        if radius <= 0.003 {
+            return Tree.K
+        } else if radius <= 0.005 {
+            return Tree.K
+        } else if radius <= 0.01 {
+            return 4 * Tree.K
+        } else if radius <= 0.02 {
+            return 256 * Tree.K
+        } else if radius <= 0.04 {
+            return 256 * Tree.K
+        } else if radius <= 0.075 {
+            return 1024 * Tree.K
+        } else if radius <= 0.15 {
+            return 4096 * Tree.K
+        } else {
+            return 16384 * Tree.K
+        }
+    }
 }
 
-class RigidBody: HasTransform {
+final class RigidBody: HasTransform {
     let name: String
     weak var parentJoint: Joint?
     var childJoints: [Joint] = []
@@ -90,6 +90,7 @@ class RigidBody: HasTransform {
 
     let mass: Float
     let length: Float
+    let radius: Float
     let momentOfInertia: Float
 
     var transform: matrix_float3x3 = matrix_identity_float3x3 {
@@ -112,21 +113,16 @@ class RigidBody: HasTransform {
         }
     }
 
-    var depth: Int {
-        if let parentJoint = parentJoint {
-            return parentJoint.parentRigidBody.depth + 1
-        } else {
-            return 0
-        }
-    }
+    let density: Float = 750
 
-    init(mass: Float = 1.0, length: Float = 1.0) {
+    init(length: Float = 1.0, radius: Float = 1.0) {
         self.name = "Branch[\(i)]"
+        print(name)
         i += 1
-        print(i)
 
-        self.mass = mass
+        self.mass = Float.pi * radius*radius * length * density
         self.length = length
+        self.radius = radius
         self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
 
         let cylinder = SCNCylinder(radius: CGFloat(0.01), height: CGFloat(length))
@@ -174,7 +170,7 @@ class RigidBody: HasTransform {
     }
 }
 
-class CompositeBody {
+final class CompositeBody {
     var mass: Float = 0
     var momentOfInertia: Float = 0
     var force: float2 = float2.zero
