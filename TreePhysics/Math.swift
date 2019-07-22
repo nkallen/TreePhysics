@@ -106,6 +106,10 @@ func matrix3x3_rotation(radians: Float) -> float3x3 {
          float3(0, 0, 1)))
 }
 
+func rotate(_ x: float2, by radians: Float) -> float2 {
+    return (matrix3x3_rotation(radians: radians) * float3(x, 1)).xy
+}
+
 func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> float3x3 {
     return matrix_float3x3.init(columns:(vector_float3(1, 0, 0),
                                          vector_float3(0, 1, 0),
