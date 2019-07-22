@@ -115,7 +115,7 @@ final class RigidBody: HasTransform {
 
     let density: Float = 750
 
-    init(length: Float = 1.0, radius: Float = 1.0) {
+    init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi) {
         self.name = "Branch[\(i)]"
         print(name)
         i += 1
