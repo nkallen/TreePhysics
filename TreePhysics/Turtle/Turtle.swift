@@ -1,12 +1,6 @@
 import Foundation
 import simd
 
-protocol Pen {
-    func start(at: float2, tangent: float2)
-    func cont(at: float2, tangent: float2)
-    func end(at: float2, tangent: float2)
-}
-
 enum Command {
     case forward(distance: Float?, width: Float?)
     case tropism(magnitude: Float?)
@@ -51,34 +45,61 @@ class Interpreter {
         tropism: 0,
         elasticity: 0.1)
     let configuration: Configuration
-    let penFactory: () -> Pen
     var stack: [State] = []
 
-    init(configuration: Configuration = Interpreter.defaultConfiguration, _ penFactory: @escaping () -> Pen) {
-        self.configuration = configuration
-        self.penFactory = penFactory
-        stack.append(
-            State(position: float2.zero, heading: float2(0,1), stepSize: configuration.stepSize, thickness: configuration.thickness, pen: penFactory()))
+    static func parse(_ s: String) -> [Command] {
+        var result: [Command] = []
+        for char in s {
+            switch char {
+            case "F":
+                result.append(.forward(distance: nil, width: nil))
+            case "!":
+                result.append(.multiplyThickness(nil))
+            case "\"":
+                result.append(.multiplyStepSize(nil))
+            case "-":
+                result.append(.turnLeft(radians: nil))
+            case "+":
+                result.append(.turnRight(radians: nil))
+            case "[":
+                result.append(.push)
+            case "]":
+                result.append(.pop)
+            default:
+                fatalError()
+            }
+        }
+        return result
     }
 
-    func interpret(commands: [Command]) {
+    init(configuration: Configuration = Interpreter.defaultConfiguration, pen: Pen) {
+        self.configuration = configuration
+        stack.append(
+            State(position: float2.zero, heading: float2(0,1), stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
+    }
+
+    func interpret(_ string: String) {
+        interpret(Interpreter.parse(string))
+    }
+
+    func interpret(_ commands: [Command]) {
         var state = self.stack.removeLast()
-        state.pen.start(at: state.position, tangent: state.heading)
+        state.pen.start(at: state.position, tangent: state.heading, thickness: state.thickness)
 
         for command in commands {
             switch command {
             case let .forward(distance, thickness):
                 state.position += state.heading * (distance ?? state.stepSize)
                 state.thickness = thickness ?? state.stepSize
-                state.pen.cont(at: state.position, tangent: state.heading)
+                state.pen.cont(to: state.position, tangent: state.heading, thickness: state.thickness)
             case let .tropism(magnitude):
                 let angle = configuration.elasticity *
                     length(cross(state.heading, float2(0, -(magnitude ?? configuration.tropism))))
                 state.heading = rotate(state.heading, by: angle)
             case let .turnLeft(radians):
-                state.heading = rotate(state.heading, by: -abs(radians ?? configuration.angle))
-            case let .turnRight(radians):
                 state.heading = rotate(state.heading, by: abs(radians ?? configuration.angle))
+            case let .turnRight(radians):
+                state.heading = rotate(state.heading, by: -abs(radians ?? configuration.angle))
             case let .turnRandom(upToRadians):
                 let upTo = upToRadians ?? configuration.angle
                 state.heading = rotate(state.heading, by: Float.random(in: -upTo...upTo))
@@ -88,8 +109,8 @@ class Interpreter {
                 state.thickness *= thicknessScale ?? configuration.thicknessScale
             case .push:
                 self.stack.append(state)
-                let pen = penFactory()
-                pen.start(at: state.position, tangent: state.heading)
+                let pen = state.pen.branch
+                pen.start(at: state.position, tangent: state.heading, thickness: state.thickness)
                 state = State(position: state.position, heading: state.heading, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
             case .pop:
                 state = self.stack.removeLast()

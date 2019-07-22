@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1B22E4F4A700229235 /* TurtleTests.swift */; };
 		9E036B1F22E4F58600229235 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
+		9E461B3322E5E025008AB788 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
 		9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* Simulator.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
@@ -36,6 +37,7 @@
 /* Begin PBXFileReference section */
 		9E036B1B22E4F4A700229235 /* TurtleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurtleTests.swift; sourceTree = "<group>"; };
 		9E036B1E22E4F58600229235 /* Turtle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turtle.swift; sourceTree = "<group>"; };
+		9E461B3222E5E025008AB788 /* Pen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pen.swift; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* Simulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Simulator.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				9E036B1E22E4F58600229235 /* Turtle.swift */,
+				9E461B3222E5E025008AB788 /* Pen.swift */,
 			);
 			path = Turtle;
 			sourceTree = "<group>";
@@ -235,6 +238,7 @@
 				9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */,
 				9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */,
 				9EE7EBCA22E0F27900535997 /* main.swift in Sources */,
+				9E461B3322E5E025008AB788 /* Pen.swift in Sources */,
 				9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */,
 				9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */,
 				9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */,

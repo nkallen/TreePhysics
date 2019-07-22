@@ -34,7 +34,13 @@ class GameViewController: NSViewController {
     }
 
     override func viewDidAppear() {
-        let tree = TreeMaker().make()
+        let root = RigidBody(length: 0.1, radius: 0.1)
+        let pen = CylinderPen(parent: root, angle: .pi/2)
+        let interpreter = Interpreter(pen: pen)
+        interpreter.interpret("""
+FFF!"-[FFF!"-[FFF!"-[FFF!"-++]++[FFF!"-++]]++[FFF!"-[FFF!"-++]++[FFF!"-++]]]++[FFF!"-[FFF!"-[FFF!"-++]++[FFF!"-++]]++[FFF!"-[FFF!"-++]++[FFF!"-++]]]
+""")
+        let tree = Tree(root)
         self.simulator = Simulator(tree: tree)
         scnView.scene!.rootNode.addChildNode(tree.root.node)
         scnView.delegate = self
