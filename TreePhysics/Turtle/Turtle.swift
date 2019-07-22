@@ -21,29 +21,42 @@ struct State {
     let pen: Pen
 }
 
-struct Configuration {
-    let randomScale: Float
-    let randomSeed: Float
-    let angle: Float
-    let thickness: Float
-    let thicknessScale: Float
-    let stepSize: Float
-    let stepSizeScale: Float
-    let tropism: Float
-    let elasticity: Float
-}
 
 class Interpreter {
-    static let defaultConfiguration = Configuration(
-        randomScale: 0,
-        randomSeed: 0,
-        angle: .pi/4,
-        thickness: 0.1,
-        thicknessScale: 0.9,
-        stepSize: 0.1,
-        stepSizeScale: 0.9,
-        tropism: 0,
-        elasticity: 0.1)
+    struct Configuration {
+        init(
+            randomScale: Float = 0,
+            randomSeed: Float = 0,
+            angle: Float = .pi/8,
+            thickness: Float = 0.1,
+            thicknessScale: Float = 0.9,
+            stepSize: Float = 0.1,
+            stepSizeScale: Float = 0.9,
+            tropism: Float = 0,
+            elasticity: Float = 0.1
+            ) {
+            self.randomScale = randomScale
+            self.randomSeed = randomSeed
+            self.angle = angle
+            self.thickness = thickness
+            self.thicknessScale = thicknessScale
+            self.stepSize = stepSize
+            self.stepSizeScale = stepSizeScale
+            self.tropism = tropism
+            self.elasticity = elasticity
+        }
+
+        let randomScale: Float
+        let randomSeed: Float
+        let angle: Float
+        let thickness: Float
+        let thicknessScale: Float
+        let stepSize: Float
+        let stepSizeScale: Float
+        let tropism: Float
+        let elasticity: Float
+    }
+
     let configuration: Configuration
     var stack: [State] = []
 
@@ -72,7 +85,7 @@ class Interpreter {
         return result
     }
 
-    init(configuration: Configuration = Interpreter.defaultConfiguration, pen: Pen) {
+    init(configuration: Configuration = Configuration(), pen: Pen) {
         self.configuration = configuration
         stack.append(
             State(position: float2.zero, heading: float2(0,1), stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
@@ -90,7 +103,7 @@ class Interpreter {
             switch command {
             case let .forward(distance, thickness):
                 state.position += state.heading * (distance ?? state.stepSize)
-                state.thickness = thickness ?? state.stepSize
+                state.thickness = thickness ?? state.thickness
                 state.pen.cont(to: state.position, tangent: state.heading, thickness: state.thickness)
             case let .tropism(magnitude):
                 let angle = configuration.elasticity *

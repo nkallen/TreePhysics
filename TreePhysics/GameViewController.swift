@@ -34,11 +34,12 @@ class GameViewController: NSViewController {
     }
 
     override func viewDidAppear() {
-        let root = RigidBody(length: 0.1, radius: 0.1)
+        let root = RigidBody(length: 0, radius: 0, kind: .static)
         let pen = CylinderPen(parent: root, angle: .pi/2)
-        let interpreter = Interpreter(pen: pen)
+        let configuration = Interpreter.Configuration(thicknessScale: 0.4, stepSize: 0.5)
+        let interpreter = Interpreter(configuration: configuration, pen: pen)
         interpreter.interpret("""
-FFF!"-[FFF!"-[FFF!"-[FFF!"-++]++[FFF!"-++]]++[FFF!"-[FFF!"-++]++[FFF!"-++]]]++[FFF!"-[FFF!"-[FFF!"-++]++[FFF!"-++]]++[FFF!"-[FFF!"-++]++[FFF!"-++]]]
+FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]++[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]
 """)
         let tree = Tree(root)
         self.simulator = Simulator(tree: tree)
@@ -64,44 +65,12 @@ extension GameViewController {
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if toggle {
-            Tree.gravity = float2(0, -9.81)
+            Tree.gravity = float2(0, -10)
         } else {
             Tree.gravity = float2.zero
         }
 
         simulator.update(at: 1.0 / 30)
         renderer.isPlaying = true
-    }
-}
-
-class TreeMaker {
-    static let depth = 5
-    let branchAngles: [Float] = [Float.pi / 4, 0.1, -Float.pi / 3]
-    let segments = 5
-
-    static let lengthInitial: Float = 0.8 * Float(depth)
-    static let radiusInitial: Float = 0.0375 * Float(depth)
-    static let lengthFactor: Float = 0.6
-    static let radiusFactor: Float = 0.5
-
-    func make() -> Tree {
-        let root = RigidBody(length: TreeMaker.lengthInitial, radius: TreeMaker.radiusInitial)
-        make(parent: root, depth: TreeMaker.depth, length: TreeMaker.lengthInitial * TreeMaker.lengthFactor, radius: TreeMaker.radiusInitial * TreeMaker.radiusFactor)
-        return Tree(root)
-    }
-
-    private func make(parent: RigidBody, depth: Int, length: Float, radius: Float) {
-        guard depth >= 0 else { return }
-        for branchAngle in branchAngles {
-            let branch = RigidBody(length: length / Float(segments), radius: radius)
-            parent.add(branch, at: branchAngle)
-            var segment = branch
-            for _ in 1..<segments {
-                let branch = RigidBody(length: length / Float(segments), radius: radius)
-                segment.add(branch, at: 0)
-                segment = branch
-            }
-            make(parent: segment, depth: depth - 1, length: length * TreeMaker.lengthFactor, radius: radius * TreeMaker.radiusFactor)
-        }
     }
 }

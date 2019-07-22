@@ -39,11 +39,10 @@ final class Joint: HasTransform {
 
     let node: SCNNode
 
-    init(parent: RigidBody, child: RigidBody) {
+    init(parent: RigidBody, child: RigidBody, k: Float? = nil) {
         self.parentRigidBody = parent
         self.childRigidBody = child
-        self.k = Joint.computeK(radius: parent.radius)
-        print(parent.radius, self.k)
+        self.k = k ?? Joint.computeK(radius: parent.radius)
 
         let node = SCNNode()
         node.addChildNode(child.node)
@@ -82,6 +81,12 @@ final class Joint: HasTransform {
 }
 
 final class RigidBody: HasTransform {
+    enum Kind {
+        case `static`
+        case `dynamic`
+    }
+    let kind: Kind
+
     let name: String
     weak var parentJoint: Joint?
     var childJoints: [Joint] = []
@@ -113,19 +118,19 @@ final class RigidBody: HasTransform {
         }
     }
 
-    let density: Float = 750
-
-    init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi) {
+    init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
         self.name = "Branch[\(i)]"
-        print(name)
         i += 1
+
+        self.kind = kind
 
         self.mass = Float.pi * radius*radius * length * density
         self.length = length
         self.radius = radius
         self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
 
-        let cylinder = SCNCylinder(radius: CGFloat(0.01), height: CGFloat(length))
+        print("making cyl with radius", radius)
+        let cylinder = SCNCylinder(radius: CGFloat(radius), height: CGFloat(length))
         let node = SCNNode(geometry: cylinder)
         node.name = name
         node.pivot = SCNMatrix4MakeTranslation(0, CGFloat(-length / 2), 0)
@@ -137,7 +142,12 @@ final class RigidBody: HasTransform {
     }
 
     func add(_ child: RigidBody, at angle: Float = -Float.pi / 4) {
-        let joint = Joint(parent: self, child: child)
+        let joint: Joint
+        if kind == .static {
+            joint = Joint(parent: self, child: child, k: Float.infinity)
+        } else {
+            joint = Joint(parent: self, child: child)
+        }
         child.angle = angle
         self.node.addChildNode(joint.node)
     }

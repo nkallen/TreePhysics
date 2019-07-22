@@ -27,7 +27,7 @@ class CylinderPen: Pen {
 
         let (startPosition, _) = start
         let delta = to - startPosition
-        let newBranch = RigidBody(length: distance(startPosition, to), radius: sqrt(thickness))
+        let newBranch = RigidBody(length: distance(startPosition, to), radius: sqrt(thickness / .pi), density: 750)
 
         let angle = atan2(delta.y, delta.x)
         parentBranch.add(newBranch, at: angle - parentAngle)
