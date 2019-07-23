@@ -20,7 +20,6 @@ class CylinderPen: Pen {
         self.parent = parent
     }
 
-    // does start need a tangent?
     func start(at: float2, thickness: Float) {
         start = at
     }

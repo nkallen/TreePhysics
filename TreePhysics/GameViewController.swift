@@ -35,8 +35,8 @@ class GameViewController: NSViewController {
 
     override func viewDidAppear() {
         let root = RigidBody(length: 0, radius: 0, kind: .static)
-        let pen = CylinderPen(radialSegmentCount: 3)
-        let configuration = Interpreter.Configuration(thicknessScale: 0.4, stepSize: 0.5)
+        let pen = CylinderPen(radialSegmentCount: 5)
+        let configuration = Interpreter.Configuration(thicknessScale: 0.4, stepSize: 0.2)
         let interpreter = Interpreter(configuration: configuration, pen: pen)
         interpreter.interpret("""
 FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]++[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]
