@@ -52,7 +52,7 @@ final class RigidBody: HasTransform {
         self.radius = radius
         self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
 
-        let node = SCNNode(geometry: SCNSphere(radius: 0.1))
+        let node = SCNNode(geometry: SCNCylinder(radius: 0.1, height: 0.1))
         self.node = node
         self.composite = CompositeBody()
 

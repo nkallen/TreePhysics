@@ -20,7 +20,7 @@ F[-F]
 
         let boneInverseBindTransforms: [NSValue]? = bones.map { NSValue(scnMatrix4: SCNMatrix4Invert($0.transform)) }
         var boneWeights: [Float] = [1.0, 1.0]
-        var boneIndices: [UInt16] = [0, 1]
+        var boneIndices: Indices = [0, 1]
 
         let boneWeightsData = Data(bytesNoCopy: &boneWeights, count: boneWeights.count, deallocator: .none)
         let boneIndicesData = Data(bytesNoCopy: &boneIndices, count: boneWeights.count, deallocator: .none)

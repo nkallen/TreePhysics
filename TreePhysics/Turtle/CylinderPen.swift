@@ -1,10 +1,12 @@
 import Foundation
 import SceneKit
 
-class CylinderPen: Pen {
+final class CylinderPen: Pen {
+    typealias T = Indices
+
     private(set) var vertices: [float3] = []
-    private(set) var indices: [UInt16] = []
-    private let parent: CylinderPen?
+    private(set) var indices: Indices = []
+    weak var parent: CylinderPen?
 
     private var start: float2? = nil
 
@@ -23,7 +25,7 @@ class CylinderPen: Pen {
         start = at
     }
 
-    func cont(distance: Float, tangent: float2, thickness: Float) {
+    func cont(distance: Float, tangent: float2, thickness: Float) -> Indices {
         precondition(length(tangent) > 0)
         guard let start = start else { fatalError() }
 
@@ -41,14 +43,15 @@ class CylinderPen: Pen {
                 float3(start, 0) + (rotation * float4(vertex, 0)).xyz
             }
         }
-        addSegment(rotatedVertices, indices)
 
         self.start = start + distance * tangent
+
+        return addSegment(rotatedVertices, indices)
     }
 
-    func addSegment(_ vertices: [float3], _ indices: [UInt16]) {
+    func addSegment(_ vertices: [float3], _ indices: Indices) -> Indices {
         if let parent = parent {
-            parent.addSegment(vertices, indices)
+            return parent.addSegment(vertices, indices)
         } else {
             let offset = UInt16(self.vertices.count)
             let offsetIndices = indices.map { offset + $0 }
@@ -60,17 +63,19 @@ class CylinderPen: Pen {
 
             self.vertices.append(contentsOf: vertices)
             self.indices.append(contentsOf: offsetIndices)
+
+            return Array(Set(offsetIndices))
         }
     }
 
-    var branch: Pen {
+    var branch: CylinderPen {
         guard let start = start else { fatalError() }
         let pen = CylinderPen(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
         pen.start(at: start, thickness: 1)
         return pen
     }
 
-    private func makeSegment(radius: Float, height: Float) -> ([float3], [UInt16]) {
+    private func makeSegment(radius: Float, height: Float) -> ([float3], Indices) {
         var vertices: [float3] = []
         let radialSegmentCountUInt16 = UInt16(radialSegmentCount)
         let arcLength: Float = 2.0 * .pi / Float(radialSegmentCount)

@@ -1,7 +1,9 @@
 import Foundation
 import simd
 
-class RigidBodyPen: Pen {
+final class RigidBodyPen: Pen {
+    typealias T = RigidBody
+
     private var parentBranch: RigidBody
     private var parentAngle: Float
     private var start: float2? = nil
@@ -15,7 +17,7 @@ class RigidBodyPen: Pen {
         start = at
     }
 
-    func cont(distance: Float, tangent: float2, thickness: Float) {
+    func cont(distance: Float, tangent: float2, thickness: Float) -> RigidBody {
         guard let start = start else { fatalError() }
 
         let newBranch = RigidBody(length: distance, radius: sqrt(thickness / .pi), density: 750)
@@ -26,9 +28,11 @@ class RigidBodyPen: Pen {
 
         self.start = start + distance * tangent
         self.parentBranch = newBranch
+
+        return newBranch
     }
 
-    var branch: Pen {
+    var branch: RigidBodyPen {
         return RigidBodyPen(parent: parentBranch, angle: parentAngle)
     }
 }

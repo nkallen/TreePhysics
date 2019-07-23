@@ -13,16 +13,7 @@ enum Command {
     case pop
 }
 
-struct State {
-    var position: float2
-    var heading: float2
-    var stepSize: Float // meters
-    var thickness: Float // meters^2
-    let pen: Pen
-}
-
-
-class Interpreter {
+class Interpreter<P> where P: Pen {
     struct Configuration {
         init(
             randomScale: Float = 0,
@@ -57,6 +48,14 @@ class Interpreter {
         let elasticity: Float
     }
 
+    struct State {
+        var position: float2
+        var heading: float2
+        var stepSize: Float // meters
+        var thickness: Float // meters^2
+        let pen: P
+    }
+
     let configuration: Configuration
     var stack: [State] = []
 
@@ -85,7 +84,7 @@ class Interpreter {
         return result
     }
 
-    init(configuration: Configuration = Configuration(), pen: Pen) {
+    init(configuration: Configuration = Configuration(), pen: P) {
         self.configuration = configuration
         stack.append(
             State(position: float2.zero, heading: float2(0,1), stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
@@ -105,7 +104,7 @@ class Interpreter {
                 let distance = distance ?? state.stepSize
                 state.position += state.heading * distance
                 state.thickness = thickness ?? state.thickness
-                state.pen.cont(distance: distance, tangent: state.heading, thickness: state.thickness)
+                _ = state.pen.cont(distance: distance, tangent: state.heading, thickness: state.thickness)
             case let .tropism(magnitude):
                 let angle = configuration.elasticity *
                     length(cross(state.heading, float2(0, -(magnitude ?? configuration.tropism))))
