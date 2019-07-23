@@ -11,16 +11,12 @@ class FakePen: Pen {
         self._branch = branch
     }
 
-    func start(at: float2, tangent: float2, thickness: Float) {
+    func start(at: float2, thickness: Float) {
         points.append(at)
     }
 
-    func cont(to: float2, tangent: float2, thickness: Float) {
-        points.append(to)
-    }
-
-    func end(at: float2, tangent: float2, thickness: Float) {
-        points.append(at)
+    func cont(distance: Float, tangent: float2, thickness: Float) {
+        points.append(points.last! + distance * tangent)
     }
 
     var branch: Pen { return _branch! }

@@ -106,6 +106,34 @@ func matrix3x3_rotation(radians: Float) -> float3x3 {
          float3(0, 0, 1)))
 }
 
+func matrix4x4_rotation(from: float3, to: float3) -> float4x4 {
+    let from = normalize(from), to = normalize(to)
+
+    let axis = cross(from, to)
+    let unitAxis = normalize(axis)
+    let ct = dot(from, to)
+    let st = length(axis)
+    let ci = 1 - ct
+    let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
+    return matrix_float4x4.init(columns:(float4(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st, 0),
+                                         float4(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st, 0),
+                                         float4(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci, 0),
+                                         float4(                  0,                   0,                   0, 1)))
+}
+
+func matrix4x4_rotation(radians: Float, axis: float3) -> matrix_float4x4 {
+    let unitAxis = normalize(axis)
+    let ct = cosf(radians)
+    let st = sinf(radians)
+    let ci = 1 - ct
+    let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
+    return matrix_float4x4.init(columns:(float4(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st, 0),
+                                         float4(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st, 0),
+                                         float4(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci, 0),
+                                         float4(                  0,                   0,                   0, 1)))
+}
+
+
 func rotate(_ x: float2, by radians: Float) -> float2 {
     return (matrix3x3_rotation(radians: radians) * float3(x, 1)).xy
 }
@@ -123,6 +151,16 @@ extension float3 {
 
     var xy: float2 {
         return float2(x, y)
+    }
+}
+
+extension float4 {
+    init(_ float3: float3, _ w: Float) {
+        self = float4(float3.x, float3.y, float3.z, w)
+    }
+
+    var xyz: float3 {
+        return float3(x, y, z)
     }
 }
 

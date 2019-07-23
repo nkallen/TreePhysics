@@ -97,14 +97,15 @@ class Interpreter {
 
     func interpret(_ commands: [Command]) {
         var state = self.stack.removeLast()
-        state.pen.start(at: state.position, tangent: state.heading, thickness: state.thickness)
+        state.pen.start(at: state.position, thickness: state.thickness)
 
         for command in commands {
             switch command {
             case let .forward(distance, thickness):
-                state.position += state.heading * (distance ?? state.stepSize)
+                let distance = distance ?? state.stepSize
+                state.position += state.heading * distance
                 state.thickness = thickness ?? state.thickness
-                state.pen.cont(to: state.position, tangent: state.heading, thickness: state.thickness)
+                state.pen.cont(distance: distance, tangent: state.heading, thickness: state.thickness)
             case let .tropism(magnitude):
                 let angle = configuration.elasticity *
                     length(cross(state.heading, float2(0, -(magnitude ?? configuration.tropism))))
@@ -123,7 +124,7 @@ class Interpreter {
             case .push:
                 self.stack.append(state)
                 let pen = state.pen.branch
-                pen.start(at: state.position, tangent: state.heading, thickness: state.thickness)
+                pen.start(at: state.position, thickness: state.thickness)
                 state = State(position: state.position, heading: state.heading, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
             case .pop:
                 state = self.stack.removeLast()

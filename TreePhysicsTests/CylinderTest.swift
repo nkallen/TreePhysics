@@ -3,27 +3,30 @@ import XCTest
 @testable import TreePhysics
 import simd
 
-class CylinderTests: XCTestCase {
-    var cylinder: Cylinder!
+class CylinderPenTests: XCTestCase {
+    var pen: CylinderPen!
     var arcLength: Float!
 
     override func setUp() {
         super.setUp()
-        self.cylinder = Cylinder(radius: 1.0, height: 1.0, radialSegmentCount: 3)
+        self.pen = CylinderPen(radialSegmentCount: 3)
         self.arcLength = 2.0 * .pi / 3
+
+        pen.start(at: float2.zero, thickness: 1)
+        pen.cont(distance: 1, tangent: float2(0,1), thickness: .pi)
     }
 
     func testVertices() {
         XCTAssertEqual([
-            float3(cos(0), -0.5, sin(0)),
-            float3(cos(0), 0.5, sin(0)),
+            float3(cos(0), 0, sin(0)),
+            float3(cos(0), 1, sin(0)),
 
-            float3(cos(arcLength), -0.5, sin(arcLength)),
-            float3(cos(arcLength), 0.5, sin(arcLength)),
+            float3(cos(arcLength), 0, sin(arcLength)),
+            float3(cos(arcLength), 1, sin(arcLength)),
 
-            float3(cos(2*arcLength), -0.5, sin(2*arcLength)),
-            float3(cos(2*arcLength), 0.5, sin(2*arcLength)),
-            ], cylinder.vertices)
+            float3(cos(2*arcLength), 0, sin(2*arcLength)),
+            float3(cos(2*arcLength), 1, sin(2*arcLength)),
+            ], pen.vertices)
     }
 
     func testIndices() {
@@ -32,7 +35,8 @@ class CylinderTests: XCTestCase {
             3,
             4,
             5,
-            0
-            ], cylinder.indices)
+            0,
+            1
+            ], pen.indices)
     }
 }
