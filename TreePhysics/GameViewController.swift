@@ -35,12 +35,12 @@ class GameViewController: NSViewController {
 
     override func viewDidAppear() {
         let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)
-//        let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
+        let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
         let rigidBodyPen = RigidBodyPen(parent: root)
-//        let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
+        let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let configuration = Interpreter.Configuration(thicknessScale: 0.4, stepSize: 0.2)
-        let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
+        let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret("""
 FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]++[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]
 """)
@@ -48,26 +48,26 @@ FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[F
         self.simulator = Simulator(tree: tree)
 
         let bones = root.flatten.map { $0.node }
-//        let geometry = cylinderPen.geometry
-//
-//        let boneInverseBindTransforms: [NSValue]? = bones.map { NSValue(scnMatrix4: SCNMatrix4Invert($0.worldTransform)) }
-//        var boneWeights: [Float] = cylinderPen.vertices.map { _ in 1.0 }
-//        var boneIndices: [UInt8] = cylinderPen.vertices.map { _ in 1 }
-//
-//
-//        let boneWeightsData = Data(bytesNoCopy: &boneWeights, count: boneWeights.count * MemoryLayout<Float>.size, deallocator: .none)
-//        let boneIndicesData = Data(bytesNoCopy: &boneIndices, count: boneWeights.count * MemoryLayout<UInt16>.size, deallocator: .none)
-//
-//        let boneWeightsGeometrySource = SCNGeometrySource(data: boneWeightsData, semantic: .boneWeights, vectorCount: boneWeights.count, usesFloatComponents: true, componentsPerVector: 1, bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0, dataStride: MemoryLayout<Float>.size)
-//        let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<UInt16>.size, dataOffset: 0, dataStride: MemoryLayout<UInt16>.size)
+        let geometry = cylinderPen.geometry
 
-//        let skinner = SCNSkinner(baseGeometry: geometry, bones: bones, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
+        let boneInverseBindTransforms: [NSValue]? = bones.map { NSValue(scnMatrix4: SCNMatrix4Invert($0.worldTransform)) }
+        var boneWeights: [Float] = cylinderPen.vertices.map { _ in 1.0 }
+        var boneIndices: [UInt16] = cylinderPen.vertices.map { _ in 1 }
 
-//        let node = SCNNode(geometry: geometry)
-//        node.skinner = skinner
+
+        let boneWeightsData = Data(bytesNoCopy: &boneWeights, count: boneWeights.count * MemoryLayout<Float>.size, deallocator: .none)
+        let boneIndicesData = Data(bytesNoCopy: &boneIndices, count: boneWeights.count * MemoryLayout<UInt16>.size, deallocator: .none)
+
+        let boneWeightsGeometrySource = SCNGeometrySource(data: boneWeightsData, semantic: .boneWeights, vectorCount: boneWeights.count, usesFloatComponents: true, componentsPerVector: 1, bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0, dataStride: MemoryLayout<Float>.size)
+        let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<UInt16>.size, dataOffset: 0, dataStride: MemoryLayout<UInt16>.size)
+
+        let skinner = SCNSkinner(baseGeometry: geometry, bones: bones, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
+
+        let node = SCNNode(geometry: geometry)
+        node.skinner = skinner
 
         let scene = scnView.scene!
-//        scene.rootNode.addChildNode(node)
+        scene.rootNode.addChildNode(node)
         for bone in bones {
             scene.rootNode.addChildNode(bone)
         }
