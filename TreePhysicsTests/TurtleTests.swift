@@ -35,7 +35,8 @@ class TurtleTests: XCTestCase {
         super.setUp()
 
         self.pen = FakePen(branch: FakePen())
-        self.interpreter = Interpreter(pen: self.pen)
+        let configuration = Interpreter.Configuration(angle: .pi / 4)
+        self.interpreter = Interpreter(configuration: configuration, pen: self.pen)
         self.stepSize = interpreter.configuration.stepSize
     }
 

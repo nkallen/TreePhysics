@@ -1,1 +1,9 @@
-30fps @ 1090 (depth: 4, angles: 3, segments: 3)
+Simplified Mesh:
+
+1. Cylinder[radius, height, radialSegmentCount, heightSegmentCount]
+  - goes from 0..height in direction (0,1,0)
+2. Generate triangles
+3. Generate SCNGeometry object
+4. Cylinder goes from a->b: height = distance(a,b). calculate rotation from (0,1,0) to (b-a) using
+  - https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
+
