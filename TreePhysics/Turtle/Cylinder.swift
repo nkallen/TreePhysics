@@ -87,11 +87,17 @@ class CylinderPen: Pen {
         return (vertices, indices)
     }
 
-    var element: SCNGeometryElement {
+    private var element: SCNGeometryElement {
+        print("indices", indices)
         return SCNGeometryElement(indices: indices, primitiveType: .triangleStrip)
     }
 
-    var source: SCNGeometrySource {
+    private var source: SCNGeometrySource {
+        print("vertices", vertices)
         return SCNGeometrySource(vertices: vertices.map { SCNVector3($0) })
     }
+
+    lazy var geometry: SCNGeometry = {
+        return SCNGeometry(sources: [source], elements: [element])
+    }()
 }
