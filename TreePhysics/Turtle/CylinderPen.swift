@@ -1,5 +1,4 @@
 import Foundation
-import simd
 import SceneKit
 
 class CylinderPen: Pen {
@@ -87,17 +86,17 @@ class CylinderPen: Pen {
         return (vertices, indices)
     }
 
-    private var element: SCNGeometryElement {
+    private(set) lazy var element: SCNGeometryElement = {
         print("indices", indices)
         return SCNGeometryElement(indices: indices, primitiveType: .triangleStrip)
-    }
+    }()
 
-    private var source: SCNGeometrySource {
+    private(set) lazy var source: SCNGeometrySource = {
         print("vertices", vertices)
         return SCNGeometrySource(vertices: vertices.map { SCNVector3($0) })
-    }
+    }()
 
-    lazy var geometry: SCNGeometry = {
+    private(set) lazy var geometry: SCNGeometry = {
         return SCNGeometry(sources: [source], elements: [element])
     }()
 }

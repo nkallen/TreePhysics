@@ -11,28 +11,16 @@ final class Joint: HasTransform {
     var angularVelocity: Float = 0
     var angle: Float = 0 {
         didSet {
-            node.simdRotation = float4(0, 0, 1, angle)
             self.transform = parentRigidBody.transform * matrix3x3_translation(0, parentRigidBody.length) * matrix3x3_rotation(radians: self.angle)
         }
     }
 
     let k: Float
 
-    let node: SCNNode
-
     init(parent: RigidBody, child: RigidBody, k: Float? = nil) {
         self.parentRigidBody = parent
         self.childRigidBody = child
         self.k = k ?? Joint.computeK(radius: parent.radius)
-
-        let node = SCNNode()
-        node.addChildNode(child.node)
-        node.name = "Joint"
-        // SceneKit's cylinder's (0,0) is at its center, so the joint is at length/2 on the y axis
-        node.simdPosition = float3(0, parent.length/2, 0)
-        self.node = node
-        parent.childJoints.append(self)
-        child.parentJoint = self
         updateTransform()
     }
 

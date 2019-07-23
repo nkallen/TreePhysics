@@ -8,8 +8,9 @@ final class Simulator {
 
     init(tree: Tree) {
         self.tree = tree
-        self.rigidBodiesLevelOrder = tree.flatten.filter { $0.kind == .dynamic }
+        self.rigidBodiesLevelOrder = tree.root.flatten.filter { $0.kind == .dynamic }
         self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
+        updateRigidBodies()
     }
 
     func update(at time: TimeInterval) {
@@ -92,27 +93,6 @@ final class Simulator {
             rigidBody.resetForces()
         }
     }
-}
-
-extension Tree {
-    var flatten: [RigidBody] {
-        var result: [RigidBody] = []
-        var queue: [RigidBody] = [root]
-        searchBreadthFirst(queue: &queue, result: &result)
-        return result
-    }
-
-    private func searchBreadthFirst(queue: inout [RigidBody], result: inout [RigidBody]) {
-        while !queue.isEmpty {
-            let start = queue.removeFirst()
-            result.append(start)
-            for childJoint in start.childJoints {
-                queue.append(childJoint.childRigidBody)
-            }
-        }
-    }
-
-
 }
 
 extension RigidBody: CustomDebugStringConvertible {
