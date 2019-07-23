@@ -43,7 +43,9 @@ FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[F
 """)
         let tree = Tree(root)
         self.simulator = Simulator(tree: tree)
-        scnView.scene!.rootNode.addChildNode(tree.root.node)
+//        scnView.scene!.rootNode.addChildNode(tree.root.node)
+        let cylinder = Cylinder(radius: 1, height: 5)
+        scnView.scene!.rootNode.addChildNode(SCNNode(geometry: SCNGeometry(sources: [cylinder.source], elements: [cylinder.element])))
         scnView.delegate = self
     }
 

@@ -110,6 +110,7 @@
 		9EE7EBA022DDDC6C00535997 /* TreePhysics */ = {
 			isa = PBXGroup;
 			children = (
+				9EE7EBCB22E1078200535997 /* NOTES */,
 				9E036B1D22E4F57900229235 /* Turtle */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA322DDDC6C00535997 /* GameViewController.swift */,
@@ -122,7 +123,6 @@
 				9EE7EBC322E08E4000535997 /* Math.swift */,
 				9EE7EBC522E0972400535997 /* HasTransform.swift */,
 				9EE7EBC922E0F27900535997 /* main.swift */,
-				9EE7EBCB22E1078200535997 /* NOTES */,
 				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
 			);
 			path = TreePhysics;
