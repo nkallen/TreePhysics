@@ -2,20 +2,22 @@ import Foundation
 import simd
 import SceneKit
 
-class CylinderPen {
+class CylinderPen: Pen {
     private(set) var vertices: [float3] = []
     private(set) var indices: [UInt16] = []
+    private let parent: CylinderPen?
 
     private var start: float2? = nil
 
     let radialSegmentCount: Int
     let heightSegmentCount: Int
 
-    init(radialSegmentCount: Int = 48, heightSegmentCount: Int = 1) {
+    init(radialSegmentCount: Int = 48, heightSegmentCount: Int = 1, parent: CylinderPen? = nil) {
         guard radialSegmentCount >= 3 else { fatalError() }
 
         self.radialSegmentCount = radialSegmentCount
         self.heightSegmentCount = heightSegmentCount
+        self.parent = parent
     }
 
     // does start need a tangent?
@@ -41,18 +43,33 @@ class CylinderPen {
                 float3(start, 0) + (rotation * float4(vertex, 0)).xyz
             }
         }
-        let offset = UInt16(self.vertices.count)
-        let offsetIndices = indices.map { offset + $0 }
-
-        if let last = self.indices.last {
-            let degenerate = [last, offsetIndices.first!]
-            self.indices.append(contentsOf: degenerate)
-        }
-
-        self.vertices.append(contentsOf: rotatedVertices)
-        self.indices.append(contentsOf: offsetIndices)
+        addSegment(rotatedVertices, indices)
 
         self.start = start + distance * tangent
+    }
+
+    func addSegment(_ vertices: [float3], _ indices: [UInt16]) {
+        if let parent = parent {
+            parent.addSegment(vertices, indices)
+        } else {
+            let offset = UInt16(self.vertices.count)
+            let offsetIndices = indices.map { offset + $0 }
+
+            if let last = self.indices.last {
+                let degenerate = [last, offsetIndices.first!]
+                self.indices.append(contentsOf: degenerate)
+            }
+
+            self.vertices.append(contentsOf: vertices)
+            self.indices.append(contentsOf: offsetIndices)
+        }
+    }
+
+    var branch: Pen {
+        guard let start = start else { fatalError() }
+        let pen = CylinderPen(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
+        pen.start(at: start, thickness: 1)
+        return pen
     }
 
     private func makeSegment(radius: Float, height: Float) -> ([float3], [UInt16]) {
@@ -72,12 +89,10 @@ class CylinderPen {
     }
 
     var element: SCNGeometryElement {
-        print("indices", indices)
         return SCNGeometryElement(indices: indices, primitiveType: .triangleStrip)
     }
 
     var source: SCNGeometrySource {
-        print("vertices", vertices)
         return SCNGeometrySource(vertices: vertices.map { SCNVector3($0) })
     }
 }

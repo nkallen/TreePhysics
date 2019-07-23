@@ -34,21 +34,16 @@ class GameViewController: NSViewController {
     }
 
     override func viewDidAppear() {
-//        let root = RigidBody(length: 0, radius: 0, kind: .static)
-//        let pen = CylinderPen(parent: root, angle: .pi/2)
-//        let configuration = Interpreter.Configuration(thicknessScale: 0.4, stepSize: 0.5)
-//        let interpreter = Interpreter(configuration: configuration, pen: pen)
-//        interpreter.interpret("""
-//FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]++[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]
-//""")
-//        let tree = Tree(root)
-//        self.simulator = Simulator(tree: tree)
-//        scnView.scene!.rootNode.addChildNode(tree.root.node)
+        let root = RigidBody(length: 0, radius: 0, kind: .static)
         let pen = CylinderPen(radialSegmentCount: 3)
-        pen.start(at: float2.zero, thickness: 1)
-        pen.cont(distance: 1, tangent: float2(0,1), thickness: 1)
-        pen.cont(distance: 2, tangent: normalize(float2(1,1)), thickness: 1)
-        pen.cont(distance: 3, tangent: normalize(float2(1,0)), thickness: 1)
+        let configuration = Interpreter.Configuration(thicknessScale: 0.4, stepSize: 0.5)
+        let interpreter = Interpreter(configuration: configuration, pen: pen)
+        interpreter.interpret("""
+FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]++[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]
+""")
+        let tree = Tree(root)
+        self.simulator = Simulator(tree: tree)
+        scnView.scene!.rootNode.addChildNode(tree.root.node)
         scnView.scene!.rootNode.addChildNode(SCNNode(geometry: SCNGeometry(sources: [pen.source], elements: [pen.element])))
         scnView.delegate = self
     }
