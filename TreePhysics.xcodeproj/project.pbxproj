@@ -91,6 +91,14 @@
 			path = Turtle;
 			sourceTree = "<group>";
 		};
+		9E56C94322E78FA90095C8AC /* Tree */ = {
+			isa = PBXGroup;
+			children = (
+				9EE7EBB322DDDCCB00535997 /* Tree.swift */,
+			);
+			path = Tree;
+			sourceTree = "<group>";
+		};
 		9EE7EB9522DDDC6C00535997 = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +120,7 @@
 		9EE7EBA022DDDC6C00535997 /* TreePhysics */ = {
 			isa = PBXGroup;
 			children = (
+				9E56C94322E78FA90095C8AC /* Tree */,
 				9EE7EBCB22E1078200535997 /* NOTES */,
 				9E036B1D22E4F57900229235 /* Turtle */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
@@ -121,7 +130,6 @@
 				9EE7EBA922DDDC6E00535997 /* Main.storyboard */,
 				9EE7EBAC22DDDC6E00535997 /* Info.plist */,
 				9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */,
-				9EE7EBB322DDDCCB00535997 /* Tree.swift */,
 				9EE7EBC322E08E4000535997 /* Math.swift */,
 				9EE7EBC522E0972400535997 /* HasTransform.swift */,
 				9EE7EBC922E0F27900535997 /* main.swift */,
