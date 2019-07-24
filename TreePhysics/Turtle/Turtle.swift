@@ -115,7 +115,7 @@ class Interpreter<P> where P: Pen {
                 }
                 state.position += state.heading * distanceScaled
                 state.thickness = thicknessScaled
-                _ = state.pen.cont(distance: distance, tangent: state.heading, thickness: state.thickness)
+                _ = state.pen.cont(distance: distanceScaled, tangent: state.heading, thickness: state.thickness)
             case let .tropism(magnitude):
                 let angle = configuration.elasticity *
                     length(cross(state.heading, float2(0, -(magnitude ?? configuration.tropism))))
