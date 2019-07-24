@@ -38,7 +38,7 @@ class SimulatorTests: XCTestCase {
         XCTAssertEqual(b1.centerOfMass, float3(0.5/sqrt(2), 1 + 0.5/sqrt(2), 0), accuracy: 0.0001)
         XCTAssertEqual(root.centerOfMass, float3(0, 0.5, 0), accuracy: 0.0001)
 
-        XCTAssertEqual(b2.parentJoint!.position, float3(1/sqrt(2), 1 + 1/sqrt(2), 0))
+        XCTAssertEqual(b2.parentJoint!.position, float3(1/sqrt(2), 1 + 1/sqrt(2), 0), accuracy: 0.0001)
         XCTAssertEqual(b1.parentJoint!.position, float3(0,1, 0))
     }
 
