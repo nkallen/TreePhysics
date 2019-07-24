@@ -24,7 +24,7 @@ final class RigidBody: HasTransform {
     var transform: matrix_float4x4 = matrix_identity_float4x4 {
         didSet {
             updateCenterOfMass()
-            node.simdPosition = position
+            node.simdTransform = self.transform
         }
     }
     var centerOfMass: float3 = float3.zero
