@@ -102,8 +102,19 @@ class Interpreter<P> where P: Pen {
             switch command {
             case let .forward(distance, thickness):
                 let distance = distance ?? state.stepSize
-                state.position += state.heading * distance
-                state.thickness = thickness ?? state.thickness
+                let thickness = thickness ?? state.thickness
+                let distanceScaled: Float
+                let thicknessScaled: Float
+                if configuration.randomScale != 0 {
+                    let rand = Float.random(in: -configuration.randomScale...configuration.randomScale)
+                    distanceScaled = distance + distance * rand
+                    thicknessScaled = thickness + thickness * rand
+                } else {
+                    distanceScaled = distance
+                    thicknessScaled = thickness
+                }
+                state.position += state.heading * distanceScaled
+                state.thickness = thicknessScaled
                 _ = state.pen.cont(distance: distance, tangent: state.heading, thickness: state.thickness)
             case let .tropism(magnitude):
                 let angle = configuration.elasticity *

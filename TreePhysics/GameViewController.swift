@@ -42,7 +42,7 @@ class GameViewController: NSViewController {
         let rule = Rewriter.Rule(symbol: "A", replacement: #"F!"[+FA][-FA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
 
-        let configuration = Interpreter<SkinningPen>.Configuration(thickness: 0.333, thicknessScale: 0.4, stepSize: 1.5, stepSizeScale: 0.7)
+        let configuration = Interpreter<SkinningPen>.Configuration(randomScale: 0.3, thickness: 0.333, thicknessScale: 0.4, stepSize: 1.5, stepSizeScale: 0.7)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
         let tree = Tree(root)
