@@ -133,6 +133,19 @@ func matrix4x4_rotation(radians: Float, axis: float3) -> matrix_float4x4 {
                                          float4(                  0,                   0,                   0, 1)))
 }
 
+func matrix4x4_translation(_ translationX: Float, _ translationY: Float, _ translationZ: Float) -> matrix_float4x4 {
+    return matrix_float4x4.init(columns:(vector_float4(1, 0, 0, 0),
+                                         vector_float4(0, 1, 0, 0),
+                                         vector_float4(0, 0, 1, 0),
+                                         vector_float4(translationX, translationY, translationZ, 1)))
+}
+
+func matrix4x4_scale(_ sx: Float, _ sy: Float, _ sz: Float) -> matrix_float4x4 {
+    return matrix_float4x4.init(columns:(vector_float4(sx, 0, 0, 0),
+                                         vector_float4(0, sy, 0, 0),
+                                         vector_float4(0, 0, sz, 0),
+                                         vector_float4(0, 0, 0, 1)))
+}
 
 func rotate(_ x: float2, by radians: Float) -> float2 {
     return (matrix3x3_rotation(radians: radians) * float3(x, 1)).xy
@@ -145,6 +158,10 @@ func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> floa
 }
 
 extension float3 {
+    static let x = float3(1,0,0)
+    static let y = float3(0,1,0)
+    static let z = float3(0,0,1)
+
     init(_ float2: float2, _ z: Float) {
         self = float3(float2.x, float2.y, z)
     }

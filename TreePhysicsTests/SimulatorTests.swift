@@ -7,7 +7,7 @@ class SimulatorTests: XCTestCase {
     var root: RigidBody!
     var b1: RigidBody!
     var b2: RigidBody!
-    let force = float2(0, 1) // world coordinates
+    let force = float3(0, 1, 0) // world coordinates
 
     override func setUp() {
         super.setUp()
@@ -20,32 +20,32 @@ class SimulatorTests: XCTestCase {
 
         simulator = Simulator(tree: Tree(root))
 
-        b2.apply(force: force, at: 1) // ie at float2(0, 1) in local coordinates
+        b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
     }
 
     func testApplyForce() {
         XCTAssertEqual(b2.mass, 1)
         XCTAssertEqual(b2.force, force)
 
-        XCTAssertEqual(b2.torque, cross(b2.convert(position: float2(0, 1)) - b2.position, force))
+        XCTAssertEqual(b2.torque, cross(b2.convert(position: float3(0, 1, 0)) - b2.position, force))
         XCTAssertEqual(b2.momentOfInertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
 
-        XCTAssertEqual(root.position, float2(0,0))
-        XCTAssertEqual(b1.parentJoint!.position, float2(0,1))
-        XCTAssertEqual(b1.position, float2(0,1))
+        XCTAssertEqual(root.position, float3.zero)
+        XCTAssertEqual(b1.parentJoint!.position, float3(0,1,0))
+        XCTAssertEqual(b1.position, float3(0,1,0))
 
-        XCTAssertEqual(b2.centerOfMass, float2(0.5 + 1/sqrt(2), 1 + 1/sqrt(2)), accuracy: 0.0001)
-        XCTAssertEqual(b1.centerOfMass, float2(0.5/sqrt(2), 1 + 0.5/sqrt(2)), accuracy: 0.0001)
-        XCTAssertEqual(root.centerOfMass, float2(0, 0.5), accuracy: 0.0001)
+        XCTAssertEqual(b2.centerOfMass, float3(0.5 + 1/sqrt(2), 1 + 1/sqrt(2), 0), accuracy: 0.0001)
+        XCTAssertEqual(b1.centerOfMass, float3(0.5/sqrt(2), 1 + 0.5/sqrt(2), 0), accuracy: 0.0001)
+        XCTAssertEqual(root.centerOfMass, float3(0, 0.5, 0), accuracy: 0.0001)
 
-        XCTAssertEqual(b2.parentJoint!.position, float2(1/sqrt(2), 1 + 1/sqrt(2)))
-        XCTAssertEqual(b1.parentJoint!.position, float2(0,1))
+        XCTAssertEqual(b2.parentJoint!.position, float3(1/sqrt(2), 1 + 1/sqrt(2), 0))
+        XCTAssertEqual(b1.parentJoint!.position, float3(0,1, 0))
     }
 
     func testComposite() {
         simulator.updateCompositeBodies()
 
-        let forceAppliedPosition = b2.convert(position: float2(0, 1))
+        let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         // mass
         XCTAssertEqual(b2.composite.mass, 1)
@@ -101,7 +101,7 @@ class TreeTests: XCTestCase {
         b2.add(b6)
         b2.add(b7)
 
-        XCTAssertEqual(Tree(root).flatten,
+        XCTAssertEqual(root.flatten,
                        [root, b1, b2, b3, b4, b6, b7, b5])
     }
 }
@@ -123,9 +123,10 @@ class QuadraticTests: XCTestCase {
     }
 }
 
-func XCTAssertEqual(_ x: float2, _ y: float2, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(x.x, y.x, accuracy: accuracy, file: file, line: line)
-    XCTAssertEqual(x.y, y.y, accuracy: accuracy, file: file, line: line)
+func XCTAssertEqual(_ a: float3, _ b: float3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
+    XCTAssertEqual(a.x, b.x, accuracy: accuracy, file: file, line: line)
+    XCTAssertEqual(a.y, b.y, accuracy: accuracy, file: file, line: line)
+    XCTAssertEqual(a.z, b.z, accuracy: accuracy, file: file, line: line)
 }
 
 class DifferentialTests: XCTestCase {

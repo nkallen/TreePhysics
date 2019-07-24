@@ -3,7 +3,9 @@ import XCTest
 @testable import TreePhysics
 import simd
 
-class FakePen: Pen {
+final class FakePen: Pen {
+    typealias T = ()
+
     var points: [float2] = []
     let _branch: FakePen?
 
@@ -15,23 +17,23 @@ class FakePen: Pen {
         points.append(at)
     }
 
-    func cont(distance: Float, tangent: float2, thickness: Float) {
+    func cont(distance: Float, tangent: float2, thickness: Float) -> () {
         points.append(points.last! + distance * tangent)
     }
 
-    var branch: Pen { return _branch! }
+    var branch: FakePen { return _branch! }
 }
 
 class TurtleTests: XCTestCase {
     var pen: FakePen!
-    var interpreter: Interpreter!
+    var interpreter: Interpreter<FakePen>!
     var stepSize: Float!
 
     override func setUp() {
         super.setUp()
 
         self.pen = FakePen(branch: FakePen())
-        let configuration = Interpreter.Configuration(angle: .pi / 4)
+        let configuration = Interpreter<FakePen>.Configuration(angle: .pi / 4)
         self.interpreter = Interpreter(configuration: configuration, pen: self.pen)
         self.stepSize = interpreter.configuration.stepSize
     }

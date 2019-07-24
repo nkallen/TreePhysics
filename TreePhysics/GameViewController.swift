@@ -101,9 +101,9 @@ extension GameViewController {
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if toggle {
-            Tree.gravity = float2(0, -100)
+            Tree.gravity = float3(0, -100, 0)
         } else {
-            Tree.gravity = float2.zero
+            Tree.gravity = float3.zero
         }
 
         simulator.update(at: 1.0 / 60)

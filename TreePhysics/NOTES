@@ -1,9 +1,6 @@
-Simplified Mesh:
-
-1. Cylinder[radius, height, radialSegmentCount, heightSegmentCount]
-  - goes from 0..height in direction (0,1,0)
-2. Generate triangles
-3. Generate SCNGeometry object
-4. Cylinder goes from a->b: height = distance(a,b). calculate rotation from (0,1,0) to (b-a) using
-  - https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
-
+1. Convert most things to 3d
+2. Test very complicated L-system
+3. Wind and fictitious forces
+4. mouse based control points to test what might happen to a face
+6. transparent shader
+5. bring in face growth

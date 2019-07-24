@@ -21,14 +21,14 @@ final class RigidBody: HasTransform {
     let radius: Float
     let momentOfInertia: Float
 
-    var transform: matrix_float3x3 = matrix_identity_float3x3 {
+    var transform: matrix_float4x4 = matrix_identity_float4x4 {
         didSet {
             updateCenterOfMass()
-            node.simdPosition = float3(convert(position: float2(0,0)), 0)
+            node.simdPosition = position
         }
     }
-    var centerOfMass: float2 = float2.zero
-    var force: float2 = float2.zero
+    var centerOfMass: float3 = float3.zero
+    var force: float3 = float3.zero
     var torque: float3 = float3.zero
 
     let node: SCNNode
@@ -57,7 +57,7 @@ final class RigidBody: HasTransform {
         self.composite = CompositeBody()
 
         node.name = name
-        node.simdPosition = float3(convert(position: float2(0,0)),0)
+        node.simdPosition = position
 
         updateCenterOfMass()
     }
@@ -76,28 +76,28 @@ final class RigidBody: HasTransform {
 
     // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
     // distance is in normalize [0..1] coordinates
-    func apply(force: float2, at distance: Float) {
+    func apply(force: float3, at distance: Float) {
         guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
 
         self.force += force
-        self.torque += cross(convert(position: float2(0, 1) * distance * length) - self.position, force)
+        self.torque += cross(convert(position: float3(0, 1, 0) * distance * length) - self.position, force)
     }
 
     func resetForces() {
-        self.force = float2.zero
+        self.force = float3.zero
         self.torque = float3.zero
     }
 
     func updateTransform() {
         if let parentJoint = parentJoint {
-            self.transform = parentJoint.transform * matrix3x3_rotation(radians: self.angle)
+            self.transform = parentJoint.transform * matrix4x4_rotation(radians: self.angle, axis: .z)
         } else {
-            self.transform = matrix_identity_float3x3
+            self.transform = matrix_identity_float4x4
         }
     }
 
     private func updateCenterOfMass() {
-        let localCenterOfMass = float2(0, 1) * length / 2
+        let localCenterOfMass = float3(0, 1, 0) * length / 2
         self.centerOfMass = convert(position: localCenterOfMass)
     }
 }

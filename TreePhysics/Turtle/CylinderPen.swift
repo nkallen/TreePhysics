@@ -92,12 +92,10 @@ final class CylinderPen: Pen {
     }
 
     private(set) lazy var element: SCNGeometryElement = {
-        print("indices", indices)
         return SCNGeometryElement(indices: indices, primitiveType: .triangleStrip)
     }()
 
     private(set) lazy var source: SCNGeometrySource = {
-        print("vertices", vertices)
         return SCNGeometrySource(vertices: vertices.map { SCNVector3($0) })
     }()
 

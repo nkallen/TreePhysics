@@ -8,7 +8,7 @@ extension Tree {
     static let maxAngle: Float = Float.pi / 3
     static let minAngle: Float = -Float.pi / 3
 
-    static var gravity = float2.zero
+    static var gravity = float3.zero
 }
 
 final class Tree {
