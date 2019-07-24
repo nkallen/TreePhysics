@@ -6,18 +6,18 @@ final class RigidBodyPen: Pen {
 
     private var parentBranch: RigidBody
     private var parentAngle: Float
-    private var start: float2? = nil
+    private var start: float3? = nil
 
     init(parent: RigidBody, angle: Float = .pi/2) {
         self.parentBranch = parent
         self.parentAngle = angle
     }
 
-    func start(at: float2, thickness: Float) {
+    func start(at: float3, thickness: Float) {
         start = at
     }
 
-    func cont(distance: Float, tangent: float2, thickness: Float) -> RigidBody {
+    func cont(distance: Float, tangent: float3, thickness: Float) -> RigidBody {
         guard let start = start else { fatalError() }
 
         let newBranch = RigidBody(length: distance, radius: sqrt(thickness / .pi), density: 750)

@@ -129,11 +129,46 @@ func XCTAssertEqual(_ a: float3, _ b: float3, accuracy: Float, file: StaticStrin
     XCTAssertEqual(a.z, b.z, accuracy: accuracy, file: file, line: line)
 }
 
+
+func XCTAssertEqual(_ a: [float3], _ b: [float3], accuracy: Float, file: StaticString = #file, line: UInt = #line) {
+    XCTAssertEqual(a.count, b.count, file: file, line: line)
+    for (left, right) in zip(a, b) {
+        XCTAssertEqual(left, right, accuracy: accuracy)
+    }
+}
+
+func XCTAssertEqual(_ a: DifferentialSolution, _ b: DifferentialSolution, accuracy: Double, file: StaticString = #file, line: UInt = #line) {
+    switch (a, b) {
+    case let (.realDistinct(c1_left, c2_left, r1_left, r2_left, k_left),
+              .realDistinct(c1_right, c2_right, r1_right, r2_right, k_right)):
+        XCTAssertEqual(c1_left, c1_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(c2_left, c2_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(r1_left, r1_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(r2_left, r2_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(k_left, k_right, accuracy: accuracy)
+    case let (.real(c1_left, c2_left, r_left, k_left),
+              .real(c1_right, c2_right, r_right, k_right)):
+        XCTAssertEqual(c1_left, c1_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(c2_left, c2_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(r_left, r_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(k_left, k_right, accuracy: accuracy, file: file, line: line)
+    case let (.complex(c1_left, c2_left, lambda_left, mu_left, k_left),
+          .complex(c1_right, c2_right, lambda_right, mu_right, k_right)):
+        XCTAssertEqual(c1_left, c1_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(c2_left, c2_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(lambda_left, lambda_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(mu_left, mu_right, accuracy: accuracy, file: file, line: line)
+        XCTAssertEqual(k_left, k_right, accuracy: accuracy, file: file, line: line)
+    default:
+        XCTFail(file: file, line: line)
+    }
+}
+
 class DifferentialTests: XCTestCase {
     func testRealDistinct() {
         let actual = solve_differential(a: 1, b: 11, c: 24, g: 0, y_0: 0, y_ddt_0: -7)
         let expected = DifferentialSolution.realDistinct(c1: -7.0/5, c2: 7.0/5, r1: -3, r2: -8, k: 0)
-        XCTAssertEqual(actual, expected)
+        XCTAssertEqual(actual, expected, accuracy: 0.0001)
         XCTAssertEqual(evaluate(differential: actual, at: 0), float3(0, -7, 77))
     }
 

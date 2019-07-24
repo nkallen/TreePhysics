@@ -147,8 +147,8 @@ func matrix4x4_scale(_ sx: Float, _ sy: Float, _ sz: Float) -> matrix_float4x4 {
                                          vector_float4(0, 0, 0, 1)))
 }
 
-func rotate(_ x: float2, by radians: Float) -> float2 {
-    return (matrix3x3_rotation(radians: radians) * float3(x, 1)).xy
+func rotate(_ x: float3, by radians: Float, axis: float3) -> float3 {
+    return (matrix4x4_rotation(radians: radians, axis: axis) * float4(x, 0)).xyz
 }
 
 func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> float3x3 {

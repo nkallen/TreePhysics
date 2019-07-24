@@ -6,18 +6,18 @@ import simd
 final class FakePen: Pen {
     typealias T = ()
 
-    var points: [float2] = []
+    var points: [float3] = []
     let _branch: FakePen?
 
     init(branch: FakePen? = nil) {
         self._branch = branch
     }
 
-    func start(at: float2, thickness: Float) {
+    func start(at: float3, thickness: Float) {
         points.append(at)
     }
 
-    func cont(distance: Float, tangent: float2, thickness: Float) -> () {
+    func cont(distance: Float, tangent: float3, thickness: Float) -> () {
         points.append(points.last! + distance * tangent)
     }
 
@@ -40,8 +40,9 @@ class TurtleTests: XCTestCase {
 
     func testForward() {
         interpreter.interpret([.forward(distance: nil, width: nil), .turnLeft(radians: nil), .forward(distance: nil, width: nil)])
-        XCTAssertEqual([float2.zero, float2(0, stepSize), float2(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2))],
-                       pen.points)
+        XCTAssertEqual([float3.zero, float3(0, stepSize, 0), float3(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+                       pen.points,
+                       accuracy: 0.0001)
     }
 
     func testBranch() {
@@ -52,14 +53,16 @@ class TurtleTests: XCTestCase {
                                .pop,
                                .turnLeft(radians: nil), .forward(distance: nil, width: nil)])
         XCTAssertEqual([
-            float2.zero,
-            float2(0, stepSize),
-            float2(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2))],
-                       pen.points)
+            float3.zero,
+            float3(0, stepSize, 0),
+            float3(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+                       pen.points,
+                       accuracy: 0.0001)
         XCTAssertEqual([
-            float2(0, stepSize),
-            float2(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2))],
-                       (pen.branch as! FakePen).points)
+            float3(0, stepSize, 0),
+            float3(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+                       pen.branch.points,
+                       accuracy: 0.0001)
 
     }
 }

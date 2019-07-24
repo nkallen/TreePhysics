@@ -49,7 +49,6 @@ final class RigidBody: HasTransform {
         self.kind = kind
 
         self.mass = Float.pi * radius*radius * length * density
-        print(name, mass, radius, length, density)
         self.length = length
         self.radius = radius
         self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass

@@ -12,8 +12,8 @@ class CylinderPenTests: XCTestCase {
         self.pen = CylinderPen(radialSegmentCount: 3)
         self.arcLength = 2.0 * .pi / 3
 
-        pen.start(at: float2.zero, thickness: 1)
-        pen.cont(distance: 1, tangent: float2(0,1), thickness: .pi)
+        pen.start(at: float3.zero, thickness: 1)
+        _ = pen.cont(distance: 1, tangent: float3(0,1,0), thickness: .pi)
     }
 
     func testVertices() {

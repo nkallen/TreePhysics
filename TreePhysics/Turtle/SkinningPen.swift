@@ -17,12 +17,12 @@ final class SkinningPen: Pen {
         self.parent = parent
     }
 
-    func start(at: float2, thickness: Float) {
+    func start(at: float3, thickness: Float) {
         cylinderPen.start(at: at, thickness: thickness)
         rigidBodyPen.start(at: at, thickness: thickness)
     }
 
-    func cont(distance: Float, tangent: float2, thickness: Float) -> T {
+    func cont(distance: Float, tangent: float3, thickness: Float) -> T {
         let vertices = cylinderPen.cont(distance: distance, tangent: tangent, thickness: thickness)
         let rigidBody = rigidBodyPen.cont(distance: distance, tangent: tangent, thickness: thickness)
         return addBone((vertices, rigidBody))

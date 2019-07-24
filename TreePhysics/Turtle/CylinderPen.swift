@@ -8,7 +8,7 @@ final class CylinderPen: Pen {
     private(set) var indices: Indices = []
     weak var parent: CylinderPen?
 
-    private var start: float2? = nil
+    private var start: float3? = nil
 
     let radialSegmentCount: Int
     let heightSegmentCount: Int
@@ -21,26 +21,26 @@ final class CylinderPen: Pen {
         self.parent = parent
     }
 
-    func start(at: float2, thickness: Float) {
+    func start(at: float3, thickness: Float) {
         start = at
     }
 
-    func cont(distance: Float, tangent: float2, thickness: Float) -> Indices {
+    func cont(distance: Float, tangent: float3, thickness: Float) -> Indices {
         precondition(length(tangent) > 0)
         guard let start = start else { fatalError() }
 
         let radius = sqrt(thickness / .pi)
 
         let (vertices, indices) = makeSegment(radius: radius, height: distance)
-        let rotation = matrix4x4_rotation(from: float3(0,1,0), to: float3(tangent, 0))
+        let rotation = matrix4x4_rotation(from: float3(0,1,0), to: tangent)
         let rotatedVertices: [float3]
         if tangent.x == 0 && tangent.y > 0 {
             rotatedVertices = vertices.map { vertex in
-                float3(start, 0) + vertex
+                start + vertex
             }
         } else {
             rotatedVertices = vertices.map { vertex in
-                float3(start, 0) + (rotation * float4(vertex, 0)).xyz
+                start + (rotation * float4(vertex, 0)).xyz
             }
         }
 

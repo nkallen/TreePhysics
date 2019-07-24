@@ -95,6 +95,7 @@ extension GameViewController {
     @objc
     func handleClick(_ gestureRecognizer: NSGestureRecognizer) {
         toggle = !toggle
+        print(scnView.hitTest(gestureRecognizer.location(in: scnView), options: nil))
     }
 
 }

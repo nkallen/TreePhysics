@@ -9,6 +9,8 @@ enum Command {
     case turnRandom(upToRadians: Float?)
     case multiplyStepSize(Float?)
     case multiplyThickness(Float?)
+    case roll(Float?)
+    case pitch(Float?)
     case push
     case pop
 }
@@ -49,8 +51,10 @@ class Interpreter<P> where P: Pen {
     }
 
     struct State {
-        var position: float2
-        var heading: float2
+        var position: float3
+        var heading: float3
+        var left: float3
+        var up: float3
         var stepSize: Float // meters
         var thickness: Float // meters^2
         let pen: P
@@ -77,6 +81,10 @@ class Interpreter<P> where P: Pen {
                 result.append(.push)
             case "]":
                 result.append(.pop)
+            case "/":
+                result.append(.roll(nil))
+            case "&":
+                result.append(.pitch(nil))
             default: ()
 //                fatalError()
             }
@@ -87,7 +95,7 @@ class Interpreter<P> where P: Pen {
     init(configuration: Configuration = Configuration(), pen: P) {
         self.configuration = configuration
         stack.append(
-            State(position: float2.zero, heading: float2(0,1), stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
+            State(position: float3.zero, heading: .y, left: -.x, up: -.z, stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
     }
 
     func interpret(_ string: String) {
@@ -118,15 +126,15 @@ class Interpreter<P> where P: Pen {
                 _ = state.pen.cont(distance: distanceScaled, tangent: state.heading, thickness: state.thickness)
             case let .tropism(magnitude):
                 let angle = configuration.elasticity *
-                    length(cross(state.heading, float2(0, -(magnitude ?? configuration.tropism))))
-                state.heading = rotate(state.heading, by: angle)
+                    length(cross(state.heading, float3(0, -(magnitude ?? configuration.tropism), 0)))
+                state.heading = rotate(state.heading, by: angle, axis: state.up)
             case let .turnLeft(radians):
-                state.heading = rotate(state.heading, by: abs(radians ?? configuration.angle))
+                state.heading = rotate(state.heading, by: -abs(radians ?? configuration.angle), axis: state.up)
             case let .turnRight(radians):
-                state.heading = rotate(state.heading, by: -abs(radians ?? configuration.angle))
+                state.heading = rotate(state.heading, by: abs(radians ?? configuration.angle), axis: state.up)
             case let .turnRandom(upToRadians):
                 let upTo = upToRadians ?? configuration.angle
-                state.heading = rotate(state.heading, by: Float.random(in: -upTo...upTo))
+                state.heading = rotate(state.heading, by: Float.random(in: -upTo...upTo), axis: state.up)
             case let .multiplyStepSize(stepSizeScale):
                 state.stepSize *= stepSizeScale ?? configuration.stepSizeScale
             case let .multiplyThickness(thicknessScale):
@@ -135,9 +143,10 @@ class Interpreter<P> where P: Pen {
                 self.stack.append(state)
                 let pen = state.pen.branch
                 pen.start(at: state.position, thickness: state.thickness)
-                state = State(position: state.position, heading: state.heading, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
+                state = State(position: state.position, heading: state.heading, left: state.left, up: state.up, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
             case .pop:
                 state = self.stack.removeLast()
+            default: ()
             }
         }
         stack.append(state)
