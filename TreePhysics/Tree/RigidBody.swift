@@ -44,10 +44,12 @@ final class RigidBody: HasTransform {
     init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
         self.name = "Branch[\(i)]"
         i += 1
+//        print(self.name)
 
         self.kind = kind
 
         self.mass = Float.pi * radius*radius * length * density
+        print(name, mass, radius, length, density)
         self.length = length
         self.radius = radius
         self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass

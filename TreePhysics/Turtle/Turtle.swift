@@ -77,8 +77,8 @@ class Interpreter<P> where P: Pen {
                 result.append(.push)
             case "]":
                 result.append(.pop)
-            default:
-                fatalError()
+            default: ()
+//                fatalError()
             }
         }
         return result

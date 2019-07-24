@@ -29,22 +29,6 @@ final class Joint: HasTransform {
     }
 
     private static func computeK(radius: Float) -> Float {
-        if radius <= 0.003 {
-            return Tree.K
-        } else if radius <= 0.005 {
-            return Tree.K
-        } else if radius <= 0.01 {
-            return 4 * Tree.K
-        } else if radius <= 0.02 {
-            return 256 * Tree.K
-        } else if radius <= 0.04 {
-            return 256 * Tree.K
-        } else if radius <= 0.075 {
-            return 1024 * Tree.K
-        } else if radius <= 0.15 {
-            return 4096 * Tree.K
-        } else {
-            return 16384 * Tree.K
-        }
+        return Tree.K + Tree.K * 3e5*radius
     }
 }

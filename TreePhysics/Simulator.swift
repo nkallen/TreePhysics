@@ -74,8 +74,8 @@ final class Simulator {
                     parentJoint.angularVelocity = 0
                     parentJoint.angularAcceleration = 0
                 } else {
-                    let solution = solve_differential(a: compositeInertiaRelativeToJoint, b: Tree.B * parentJoint.k, c: parentJoint.k, g: rigidBody.composite.torque.z, y_0: parentJoint.angle, y_ddt_0: parentJoint.angularVelocity)
-                    let thetas = evaluate(differential: solution, at: Float(time))
+                    let solution = solve_differential(a: Double(compositeInertiaRelativeToJoint), b: Double(Tree.B * parentJoint.k), c: Double(parentJoint.k), g: Double(rigidBody.composite.torque.z), y_0: Double(parentJoint.angle), y_ddt_0: Double(parentJoint.angularVelocity))
+                    let thetas = evaluate(differential: solution, at: time)
                     parentJoint.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.x))
                     parentJoint.angularVelocity = thetas.y
                     parentJoint.angularAcceleration = thetas.z

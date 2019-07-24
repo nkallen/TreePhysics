@@ -39,11 +39,12 @@ class GameViewController: NSViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
-        let configuration = Interpreter<SkinningPen>.Configuration(thicknessScale: 0.4, stepSize: 0.2)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"F!"[+FA][-FA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
+
+        let configuration = Interpreter<SkinningPen>.Configuration(thickness: 0.333, thicknessScale: 0.4, stepSize: 1.5, stepSizeScale: 0.7)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
-        interpreter.interpret("""
-FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]++[FFFFFFFFF!"-[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]++[FFFFFFFFF!"-[FFFFFFFFF]++[FFFFFFFFF]]]
-""")
+        interpreter.interpret(lSystem)
         let tree = Tree(root)
         self.simulator = Simulator(tree: tree)
 
