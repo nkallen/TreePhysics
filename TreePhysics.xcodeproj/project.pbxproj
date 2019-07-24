@@ -18,6 +18,8 @@
 		9E56C94922E78FFC0095C8AC /* CompositeBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94822E78FFC0095C8AC /* CompositeBody.swift */; };
 		9E56C94B22E792820095C8AC /* RigidBodyPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94A22E792820095C8AC /* RigidBodyPen.swift */; };
 		9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
+		9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
+		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
 		9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* Simulator.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
@@ -54,6 +56,8 @@
 		9E56C94822E78FFC0095C8AC /* CompositeBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositeBody.swift; sourceTree = "<group>"; };
 		9E56C94A22E792820095C8AC /* RigidBodyPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBodyPen.swift; sourceTree = "<group>"; };
 		9E56C94C22E7929B0095C8AC /* SkinningPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinningPen.swift; sourceTree = "<group>"; };
+		9E9C1E7F22E86B290030DB0E /* Rewriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rewriter.swift; sourceTree = "<group>"; };
+		9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriterTests.swift; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* Simulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Simulator.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -99,6 +103,7 @@
 				9E461B3422E7017F008AB788 /* CylinderPen.swift */,
 				9E56C94A22E792820095C8AC /* RigidBodyPen.swift */,
 				9E56C94C22E7929B0095C8AC /* SkinningPen.swift */,
+				9E9C1E7F22E86B290030DB0E /* Rewriter.swift */,
 			);
 			path = Turtle;
 			sourceTree = "<group>";
@@ -161,6 +166,7 @@
 				9E036B1B22E4F4A700229235 /* TurtleTests.swift */,
 				9E461B3622E704BD008AB788 /* CylinderTest.swift */,
 				9E56C94122E76C340095C8AC /* SkinnerTest.swift */,
+				9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -280,6 +286,7 @@
 				9E461B3522E7017F008AB788 /* CylinderPen.swift in Sources */,
 				9EE7EBC422E08E4000535997 /* Math.swift in Sources */,
 				9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */,
+				9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */,
 				9E036B1F22E4F58600229235 /* Turtle.swift in Sources */,
 				9E56C94722E78FEC0095C8AC /* RigidBody.swift in Sources */,
 			);
@@ -293,6 +300,7 @@
 				9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */,
 				9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */,
 				9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */,
+				9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
