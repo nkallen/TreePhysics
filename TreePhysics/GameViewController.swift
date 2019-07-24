@@ -13,7 +13,7 @@ class GameViewController: NSViewController {
         camera.zNear = 0
         cameraNode.camera = camera
         scene.rootNode.addChildNode(cameraNode)
-        cameraNode.position = SCNVector3(x: 0, y: 3, z: 8)
+        cameraNode.position = SCNVector3(x: 0, y: 0, z: 0.5)
         cameraNode.name = "Camera"
 
         let ambientLightNode = SCNNode()
@@ -39,10 +39,11 @@ class GameViewController: NSViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"F!"[+FA][-FA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 7)
 
-        let configuration = Interpreter<SkinningPen>.Configuration(randomScale: 0.4, thickness: 0.333, thicknessScale: 0.4, stepSize: 1.5, stepSizeScale: 0.7)
+        let configuration = Interpreter<SkinningPen>.Configuration(
+            randomScale: 0.4, angle: 18 * .pi / 180, thickness: 0.001*0.001*Float.pi, thicknessScale: 0.9, stepSize: 0.1, stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
         let tree = Tree(root)

@@ -2,3 +2,9 @@
 4. mouse based control points to test what might happen to a face
 6. transparent shader
 5. bring in face growth
+
+with orientation simd_float3x3([[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+advancing to SIMD3<Float>(0.0, 0.095105655, 0.030901698) with orientation simd_float3x3([[0.0, 0.95105654, 0.30901697], [-1.0, 0.0, 0.0], [0.0, -0.30901697, 0.95105654]])
+
+
+advancing to SIMD3<Float>(0.0, 0.095105655, 0.030901698) with orientation simd_float3x3([[0.0, 0.95105654, 0.30901697], [-1.0, 0.0, 0.0], [0.0, -0.30901697, 0.95105654]])

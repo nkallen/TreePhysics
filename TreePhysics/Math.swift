@@ -110,6 +110,8 @@ func matrix4x4_rotation(from: float3, to: float3) -> float4x4 {
     let from = normalize(from), to = normalize(to)
 
     let axis = cross(from, to)
+    if length(axis) == 0 { return matrix_identity_float4x4 }
+
     let unitAxis = normalize(axis)
     let ct = dot(from, to)
     let st = length(axis)

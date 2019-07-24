@@ -32,16 +32,11 @@ final class CylinderPen: Pen {
         let radius = sqrt(thickness / .pi)
 
         let (vertices, indices) = makeSegment(radius: radius, height: distance)
+
         let rotation = matrix4x4_rotation(from: float3(0,1,0), to: tangent)
         let rotatedVertices: [float3]
-        if tangent.x == 0 && tangent.y > 0 {
-            rotatedVertices = vertices.map { vertex in
-                start + vertex
-            }
-        } else {
-            rotatedVertices = vertices.map { vertex in
-                start + (rotation * float4(vertex, 0)).xyz
-            }
+        rotatedVertices = vertices.map { vertex in
+            start + (rotation * float4(vertex, 0)).xyz
         }
 
         self.start = start + distance * tangent

@@ -3,17 +3,19 @@ import simd
 
 enum Command {
     case forward(distance: Float?, width: Float?)
-    case tropism(magnitude: Float?)
+    case tropism(force: float3?)
     case turnLeft(radians: Float?)
     case turnRight(radians: Float?)
     case turnRandom(upToRadians: Float?)
     case multiplyStepSize(Float?)
     case multiplyThickness(Float?)
-    case roll(Float?)
-    case pitch(Float?)
+    case rollRight(Float?)
+    case pitchDown(Float?)
     case push
     case pop
 }
+
+fileprivate let initialOrientation = matrix_float3x3.init(columns: (.y, -.x, .z))
 
 class Interpreter<P> where P: Pen {
     struct Configuration {
@@ -25,7 +27,7 @@ class Interpreter<P> where P: Pen {
             thicknessScale: Float = 0.9,
             stepSize: Float = 0.1,
             stepSizeScale: Float = 0.9,
-            tropism: Float = 0,
+            tropism: float3 = float3.zero,
             elasticity: Float = 0.1
             ) {
             self.randomScale = randomScale
@@ -46,18 +48,20 @@ class Interpreter<P> where P: Pen {
         let thicknessScale: Float
         let stepSize: Float
         let stepSizeScale: Float
-        let tropism: Float
+        let tropism: float3
         let elasticity: Float
     }
 
     struct State {
         var position: float3
-        var heading: float3
-        var left: float3
-        var up: float3
+        var orientation: float3x3
         var stepSize: Float // meters
         var thickness: Float // meters^2
         let pen: P
+
+        var heading: float3 {
+            return orientation.columns.0
+        }
     }
 
     let configuration: Configuration
@@ -82,9 +86,9 @@ class Interpreter<P> where P: Pen {
             case "]":
                 result.append(.pop)
             case "/":
-                result.append(.roll(nil))
+                result.append(.rollRight(nil))
             case "&":
-                result.append(.pitch(nil))
+                result.append(.pitchDown(nil))
             default: ()
 //                fatalError()
             }
@@ -95,7 +99,7 @@ class Interpreter<P> where P: Pen {
     init(configuration: Configuration = Configuration(), pen: P) {
         self.configuration = configuration
         stack.append(
-            State(position: float3.zero, heading: .y, left: -.x, up: -.z, stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
+            State(position: float3.zero, orientation: initialOrientation, stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
     }
 
     func interpret(_ string: String) {
@@ -124,17 +128,26 @@ class Interpreter<P> where P: Pen {
                 state.position += state.heading * distanceScaled
                 state.thickness = thicknessScaled
                 _ = state.pen.cont(distance: distanceScaled, tangent: state.heading, thickness: state.thickness)
-            case let .tropism(magnitude):
-                let angle = configuration.elasticity *
-                    length(cross(state.heading, float3(0, -(magnitude ?? configuration.tropism), 0)))
-                state.heading = rotate(state.heading, by: angle, axis: state.up)
+            case let .tropism(force): ()
+//                let force = force ?? configuration.force
+//                let angle = configuration.elasticity *
+//                    length(cross(state.heading, force))
+//                state.heading = rotate(state.heading, by: angle, axis: state.up)
             case let .turnLeft(radians):
-                state.heading = rotate(state.heading, by: -abs(radians ?? configuration.angle), axis: state.up)
+                let radians = abs(radians ?? configuration.angle)
+                state.orientation *= matrix3x3_rotation_up(radians: radians)
             case let .turnRight(radians):
-                state.heading = rotate(state.heading, by: abs(radians ?? configuration.angle), axis: state.up)
+                let radians = -abs(radians ?? configuration.angle)
+                state.orientation *= matrix3x3_rotation_up(radians: radians)
             case let .turnRandom(upToRadians):
                 let upTo = upToRadians ?? configuration.angle
-                state.heading = rotate(state.heading, by: Float.random(in: -upTo...upTo), axis: state.up)
+//                state.heading = rotate(state.heading, by: Float.random(in: -upTo...upTo), axis: state.up)
+            case let .rollRight(radians):
+                let radians = -abs(radians ?? configuration.angle)
+                state.orientation *= matrix3x3_rotation_heading(radians: radians)
+            case let .pitchDown(radians):
+                let radians = abs(radians ?? configuration.angle)
+                state.orientation *= matrix3x3_rotation_left(radians: radians)
             case let .multiplyStepSize(stepSizeScale):
                 state.stepSize *= stepSizeScale ?? configuration.stepSizeScale
             case let .multiplyThickness(thicknessScale):
@@ -143,12 +156,40 @@ class Interpreter<P> where P: Pen {
                 self.stack.append(state)
                 let pen = state.pen.branch
                 pen.start(at: state.position, thickness: state.thickness)
-                state = State(position: state.position, heading: state.heading, left: state.left, up: state.up, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
+                state = State(position: state.position, orientation: state.orientation, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
             case .pop:
                 state = self.stack.removeLast()
-            default: ()
             }
         }
         stack.append(state)
     }
+}
+
+// cf http://algorithmicbotany.org/papers/hanan.dis1992.pdf
+
+fileprivate func matrix3x3_rotation_up(radians: Float) -> float3x3 {
+    let cs = cosf(radians)
+    let sn = sinf(radians)
+    return matrix_float3x3.init(columns:
+        (float3(cs, -sn, 0),
+         float3(sn, cs, 0),
+         float3(0, 0, 1)))
+}
+
+fileprivate func matrix3x3_rotation_left(radians: Float) -> float3x3 {
+    let cs = cosf(radians)
+    let sn = sinf(radians)
+    return matrix_float3x3.init(columns:
+        (float3(cs, 0, sn),
+         float3(0, 1, 0),
+         float3(-sn, 0, cs)))
+}
+
+fileprivate func matrix3x3_rotation_heading(radians: Float) -> float3x3 {
+    let cs = cosf(radians)
+    let sn = sinf(radians)
+    return matrix_float3x3.init(columns:
+        (float3(1, 0, 0),
+         float3(0, cs, sn),
+         float3(0, -sn, cs)))
 }
