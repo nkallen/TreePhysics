@@ -201,6 +201,11 @@ func sqr(_ x: Float) -> Float {
     return x * x
 }
 
+func sqr(_ x: Double) -> Double {
+    return x * x
+}
+
+
 func sqr(_ x: matrix_float3x3) -> matrix_float3x3 {
     return matrix_multiply(x, x)
 }

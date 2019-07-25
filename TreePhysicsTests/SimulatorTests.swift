@@ -163,6 +163,12 @@ func XCTAssertEqual(_ a: float3, _ b: float3, accuracy: Float, file: StaticStrin
     XCTAssertEqual(a.z, b.z, accuracy: accuracy, file: file, line: line)
 }
 
+func XCTAssertEqual(_ a: double3, _ b: double3, accuracy: Double, file: StaticString = #file, line: UInt = #line) {
+    XCTAssertEqual(a.x, b.x, accuracy: accuracy, file: file, line: line)
+    XCTAssertEqual(a.y, b.y, accuracy: accuracy, file: file, line: line)
+    XCTAssertEqual(a.z, b.z, accuracy: accuracy, file: file, line: line)
+}
+
 func XCTAssertEqual(_ a: float3x3, _ b: float3x3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.columns.0, b.columns.0, accuracy: accuracy, file: file, line: line)
     XCTAssertEqual(a.columns.1, b.columns.1, accuracy: accuracy, file: file, line: line)
