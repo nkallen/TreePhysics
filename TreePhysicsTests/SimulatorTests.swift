@@ -23,12 +23,46 @@ class SimulatorTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
     }
 
+    func testInertiaTensorsInCompositeBodies() {
+        let start = RigidBody()
+        let stop = RigidBody()
+        start.add(stop, at: 0)
+        let simulator = Simulator(tree: Tree(start))
+        simulator.updateCompositeBodies()
+
+        XCTAssertEqual(start.momentOfInertia, 1.0/12)
+        XCTAssertEqual(stop.momentOfInertia, 1.0/12)
+
+        XCTAssertEqual(stop.composite.momentOfInertia, 1.0/12)
+        XCTAssertEqual(start.composite.momentOfInertia, Float((1.0/12 + 1.0/4) * 2.0))
+
+        let rotation_world2local_stop = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: stop.transform)
+        let rotation_world2local_start = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: start.transform)
+
+        print(rotation_world2local_start)
+
+        XCTAssertEqual((rotation_world2local_stop * stop.inertiaTensor * rotation_world2local_stop.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
+        XCTAssertEqual((rotation_world2local_start * start.inertiaTensor * rotation_world2local_start.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
+
+        XCTAssertEqual((rotation_world2local_stop * stop.composite.inertiaTensor * rotation_world2local_stop.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
+        XCTAssertEqual((rotation_world2local_start * start.composite.inertiaTensor * rotation_world2local_start.transpose * float3(0,0,1)).z,
+                       Float(1.0/12 * 2 * 2*2 + 1.0/4 * 2 * 1*1), accuracy: 0.0001)
+    }
+
     func testApplyForce() {
         XCTAssertEqual(b2.mass, 1)
         XCTAssertEqual(b2.force, force)
+        XCTAssertEqual(b2.length, 1)
+        XCTAssertEqual(b2.radius, 1)
 
         XCTAssertEqual(b2.torque, cross(b2.convert(position: float3(0, 1, 0)) - b2.position, force))
         XCTAssertEqual(b2.momentOfInertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
+        let rotation_world2local = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: b2.transform)
+        XCTAssertEqual(rotation_world2local * b2.inertiaTensor * rotation_world2local.transpose, matrix_float3x3.init(diagonal: float3(
+            1.0/4 + 1.0/12,
+            1.0/2,
+            1.0/4 + 1.0/12
+        )), accuracy: 0.0001)
 
         XCTAssertEqual(root.position, float3.zero)
         XCTAssertEqual(b1.parentJoint!.position, float3(0,1,0))
@@ -129,11 +163,16 @@ func XCTAssertEqual(_ a: float3, _ b: float3, accuracy: Float, file: StaticStrin
     XCTAssertEqual(a.z, b.z, accuracy: accuracy, file: file, line: line)
 }
 
+func XCTAssertEqual(_ a: float3x3, _ b: float3x3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
+    XCTAssertEqual(a.columns.0, b.columns.0, accuracy: accuracy, file: file, line: line)
+    XCTAssertEqual(a.columns.1, b.columns.1, accuracy: accuracy, file: file, line: line)
+    XCTAssertEqual(a.columns.2, b.columns.2, accuracy: accuracy, file: file, line: line)
+}
 
 func XCTAssertEqual(_ a: [float3], _ b: [float3], accuracy: Float, file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.count, b.count, file: file, line: line)
     for (left, right) in zip(a, b) {
-        XCTAssertEqual(left, right, accuracy: accuracy)
+        XCTAssertEqual(left, right, accuracy: accuracy, file: file, line: line)
     }
 }
 

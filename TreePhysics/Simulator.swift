@@ -46,11 +46,8 @@ final class Simulator {
             composite.centerOfMass /= composite.mass
 
             composite.momentOfInertia = rigidBody.momentOfInertia + rigidBody.mass * square(distance(rigidBody.centerOfMass, composite.centerOfMass))
-
-
-            let p = composite.centerOfMass - rigidBody.centerOfMass
-            let pstar = matrix3x3_cross(p)
-            composite.inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * matrix_multiply(pstar, pstar)
+            composite.inertiaTensor = rigidBody.inertiaTensor -
+                rigidBody.mass * square((rigidBody.centerOfMass - rigidBody.composite.centerOfMass).cross_matrix)
 
 
             for childJoint in rigidBody.childJoints {
@@ -65,11 +62,8 @@ final class Simulator {
                     childComposite.mass * square(distance(composite.centerOfMass, childComposite.centerOfMass))
 
 
-                let p = composite.centerOfMass - childComposite.centerOfMass
-                let pstar = matrix3x3_cross(p)
-
-                composite.inertiaTensor += childComposite.inertiaTensor +
-                    childComposite.mass * matrix_multiply(pstar, pstar)
+                composite.inertiaTensor += childComposite.inertiaTensor -
+                    childComposite.mass * square((childComposite.centerOfMass - composite.centerOfMass).cross_matrix)
             }
         }
     }
@@ -80,6 +74,13 @@ final class Simulator {
                 let compositeInertiaRelativeToJoint = rigidBody.composite.momentOfInertia +
                     rigidBody.composite.mass * square(distance(rigidBody.composite.centerOfMass, parentJoint.position))
 
+                let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
+                let inertiaTensorInJointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
+                    rigidBody.composite.mass * square(pr.cross_matrix)
+
+                let torque = Double(rigidBody.composite.torque.z)
+                let torque_fancy = parentJoint.rotate(vector: rigidBody.composite.torque)
+
                 // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
                 // θ(0) = joint's angle, θ'(0) = joint's angular velocity
 
@@ -88,7 +89,7 @@ final class Simulator {
                     parentJoint.angularVelocity = 0
                     parentJoint.angularAcceleration = 0
                 } else {
-                    let solution = solve_differential(a: Double(compositeInertiaRelativeToJoint), b: Double(Tree.B * parentJoint.k), c: Double(parentJoint.k), g: Double(rigidBody.composite.torque.z), y_0: Double(parentJoint.angle), y_ddt_0: Double(parentJoint.angularVelocity))
+                    let solution = solve_differential(a: Double(compositeInertiaRelativeToJoint), b: Double(Tree.B * parentJoint.k), c: Double(parentJoint.k), g: torque, y_0: Double(parentJoint.angle), y_ddt_0: Double(parentJoint.angularVelocity))
                     let thetas = evaluate(differential: solution, at: time)
                     parentJoint.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.x))
                     parentJoint.angularVelocity = thetas.y

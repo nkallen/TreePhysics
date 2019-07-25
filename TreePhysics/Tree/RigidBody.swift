@@ -1,7 +1,8 @@
 import Foundation
 import SceneKit
 
-var i = 0
+fileprivate var i = 0
+fileprivate let local_ijk = matrix_float4x4(diagonal: float4(1,1,1,0))
 
 final class RigidBody: HasTransform {
     enum Kind {
@@ -20,12 +21,15 @@ final class RigidBody: HasTransform {
     let length: Float
     let radius: Float
     let momentOfInertia: Float
-    let inertiaTensor: float3x3
+    private let inertiaTensor_local: float3x3
+    var inertiaTensor: float3x3
 
     var transform: matrix_float4x4 = matrix_identity_float4x4 {
         didSet {
             updateCenterOfMass()
             node.simdTransform = self.transform
+            let rotation_local2world = matrix3x3_rotation(from: local_ijk, to: transform)
+            self.inertiaTensor = rotation_local2world * inertiaTensor_local * rotation_local2world.transpose
         }
     }
     var centerOfMass: float3 = float3.zero
@@ -59,11 +63,11 @@ final class RigidBody: HasTransform {
 
         // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
         // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-        self.inertiaTensor = matrix_float3x3.init(diagonal:
+        self.inertiaTensor_local = matrix_float3x3.init(diagonal:
             float3(momentOfInertiaAboutY + momentOfInertiaAboutX,
                    momentOfInertiaAboutZ + momentOfInertiaAboutX,
                    momentOfInertiaAboutX + momentOfInertiaAboutY))
-
+        self.inertiaTensor = inertiaTensor_local
 
         let node = SCNNode(geometry: SCNCylinder(radius: 0.1, height: 0.1))
         self.node = node

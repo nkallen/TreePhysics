@@ -153,17 +153,17 @@ func rotate(_ x: float3, by radians: Float, axis: float3) -> float3 {
     return (matrix4x4_rotation(radians: radians, axis: axis) * float4(x, 0)).xyz
 }
 
+func matrix3x3_rotation(from: matrix_float4x4, to: matrix_float4x4) -> matrix_float3x3 {
+    return matrix_float3x3.init(columns:
+        (float3(dot(to.columns.0, from.columns.0), dot(to.columns.1, from.columns.0), dot(to.columns.2, from.columns.0)),
+         float3(dot(to.columns.0, from.columns.1), dot(to.columns.1, from.columns.1), dot(to.columns.2, from.columns.1)),
+         float3(dot(to.columns.0, from.columns.2), dot(to.columns.1, from.columns.2), dot(to.columns.2, from.columns.2))))
+}
+
 func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> float3x3 {
     return matrix_float3x3.init(columns:(vector_float3(1, 0, 0),
                                          vector_float3(0, 1, 0),
                                          vector_float3(translationX, translationY, 1)))
-}
-
-func matrix3x3_cross(_ a: float3) -> float3x3 {
-    return matrix_float3x3.init(columns:
-        (float3(0, a.z, -a.y),
-         float3(-a.z, 0, a.x),
-         float3(a.y, -a.x, 0)))
 }
 
 extension float3 {
@@ -177,6 +177,13 @@ extension float3 {
 
     var xy: float2 {
         return float2(x, y)
+    }
+
+    var cross_matrix: float3x3 {
+        return matrix_float3x3.init(columns:
+            (float3(0, self.z, -self.y),
+             float3(-self.z, 0, self.x),
+             float3(self.y, -self.x, 0)))
     }
 }
 
@@ -192,6 +199,10 @@ extension float4 {
 
 func square(_ x: Float) -> Float {
     return x * x
+}
+
+func square(_ x: matrix_float3x3) -> matrix_float3x3 {
+    return matrix_multiply(x, x)
 }
 
 extension Double {
