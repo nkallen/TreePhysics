@@ -46,6 +46,7 @@ final class Simulator {
             composite.centerOfMass /= composite.mass
 
             composite.momentOfInertia = rigidBody.momentOfInertia + rigidBody.mass * square(distance(rigidBody.centerOfMass, composite.centerOfMass))
+
             composite.inertiaTensor = rigidBody.inertiaTensor -
                 rigidBody.mass * square((rigidBody.centerOfMass - rigidBody.composite.centerOfMass).cross_matrix)
 
@@ -60,7 +61,6 @@ final class Simulator {
                 // dependency on the composite.centerOfMass /= composite.mass step
                 composite.momentOfInertia += childComposite.momentOfInertia +
                     childComposite.mass * square(distance(composite.centerOfMass, childComposite.centerOfMass))
-
 
                 composite.inertiaTensor += childComposite.inertiaTensor -
                     childComposite.mass * square((childComposite.centerOfMass - composite.centerOfMass).cross_matrix)

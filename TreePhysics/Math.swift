@@ -208,3 +208,26 @@ func square(_ x: matrix_float3x3) -> matrix_float3x3 {
 extension Double {
     static let e: Double = Darwin.M_E
 }
+
+extension matrix_float3x3 {
+    var cholesky: float3x3 {
+        var result = matrix_float3x3(0)
+        for i in 0..<3 {
+            for j in 0...i {
+                var sum: Float = 0
+                if j == i {
+                    for k in 0..<j {
+                        sum += pow(result[k, j], 2)
+                    }
+                    result[j, j] = sqrt(self[j, j] - sum)
+                } else {
+                    for k in 0..<j {
+                        sum += result[k, i] * result[k, j]
+                    }
+                    result[j, i] = (self[j, i] - sum) / result[j, j]
+                }
+            }
+        }
+        return result
+    }
+}

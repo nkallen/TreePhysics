@@ -39,14 +39,14 @@ class SimulatorTests: XCTestCase {
         let rotation_world2local_stop = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: stop.transform)
         let rotation_world2local_start = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: start.transform)
 
-        print(rotation_world2local_start)
-
         XCTAssertEqual((rotation_world2local_stop * stop.inertiaTensor * rotation_world2local_stop.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
         XCTAssertEqual((rotation_world2local_start * start.inertiaTensor * rotation_world2local_start.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
 
         XCTAssertEqual((rotation_world2local_stop * stop.composite.inertiaTensor * rotation_world2local_stop.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
         XCTAssertEqual((rotation_world2local_start * start.composite.inertiaTensor * rotation_world2local_start.transpose * float3(0,0,1)).z,
                        Float(1.0/12 * 2 * 2*2 + 1.0/4 * 2 * 1*1), accuracy: 0.0001)
+
+        print(rotation_world2local_start * start.composite.inertiaTensor * rotation_world2local_start.transpose , Float((1.0/12 + 1.0/4) * 2.0))
     }
 
     func testApplyForce() {

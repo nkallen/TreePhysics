@@ -32,6 +32,7 @@
 		9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC522E0972400535997 /* HasTransform.swift */; };
 		9EE7EBCA22E0F27900535997 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9EE7EBCC22E1078200535997 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBCB22E1078200535997 /* NOTES */; };
+		9EEC11E022EA23000078BBFD /* MathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11DF22EA23000078BBFD /* MathTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 		9EE7EBC522E0972400535997 /* HasTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasTransform.swift; sourceTree = "<group>"; };
 		9EE7EBC922E0F27900535997 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		9EE7EBCB22E1078200535997 /* NOTES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
+		9EEC11DF22EA23000078BBFD /* MathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +169,7 @@
 				9E461B3622E704BD008AB788 /* CylinderTest.swift */,
 				9E56C94122E76C340095C8AC /* SkinnerTest.swift */,
 				9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */,
+				9EEC11DF22EA23000078BBFD /* MathTests.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -299,6 +302,7 @@
 				9EE7EBBC22DE1AD100535997 /* SimulatorTests.swift in Sources */,
 				9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */,
 				9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */,
+				9EEC11E022EA23000078BBFD /* MathTests.swift in Sources */,
 				9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */,
 				9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */,
 			);
