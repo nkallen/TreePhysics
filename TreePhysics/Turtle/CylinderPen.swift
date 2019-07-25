@@ -1,6 +1,10 @@
 import Foundation
 import SceneKit
 
+// NOTE: We need to keep all the vertices to gether in one array; however, we can keep the
+// indices separate so that there are distinct SCNGeometryElement objects. It's unclear how this
+// affects rendering performance however.
+
 final class CylinderPen: Pen {
     typealias T = Indices
 

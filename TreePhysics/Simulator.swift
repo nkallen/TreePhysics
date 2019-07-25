@@ -46,6 +46,13 @@ final class Simulator {
             composite.centerOfMass /= composite.mass
 
             composite.momentOfInertia = rigidBody.momentOfInertia + rigidBody.mass * square(distance(rigidBody.centerOfMass, composite.centerOfMass))
+
+
+            let p = composite.centerOfMass - rigidBody.centerOfMass
+            let pstar = matrix3x3_cross(p)
+            composite.inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * matrix_multiply(pstar, pstar)
+
+
             for childJoint in rigidBody.childJoints {
                 let childRigidBody = childJoint.childRigidBody
                 let childComposite = childRigidBody.composite
@@ -56,6 +63,13 @@ final class Simulator {
                 // dependency on the composite.centerOfMass /= composite.mass step
                 composite.momentOfInertia += childComposite.momentOfInertia +
                     childComposite.mass * square(distance(composite.centerOfMass, childComposite.centerOfMass))
+
+
+                let p = composite.centerOfMass - childComposite.centerOfMass
+                let pstar = matrix3x3_cross(p)
+
+                composite.inertiaTensor += childComposite.inertiaTensor +
+                    childComposite.mass * matrix_multiply(pstar, pstar)
             }
         }
     }

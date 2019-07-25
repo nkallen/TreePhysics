@@ -159,6 +159,13 @@ func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> floa
                                          vector_float3(translationX, translationY, 1)))
 }
 
+func matrix3x3_cross(_ a: float3) -> float3x3 {
+    return matrix_float3x3.init(columns:
+        (float3(0, a.z, -a.y),
+         float3(-a.z, 0, a.x),
+         float3(a.y, -a.x, 0)))
+}
+
 extension float3 {
     static let x = float3(1,0,0)
     static let y = float3(0,1,0)

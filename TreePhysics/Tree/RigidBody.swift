@@ -20,6 +20,7 @@ final class RigidBody: HasTransform {
     let length: Float
     let radius: Float
     let momentOfInertia: Float
+    let inertiaTensor: float3x3
 
     var transform: matrix_float4x4 = matrix_identity_float4x4 {
         didSet {
@@ -52,6 +53,17 @@ final class RigidBody: HasTransform {
         self.length = length
         self.radius = radius
         self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
+        let momentOfInertiaAboutY = self.momentOfInertia
+        let momentOfInertiaAboutX = 1.0/4 * mass * radius * radius
+        let momentOfInertiaAboutZ = momentOfInertiaAboutX
+
+        // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
+        // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
+        self.inertiaTensor = matrix_float3x3.init(diagonal:
+            float3(momentOfInertiaAboutY + momentOfInertiaAboutX,
+                   momentOfInertiaAboutZ + momentOfInertiaAboutX,
+                   momentOfInertiaAboutX + momentOfInertiaAboutY))
+
 
         let node = SCNNode(geometry: SCNCylinder(radius: 0.1, height: 0.1))
         self.node = node
