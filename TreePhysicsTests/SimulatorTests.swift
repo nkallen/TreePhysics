@@ -106,13 +106,13 @@ class SimulatorTests: XCTestCase {
         // inertia
         XCTAssertEqual(b2.composite.momentOfInertia, b2.momentOfInertia)
         XCTAssertEqual(b1.composite.momentOfInertia,
-                       b1.momentOfInertia + b1.mass * square(distance(b1.centerOfMass, b1.composite.centerOfMass)) +
-                        b2.momentOfInertia + b2.mass * square(distance(b2.centerOfMass, b1.composite.centerOfMass)),
+                       b1.momentOfInertia + b1.mass * sqr(distance(b1.centerOfMass, b1.composite.centerOfMass)) +
+                        b2.momentOfInertia + b2.mass * sqr(distance(b2.centerOfMass, b1.composite.centerOfMass)),
                        accuracy: 0.0001)
         XCTAssertEqual(root.composite.momentOfInertia,
-                       root.momentOfInertia + root.mass * square(distance(root.centerOfMass, root.composite.centerOfMass)) +
-                        b1.momentOfInertia + b1.mass * square(distance(b1.centerOfMass, root.composite.centerOfMass)) +
-                        b2.momentOfInertia + b2.mass * square(distance(b2.centerOfMass, root.composite.centerOfMass)),
+                       root.momentOfInertia + root.mass * sqr(distance(root.centerOfMass, root.composite.centerOfMass)) +
+                        b1.momentOfInertia + b1.mass * sqr(distance(b1.centerOfMass, root.composite.centerOfMass)) +
+                        b2.momentOfInertia + b2.mass * sqr(distance(b2.centerOfMass, root.composite.centerOfMass)),
                        accuracy: 0.0001)
     }
 }

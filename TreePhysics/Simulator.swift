@@ -45,10 +45,10 @@ final class Simulator {
             }
             composite.centerOfMass /= composite.mass
 
-            composite.momentOfInertia = rigidBody.momentOfInertia + rigidBody.mass * square(distance(rigidBody.centerOfMass, composite.centerOfMass))
+            composite.momentOfInertia = rigidBody.momentOfInertia + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, composite.centerOfMass))
 
             composite.inertiaTensor = rigidBody.inertiaTensor -
-                rigidBody.mass * square((rigidBody.centerOfMass - rigidBody.composite.centerOfMass).cross_matrix)
+                rigidBody.mass * sqr((rigidBody.centerOfMass - rigidBody.composite.centerOfMass).cross_matrix)
 
 
             for childJoint in rigidBody.childJoints {
@@ -60,10 +60,10 @@ final class Simulator {
                 // center of mass of the composite). NOTE: This is in a separate loop because of the
                 // dependency on the composite.centerOfMass /= composite.mass step
                 composite.momentOfInertia += childComposite.momentOfInertia +
-                    childComposite.mass * square(distance(composite.centerOfMass, childComposite.centerOfMass))
+                    childComposite.mass * sqr(distance(composite.centerOfMass, childComposite.centerOfMass))
 
                 composite.inertiaTensor += childComposite.inertiaTensor -
-                    childComposite.mass * square((childComposite.centerOfMass - composite.centerOfMass).cross_matrix)
+                    childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).cross_matrix)
             }
         }
     }
@@ -72,11 +72,11 @@ final class Simulator {
         for rigidBody in rigidBodiesLevelOrder { // Order does not matter
             if let parentJoint = rigidBody.parentJoint {
                 let compositeInertiaRelativeToJoint = rigidBody.composite.momentOfInertia +
-                    rigidBody.composite.mass * square(distance(rigidBody.composite.centerOfMass, parentJoint.position))
+                    rigidBody.composite.mass * sqr(distance(rigidBody.composite.centerOfMass, parentJoint.position))
 
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
                 let inertiaTensorInJointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
-                    rigidBody.composite.mass * square(pr.cross_matrix)
+                    rigidBody.composite.mass * sqr(pr.cross_matrix)
 
                 let torque = Double(rigidBody.composite.torque.z)
                 let torque_fancy = parentJoint.rotate(vector: rigidBody.composite.torque)

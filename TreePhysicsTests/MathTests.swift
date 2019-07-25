@@ -16,4 +16,14 @@ class MathTests: XCTestCase {
                 float3(-16,-43,98)
             )).cholesky)
     }
+
+    func testEigenvaluesCardano() {
+        XCTAssertEqual(
+            float3(2 + sqrt(2), 2 - sqrt(2.0), 2),
+            float3x3(columns: (
+                float3(2,1,0),
+                float3(1,2,1),
+                float3(0,1,2)
+            )).eigenvalues_cardano, accuracy: 0.0001)
+    }
 }

@@ -197,11 +197,11 @@ extension float4 {
     }
 }
 
-func square(_ x: Float) -> Float {
+func sqr(_ x: Float) -> Float {
     return x * x
 }
 
-func square(_ x: matrix_float3x3) -> matrix_float3x3 {
+func sqr(_ x: matrix_float3x3) -> matrix_float3x3 {
     return matrix_multiply(x, x)
 }
 
@@ -231,3 +231,4 @@ extension matrix_float3x3 {
         return result
     }
 }
+

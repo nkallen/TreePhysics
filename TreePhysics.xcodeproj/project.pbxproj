@@ -33,6 +33,7 @@
 		9EE7EBCA22E0F27900535997 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9EE7EBCC22E1078200535997 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBCB22E1078200535997 /* NOTES */; };
 		9EEC11E022EA23000078BBFD /* MathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11DF22EA23000078BBFD /* MathTests.swift */; };
+		9EEC11E222EA50920078BBFD /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		9EE7EBC922E0F27900535997 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		9EE7EBCB22E1078200535997 /* NOTES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
 		9EEC11DF22EA23000078BBFD /* MathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTests.swift; sourceTree = "<group>"; };
+		9EEC11E122EA50920078BBFD /* Diagonalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagonalization.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +158,7 @@
 				9EE7EBC522E0972400535997 /* HasTransform.swift */,
 				9EE7EBC922E0F27900535997 /* main.swift */,
 				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
+				9EEC11E122EA50920078BBFD /* Diagonalization.swift */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 				9EE7EBCA22E0F27900535997 /* main.swift in Sources */,
 				9E56C94922E78FFC0095C8AC /* CompositeBody.swift in Sources */,
 				9E461B3322E5E025008AB788 /* Pen.swift in Sources */,
+				9EEC11E222EA50920078BBFD /* Diagonalization.swift in Sources */,
 				9E56C94522E78FCF0095C8AC /* Joint.swift in Sources */,
 				9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */,
 				9E56C94B22E792820095C8AC /* RigidBodyPen.swift in Sources */,
