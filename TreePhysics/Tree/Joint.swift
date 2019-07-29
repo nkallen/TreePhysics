@@ -46,6 +46,6 @@ final class Joint: HasTransform {
     }
 
     private static func computeK(radius: Float) -> Float {
-        return Tree.K + Tree.K * 4e5*radius
+        return Tree.K
     }
 }

@@ -45,8 +45,6 @@ final class Simulator {
             }
             composite.centerOfMass /= composite.mass
 
-            composite.momentOfInertia = rigidBody.momentOfInertia + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, composite.centerOfMass))
-
             composite.inertiaTensor = rigidBody.inertiaTensor -
                 rigidBody.mass * sqr((rigidBody.centerOfMass - rigidBody.composite.centerOfMass).cross_matrix)
 
@@ -55,13 +53,7 @@ final class Simulator {
                 let childRigidBody = childJoint.childRigidBody
                 let childComposite = childRigidBody.composite
 
-                // using the parallel axis theorem I' = I + md^2, calculate inertia of this body about the
-                // center of mass of the composite body, then add the child inertia's (also relative to the
-                // center of mass of the composite). NOTE: This is in a separate loop because of the
-                // dependency on the composite.centerOfMass /= composite.mass step
-                composite.momentOfInertia += childComposite.momentOfInertia +
-                    childComposite.mass * sqr(distance(composite.centerOfMass, childComposite.centerOfMass))
-
+                // using the parallel axis theorem I' = I + md^2, but with tensors:
                 composite.inertiaTensor += childComposite.inertiaTensor -
                     childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).cross_matrix)
             }
@@ -76,8 +68,9 @@ final class Simulator {
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
                     rigidBody.composite.mass * sqr(pr.cross_matrix)
 
+//                print("t", rigidBody.composite.torque)
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
-
+//                print("tjs", torque_jointSpace)
                 if parentJoint.k == .infinity {
                     parentJoint.angle = 0
                     parentJoint.angularVelocity = 0
@@ -94,7 +87,7 @@ final class Simulator {
                     let L_inverse = L.inverse, L_transpose_inverse = L.transpose.inverse
 
                     // 1.b. the generalized eigenvalue problem A * X = X * Λ
-                    // where A = L^(−1) * K * L^(−T)
+                    // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
                     let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
                     let (Λ, X) = A.eigen_ql! // FIXME investigate analytic option, what percentage of the time it would succeed
 
@@ -106,7 +99,7 @@ final class Simulator {
 
                     let torque_diagonal = U_transpose * torque_jointSpace
                     let theta_diagonal_0 = U_inverse * float3(0,0,parentJoint.angle)
-                    let theta_ddt_diagonal_0 = U_inverse * float3(0,0,parentJoint.angularVelocity)
+                    let theta_ddt_diagonal_0 = U_inverse * float3(0,0,0) // parentJoint.angularVelocity
                     let βΛ = Tree.B * Λ
 
                     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
@@ -126,7 +119,7 @@ final class Simulator {
 
                     var thetas = U * thetas_diagonal
 
-                    parentJoint.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.z))
+                    parentJoint.angle = thetas.z // max(Tree.minAngle, min(Tree.maxAngle, thetas.z))
                     parentJoint.angularVelocity = thetas.y
                     parentJoint.angularAcceleration = thetas.z
                 }

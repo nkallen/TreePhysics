@@ -13,7 +13,7 @@ class GameViewController: NSViewController {
         camera.zNear = 0
         cameraNode.camera = camera
         scene.rootNode.addChildNode(cameraNode)
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 0.5)
+        cameraNode.position = SCNVector3(x: 0, y: 0, z: 1)
         cameraNode.name = "Camera"
 
         let ambientLightNode = SCNNode()
@@ -39,11 +39,11 @@ class GameViewController: NSViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
-            randomScale: 0.4, angle: 18 * .pi / 180, thickness: 0.001*0.001*Float.pi, thicknessScale: 0.9, stepSize: 0.1, stepSizeScale: 0.9)
+            angle: 18 * .pi / 180, thickness: 0.003*0.003*Float.pi, thicknessScale: 0.5, stepSize: 0.05, stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
         let tree = Tree(root)
@@ -80,7 +80,7 @@ class GameViewController: NSViewController {
         let scene = scnView.scene!
         scene.rootNode.addChildNode(node)
         for bone in boneNodes {
-            scene.rootNode.addChildNode(bone)
+//            scene.rootNode.addChildNode(bone)
         }
         scnView.delegate = self
     }
@@ -104,7 +104,7 @@ extension GameViewController {
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if toggle {
-            Tree.gravity = float3(0, -10, 0)
+            Tree.gravity = float3(0, -1, 0)
         } else {
             Tree.gravity = float3.zero
         }

@@ -59,7 +59,7 @@ final class RigidBody: HasTransform {
         self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
         let momentOfInertiaAboutY = self.momentOfInertia
         let momentOfInertiaAboutX = 1.0/4 * mass * radius * radius
-        let momentOfInertiaAboutZ = momentOfInertiaAboutX
+        let momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius
 
         // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
         // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia

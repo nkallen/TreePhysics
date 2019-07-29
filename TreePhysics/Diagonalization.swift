@@ -117,7 +117,8 @@ extension matrix_double3x3 {
                 c = 1.0; s = 1.0
                 p = 0.0
 
-                for i in stride(from: m-1, to: l-1, by: -1) {
+                var i = m-1
+                while i >= l {
                     f = s * e[i]
                     b = c * e[i]
                     if abs(f) > abs(g) {
@@ -146,6 +147,7 @@ extension matrix_double3x3 {
                         Q[i+1, k] = s*Q[i, k] + c*t
                         Q[i, k]   = c*Q[i, k] - s*t
                     }
+                    i -= 1
                 }
                 w[l] -= p
                 e[l]  = g
