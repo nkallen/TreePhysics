@@ -3,24 +3,24 @@ import Darwin
 import simd
 
 enum QuadraticSolution: Equatable {
-    case real(Double)
-    case realDistinct(Double, Double)
-    case complex(Double, Double)
+    case real(Float)
+    case realDistinct(Float, Float)
+    case complex(Float, Float)
 }
 
 enum DifferentialSolution: Equatable {
-    case real(c1: Double, c2: Double, r: Double, k: Double)
-    case realDistinct(c1: Double, c2: Double, r1: Double, r2: Double, k: Double)
-    case complex(c1: Double, c2: Double, lambda: Double, mu: Double, k: Double)
+    case real(c1: Float, c2: Float, r: Float, k: Float)
+    case realDistinct(c1: Float, c2: Float, r1: Float, r2: Float, k: Float)
+    case complex(c1: Float, c2: Float, lambda: Float, mu: Float, k: Float)
 }
 
-func solve_quadratic(a: Double, b: Double, c: Double) -> QuadraticSolution {
+func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     //    (-b +/- sqrt(b^2 - 4ac)) / 2a
     let b2_4ac = b*b - 4.0*a*c
     let _2a = 1.0 / (2.0*a)
     if b2_4ac == 0 {
         let b_2a = -b * _2a
-        return .real(Double(b_2a))
+        return .real(b_2a)
     } else if b2_4ac > 0 {
         let b_2a = -b * _2a
         let sqrt_b2_4ac_2a = sqrt(b2_4ac) * _2a
@@ -32,50 +32,50 @@ func solve_quadratic(a: Double, b: Double, c: Double) -> QuadraticSolution {
     }
 }
 
-func solve_differential(a: Double, b: Double, c: Double, g: Double, y_0: Double, y_ddt_0: Double) -> DifferentialSolution {
+func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_ddt_0: Float) -> DifferentialSolution {
     switch solve_quadratic(a: a, b: b, c: c) {
     case let .complex(real, imaginary):
         let c1 = y_0
         let c2 = (y_ddt_0 - real * c1) / imaginary
         return .complex(c1: c1, c2: c2, lambda: real, mu: imaginary, k: g/c)
     case let .real(r):
-        let system = double2x2(columns: (double2(1, r), double2(0, 1)))
-        let solution = system.inverse * double2(y_0, y_ddt_0)
+        let system = float2x2(columns: (float2(1, r), float2(0, 1)))
+        let solution = system.inverse * float2(y_0, y_ddt_0)
         return .real(c1: solution.x, c2: solution.y, r: r, k: g/c)
     case let .realDistinct(r1, r2):
-        let system = double2x2(columns: (double2(1, r1), double2(1, r2)))
-        let solution = system.inverse * double2(y_0, y_ddt_0)
+        let system = float2x2(columns: (float2(1, r1), float2(1, r2)))
+        let solution = system.inverse * float2(y_0, y_ddt_0)
         return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2, k: g/c)
     }
 }
 
 // Evaluate 2nd-order differential equation given its analytic solution
-func evaluate(differential: DifferentialSolution, at t: Double) -> float3 {
+func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
     switch differential {
     case let .complex(c1: c1, c2: c2, lambda: lambda, mu: mu, k: k):
-        let y = c1*pow(.e,lambda*t)*cos(mu*t) + c2*pow(.e,lambda*t)*sin(mu*t) + k
-        let y_ddt = lambda*c1*pow(.e,lambda*t)*cos(mu*t) - mu*c1*pow(.e,lambda*t)*sin(mu*t) +
-            lambda*c2*pow(.e,lambda*t)*sin(mu*t) + mu*c2*pow(.e,lambda*t)*cos(mu*t)
-        let y_d2dt = lambda*lambda*c1*pow(.e,lambda*t)*cos(mu*t) - mu*lambda*c1*pow(.e,lambda*t)*sin(mu*t) -
-            (lambda*mu*c1*pow(.e,lambda*t)*sin(mu*t) + mu*mu*c1*pow(.e,lambda*t)*cos(mu*t)) +
-            lambda*lambda*c2*pow(.e,lambda*t)*sin(mu*t) + mu*lambda*c2*pow(.e,lambda*t)*cos(mu*t) +
-            lambda*mu*c2*pow(.e,lambda*t)*cos(mu*t) - mu*mu*c2*pow(.e,lambda*t)*sin(mu*t)
-        return float3(Float(y), Float(y_ddt), Float(y_d2dt))
+        let y = c1*powf(.e,lambda*t)*cos(mu*t) + c2*powf(.e,lambda*t)*sin(mu*t) + k
+        let y_ddt = lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*c1*powf(.e,lambda*t)*sin(mu*t) +
+            lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*c2*powf(.e,lambda*t)*cos(mu*t)
+        let y_d2dt = lambda*lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*lambda*c1*powf(.e,lambda*t)*sin(mu*t) -
+            (lambda*mu*c1*powf(.e,lambda*t)*sin(mu*t) + mu*mu*c1*powf(.e,lambda*t)*cos(mu*t)) +
+            lambda*lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*lambda*c2*powf(.e,lambda*t)*cos(mu*t) +
+            lambda*mu*c2*powf(.e,lambda*t)*cos(mu*t) - mu*mu*c2*powf(.e,lambda*t)*sin(mu*t)
+        return float3(y, y_ddt, y_d2dt)
     case let .real(c1: c1, c2: c2, r: r, k: k):
-        let y = c1*pow(.e,r*t) + c2*t*pow(.e,r*t) + k
-        let y_ddt = r*c1*pow(.e,r*t) +
-            c2*pow(.e,r*t) + r*c2*t*pow(.e,r*t)
-        let y_d2dt = r*r*c1*pow(.e,r*t) +
-            r*c2*pow(.e,r*t) +
-            r*c2*pow(.e,r*t) + r*r*c2*t*pow(.e,r*t)
-        return float3(Float(y), Float(y_ddt), Float(y_d2dt))
+        let y = c1*powf(.e,r*t) + c2*t*powf(.e,r*t) + k
+        let y_ddt = r*c1*powf(.e,r*t) +
+            c2*powf(.e,r*t) + r*c2*t*powf(.e,r*t)
+        let y_d2dt = r*r*c1*powf(.e,r*t) +
+            r*c2*powf(.e,r*t) +
+            r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
+        return float3(y, y_ddt, y_d2dt)
     case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
-        let y = c1*pow(.e,r1*t) + c2*pow(.e,r2*t) + k
-        let y_ddt = r1*c1*pow(.e,r1*t) +
-            r2*c2 * pow(.e,r2*t)
-        let y_d2dt = r1*r1*c1 * pow(.e,r1*t) +
-            r2*r2*c2 * pow(.e,r2*t)
-        return float3(Float(y), Float(y_ddt), Float(y_d2dt))
+        let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
+        let y_ddt = r1*c1*powf(.e,r1*t) +
+            r2*c2 * powf(.e,r2*t)
+        let y_d2dt = r1*r1*c1 * powf(.e,r1*t) +
+            r2*r2*c2 * powf(.e,r2*t)
+        return float3(y, y_ddt, y_d2dt)
     }
 }
 
@@ -166,10 +166,21 @@ func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> floa
                                          vector_float3(translationX, translationY, 1)))
 }
 
+extension float2 {
+    init(_ double2: double2) {
+        self = float2(Float(double2.x), Float(double2.y))
+    }
+
+}
+
 extension float3 {
     static let x = float3(1,0,0)
     static let y = float3(0,1,0)
     static let z = float3(0,0,1)
+
+    init(_ double3: double3) {
+        self = float3(Float(double3.x), Float(double3.y), Float(double3.z))
+    }
 
     init(_ float2: float2, _ z: Float) {
         self = float3(float2.x, float2.y, z)
@@ -197,24 +208,50 @@ extension float4 {
     }
 }
 
+extension double3 {
+    init(_ float3: float3) {
+        self = double3(Double(float3.x), Double(float3.y), Double(float3.z))
+    }
+}
+
+extension double3x3 {
+    init(_ float3x3: float3x3) {
+        self = double3x3(columns: (
+            double3(float3x3[0]),
+            double3(float3x3[1]),
+            double3(float3x3[2])
+        ))
+    }
+}
+
+@inline(__always)
 func sqr(_ x: Float) -> Float {
     return x * x
 }
 
+@inline(__always)
 func sqr(_ x: Double) -> Double {
     return x * x
 }
 
-
+@inline(__always)
 func sqr(_ x: matrix_float3x3) -> matrix_float3x3 {
     return matrix_multiply(x, x)
 }
 
-extension Double {
-    static let e: Double = Darwin.M_E
+extension Float {
+    static let e: Float = Float(Darwin.M_E)
 }
 
 extension matrix_float3x3 {
+    init(_ double3x3: double3x3) {
+        self = matrix_float3x3(columns: (
+            float3(double3x3[0]),
+            float3(double3x3[1]),
+            float3(double3x3[2])
+        ))
+    }
+
     var cholesky: float3x3 {
         var result = matrix_float3x3(0)
         for i in 0..<3 {
@@ -222,7 +259,7 @@ extension matrix_float3x3 {
                 var sum: Float = 0
                 if j == i {
                     for k in 0..<j {
-                        sum += pow(result[k, j], 2)
+                        sum += powf(result[k, j], 2)
                     }
                     result[j, j] = sqrt(self[j, j] - sum)
                 } else {
@@ -234,6 +271,10 @@ extension matrix_float3x3 {
             }
         }
         return result
+    }
+
+    var isSymmetric: Bool {
+        return self == self.transpose
     }
 }
 

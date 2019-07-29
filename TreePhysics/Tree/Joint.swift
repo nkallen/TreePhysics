@@ -20,7 +20,7 @@ final class Joint: HasTransform {
             updateTransform()
         }
     }
-    var rotation_world2local: float3x3 = matrix_identity_float3x3
+    private(set) var rotation_world2local: float3x3 = matrix_identity_float3x3
 
     let k: Float
 
@@ -35,10 +35,12 @@ final class Joint: HasTransform {
         self.transform = parentRigidBody.transform * matrix4x4_translation(0, parentRigidBody.length, 0) * matrix4x4_rotation(radians: self.angle, axis: .z)
     }
 
+    @inline(__always)
     func rotate(tensor: float3x3) -> float3x3 {
         return rotation_world2local * tensor * rotation_world2local.transpose
     }
 
+    @inline(__always)
     func rotate(vector: float3) -> float3 {
         return rotation_world2local * vector
     }

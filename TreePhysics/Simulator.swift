@@ -71,27 +71,62 @@ final class Simulator {
     func updateSprings(at time: TimeInterval) {
         for rigidBody in rigidBodiesLevelOrder { // Order does not matter
             if let parentJoint = rigidBody.parentJoint {
-                let compositeInertiaRelativeToJoint = rigidBody.composite.momentOfInertia +
-                    rigidBody.composite.mass * sqr(distance(rigidBody.composite.centerOfMass, parentJoint.position))
-
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
-                let inertiaTensorInJointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
+
+                let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
                     rigidBody.composite.mass * sqr(pr.cross_matrix)
 
-                let torque = Double(rigidBody.composite.torque.z)
-                let torque_fancy = parentJoint.rotate(vector: rigidBody.composite.torque)
-
-                // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
-                // θ(0) = joint's angle, θ'(0) = joint's angular velocity
+                let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
 
                 if parentJoint.k == .infinity {
                     parentJoint.angle = 0
                     parentJoint.angularVelocity = 0
                     parentJoint.angularAcceleration = 0
                 } else {
-                    let solution = solve_differential(a: Double(compositeInertiaRelativeToJoint), b: Double(Tree.B * parentJoint.k), c: Double(parentJoint.k), g: torque, y_0: Double(parentJoint.angle), y_ddt_0: Double(parentJoint.angularVelocity))
-                    let thetas = evaluate(differential: solution, at: time)
-                    parentJoint.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.x))
+                    // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
+                    // θ(0) = joint's angle, θ'(0) = joint's angular velocity
+
+                    // 1. First we need to diagonalize I and K so we can solve diff equation, i.e.,
+                    // produce the generalized eigendecomposition of I and K
+
+                    // 1.a. the cholesky decomposition of I
+                    let L = inertiaTensor_jointSpace.cholesky
+                    let L_inverse = L.inverse, L_transpose_inverse = L.transpose.inverse
+
+                    // 1.b. the generalized eigenvalue problem A * X = X * Λ
+                    // where A = L^(−1) * K * L^(−T)
+                    let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
+                    let (Λ, X) = A.eigen_ql! // FIXME investigate analytic option, what percentage of the time it would succeed
+
+                    // 2. Now we can restate the differential equation in terms of other (diagonal)
+                    // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
+
+                    let U = L_transpose_inverse * X
+                    let U_transpose =  U.transpose, U_inverse = U.inverse
+
+                    let torque_diagonal = U_transpose * torque_jointSpace
+                    let theta_diagonal_0 = U_inverse * float3(0,0,parentJoint.angle)
+                    let theta_ddt_diagonal_0 = U_inverse * float3(0,0,parentJoint.angularVelocity)
+                    let βΛ = Tree.B * Λ
+
+                    // 2.a. thanks to diagonalization, we now have three independent 2nd-order
+                    // differential equations, θ'' + bθ' + kθ = f 
+
+                    // 2.a.i,
+                    let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: theta_diagonal_0.x, y_ddt_0: theta_ddt_diagonal_0.x)
+
+                    let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: theta_diagonal_0.y, y_ddt_0: theta_ddt_diagonal_0.y)
+
+                    let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: theta_diagonal_0.z, y_ddt_0: theta_ddt_diagonal_0.z)
+
+                    let thetas_diagonal = float3(
+                        evaluate(differential: solution_i,   at: Float(time)).x,
+                        evaluate(differential: solution_ii,  at: Float(time)).x,
+                        evaluate(differential: solution_iii, at: Float(time)).x)
+
+                    var thetas = U * thetas_diagonal
+
+                    parentJoint.angle = max(Tree.minAngle, min(Tree.maxAngle, thetas.z))
                     parentJoint.angularVelocity = thetas.y
                     parentJoint.angularAcceleration = thetas.z
                 }

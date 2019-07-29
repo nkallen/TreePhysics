@@ -40,7 +40,7 @@ class GameViewController: NSViewController {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 7)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4, angle: 18 * .pi / 180, thickness: 0.001*0.001*Float.pi, thicknessScale: 0.9, stepSize: 0.1, stepSizeScale: 0.9)
@@ -80,7 +80,7 @@ class GameViewController: NSViewController {
         let scene = scnView.scene!
         scene.rootNode.addChildNode(node)
         for bone in boneNodes {
-//            scene.rootNode.addChildNode(bone)
+            scene.rootNode.addChildNode(bone)
         }
         scnView.delegate = self
     }
@@ -104,7 +104,7 @@ extension GameViewController {
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if toggle {
-            Tree.gravity = float3(0, -100, 0)
+            Tree.gravity = float3(0, -10, 0)
         } else {
             Tree.gravity = float3.zero
         }

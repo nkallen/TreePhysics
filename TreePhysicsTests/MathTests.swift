@@ -1,6 +1,7 @@
 import XCTest
 @testable import TreePhysics
 import simd
+import Accelerate
 
 class MathTests: XCTestCase {
     func testCholesky() {
@@ -22,10 +23,14 @@ class MathTests: XCTestCase {
             float3(2,1,0),
             float3(1,2,1),
             float3(0,1,2)))
+        guard let (eigenvalues, eigenvectors) = matrix.eigen_analytical else {
+            XCTFail()
+            return
+        }
 
         XCTAssertEqual(
             float3(2 + sqrt(2), 2 - sqrt(2.0), 2),
-            matrix.eigenvalues_analytical, accuracy: 0.0001)
+            eigenvalues, accuracy: 0.0001)
 
         XCTAssertEqual(
             (matrix - matrix.eigenvalues_analytical.x * matrix_identity_float3x3).determinant,
@@ -37,47 +42,61 @@ class MathTests: XCTestCase {
                 float3(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),
                 float3(1 / sqrt(2.0), 0, -1/sqrt(2.0))
             )),
-            matrix.eigenvectors_analytical, accuracy: 0.0001)
-        print(matrix.eigenvectors_analytical)
+            eigenvectors, accuracy: 0.0001)
     }
 
-    func testEigenvectorsAnalytical() {
-        let matrix = double3x3(columns: (
-            double3(-2,-2,4),
-            double3(-4,1,2),
-            double3(2,2,5)
-        ))
-        XCTAssertEqual(
-            double3(6, -5, 3),
-            matrix.eigenvalues_analytical, accuracy: 0.0001)
-        XCTAssertEqual(
-            (matrix - matrix.eigenvalues_analytical.x * matrix_identity_double3x3).determinant,
-            0)
-        XCTAssertEqual(
-            (matrix - matrix.eigenvalues_analytical.y * matrix_identity_double3x3).determinant,
-            0)
-        XCTAssertEqual(
-            (matrix - matrix.eigenvalues_analytical.z * matrix_identity_double3x3).determinant,
-            0)
-    }
-
-    func testEigenvectorsAnalyitcal() {
+    func testTridiagonal() {
         let matrix = float3x3(columns: (
-            float3(-2,-2,4),
-            float3(-4,1,2),
-            float3(2,2,5)
-        ))
+            float3(2,1,0),
+            float3(1,2,1),
+            float3(0,1,2)))
+
+        let (Q, d, e) = matrix.tridiagonal
+        let Q_transpose = Q.transpose
+        let X = float3x3(columns: (
+            float3(d[0],e[0],0),
+            float3(e[0],d[1],e[1]),
+            float3(0,e[1],d[2])))
+        let Y = Q * X * Q_transpose
+
+        XCTAssertEqual(matrix, Y)
+    }
+
+    func testEigenQL() {
+        let matrix = float3x3(columns: (
+            float3(2,1,0),
+            float3(1,2,1),
+            float3(0,1,2)))
+
+        guard let (eigenvalues, eigenvectors) = matrix.eigen_ql else {
+            XCTFail()
+            return
+        }
+
         XCTAssertEqual(
-            float3(6, -5, 3),
-            matrix.eigenvalues_analytical, accuracy: 0.0001)
+            float3(2 - sqrt(2), 2, 2 + sqrt(2.0)),
+            eigenvalues, accuracy: 0.0001)
 
         XCTAssertEqual(
             float3x3(columns: (
-                normalize(float3(1, -3.0/2, -1.0/2)),
-                normalize(float3(1, -1.0/2, 1.0/2)),
-                normalize(float3(1, 6, 16))
+                -float3(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),
+                float3(1 / sqrt(2.0), 0, -1/sqrt(2.0)),
+                float3(1.0/2, sqrt(2.0) / 2, 1.0/2)
             )),
-            matrix.eigenvectors_analytical, accuracy: 0.0001)
-        print(matrix.eigenvectors_analytical)
+            eigenvectors, accuracy: 0.001)
+    }
+
+    func testFoo() {
+        let inertiaTensor_jointSpace = matrix_float3x3(columns: (
+            float3(1.838548e-07, 6.280492e-08, 0.000000e+00),
+            float3(6.280492e-08, 2.147834e-08, 0.000000e+00),
+            float3(0.000000e+00, 0.000000e+00, 2.053115e-07) ))
+        let L = inertiaTensor_jointSpace.cholesky
+        let L_inverse = L.inverse, L_transpose_inverse = L.transpose.inverse
+        let k: Float = 27423.6777
+        let A = L_inverse * (k * matrix_identity_float3x3) * L_transpose_inverse
+//        let (Λ, X) = A.eigen_ql!
+
+        print(A.tridiagonal)
     }
 }

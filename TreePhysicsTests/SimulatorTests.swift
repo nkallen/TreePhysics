@@ -182,7 +182,7 @@ func XCTAssertEqual(_ a: [float3], _ b: [float3], accuracy: Float, file: StaticS
     }
 }
 
-func XCTAssertEqual(_ a: DifferentialSolution, _ b: DifferentialSolution, accuracy: Double, file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: DifferentialSolution, _ b: DifferentialSolution, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
     switch (a, b) {
     case let (.realDistinct(c1_left, c2_left, r1_left, r2_left, k_left),
               .realDistinct(c1_right, c2_right, r1_right, r2_right, k_right)):

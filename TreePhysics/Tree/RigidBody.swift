@@ -69,7 +69,7 @@ final class RigidBody: HasTransform {
                    momentOfInertiaAboutX + momentOfInertiaAboutY))
         self.inertiaTensor = inertiaTensor_local
 
-        let node = SCNNode(geometry: SCNCylinder(radius: 0.1, height: 0.1))
+        let node = SCNNode(geometry: SCNSphere(radius: 0.01))
         self.node = node
         self.composite = CompositeBody()
 

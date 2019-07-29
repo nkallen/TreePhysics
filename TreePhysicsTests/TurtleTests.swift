@@ -40,7 +40,7 @@ class TurtleTests: XCTestCase {
 
     func testForward() {
         interpreter.interpret([.forward(distance: nil, width: nil), .turnLeft(radians: nil), .forward(distance: nil, width: nil)])
-        XCTAssertEqual([float3.zero, float3(0, stepSize, 0), float3(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+        XCTAssertEqual([float3.zero, float3(0, stepSize, 0), float3(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
                        pen.points,
                        accuracy: 0.0001)
     }
@@ -55,12 +55,12 @@ class TurtleTests: XCTestCase {
         XCTAssertEqual([
             float3.zero,
             float3(0, stepSize, 0),
-            float3(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+            float3(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
                        pen.points,
                        accuracy: 0.0001)
         XCTAssertEqual([
             float3(0, stepSize, 0),
-            float3(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+            float3(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
                        pen.branch.points,
                        accuracy: 0.0001)
 
