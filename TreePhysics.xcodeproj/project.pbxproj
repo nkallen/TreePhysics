@@ -99,7 +99,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		9E036B1D22E4F57900229235 /* Turtle */ = {
+		9E036B1D22E4F57900229235 /* L-Systems */ = {
 			isa = PBXGroup;
 			children = (
 				9E036B1E22E4F58600229235 /* Turtle.swift */,
@@ -109,7 +109,7 @@
 				9E56C94C22E7929B0095C8AC /* SkinningPen.swift */,
 				9E9C1E7F22E86B290030DB0E /* Rewriter.swift */,
 			);
-			path = Turtle;
+			path = "L-Systems";
 			sourceTree = "<group>";
 		};
 		9E56C94322E78FA90095C8AC /* Tree */ = {
@@ -144,9 +144,11 @@
 		9EE7EBA022DDDC6C00535997 /* TreePhysics */ = {
 			isa = PBXGroup;
 			children = (
+				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
+				9EEC11E322F0E3D20078BBFD /* Util */,
 				9E56C94322E78FA90095C8AC /* Tree */,
 				9EE7EBCB22E1078200535997 /* NOTES */,
-				9E036B1D22E4F57900229235 /* Turtle */,
+				9E036B1D22E4F57900229235 /* L-Systems */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA322DDDC6C00535997 /* GameViewController.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
@@ -154,11 +156,7 @@
 				9EE7EBA922DDDC6E00535997 /* Main.storyboard */,
 				9EE7EBAC22DDDC6E00535997 /* Info.plist */,
 				9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */,
-				9EE7EBC322E08E4000535997 /* Math.swift */,
-				9EE7EBC522E0972400535997 /* HasTransform.swift */,
 				9EE7EBC922E0F27900535997 /* main.swift */,
-				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
-				9EEC11E122EA50920078BBFD /* Diagonalization.swift */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -175,6 +173,16 @@
 				9EEC11DF22EA23000078BBFD /* MathTests.swift */,
 			);
 			path = TreePhysicsTests;
+			sourceTree = "<group>";
+		};
+		9EEC11E322F0E3D20078BBFD /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				9EE7EBC522E0972400535997 /* HasTransform.swift */,
+				9EEC11E122EA50920078BBFD /* Diagonalization.swift */,
+				9EE7EBC322E08E4000535997 /* Math.swift */,
+			);
+			path = Util;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -21,7 +21,9 @@ final class Simulator {
 
     func updateCompositeBodies() {
         for rigidBody in rigidBodiesReverseLevelOrder {
-            rigidBody.apply(force: Tree.gravity * rigidBody.mass, at: 0.5) // FIXME
+            // FIXME this is a temporary hack; the force of gravity is turned on and off elsewhere
+            // to poke and prod the system.
+            rigidBody.apply(force: Tree.gravity * rigidBody.mass, at: 0.5)
 
             let composite = rigidBody.composite
 
@@ -68,10 +70,10 @@ final class Simulator {
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
                     rigidBody.composite.mass * sqr(pr.cross_matrix)
 
-//                print("t", rigidBody.composite.torque)
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
-//                print("tjs", torque_jointSpace)
+
                 if parentJoint.k == .infinity {
+                    // static bodies, like the root of the tree
                     parentJoint.angle = 0
                     parentJoint.angularVelocity = 0
                     parentJoint.angularAcceleration = 0
@@ -79,8 +81,8 @@ final class Simulator {
                     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
                     // θ(0) = joint's angle, θ'(0) = joint's angular velocity
 
-                    // 1. First we need to diagonalize I and K so we can solve diff equation, i.e.,
-                    // produce the generalized eigendecomposition of I and K
+                    // 1. First we need to diagonalize I and K so we can solve the diff equation --
+                    // i.e., produce the generalized eigendecomposition of I and K
 
                     // 1.a. the cholesky decomposition of I
                     let L = inertiaTensor_jointSpace.cholesky
@@ -89,7 +91,7 @@ final class Simulator {
                     // 1.b. the generalized eigenvalue problem A * X = X * Λ
                     // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
                     let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
-                    let (Λ, X) = A.eigen_ql! // FIXME investigate analytic option, what percentage of the time it would succeed
+                    let (Λ, X) = A.eigen_ql!
 
                     // 2. Now we can restate the differential equation in terms of other (diagonal)
                     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
@@ -105,23 +107,24 @@ final class Simulator {
                     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
                     // differential equations, θ'' + bθ' + kθ = f 
 
-                    // 2.a.i,
                     let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: theta_diagonal_0.x, y_ddt_0: theta_ddt_diagonal_0.x)
 
                     let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: theta_diagonal_0.y, y_ddt_0: theta_ddt_diagonal_0.y)
 
                     let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: theta_diagonal_0.z, y_ddt_0: theta_ddt_diagonal_0.z)
 
-                    let thetas_diagonal = float3x3(rows: [
+                    let θ_diagonal = float3x3(rows: [
                         evaluate(differential: solution_i, at: Float(time)),
                         evaluate(differential: solution_ii, at: Float(time)),
                         evaluate(differential: solution_iii, at: Float(time))])
 
-                    var thetas = U * thetas_diagonal
+                    var θ = U * θ_diagonal
 
-                    parentJoint.angle = thetas[0, 2]
-                    parentJoint.angularVelocity = thetas[1, 2]
-                    parentJoint.angularAcceleration = thetas[2, 2]
+                    // FIXME for now we're ignoring all but rotation around the z-axis (i.e., the
+                    // second row of θ):
+                    parentJoint.angle = θ[0, 2]
+                    parentJoint.angularVelocity = θ[1, 2]
+                    parentJoint.angularAcceleration = θ[2, 2]
                 }
             }
         }
@@ -135,21 +138,5 @@ final class Simulator {
             }
             rigidBody.resetForces()
         }
-    }
-}
-
-extension RigidBody: CustomDebugStringConvertible {
-    var debugDescription: String {
-        return name
-    }
-}
-
-extension RigidBody: Equatable, Hashable {
-    static func == (lhs: RigidBody, rhs: RigidBody) -> Bool {
-        return lhs === rhs
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(self))
     }
 }

@@ -1,5 +1,7 @@
 import Foundation
 
+// L-system rewriter
+
 class Rewriter {
     struct Rule {
         let symbol: Character

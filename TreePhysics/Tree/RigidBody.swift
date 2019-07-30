@@ -117,6 +117,8 @@ final class RigidBody: HasTransform {
     }
 }
 
+// MARK: Flattening
+
 extension RigidBody {
     var flatten: [RigidBody] {
         var result: [RigidBody] = []

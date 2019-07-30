@@ -2,7 +2,9 @@ import Foundation
 import simd
 import Accelerate
 
-fileprivate let sqrt_3: Float = 1.73205080756887729352744634151
+// This code is ported from C found here: https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/
+
+fileprivate let sqrt_3: Double = 1.73205080756887729352744634151
 
 extension matrix_double3x3 {
     // Reduces a symmetric 3x3 matrix to tridiagonal form by applying
@@ -158,12 +160,67 @@ extension matrix_double3x3 {
         return (w, Q)
     }
 
-}
+    var eigen_analytical: (double3, double3x3)? {
+        var Q = double3x3.init(0)
+        let w = self.eigenvalues_analytical
+        let abs_w = abs(w)
 
-extension matrix_float3x3 {
+        var t = abs_w.x
+        var u = abs_w.y
+        if u > abs_w.x {
+            t = abs_w.x
+        }
+        u = abs_w.z
+        if u > t {
+            t = u
+        }
+        if t < 1.0 {
+            u = t
+        } else {
+            u = sqr(t)
+        }
+        let error = 256.0 * Double.ulpOfOne * sqr(u)
+
+        // Calculate first eigenvector by the formula
+        //   v[0] = (A - w[0]).e1 x (A - w[0]).e2
+        Q[0] = cross(self[0] - double3(w.x, 0, 0), self[1] - double3(0, w.x, 0))
+        var norm = dot(Q[0], Q[0])
+
+        // If vectors are nearly linearly dependent, or if there might have
+        // been large cancellations in the calculation of A[i][i] - w[0], fall
+        // back to QL algorithm
+        // Note that this simultaneously ensures that multiple eigenvalues do
+        // not cause problems: If w[0] = w[1], then A - w[0] * I has rank 1,
+        // i.e. all columns of A - w[0] * I are linearly dependent.
+        if norm <= error {
+            return self.eigen_ql
+        } else {                      // This is the standard branch
+            norm = sqrt(1.0 / norm)
+            Q[0] *= norm
+        }
+
+        // Calculate second eigenvector by the formula
+        //   v[1] = (A - w[1]).e1 x (A - w[1]).e2
+        Q[1] = cross(self[0] - double3(w.y, 0, 0), self[1] - double3(0, w.y, 0))
+
+        norm = dot(Q[1], Q[1])
+        if norm <= error {
+            return self.eigen_ql
+        } else {
+            norm = sqrt(1.0 / norm)
+            Q[1] *= norm
+        }
+
+        // Calculate third eigenvector according to
+        //   v[2] = v[0] x v[1]
+        Q[2] = cross(Q[0], Q[1])
+
+        return (w, Q)
+    }
+
     // Calculates the eigenvalues of a symmetric 3x3 matrix A using Cardano's
     // analytical algorithm.
-    var eigenvalues_analytical: float3 {
+    var eigenvalues_analytical: double3 {
         // Determine coefficients of characteristic poynomial. We write
         //       | a   d   f  |
         //  A =  | d*  b   e  |
@@ -195,65 +252,18 @@ extension matrix_float3x3 {
         let w0  = w1 + c
         w1 -= s
 
-        return float3(w0, w1, w2)
+        return double3(w0, w1, w2)
     }
 
+}
+
+extension matrix_float3x3 {
     var eigen_analytical: (float3, float3x3)? {
-        var Q = float3x3.init(0)
-        let w = self.eigenvalues_analytical
-        let abs_w = abs(w)
-
-        var t = abs_w.x
-        var u = abs_w.y
-        if u > abs_w.x {
-            t = abs_w.x
+        guard let (eigenvalues, eigenvectors) = double3x3(self).eigen_analytical else {
+            return nil
         }
-        u = abs_w.z
-        if u > t {
-            t = u
-        }
-        if t < 1.0 {
-            u = t
-        } else {
-            u = sqr(t)
-        }
-        let error = 256.0 * Float.ulpOfOne * sqr(u)
+        return (float3(eigenvalues), float3x3(eigenvectors))
 
-        // Calculate first eigenvector by the formula
-        //   v[0] = (A - w[0]).e1 x (A - w[0]).e2
-        Q[0] = cross(self[0] - float3(w.x, 0, 0), self[1] - float3(0, w.x, 0))
-        var norm = dot(Q[0], Q[0])
-
-        // If vectors are nearly linearly dependent, or if there might have
-        // been large cancellations in the calculation of A[i][i] - w[0], fall
-        // back to QL algorithm
-        // Note that this simultaneously ensures that multiple eigenvalues do
-        // not cause problems: If w[0] = w[1], then A - w[0] * I has rank 1,
-        // i.e. all columns of A - w[0] * I are linearly dependent.
-        if norm <= error {
-            return self.eigen_ql
-        } else {                      // This is the standard branch
-            norm = sqrt(1.0 / norm)
-            Q[0] *= norm
-        }
-
-        // Calculate second eigenvector by the formula
-        //   v[1] = (A - w[1]).e1 x (A - w[1]).e2
-        Q[1] = cross(self[0] - float3(w.y, 0, 0), self[1] - float3(0, w.y, 0))
-
-        norm = dot(Q[1], Q[1])
-        if norm <= error {
-            return self.eigen_ql
-        } else {
-            norm = sqrt(1.0 / norm)
-            Q[1] *= norm
-        }
-
-        // Calculate third eigenvector according to
-        //   v[2] = v[0] x v[1]
-        Q[2] = cross(Q[0], Q[1])
-
-        return (w, Q)
     }
 
     var eigen_ql: (float3, float3x3)? {

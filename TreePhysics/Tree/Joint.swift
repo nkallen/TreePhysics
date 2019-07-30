@@ -27,7 +27,7 @@ final class Joint: HasTransform {
     init(parent: RigidBody, child: RigidBody, k: Float? = nil) {
         self.parentRigidBody = parent
         self.childRigidBody = child
-        self.k = k ?? Joint.computeK(radius: parent.radius)
+        self.k = k ?? Joint.computeK(radius: parent.radius, length: parent.length)
         updateTransform()
     }
 
@@ -46,7 +46,8 @@ final class Joint: HasTransform {
         return rotation_world2local * vector
     }
 
-    private static func computeK(radius: Float) -> Float {
+    private static func computeK(radius: Float, length: Float) -> Float {
         return Tree.K
+//        return Tree.E * .pi * radius * radius / length
     }
 }

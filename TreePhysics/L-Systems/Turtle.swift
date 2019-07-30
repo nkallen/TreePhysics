@@ -1,6 +1,9 @@
 import Foundation
 import simd
 
+// Basic turtle graphics, inspired by Houdini's L-System implementation:
+// https://www.sidefx.com/docs/houdini/nodes/sop/lsystem.html
+
 enum Command {
     case forward(distance: Float?, width: Float?)
     case tropism(force: float3?)
