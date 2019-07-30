@@ -20,7 +20,6 @@ final class RigidBody: HasTransform {
     let mass: Float
     let length: Float
     let radius: Float
-    let momentOfInertia: Float
     private let inertiaTensor_local: float3x3
     var inertiaTensor: float3x3
 
@@ -56,8 +55,7 @@ final class RigidBody: HasTransform {
         self.mass = Float.pi * radius*radius * length * density
         self.length = length
         self.radius = radius
-        self.momentOfInertia = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
-        let momentOfInertiaAboutY = self.momentOfInertia
+        let momentOfInertiaAboutY = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
         let momentOfInertiaAboutX = 1.0/4 * mass * radius * radius
         let momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius
 

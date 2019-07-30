@@ -30,8 +30,8 @@ class SimulatorTests: XCTestCase {
         let simulator = Simulator(tree: Tree(start))
         simulator.updateCompositeBodies()
 
-        XCTAssertEqual(start.momentOfInertia, 1.0/12)
-        XCTAssertEqual(stop.momentOfInertia, 1.0/12)
+//        XCTAssertEqual(start.momentOfInertia, 1.0/12)
+//        XCTAssertEqual(stop.momentOfInertia, 1.0/12)
 
 //        XCTAssertEqual(stop.composite.momentOfInertia, 1.0/12)
 //        XCTAssertEqual(start.composite.momentOfInertia, Float((1.0/12 + 1.0/4) * 2.0))
@@ -56,7 +56,7 @@ class SimulatorTests: XCTestCase {
         XCTAssertEqual(b2.radius, 1)
 
         XCTAssertEqual(b2.torque, cross(b2.convert(position: float3(0, 1, 0)) - b2.position, force))
-        XCTAssertEqual(b2.momentOfInertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
+//        XCTAssertEqual(b2.momentOfInertia, 1.0/12 * 1 * 1) // moment of inertia is relative to center of mass
         let rotation_world2local = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: b2.transform)
         XCTAssertEqual(rotation_world2local * b2.inertiaTensor * rotation_world2local.transpose, matrix_float3x3.init(diagonal: float3(
             1.0/4 + 1.0/12,
