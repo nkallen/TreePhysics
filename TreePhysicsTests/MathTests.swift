@@ -33,10 +33,6 @@ class MathTests: XCTestCase {
             eigenvalues, accuracy: 0.0001)
 
         XCTAssertEqual(
-            (matrix - matrix.eigenvalues_analytical.x * matrix_identity_float3x3).determinant,
-            0, accuracy: 0.0001)
-
-        XCTAssertEqual(
             float3x3(columns: (
                 float3(1.0/2, sqrt(2.0) / 2, 1.0/2),
                 float3(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),

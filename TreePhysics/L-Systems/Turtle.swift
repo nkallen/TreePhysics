@@ -3,6 +3,7 @@ import simd
 
 // Basic turtle graphics, inspired by Houdini's L-System implementation:
 // https://www.sidefx.com/docs/houdini/nodes/sop/lsystem.html
+// Actual drawing happens by means of a `Pen`
 
 enum Command {
     case forward(distance: Float?, width: Float?)

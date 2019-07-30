@@ -105,6 +105,7 @@ class SimulatorTests: XCTestCase {
 
         // inertia
         XCTAssertEqual(b2.composite.inertiaTensor, b2.inertiaTensor)
+        // FIXME now that we've converted to inertia tensors, we need to rewrite this test!!!
 //        XCTAssertEqual(b1.composite.momentOfInertia,
 //                       b1.momentOfInertia + b1.mass * sqr(distance(b1.centerOfMass, b1.composite.centerOfMass)) +
 //                        b2.momentOfInertia + b2.mass * sqr(distance(b2.centerOfMass, b1.composite.centerOfMass)),

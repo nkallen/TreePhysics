@@ -1,6 +1,8 @@
 import Foundation
 import SceneKit
 
+// A composite pen that "draws" cylinders and rigid bodies simultaneously.
+
 typealias Indices = [UInt16]
 
 final class SkinningPen: Pen {
