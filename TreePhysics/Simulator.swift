@@ -21,7 +21,7 @@ final class Simulator {
 
     func updateCompositeBodies() {
         for rigidBody in rigidBodiesReverseLevelOrder {
-            rigidBody.apply(force: Tree.gravity, at: 0.5) // FIXME
+            rigidBody.apply(force: Tree.gravity * rigidBody.mass, at: 0.5) // FIXME
 
             let composite = rigidBody.composite
 

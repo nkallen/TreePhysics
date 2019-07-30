@@ -6,11 +6,13 @@ protocol HasTransform {
 }
 
 extension HasTransform {
+    @inline(__always)
     func convert(position: float3) -> float3 {
         return (transform * float4(position, 1)).xyz
     }
 
+    @inline(__always)
     var position: float3 {
-        return convert(position: float3.zero) // XXX fixme
+        return convert(position: float3.zero) // XXX FIXME
     }
 }

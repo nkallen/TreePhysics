@@ -80,12 +80,9 @@ final class RigidBody: HasTransform {
     }
 
     func add(_ child: RigidBody, at angle: Float = -Float.pi / 4) {
-        let joint: Joint
-        if kind == .static {
-            joint = Joint(parent: self, child: child, k: Float.infinity)
-        } else {
-            joint = Joint(parent: self, child: child)
-        }
+        let joint = Joint(parent: self,
+                          child: child,
+                          k: kind == .static ? Float.infinity : nil)
         childJoints.append(joint)
         child.angle = angle
         child.parentJoint = joint
@@ -113,6 +110,7 @@ final class RigidBody: HasTransform {
         }
     }
 
+    @inline(__always)
     private func updateCenterOfMass() {
         let localCenterOfMass = float3(0, 1, 0) * length / 2
         self.centerOfMass = convert(position: localCenterOfMass)

@@ -31,6 +31,7 @@ final class Joint: HasTransform {
         updateTransform()
     }
 
+    @inline(__always)
     func updateTransform() {
         self.transform = parentRigidBody.transform * matrix4x4_translation(0, parentRigidBody.length, 0) * matrix4x4_rotation(radians: self.angle, axis: .z)
     }

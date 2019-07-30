@@ -43,7 +43,7 @@ class GameViewController: NSViewController {
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
-            angle: 18 * .pi / 180, thickness: 0.003*0.003*Float.pi, thicknessScale: 0.5, stepSize: 0.05, stepSizeScale: 0.9)
+            angle: 18 * .pi / 180, thickness: 0.003*0.003*Float.pi, thicknessScale: 0.9, stepSize: 0.05, stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
         let tree = Tree(root)
@@ -104,7 +104,7 @@ extension GameViewController {
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if toggle {
-            Tree.gravity = float3(0, -1, 0)
+            Tree.gravity = float3(0, -9.81, 0)
         } else {
             Tree.gravity = float3.zero
         }
