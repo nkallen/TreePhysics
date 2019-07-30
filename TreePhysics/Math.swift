@@ -16,18 +16,19 @@ enum DifferentialSolution: Equatable {
 
 func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     //    (-b +/- sqrt(b^2 - 4ac)) / 2a
+    //    where r2 = c/ar1, cf: https://math.stackexchange.com/questions/311382/solving-a-quadratic-equation-with-precision-when-using-floating-point-variables
     let b2_4ac = b*b - 4.0*a*c
-    let _2a = 1.0 / (2.0*a)
+    let _2a = 2.0*a
+
     if b2_4ac == 0 {
-        let b_2a = -b * _2a
-        return .real(b_2a)
+        return .real(-b / _2a)
     } else if b2_4ac > 0 {
-        let b_2a = -b * _2a
-        let sqrt_b2_4ac_2a = sqrt(b2_4ac) * _2a
-        return .realDistinct(b_2a + sqrt_b2_4ac_2a, b_2a - sqrt_b2_4ac_2a)
+        let r2 = (-b - sqrt(b2_4ac)) / (2.0*a)
+        let r1 = c / (a * r2)
+        return .realDistinct(r1, r2)
     } else {
-        let imaginaryPart = sqrt(-b2_4ac) * _2a
-        let realPart = -b * _2a
+        let imaginaryPart = sqrt(-b2_4ac) / _2a
+        let realPart = -b / _2a
         return .complex(realPart, imaginaryPart)
     }
 }

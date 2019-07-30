@@ -46,27 +46,27 @@ class MathTests: XCTestCase {
     }
 
     func testTridiagonal() {
-        let matrix = float3x3(columns: (
-            float3(2,1,0),
-            float3(1,2,1),
-            float3(0,1,2)))
+        let matrix = double3x3(columns: (
+            double3(2,1,0),
+            double3(1,2,1),
+            double3(0,1,2)))
 
         let (Q, d, e) = matrix.tridiagonal
         let Q_transpose = Q.transpose
-        let X = float3x3(columns: (
-            float3(d[0],e[0],0),
-            float3(e[0],d[1],e[1]),
-            float3(0,e[1],d[2])))
+        let X = double3x3(columns: (
+            double3(d[0],e[0],0),
+            double3(e[0],d[1],e[1]),
+            double3(0,e[1],d[2])))
         let Y = Q * X * Q_transpose
 
         XCTAssertEqual(matrix, Y)
     }
 
     func testEigenQL() {
-        let matrix = float3x3(columns: (
-            float3(2,1,0),
-            float3(1,2,1),
-            float3(0,1,2)))
+        let matrix = double3x3(columns: (
+            double3(2,1,0),
+            double3(1,2,1),
+            double3(0,1,2)))
 
         guard let (eigenvalues, eigenvectors) = matrix.eigen_ql else {
             XCTFail()
@@ -74,29 +74,15 @@ class MathTests: XCTestCase {
         }
 
         XCTAssertEqual(
-            float3(2 - sqrt(2), 2, 2 + sqrt(2.0)),
+            double3(2 - sqrt(2), 2, 2 + sqrt(2.0)),
             eigenvalues, accuracy: 0.0001)
 
         XCTAssertEqual(
-            float3x3(columns: (
-                -float3(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),
-                float3(1 / sqrt(2.0), 0, -1/sqrt(2.0)),
-                float3(1.0/2, sqrt(2.0) / 2, 1.0/2)
+            double3x3(columns: (
+                -double3(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),
+                double3(1 / sqrt(2.0), 0, -1/sqrt(2.0)),
+                double3(1.0/2, sqrt(2.0) / 2, 1.0/2)
             )),
             eigenvectors, accuracy: 0.001)
-    }
-
-    func testFoo() {
-        let inertiaTensor_jointSpace = matrix_float3x3(columns: (
-            float3(1.838548e-07, 6.280492e-08, 0.000000e+00),
-            float3(6.280492e-08, 2.147834e-08, 0.000000e+00),
-            float3(0.000000e+00, 0.000000e+00, 2.053115e-07) ))
-        let L = inertiaTensor_jointSpace.cholesky
-        let L_inverse = L.inverse, L_transpose_inverse = L.transpose.inverse
-        let k: Float = 27423.6777
-        let A = L_inverse * (k * matrix_identity_float3x3) * L_transpose_inverse
-//        let (Λ, X) = A.eigen_ql!
-
-        print(A.tridiagonal)
     }
 }
