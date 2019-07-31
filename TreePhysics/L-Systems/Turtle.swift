@@ -132,7 +132,7 @@ class Interpreter<P> where P: Pen {
                 state.position += state.heading * distanceScaled
                 state.thickness = thicknessScaled
                 _ = state.pen.cont(distance: distanceScaled, tangent: state.heading, thickness: state.thickness)
-            case let .tropism(force): ()
+            case .tropism(_): ()
 //                let force = force ?? configuration.force
 //                let angle = configuration.elasticity *
 //                    length(cross(state.heading, force))
@@ -144,7 +144,7 @@ class Interpreter<P> where P: Pen {
                 let radians = -abs(radians ?? configuration.angle)
                 state.orientation *= matrix3x3_rotation_up(radians: radians)
             case let .turnRandom(upToRadians):
-                let upTo = upToRadians ?? configuration.angle
+                _ = upToRadians ?? configuration.angle
 //                state.heading = rotate(state.heading, by: Float.random(in: -upTo...upTo), axis: state.up)
             case let .rollRight(radians):
                 let radians = -abs(radians ?? configuration.angle)

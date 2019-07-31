@@ -15,8 +15,8 @@ class SimulatorTests: XCTestCase {
         root = RigidBody()
         b1 = RigidBody()
         b2 = RigidBody()
-        root.add(b1, at: -Float.pi/4)
-        b1.add(b2, at: -Float.pi/4)
+        root.add(b1, at: float3(0,0,-Float.pi/4))
+        b1.add(b2, at: float3(0,0,-Float.pi/4))
 
         simulator = Simulator(tree: Tree(root))
 
@@ -26,7 +26,7 @@ class SimulatorTests: XCTestCase {
     func testInertiaTensorsInCompositeBodies() {
         let start = RigidBody()
         let stop = RigidBody()
-        start.add(stop, at: 0)
+        start.add(stop, at: float3.zero)
         let simulator = Simulator(tree: Tree(start))
         simulator.updateCompositeBodies()
 
@@ -242,7 +242,7 @@ func XCTAssertEqual(_ a: DifferentialSolution, _ b: DifferentialSolution, accura
         XCTAssertEqual(r_left, r_right, accuracy: accuracy, file: file, line: line)
         XCTAssertEqual(k_left, k_right, accuracy: accuracy, file: file, line: line)
     case let (.complex(c1_left, c2_left, lambda_left, mu_left, k_left),
-          .complex(c1_right, c2_right, lambda_right, mu_right, k_right)):
+              .complex(c1_right, c2_right, lambda_right, mu_right, k_right)):
         XCTAssertEqual(c1_left, c1_right, accuracy: accuracy, file: file, line: line)
         XCTAssertEqual(c2_left, c2_right, accuracy: accuracy, file: file, line: line)
         XCTAssertEqual(lambda_left, lambda_right, accuracy: accuracy, file: file, line: line)

@@ -8,19 +8,10 @@ final class Joint: HasTransform {
     unowned let parentRigidBody: RigidBody
     let childRigidBody: RigidBody
 
-    var transform: matrix_float4x4 = matrix_identity_float4x4 {
-        didSet {
-            self.rotation_world2local = matrix3x3_rotation(from: local_ijk, to: transform.inverse)
-        }
-    }
-    var angularAcceleration: Float = 0
-    var angularVelocity: Float = 0
-    var angle: Float = 0 {
-        didSet {
-            updateTransform()
-        }
-    }
+    var transform: matrix_float4x4 = matrix_identity_float4x4
+    var θ: float3x3 = float3x3(0)
     private(set) var rotation_world2local: float3x3 = matrix_identity_float3x3
+    private let translation_local: float4x4
 
     let k: Float
 
@@ -28,12 +19,16 @@ final class Joint: HasTransform {
         self.parentRigidBody = parent
         self.childRigidBody = child
         self.k = k ?? Joint.computeK(radius: parent.radius, length: parent.length)
+        self.translation_local = matrix4x4_translation(0, parentRigidBody.length, 0)
         updateTransform()
     }
 
     @inline(__always)
     func updateTransform() {
-        self.transform = parentRigidBody.transform * matrix4x4_translation(0, parentRigidBody.length, 0) * matrix4x4_rotation(radians: self.angle, axis: .z)
+        let eulerAngles = θ[0]
+        let rotation_local = matrix4x4_rotation(rotation: eulerAngles)
+        self.transform = parentRigidBody.transform * translation_local * rotation_local
+        self.rotation_world2local = matrix3x3_rotation(from: local_ijk, to: transform.inverse)
     }
 
     @inline(__always)

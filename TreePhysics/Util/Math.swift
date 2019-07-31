@@ -136,6 +136,32 @@ func matrix4x4_rotation(radians: Float, axis: float3) -> matrix_float4x4 {
                                          float4(                  0,                   0,                   0, 1)))
 }
 
+func matrix4x4_rotation(rotation: float3) -> matrix_float4x4 {
+    let pitch = rotation.x
+    let yaw = rotation.y
+    let roll = rotation.z
+
+    let cb = cosf(pitch)
+    let sb = sinf(pitch)
+    let ch = cosf(yaw)
+    let sh = sinf(yaw)
+    let ca = cosf(roll)
+    let sa = sinf(roll)
+
+    return float4x4(columns:(
+        float4(ch*ca,          sa,     -sh*ca,            0),
+        float4(sh*sb-ch*sa*cb, ca*cb,  sh*sa*cb+ch*sb,    0),
+        float4(ch*sa*sb+sh*cb, -ca*sb, -sh*sa*sb + ch*cb, 0),
+        float4(0,              0,      0,                 1)))
+}
+
+func matrix3x3_rotation(rotation: matrix_float4x4) -> matrix_float3x3 {
+    return float3x3(columns: (
+        rotation[0].xyz,
+        rotation[1].xyz,
+        rotation[2].xyz))
+}
+
 func matrix4x4_translation(_ translationX: Float, _ translationY: Float, _ translationZ: Float) -> matrix_float4x4 {
     return matrix_float4x4.init(columns:(vector_float4(1, 0, 0, 0),
                                          vector_float4(0, 1, 0, 0),
@@ -276,6 +302,11 @@ extension matrix_float3x3 {
 
     var isSymmetric: Bool {
         return self == self.transpose
+    }
+
+    @inline(__always)
+    func row(_ i: Int) -> float3 {
+        return float3(self[0, i], self[1, i], self[2, i])
     }
 }
 

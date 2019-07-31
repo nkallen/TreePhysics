@@ -23,7 +23,7 @@ final class RigidBodyPen: Pen {
         let newBranch = RigidBody(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
         let angle = atan2(tangent.y, tangent.x)
-        parentBranch.add(newBranch, at: angle - parentAngle)
+        parentBranch.add(newBranch, at: float3(0,0,angle - parentAngle))
         self.parentAngle = angle
 
         self.start = start + distance * tangent

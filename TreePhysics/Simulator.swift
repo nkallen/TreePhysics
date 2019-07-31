@@ -74,9 +74,7 @@ final class Simulator {
 
                 if parentJoint.k == .infinity {
                     // static bodies, like the root of the tree
-                    parentJoint.angle = 0
-                    parentJoint.angularVelocity = 0
-                    parentJoint.angularAcceleration = 0
+                    parentJoint.θ = matrix_float3x3(0)
                 } else {
                     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
                     // θ(0) = joint's angle, θ'(0) = joint's angular velocity
@@ -100,31 +98,24 @@ final class Simulator {
                     let U_transpose =  U.transpose, U_inverse = U.inverse
 
                     let torque_diagonal = U_transpose * torque_jointSpace
-                    let theta_diagonal_0 = U_inverse * float3(0,0,parentJoint.angle)
-                    let theta_ddt_diagonal_0 = U_inverse * float3(0,0,parentJoint.angularVelocity)
+                    let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
+                    let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
                     let βΛ = Tree.B * Λ
 
                     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
                     // differential equations, θ'' + bθ' + kθ = f 
 
-                    let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: theta_diagonal_0.x, y_ddt_0: theta_ddt_diagonal_0.x)
+                    let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: θ_diagonal_0.x, y_ddt_0: θ_ddt_diagonal_0.x)
+                    let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y)
+                    let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z)
 
-                    let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: theta_diagonal_0.y, y_ddt_0: theta_ddt_diagonal_0.y)
-
-                    let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: theta_diagonal_0.z, y_ddt_0: theta_ddt_diagonal_0.z)
-
-                    let θ_diagonal = float3x3(rows: [
+                    let θ_diagonal = matrix_float3x3(rows: [
                         evaluate(differential: solution_i, at: Float(time)),
                         evaluate(differential: solution_ii, at: Float(time)),
                         evaluate(differential: solution_iii, at: Float(time))])
 
-                    var θ = U * θ_diagonal
-
-                    // FIXME for now we're ignoring all but rotation around the z-axis (i.e., the
-                    // second row of θ):
-                    parentJoint.angle = θ[0, 2]
-                    parentJoint.angularVelocity = θ[1, 2]
-                    parentJoint.angularAcceleration = θ[2, 2]
+                    let θ = U * θ_diagonal
+                    parentJoint.θ = θ
                 }
             }
         }

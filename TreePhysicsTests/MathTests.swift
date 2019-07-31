@@ -81,4 +81,13 @@ class MathTests: XCTestCase {
             )),
             eigenvectors, accuracy: 0.001)
     }
+
+    func testRotation() {
+        print(            matrix4x4_rotation(radians: .pi/4, axis: .z))
+        print(matrix4x4_rotation(rotation: float3(0, 0, .pi/4)))
+        XCTAssertEqual(
+            matrix4x4_rotation(radians: .pi/4, axis: .z),
+            matrix4x4_rotation(rotation: float3(0, 0, .pi/4)),
+            accuracy: 0.0001)
+    }
 }

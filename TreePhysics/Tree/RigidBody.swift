@@ -23,27 +23,14 @@ final class RigidBody: HasTransform {
     private let inertiaTensor_local: float3x3
     var inertiaTensor: float3x3
 
-    var transform: matrix_float4x4 = matrix_identity_float4x4 {
-        didSet {
-            updateCenterOfMass()
-            node.simdTransform = self.transform
-            let rotation_local2world = matrix3x3_rotation(from: local_ijk, to: transform)
-            self.inertiaTensor = rotation_local2world * inertiaTensor_local * rotation_local2world.transpose
-        }
-    }
+    private(set) var transform: matrix_float4x4 = matrix_identity_float4x4
     var centerOfMass: float3 = float3.zero
     var force: float3 = float3.zero
     var torque: float3 = float3.zero
+    let centerOfMass_local: float3
+    private var rotation_local: float4x4 = matrix_identity_float4x4
 
     let node: SCNNode
-
-    // NOTE: the branch, in its resting state, might sprout off its parent at an angle. Thus, the
-    // joint angle (which is 0 in the resting state) is not the same as the branch angle.
-    var angle: Float = 0 {
-        didSet {
-            updateTransform()
-        }
-    }
 
     init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
         self.name = "Branch[\(i)]"
@@ -56,8 +43,8 @@ final class RigidBody: HasTransform {
         self.length = length
         self.radius = radius
         let momentOfInertiaAboutY = 1.0/12 * mass * length * length // Moment of Inertia of a rod about its center of mass
-        let momentOfInertiaAboutX = 1.0/4 * mass * radius * radius
-        let momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius
+        let momentOfInertiaAboutX = 1.0/4 * mass * radius * radius // MoI of a disc about its center
+        let momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius // ditto
 
         // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
         // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
@@ -67,6 +54,8 @@ final class RigidBody: HasTransform {
                    momentOfInertiaAboutX + momentOfInertiaAboutY))
         self.inertiaTensor = inertiaTensor_local
 
+        self.centerOfMass_local = float3(0, 1, 0) * length / 2
+
         let node = SCNNode(geometry: SCNSphere(radius: 0.01))
         self.node = node
         self.composite = CompositeBody()
@@ -74,16 +63,17 @@ final class RigidBody: HasTransform {
         node.name = name
         node.simdPosition = position
 
-        updateCenterOfMass()
+        updateTransform()
     }
 
-    func add(_ child: RigidBody, at angle: Float = -Float.pi / 4) {
+    func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) {
         let joint = Joint(parent: self,
                           child: child,
                           k: kind == .static ? Float.infinity : nil)
         childJoints.append(joint)
-        child.angle = angle
         child.parentJoint = joint
+        child.rotation_local = matrix4x4_rotation(rotation: eulerAngles)
+        child.updateTransform()
     }
 
     // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
@@ -102,16 +92,14 @@ final class RigidBody: HasTransform {
 
     func updateTransform() {
         if let parentJoint = parentJoint {
-            self.transform = parentJoint.transform * matrix4x4_rotation(radians: self.angle, axis: .z)
+            self.transform = parentJoint.transform * rotation_local
         } else {
             self.transform = matrix_identity_float4x4
         }
-    }
-
-    @inline(__always)
-    private func updateCenterOfMass() {
-        let localCenterOfMass = float3(0, 1, 0) * length / 2
-        self.centerOfMass = convert(position: localCenterOfMass)
+        node.simdTransform = self.transform
+        let rotation_local2world = matrix3x3_rotation(from: local_ijk, to: transform)
+        self.inertiaTensor = rotation_local2world * inertiaTensor_local * rotation_local2world.transpose
+        self.centerOfMass = convert(position: centerOfMass_local)
     }
 }
 
