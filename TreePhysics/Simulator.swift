@@ -50,7 +50,6 @@ final class Simulator {
             composite.inertiaTensor = rigidBody.inertiaTensor -
                 rigidBody.mass * sqr((rigidBody.centerOfMass - rigidBody.composite.centerOfMass).cross_matrix)
 
-
             for childJoint in rigidBody.childJoints {
                 let childRigidBody = childJoint.childRigidBody
                 let childComposite = childRigidBody.composite

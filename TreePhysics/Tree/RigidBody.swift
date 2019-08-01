@@ -67,12 +67,16 @@ final class RigidBody: HasTransform {
     }
 
     func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) {
+        add(child, at: matrix4x4_rotation(rotation: eulerAngles))
+    }
+
+    func add(_ child: RigidBody, at rotation: matrix_float4x4) {
         let joint = Joint(parent: self,
                           child: child,
                           k: kind == .static ? Float.infinity : nil)
         childJoints.append(joint)
         child.parentJoint = joint
-        child.rotation_local = matrix4x4_rotation(rotation: eulerAngles)
+        child.rotation_local = rotation
         child.updateTransform()
     }
 
@@ -97,9 +101,21 @@ final class RigidBody: HasTransform {
             self.transform = matrix_identity_float4x4
         }
         node.simdTransform = self.transform
-        let rotation_local2world = matrix3x3_rotation(from: local_ijk, to: transform)
-        self.inertiaTensor = rotation_local2world * inertiaTensor_local * rotation_local2world.transpose
+
+        let rotation = matrix3x3_rotation(from: transform)
+        self.inertiaTensor = rotation * inertiaTensor_local * rotation.transpose
+
+        if kind != .static {
+//            print("====")
+//            print("local:   ", (inertiaTensor_local).eigen_ql!)
+//            print("global:", (self.inertiaTensor).eigen_ql!)
+//            print("inverted:", (rotation.inverse * inertiaTensor * rotation).eigen_ql!)
+//            print("<<<<")
+            assert(inertiaTensor.isPositiveDefinite)
+        }
+
         self.centerOfMass = convert(position: centerOfMass_local)
+        if self.centerOfMass.x.isNaN { fatalError() }
     }
 }
 

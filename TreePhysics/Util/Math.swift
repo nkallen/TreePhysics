@@ -23,9 +23,13 @@ func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     if b2_4ac == 0 {
         return .real(-b / _2a)
     } else if b2_4ac > 0 {
-        let r2 = (-b - sqrt(b2_4ac)) / (2.0*a)
-        let r1 = c / (a * r2)
-        return .realDistinct(r1, r2)
+        if b < 0 {
+            fatalError("The spring coefficient should never be 0") // FIXME remove
+        } else {
+            let r2 = (-b - sqrt(b2_4ac)) / (2.0*a)
+            let r1 = c / (a * r2)
+            return .realDistinct(r1, r2)
+        }
     } else {
         let imaginaryPart = sqrt(-b2_4ac) / _2a
         let realPart = -b / _2a
@@ -71,11 +75,17 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
             r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
         return float3(y, y_ddt, y_d2dt)
     case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
-        let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
-        let y_ddt = r1*c1*powf(.e,r1*t) +
-            r2*c2 * powf(.e,r2*t)
-        let y_d2dt = r1*r1*c1 * powf(.e,r1*t) +
-            r2*r2*c2 * powf(.e,r2*t)
+        let y_a = c1 == 0 ? 0 : c1*powf(.e,r1*t)
+        let y_b = c2 == 0 ? 0 : c2*powf(.e,r2*t)
+        let y = y_a + y_b + k
+
+        let y_ddt_a = c1 == 0 ? 0 : r1*c1*powf(.e,r1*t)
+        let y_ddt_b = c2 == 0 ? 0 : r2*c2*powf(.e,r2*t)
+        let y_ddt = y_ddt_a + y_ddt_b
+
+        let y_d2dt_a = c1 == 0 ? 0 : r1*r1*c1 * powf(.e,r1*t)
+        let y_d2dt_b = c2 == 0 ? 0 : r2*r2*c2 * powf(.e,r2*t)
+        let y_d2dt = y_d2dt_a + y_d2dt_b
         return float3(y, y_ddt, y_d2dt)
     }
 }
@@ -155,6 +165,24 @@ func matrix4x4_rotation(rotation: float3) -> matrix_float4x4 {
         float4(0,              0,      0,                 1)))
 }
 
+func matrix3x3_rotation(rotation: float3) -> matrix_float3x3 {
+    let pitch = rotation.x
+    let yaw = rotation.y
+    let roll = rotation.z
+
+    let cb = cosf(pitch)
+    let sb = sinf(pitch)
+    let ch = cosf(yaw)
+    let sh = sinf(yaw)
+    let ca = cosf(roll)
+    let sa = sinf(roll)
+
+    return float3x3(columns:(
+        float3(ch*ca,          sa,     -sh*ca),
+        float3(sh*sb-ch*sa*cb, ca*cb,  sh*sa*cb+ch*sb),
+        float3(ch*sa*sb+sh*cb, -ca*sb, -sh*sa*sb + ch*cb)))
+}
+
 func matrix3x3_rotation(rotation: matrix_float4x4) -> matrix_float3x3 {
     return float3x3(columns: (
         rotation[0].xyz,
@@ -185,6 +213,12 @@ func matrix3x3_rotation(from: matrix_float4x4, to: matrix_float4x4) -> matrix_fl
         (float3(dot(to.columns.0, from.columns.0), dot(to.columns.1, from.columns.0), dot(to.columns.2, from.columns.0)),
          float3(dot(to.columns.0, from.columns.1), dot(to.columns.1, from.columns.1), dot(to.columns.2, from.columns.1)),
          float3(dot(to.columns.0, from.columns.2), dot(to.columns.1, from.columns.2), dot(to.columns.2, from.columns.2))))
+}
+
+func matrix3x3_rotation(from transform: matrix_float4x4) -> matrix_float3x3 {
+    return float3x3(columns: (
+        transform[0].xyz, transform[1].xyz, transform[2].xyz
+    ))
 }
 
 func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> float3x3 {
@@ -222,6 +256,10 @@ extension float3 {
             (float3(0, self.z, -self.y),
              float3(-self.z, 0, self.x),
              float3(self.y, -self.x, 0)))
+    }
+
+    var allPositive: Bool {
+        return x >= 0 && y >= 0 && z >= 0
     }
 }
 
@@ -304,9 +342,41 @@ extension matrix_float3x3 {
         return self == self.transpose
     }
 
+    var isValid: Bool {
+        for i in 0..<3 {
+            for j in 0..<3 {
+                if self[i, j].isInfinite || self[i, j].isNaN {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    var isPositiveDefinite: Bool {
+        guard let (eigenvalues, _) = self.eigen_ql else { return false }
+        return eigenvalues.allPositive
+    }
+
     @inline(__always)
     func row(_ i: Int) -> float3 {
         return float3(self[0, i], self[1, i], self[2, i])
     }
 }
 
+func conditionx(_ a: (float3, float3x3)) -> (float3, float3x3) {
+    var (eigenvalues, eigenvectors) = a
+    if eigenvalues.x < 0 {
+        eigenvalues.x = -eigenvalues.x
+//        eigenvectors[0] = -eigenvectors[0]
+    }
+    if eigenvalues.y < 0 {
+        eigenvalues.y = -eigenvalues.y
+//        eigenvectors[1] = -eigenvectors[1]
+    }
+    if eigenvalues.z < 0 {
+        eigenvalues.z = -eigenvalues.z
+//        eigenvectors[2] = -eigenvectors[2]
+    }
+    return (eigenvalues, eigenvectors)
+}

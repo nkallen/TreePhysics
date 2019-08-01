@@ -24,20 +24,20 @@ extension matrix_double3x3 {
         var Q = matrix_identity_double3x3
 
         // Bring first row and column to the desired form
-        let h = sqr(self[1, 0] + sqr(self[2, 0]))
+        let h = sqr(self[1, 0]) + sqr(self[2, 0])
         let g = self[1, 0] > 0 ? -sqrt(h) : sqrt(h)
 
-        e.x = g
+        e[0] = g
         var f = g * self[1, 0]
-        u.y = self[1,0] - g
-        u.z = self[2,0]
+        u[1] = self[1,0] - g
+        u[2] = self[2,0]
 
         var omega = h - f
         if omega > 0.0 {
             omega = 1.0 / omega
             var K = 0.0
             for i in 1..<3 {
-                f = self[i, 1] * u[1] + self[2, 1] * u[2]
+                f = self[i, 1] * u[1] + self[2, i] * u[2]
                 q[i] = omega * f                  // p
                 K   += u[i] * f                   // u* A u
             }
@@ -83,13 +83,11 @@ extension matrix_double3x3 {
         // with the QL method
         //
         // Loop over all off-diagonal elements
-
         for l in 0..<2 {
             var nIter = 0
             while true {
                 // Check for convergence and exit iteration loop if off-diagonal
                 // element e(l) is zero
-
                 var m = l
                 while m <= 1 {
                     g = abs(w[m])+abs(w[m+1])

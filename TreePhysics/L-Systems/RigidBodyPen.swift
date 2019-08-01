@@ -5,12 +5,10 @@ final class RigidBodyPen: Pen {
     typealias T = RigidBody
 
     private var parentBranch: RigidBody
-    private var parentAngle: Float
     private var start: float3? = nil
 
-    init(parent: RigidBody, angle: Float = .pi/2) {
+    init(parent: RigidBody) {
         self.parentBranch = parent
-        self.parentAngle = angle
     }
 
     func start(at: float3, thickness: Float) {
@@ -22,9 +20,10 @@ final class RigidBodyPen: Pen {
 
         let newBranch = RigidBody(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
-        let angle = atan2(tangent.y, tangent.x)
-        parentBranch.add(newBranch, at: float3(0,0,angle - parentAngle))
-        self.parentAngle = angle
+        let parentTangent = parentBranch.convert(position: float3(0,1,0)) - parentBranch.position
+        let rotation = matrix4x4_rotation(from: parentTangent, to: tangent)
+
+        parentBranch.add(newBranch, at: rotation)
 
         self.start = start + distance * tangent
         self.parentBranch = newBranch
@@ -33,6 +32,6 @@ final class RigidBodyPen: Pen {
     }
 
     var branch: RigidBodyPen {
-        return RigidBodyPen(parent: parentBranch, angle: parentAngle)
+        return RigidBodyPen(parent: parentBranch)
     }
 }

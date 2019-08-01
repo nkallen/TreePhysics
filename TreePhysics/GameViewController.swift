@@ -42,7 +42,7 @@ class GameViewController: NSViewController {
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
-        let configuration = Interpreter<SkinningPen>.Configuration(randomScale: 0.2,
+        let configuration = Interpreter<SkinningPen>.Configuration(//randomScale: 0.2,
             angle: 18 * .pi / 180, thickness: 0.002*0.002*Float.pi, thicknessScale: 0.9, stepSize: 0.1, stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
@@ -79,9 +79,9 @@ class GameViewController: NSViewController {
 
         let scene = scnView.scene!
         scene.rootNode.addChildNode(node)
-//        for bone in boneNodes {
-//            scene.rootNode.addChildNode(bone)
-//        }
+        for bone in boneNodes {
+            scene.rootNode.addChildNode(bone)
+        }
         scnView.delegate = self
     }
 
@@ -109,7 +109,7 @@ extension GameViewController: SCNSceneRendererDelegate {
             Tree.gravity = float3.zero
         }
 
-        simulator.update(at: 1.0 / 30)
+        simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
     }
 }

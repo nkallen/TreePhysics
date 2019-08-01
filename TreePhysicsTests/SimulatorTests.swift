@@ -182,6 +182,11 @@ class QuadraticTests: XCTestCase {
     }
 }
 
+func XCTAssertEqual(_ a: double2, _ b: double2, accuracy: Double, file: StaticString = #file, line: UInt = #line) {
+    XCTAssertEqual(a.x, b.x, accuracy: accuracy, file: file, line: line)
+    XCTAssertEqual(a.y, b.y, accuracy: accuracy, file: file, line: line)
+}
+
 func XCTAssertEqual(_ a: float3, _ b: float3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.x, b.x, accuracy: accuracy, file: file, line: line)
     XCTAssertEqual(a.y, b.y, accuracy: accuracy, file: file, line: line)
@@ -219,7 +224,6 @@ func XCTAssertEqual(_ a: double3x3, _ b: double3x3, accuracy: Double, file: Stat
     XCTAssertEqual(a.columns.1, b.columns.1, accuracy: accuracy, file: file, line: line)
     XCTAssertEqual(a.columns.2, b.columns.2, accuracy: accuracy, file: file, line: line)
 }
-
 
 func XCTAssertEqual(_ a: [float3], _ b: [float3], accuracy: Float, file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.count, b.count, file: file, line: line)
