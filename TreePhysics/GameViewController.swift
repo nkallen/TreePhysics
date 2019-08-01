@@ -3,6 +3,8 @@ import SceneKit
 class GameViewController: NSViewController {
     var simulator: Simulator!
     var gravityField: GravityField!
+    var attractorField: AttractorField!
+    var attractor: SCNNode!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -12,6 +14,7 @@ class GameViewController: NSViewController {
         let cameraNode = SCNNode()
         let camera = SCNCamera()
         camera.zNear = 0
+        camera.zFar = 5
         cameraNode.camera = camera
         scene.rootNode.addChildNode(cameraNode)
         cameraNode.position = SCNVector3(x: 0, y: 0, z: 1)
@@ -80,19 +83,28 @@ class GameViewController: NSViewController {
 
         let scene = scnView.scene!
         scene.rootNode.addChildNode(node)
+
 //        for bone in boneNodes {
 //            scene.rootNode.addChildNode(bone)
 //        }
 
         let gravityField = GravityField(float3.zero)
+        let attractorField = AttractorField()
         self.gravityField = gravityField
         simulator.add(field: gravityField)
+        simulator.add(field: attractorField)
+
+        let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
+        scene.rootNode.addChildNode(attractor)
+        self.attractorField = attractorField
+        self.attractor = attractor
 
         scnView.delegate = self
+        scnView.fooDelegate = self
     }
 
-    var scnView: SCNView {
-        return self.view as! SCNView
+    var scnView: Foo {
+        return self.view as! Foo
     }
 }
 
@@ -120,10 +132,26 @@ extension GameViewController: SCNSceneRendererDelegate {
     }
 }
 
+protocol FooDelegate: class {
+    func mouseMoved(with event: NSEvent, in view: SCNView)
+}
+
+extension GameViewController: FooDelegate {
+    func mouseMoved(with event: NSEvent, in view: SCNView) {
+        let nsPoint = event.locationInWindow
+
+        let projectedOrigin = view.projectPoint(SCNVector3Zero)
+        let vpWithZ = SCNVector3(x: nsPoint.x, y: nsPoint.y, z: projectedOrigin.z)
+        let worldPoint = float3(view.unprojectPoint(vpWithZ))
+
+        attractorField.position = worldPoint
+        attractor.simdPosition = worldPoint
+    }
+}
+
 class Foo: SCNView {
-
+    weak var fooDelegate: FooDelegate!
     var trackingArea : NSTrackingArea?
-
 
     override func updateTrackingAreas() {
         if trackingArea != nil {
@@ -137,11 +165,8 @@ class Foo: SCNView {
     }
 
     override func mouseMoved(with event: NSEvent) {
-
-        let nsPoint = event.locationInWindow
-        print(self.unprojectPoint(SCNVector3(Float(nsPoint.x), Float(nsPoint.y), 0.5)))
-
-        Swift.print("Mouse moved: \(event)")
+        fooDelegate.mouseMoved(with: event, in: self)
     }
+
 
 }
