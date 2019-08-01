@@ -263,6 +263,12 @@ extension float3 {
     }
 }
 
+extension float3: Comparable {
+    public static func < (lhs: float3, rhs: float3) -> Bool {
+        return lhs.x < rhs.x && lhs.y < rhs.y && lhs.z < rhs.z
+    }
+}
+
 extension float4 {
     init(_ float3: float3, _ w: Float) {
         self = float4(float3.x, float3.y, float3.z, w)

@@ -5,6 +5,7 @@ final class Simulator {
     let tree: Tree
     let rigidBodiesLevelOrder: [RigidBody]
     let rigidBodiesReverseLevelOrder: [RigidBody]
+    private var fields: [PhysicsField] = []
 
     init(tree: Tree) {
         self.tree = tree
@@ -13,18 +14,31 @@ final class Simulator {
         updateRigidBodies()
     }
 
+    func add(field: PhysicsField) {
+        fields.append(field)
+    }
+
     func update(at time: TimeInterval) {
+        updateFields(at: time)
         updateCompositeBodies()
         updateSprings(at: time)
         updateRigidBodies()
     }
 
+    func updateFields(at time: TimeInterval) {
+        for rigidBody in rigidBodiesReverseLevelOrder { // Order is unimportant
+            for field in fields {
+                let position = rigidBody.position
+                if field.applies(to: position) {
+                    let force = field.eval(position: position, velocity: float3.zero, mass: rigidBody.mass, time: time)
+                    rigidBody.apply(force: force, at: 0.5)
+                }
+            }
+        }
+    }
+
     func updateCompositeBodies() {
         for rigidBody in rigidBodiesReverseLevelOrder {
-            // FIXME this is a temporary hack; the force of gravity is turned on and off elsewhere
-            // to poke and prod the system.
-            rigidBody.apply(force: Tree.gravity * rigidBody.mass, at: 0.5)
-
             let composite = rigidBody.composite
 
             composite.mass = rigidBody.mass

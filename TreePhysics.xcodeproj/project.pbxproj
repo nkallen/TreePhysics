@@ -20,6 +20,7 @@
 		9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
 		9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
 		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
+		9E9D4B6622F313D0007DCF49 /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
 		9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* Simulator.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
@@ -60,6 +61,7 @@
 		9E56C94C22E7929B0095C8AC /* SkinningPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinningPen.swift; sourceTree = "<group>"; };
 		9E9C1E7F22E86B290030DB0E /* Rewriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rewriter.swift; sourceTree = "<group>"; };
 		9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriterTests.swift; sourceTree = "<group>"; };
+		9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsField.swift; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* Simulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Simulator.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -123,6 +125,15 @@
 			path = Tree;
 			sourceTree = "<group>";
 		};
+		9E9D4B6422F313BD007DCF49 /* Physics */ = {
+			isa = PBXGroup;
+			children = (
+				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
+				9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */,
+			);
+			path = Physics;
+			sourceTree = "<group>";
+		};
 		9EE7EB9522DDDC6C00535997 = {
 			isa = PBXGroup;
 			children = (
@@ -144,7 +155,7 @@
 		9EE7EBA022DDDC6C00535997 /* TreePhysics */ = {
 			isa = PBXGroup;
 			children = (
-				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
+				9E9D4B6422F313BD007DCF49 /* Physics */,
 				9EEC11E322F0E3D20078BBFD /* Util */,
 				9E56C94322E78FA90095C8AC /* Tree */,
 				9EE7EBCB22E1078200535997 /* NOTES */,
@@ -301,6 +312,7 @@
 				9E461B3522E7017F008AB788 /* CylinderPen.swift in Sources */,
 				9EE7EBC422E08E4000535997 /* Math.swift in Sources */,
 				9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */,
+				9E9D4B6622F313D0007DCF49 /* PhysicsField.swift in Sources */,
 				9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */,
 				9E036B1F22E4F58600229235 /* Turtle.swift in Sources */,
 				9E56C94722E78FEC0095C8AC /* RigidBody.swift in Sources */,

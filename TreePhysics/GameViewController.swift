@@ -2,6 +2,7 @@ import SceneKit
 
 class GameViewController: NSViewController {
     var simulator: Simulator!
+    var gravityField: GravityField!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +43,7 @@ class GameViewController: NSViewController {
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
-        let configuration = Interpreter<SkinningPen>.Configuration(//randomScale: 0.2,
+        let configuration = Interpreter<SkinningPen>.Configuration(randomScale: 0.4,
             angle: 18 * .pi / 180, thickness: 0.002*0.002*Float.pi, thicknessScale: 0.9, stepSize: 0.1, stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
@@ -79,9 +80,14 @@ class GameViewController: NSViewController {
 
         let scene = scnView.scene!
         scene.rootNode.addChildNode(node)
-        for bone in boneNodes {
-            scene.rootNode.addChildNode(bone)
-        }
+//        for bone in boneNodes {
+//            scene.rootNode.addChildNode(bone)
+//        }
+
+        let gravityField = GravityField(float3.zero)
+        self.gravityField = gravityField
+        simulator.add(field: gravityField)
+
         scnView.delegate = self
     }
 
@@ -104,12 +110,38 @@ extension GameViewController {
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if toggle {
-            Tree.gravity = float3(0, -9.81, 0)
+            gravityField.g = float3(0, -9.81, 0)
         } else {
-            Tree.gravity = float3.zero
+            gravityField.g = float3.zero
         }
 
         simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
     }
+}
+
+class Foo: SCNView {
+
+    var trackingArea : NSTrackingArea?
+
+
+    override func updateTrackingAreas() {
+        if trackingArea != nil {
+            self.removeTrackingArea(trackingArea!)
+        }
+        let options : NSTrackingArea.Options =
+            [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow]
+        trackingArea = NSTrackingArea(rect: self.bounds, options: options,
+                                      owner: self, userInfo: nil)
+        self.addTrackingArea(trackingArea!)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+
+        let nsPoint = event.locationInWindow
+        print(self.unprojectPoint(SCNVector3(Float(nsPoint.x), Float(nsPoint.y), 0.5)))
+
+        Swift.print("Mouse moved: \(event)")
+    }
+
 }
