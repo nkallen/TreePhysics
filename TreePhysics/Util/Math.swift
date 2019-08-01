@@ -75,17 +75,9 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
             r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
         return float3(y, y_ddt, y_d2dt)
     case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
-        let y_a = c1 == 0 ? 0 : c1*powf(.e,r1*t)
-        let y_b = c2 == 0 ? 0 : c2*powf(.e,r2*t)
-        let y = y_a + y_b + k
-
-        let y_ddt_a = c1 == 0 ? 0 : r1*c1*powf(.e,r1*t)
-        let y_ddt_b = c2 == 0 ? 0 : r2*c2*powf(.e,r2*t)
-        let y_ddt = y_ddt_a + y_ddt_b
-
-        let y_d2dt_a = c1 == 0 ? 0 : r1*r1*c1 * powf(.e,r1*t)
-        let y_d2dt_b = c2 == 0 ? 0 : r2*r2*c2 * powf(.e,r2*t)
-        let y_d2dt = y_d2dt_a + y_d2dt_b
+        let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
+        let y_ddt = r1*c1*powf(.e,r1*t) + r2*c2*powf(.e,r2*t)
+        let y_d2dt = r1*r1*c1 * powf(.e,r1*t) + r2*r2*c2 * powf(.e,r2*t)
         return float3(y, y_ddt, y_d2dt)
     }
 }

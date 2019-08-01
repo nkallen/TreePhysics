@@ -82,17 +82,17 @@ final class Simulator {
 
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
                     rigidBody.composite.mass * sqr(pr.cross_matrix)
-
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
 
                 if parentJoint.k == .infinity {
                     // static bodies, like the root of the tree
                     parentJoint.θ = matrix_float3x3(0)
                 } else {
-                    // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ
-                    // θ(0) = joint's angle, θ'(0) = joint's angular velocity
+                    // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
+                    // K is a spring stiffness matrix, θ = euler angles of the joint,
+                    // θ' = angular velocities (i.e., first derivative), etc.
 
-                    // 1. First we need to diagonalize I and K so we can solve the diff equation --
+                    // 1. First we need to diagonalize I and K (so we can solve the diff equations) --
                     // i.e., produce the generalized eigendecomposition of I and K
 
                     // 1.a. the cholesky decomposition of I
@@ -108,7 +108,7 @@ final class Simulator {
                     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
 
                     let U = L_transpose_inverse * X
-                    let U_transpose =  U.transpose, U_inverse = U.inverse
+                    let U_transpose = U.transpose, U_inverse = U.inverse
 
                     let torque_diagonal = U_transpose * torque_jointSpace
                     let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
@@ -127,8 +127,7 @@ final class Simulator {
                         evaluate(differential: solution_ii, at: Float(time)),
                         evaluate(differential: solution_iii, at: Float(time))])
 
-                    let θ = U * θ_diagonal
-                    parentJoint.θ = θ
+                    parentJoint.θ = U * θ_diagonal
                 }
             }
         }
