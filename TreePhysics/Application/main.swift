@@ -1,4 +1,6 @@
 import Foundation
+
+#if os(macOS)
 import Cocoa
 
 let isRunningTests = NSClassFromString("XCTestCase") != nil
@@ -15,3 +17,13 @@ if !isRunningTests {
     app.delegate = appDelegate
     NSApp.run()
 }
+#elseif os(iOS)
+import UIKit
+let appDelegate = AppDelegate()
+let app = UIApplication.shared
+app.delegate = appDelegate
+
+UIApplicationMain(
+    CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self)
+)
+#endif

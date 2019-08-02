@@ -21,6 +21,30 @@
 		9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
 		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
 		9E9D4B6622F313D0007DCF49 /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
+		9E9D4B6E22F37244007DCF49 /* HasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC522E0972400535997 /* HasTransform.swift */; };
+		9E9D4B6F22F37244007DCF49 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBB322DDDCCB00535997 /* Tree.swift */; };
+		9E9D4B7022F37244007DCF49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
+		9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94822E78FFC0095C8AC /* CompositeBody.swift */; };
+		9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
+		9E9D4B7322F37244007DCF49 /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
+		9E9D4B7422F37244007DCF49 /* Joint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94422E78FCF0095C8AC /* Joint.swift */; };
+		9E9D4B7522F37244007DCF49 /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* Simulator.swift */; };
+		9E9D4B7622F37244007DCF49 /* RigidBodyPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94A22E792820095C8AC /* RigidBodyPen.swift */; };
+		9E9D4B7722F37244007DCF49 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
+		9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
+		9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
+		9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
+		9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
+		9E9D4B7C22F37244007DCF49 /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
+		9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
+		9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
+		9E9D4B7F22F37244007DCF49 /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94622E78FEC0095C8AC /* RigidBody.swift */; };
+		9E9D4B8322F37244007DCF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
+		9E9D4B8422F37244007DCF49 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBCB22E1078200535997 /* NOTES */; };
+		9E9D4B8522F37244007DCF49 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA522DDDC6C00535997 /* art.scnassets */; };
+		9E9D4B9122F37789007DCF49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B8D22F372E4007DCF49 /* Main.storyboard */; };
+		9E9D4B9222F3778B007DCF49 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B8F22F373DA007DCF49 /* LaunchScreen.storyboard */; };
+		9E9D4B9422F438FA007DCF49 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9322F438FA007DCF49 /* Scene.swift */; };
 		9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* Simulator.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
@@ -62,15 +86,19 @@
 		9E9C1E7F22E86B290030DB0E /* Rewriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rewriter.swift; sourceTree = "<group>"; };
 		9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriterTests.swift; sourceTree = "<group>"; };
 		9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsField.swift; sourceTree = "<group>"; };
+		9E9D4B8922F37244007DCF49 /* TreePhysics-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TreePhysics-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E9D4B8A22F37244007DCF49 /* TreePhysics-macOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TreePhysics-macOS copy-Info.plist"; path = "/Users/nickkallen/Documents/TreePhysics/TreePhysics-macOS copy-Info.plist"; sourceTree = "<absolute>"; };
+		9E9D4B8D22F372E4007DCF49 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		9E9D4B8F22F373DA007DCF49 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9E9D4B9322F438FA007DCF49 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* Simulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Simulator.swift; sourceTree = "<group>"; };
-		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EE7EB9E22DDDC6C00535997 /* TreePhysics-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TreePhysics-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9EE7EBA322DDDC6C00535997 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		9EE7EBA522DDDC6C00535997 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
 		9EE7EBA722DDDC6E00535997 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9EE7EBAA22DDDC6E00535997 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9EE7EBAC22DDDC6E00535997 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TreePhysics.entitlements; sourceTree = "<group>"; };
 		9EE7EBB322DDDCCB00535997 /* Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
 		9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TreePhysicsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBBB22DE1AD100535997 /* SimulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorTests.swift; sourceTree = "<group>"; };
@@ -84,6 +112,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9E9D4B8022F37244007DCF49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9EE7EB9B22DDDC6C00535997 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -134,20 +169,51 @@
 			path = Physics;
 			sourceTree = "<group>";
 		};
+		9E9D4B6922F36FFC007DCF49 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				9EE7EBC922E0F27900535997 /* main.swift */,
+				9E9D4B6B22F37035007DCF49 /* iOS */,
+				9E9D4B6A22F3702F007DCF49 /* macOS */,
+				9E9D4B9322F438FA007DCF49 /* Scene.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		9E9D4B6A22F3702F007DCF49 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				9EE7EBA322DDDC6C00535997 /* GameViewController.swift */,
+				9EE7EBA922DDDC6E00535997 /* Main.storyboard */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		9E9D4B6B22F37035007DCF49 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				9E9D4B8D22F372E4007DCF49 /* Main.storyboard */,
+				9E9D4B8F22F373DA007DCF49 /* LaunchScreen.storyboard */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
 		9EE7EB9522DDDC6C00535997 = {
 			isa = PBXGroup;
 			children = (
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
 				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
 				9EE7EB9F22DDDC6C00535997 /* Products */,
+				9E9D4B8A22F37244007DCF49 /* TreePhysics-macOS copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
 		9EE7EB9F22DDDC6C00535997 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */,
+				9EE7EB9E22DDDC6C00535997 /* TreePhysics-macOS.app */,
 				9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */,
+				9E9D4B8922F37244007DCF49 /* TreePhysics-iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,19 +221,16 @@
 		9EE7EBA022DDDC6C00535997 /* TreePhysics */ = {
 			isa = PBXGroup;
 			children = (
+				9E9D4B6922F36FFC007DCF49 /* Application */,
 				9E9D4B6422F313BD007DCF49 /* Physics */,
 				9EEC11E322F0E3D20078BBFD /* Util */,
 				9E56C94322E78FA90095C8AC /* Tree */,
 				9EE7EBCB22E1078200535997 /* NOTES */,
 				9E036B1D22E4F57900229235 /* L-Systems */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
-				9EE7EBA322DDDC6C00535997 /* GameViewController.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
 				9EE7EBA722DDDC6E00535997 /* Assets.xcassets */,
-				9EE7EBA922DDDC6E00535997 /* Main.storyboard */,
 				9EE7EBAC22DDDC6E00535997 /* Info.plist */,
-				9EE7EBAD22DDDC6E00535997 /* TreePhysics.entitlements */,
-				9EE7EBC922E0F27900535997 /* main.swift */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -199,9 +262,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9EE7EB9D22DDDC6C00535997 /* TreePhysics */ = {
+		9E9D4B6C22F37244007DCF49 /* TreePhysics-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9EE7EBB022DDDC6E00535997 /* Build configuration list for PBXNativeTarget "TreePhysics" */;
+			buildConfigurationList = 9E9D4B8622F37244007DCF49 /* Build configuration list for PBXNativeTarget "TreePhysics-iOS" */;
+			buildPhases = (
+				9E9D4B6D22F37244007DCF49 /* Sources */,
+				9E9D4B8022F37244007DCF49 /* Frameworks */,
+				9E9D4B8122F37244007DCF49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "TreePhysics-iOS";
+			productName = TreePhysics;
+			productReference = 9E9D4B8922F37244007DCF49 /* TreePhysics-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9EE7EB9D22DDDC6C00535997 /* TreePhysics-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9EE7EBB022DDDC6E00535997 /* Build configuration list for PBXNativeTarget "TreePhysics-macOS" */;
 			buildPhases = (
 				9EE7EB9A22DDDC6C00535997 /* Sources */,
 				9EE7EB9B22DDDC6C00535997 /* Frameworks */,
@@ -211,9 +291,9 @@
 			);
 			dependencies = (
 			);
-			name = TreePhysics;
+			name = "TreePhysics-macOS";
 			productName = TreePhysics;
-			productReference = 9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */;
+			productReference = 9EE7EB9E22DDDC6C00535997 /* TreePhysics-macOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 		9EE7EBB822DE1AD100535997 /* TreePhysicsTests */ = {
@@ -266,13 +346,26 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9EE7EB9D22DDDC6C00535997 /* TreePhysics */,
+				9EE7EB9D22DDDC6C00535997 /* TreePhysics-macOS */,
+				9E9D4B6C22F37244007DCF49 /* TreePhysics-iOS */,
 				9EE7EBB822DE1AD100535997 /* TreePhysicsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		9E9D4B8122F37244007DCF49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9E9D4B9122F37789007DCF49 /* Main.storyboard in Resources */,
+				9E9D4B9222F3778B007DCF49 /* LaunchScreen.storyboard in Resources */,
+				9E9D4B8322F37244007DCF49 /* Assets.xcassets in Resources */,
+				9E9D4B8422F37244007DCF49 /* NOTES in Resources */,
+				9E9D4B8522F37244007DCF49 /* art.scnassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9EE7EB9C22DDDC6C00535997 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -294,6 +387,31 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9E9D4B6D22F37244007DCF49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9E9D4B6E22F37244007DCF49 /* HasTransform.swift in Sources */,
+				9E9D4B6F22F37244007DCF49 /* Tree.swift in Sources */,
+				9E9D4B7022F37244007DCF49 /* main.swift in Sources */,
+				9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */,
+				9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */,
+				9E9D4B7322F37244007DCF49 /* Diagonalization.swift in Sources */,
+				9E9D4B7422F37244007DCF49 /* Joint.swift in Sources */,
+				9E9D4B7522F37244007DCF49 /* Simulator.swift in Sources */,
+				9E9D4B7622F37244007DCF49 /* RigidBodyPen.swift in Sources */,
+				9E9D4B7722F37244007DCF49 /* GameViewController.swift in Sources */,
+				9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */,
+				9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */,
+				9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */,
+				9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */,
+				9E9D4B7C22F37244007DCF49 /* PhysicsField.swift in Sources */,
+				9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */,
+				9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */,
+				9E9D4B7F22F37244007DCF49 /* RigidBody.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9EE7EB9A22DDDC6C00535997 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -301,6 +419,7 @@
 				9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */,
 				9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */,
 				9EE7EBCA22E0F27900535997 /* main.swift in Sources */,
+				9E9D4B9422F438FA007DCF49 /* Scene.swift in Sources */,
 				9E56C94922E78FFC0095C8AC /* CompositeBody.swift in Sources */,
 				9E461B3322E5E025008AB788 /* Pen.swift in Sources */,
 				9EEC11E222EA50920078BBFD /* Diagonalization.swift in Sources */,
@@ -337,7 +456,7 @@
 /* Begin PBXTargetDependency section */
 		9EE7EBBF22DE1AD100535997 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9EE7EB9D22DDDC6C00535997 /* TreePhysics */;
+			target = 9EE7EB9D22DDDC6C00535997 /* TreePhysics-macOS */;
 			targetProxy = 9EE7EBBE22DE1AD100535997 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -354,6 +473,56 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		9E9D4B8722F37244007DCF49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = G3GUW83N5R;
+				INFOPLIST_FILE = "TreePhysics-macOS copy-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9E9D4B8822F37244007DCF49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = G3GUW83N5R;
+				INFOPLIST_FILE = "TreePhysics-macOS copy-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		9EE7EBAE22DDDC6E00535997 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -473,7 +642,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TreePhysics/TreePhysics.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G3GUW83N5R;
@@ -492,7 +661,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TreePhysics/TreePhysics.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G3GUW83N5R;
@@ -550,6 +719,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9E9D4B8622F37244007DCF49 /* Build configuration list for PBXNativeTarget "TreePhysics-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E9D4B8722F37244007DCF49 /* Debug */,
+				9E9D4B8822F37244007DCF49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9EE7EB9922DDDC6C00535997 /* Build configuration list for PBXProject "TreePhysics" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -559,7 +737,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9EE7EBB022DDDC6E00535997 /* Build configuration list for PBXNativeTarget "TreePhysics" */ = {
+		9EE7EBB022DDDC6E00535997 /* Build configuration list for PBXNativeTarget "TreePhysics-macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9EE7EBB122DDDC6E00535997 /* Debug */,
