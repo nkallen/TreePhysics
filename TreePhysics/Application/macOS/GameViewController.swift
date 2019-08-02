@@ -1,4 +1,5 @@
 #if os(macOS)
+import Foundation
 import SceneKit
 
 class GameViewController: NSViewController {
@@ -77,7 +78,5 @@ class MySceneView: SCNView {
     override func mouseMoved(with event: NSEvent) {
         mySceneViewDelegate.mouseMoved(with: event, in: self)
     }
-
-
 }
 #endif

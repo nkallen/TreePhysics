@@ -19,11 +19,10 @@ if !isRunningTests {
 }
 #elseif os(iOS)
 import UIKit
-let appDelegate = AppDelegate()
-let app = UIApplication.shared
-app.delegate = appDelegate
+//let appDelegate = AppDelegate()
+//let app = UIApplication.shared
+//app.delegate = appDelegate
 
 UIApplicationMain(
-    CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self)
-)
+    CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self))
 #endif
