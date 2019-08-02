@@ -82,8 +82,6 @@ class Game: NSObject {
         node.skinner = skinner
         
 
-        parent.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 0, y: 1, z: 0, duration: 5)))
-
         scene.rootNode.addChildNode(node)
         scene.rootNode.addChildNode(parent)
         //        for bone in boneNodes {
@@ -107,8 +105,15 @@ class Game: NSObject {
 
 var start = Date()
 
+let radius: Float = 3
 extension Game: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        let pov = renderer.pointOfView!
+        pov.simdPosition = float3(
+            radius * sinf(Float(start.timeIntervalSinceNow)),
+            1,
+            radius * cosf(Float(start.timeIntervalSinceNow)))
+        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
         simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
     }
