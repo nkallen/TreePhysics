@@ -11,7 +11,7 @@ enum QuadraticSolution: Equatable {
 enum DifferentialSolution: Equatable {
     case real(c1: Float, c2: Float, r: Float, k: Float)
     case realDistinct(c1: Float, c2: Float, r1: Float, r2: Float, k: Float)
-    case complex(c1: Float, c2: Float, lambda: Float, mu: Float, k: Float)
+    case complex(c1: Float, c2: Float, λ: Float, μ: Float, k: Float)
 }
 
 func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
@@ -42,7 +42,7 @@ func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_dd
     case let .complex(real, imaginary):
         let c1 = y_0
         let c2 = (y_ddt_0 - real * c1) / imaginary
-        return .complex(c1: c1, c2: c2, lambda: real, mu: imaginary, k: g/c)
+        return .complex(c1: c1, c2: c2, λ: real, μ: imaginary, k: g/c)
     case let .real(r):
         let system = float2x2(columns: (float2(1, r), float2(0, 1)))
         let solution = system.inverse * float2(y_0, y_ddt_0)
@@ -57,14 +57,14 @@ func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_dd
 // Evaluate 2nd-order differential equation given its analytic solution
 func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
     switch differential {
-    case let .complex(c1: c1, c2: c2, lambda: lambda, mu: mu, k: k):
-        let y = c1*powf(.e,lambda*t)*cos(mu*t) + c2*powf(.e,lambda*t)*sin(mu*t) + k
-        let y_ddt = lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*c1*powf(.e,lambda*t)*sin(mu*t) +
-            lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*c2*powf(.e,lambda*t)*cos(mu*t)
-        let y_d2dt = lambda*lambda*c1*powf(.e,lambda*t)*cos(mu*t) - mu*lambda*c1*powf(.e,lambda*t)*sin(mu*t) -
-            (lambda*mu*c1*powf(.e,lambda*t)*sin(mu*t) + mu*mu*c1*powf(.e,lambda*t)*cos(mu*t)) +
-            lambda*lambda*c2*powf(.e,lambda*t)*sin(mu*t) + mu*lambda*c2*powf(.e,lambda*t)*cos(mu*t) +
-            lambda*mu*c2*powf(.e,lambda*t)*cos(mu*t) - mu*mu*c2*powf(.e,lambda*t)*sin(mu*t)
+    case let .complex(c1: c1, c2: c2, λ: λ, μ: μ, k: k):
+        let y = c1*powf(.e,λ*t)*cos(μ*t) + c2*powf(.e,λ*t)*sin(μ*t) + k
+        let y_ddt = λ*c1*powf(.e,λ*t)*cos(μ*t) - μ*c1*powf(.e,λ*t)*sin(μ*t) +
+            λ*c2*powf(.e,λ*t)*sin(μ*t) + μ*c2*powf(.e,λ*t)*cos(μ*t)
+        let y_d2dt = λ*λ*c1*powf(.e,λ*t)*cos(μ*t) - μ*λ*c1*powf(.e,λ*t)*sin(μ*t) -
+            (λ*μ*c1*powf(.e,λ*t)*sin(μ*t) + μ*μ*c1*powf(.e,λ*t)*cos(μ*t)) +
+            λ*λ*c2*powf(.e,λ*t)*sin(μ*t) + μ*λ*c2*powf(.e,λ*t)*cos(μ*t) +
+            λ*μ*c2*powf(.e,λ*t)*cos(μ*t) - μ*μ*c2*powf(.e,λ*t)*sin(μ*t)
         return float3(y, y_ddt, y_d2dt)
     case let .real(c1: c1, c2: c2, r: r, k: k):
         let y = c1*powf(.e,r*t) + c2*t*powf(.e,r*t) + k
