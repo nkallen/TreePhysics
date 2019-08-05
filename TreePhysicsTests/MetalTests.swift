@@ -22,7 +22,9 @@ class MetalTests: XCTestCase {
         let expectation = XCTestExpectation(description: "wait")
         foo.run(matrix) { buffer in
             let foo = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: float3.self, capacity: 1024)
-            print(foo[0])
+            XCTAssertEqual(
+                float3(2 + sqrt(2), 2, 2 - sqrt(2.0)),
+                foo[0], accuracy: 0.0001)
             expectation.fulfill()
         }
     }
