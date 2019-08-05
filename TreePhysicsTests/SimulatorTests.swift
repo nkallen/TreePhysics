@@ -276,7 +276,7 @@ class DifferentialTests: XCTestCase {
 
     func testComplex() {
         let actual = solve_differential(a: 1, b: -4, c: 9, g: 0, y_0: 0, y_ddt_0: -8)
-        let expected = DifferentialSolution.complex(c1: 0, c2: -8/sqrt(5), lambda: 2, mu: sqrt(5), k: 0)
+        let expected = DifferentialSolution.complex(c1: 0, c2: -8/sqrt(5), λ: 2, μ: sqrt(5), k: 0)
         XCTAssertEqual(actual, expected)
         XCTAssertEqual(evaluate(differential: actual, at: 0), float3(0, -8, -32))
     }
