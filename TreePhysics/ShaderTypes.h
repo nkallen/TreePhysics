@@ -36,11 +36,11 @@ typedef struct {
     int parentGid;
     int childGids[5];
     uint childCount;
+    vector_float3 position;
     float mass;
     float length;
     float radius;
     matrix_float3x3 inertiaTensor;
-    vector_float3 position;
 
     vector_float3 force;
     vector_float3 torque;
@@ -50,7 +50,6 @@ typedef struct {
 typedef struct {
     CompositeBodyStruct childCompositeBody;
     matrix_float3x3 worldToLocalRotation;
-    vector_float3 position;
     matrix_float3x3 theta;
     float k;
 } JointStruct;

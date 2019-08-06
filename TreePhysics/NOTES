@@ -1,18 +1,7 @@
-8.826582367562519308546e
-8.826582481590549e
 
-1132941333754473.500000
-1132941319118337.0
-
-303928890621250.25
-528048218330896.562500
-
-3. Wind and fictitious forces
-6. transparent shader
-5. bring in face growth
-
-with orientation simd_float3x3([[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
-advancing to SIMD3<Float>(0.0, 0.095105655, 0.030901698) with orientation simd_float3x3([[0.0, 0.95105654, 0.30901697], [-1.0, 0.0, 0.0], [0.0, -0.30901697, 0.95105654]])
+(0, __C.RigidBodyStruct(parentGid: 1, childGids: (0, 0, 272634087, 1073741824, 2), childCount: 0, mass: 1.0, length: 1.0, radius: 1.0, inertiaTensor: simd_float3x3([[0.5, 1.4901161e-08, 0.0], [1.4901161e-08, 0.33333334, 0.0], [0.0, 0.0, 0.33333334]]), position: SIMD3<Float>(0.70710677, 1.7071068, 0.0), force: SIMD3<Float>(0.0, 1.0, 0.0), torque: SIMD3<Float>(0.0, 0.0, 1.0), centerOfMass: SIMD3<Float>(1.2071068, 1.7071068, 0.0)))
+(1, __C.RigidBodyStruct(parentGid: 2, childGids: (0, 0, 272630055, 1879048192, 1650786306), childCount: 1, mass: 1.0, length: 1.0, radius: 1.0, inertiaTensor: simd_float3x3([[0.4166667, 0.08333333, 0.0], [0.08333333, 0.4166667, 0.0], [0.0, 0.0, 0.33333334]]), position: SIMD3<Float>(0.0, 1.0, 0.0), force: SIMD3<Float>(0.0, 0.0, 0.0), torque: SIMD3<Float>(0.0, 0.0, 0.0), centerOfMass: SIMD3<Float>(0.35355338, 1.3535534, 0.0)))
+(2, __C.RigidBodyStruct(parentGid: -1, childGids: (1, 0, 0, 0, 3), childCount: 1, mass: 1.0, length: 1.0, radius: 1.0, inertiaTensor: simd_float3x3([[0.33333334, 0.0, 0.0], [0.0, 0.5, 0.0], [0.0, 0.0, 0.33333334]]), position: SIMD3<Float>(0.0, 0.0, 0.0), force: SIMD3<Float>(0.0, 0.0, 0.0), torque: SIMD3<Float>(0.0, 0.0, 0.0), centerOfMass: SIMD3<Float>(0.0, 0.5, 0.0)))
 
 
-advancing to SIMD3<Float>(0.0, 0.095105655, 0.030901698) with orientation simd_float3x3([[0.0, 0.95105654, 0.30901697], [-1.0, 0.0, 0.0], [0.0, -0.30901697, 0.95105654]])
+

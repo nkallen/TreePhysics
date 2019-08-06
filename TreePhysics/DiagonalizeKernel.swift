@@ -156,11 +156,11 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             parentGid: parentGid,
             childGids: childGids.pointee,
             childCount: uint(childRigidBodies.count),
+            position: rigidBody.position,
             mass: rigidBody.mass,
             length: rigidBody.length,
             radius: rigidBody.radius,
             inertiaTensor: rigidBody.inertiaTensor,
-            position: rigidBody.position,
             force: rigidBody.force,
             torque: rigidBody.torque,
             centerOfMass: rigidBody.centerOfMass)

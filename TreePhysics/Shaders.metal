@@ -115,9 +115,11 @@ inline CompositeBodyStruct updateCompositeBody(
     compositeBody.force = rigidBody.force;
     compositeBody.torque = rigidBody.torque;
     compositeBody.centerOfMass = rigidBody.mass * rigidBody.centerOfMass;
+    compositeBody.position = rigidBody.position;
 
     for (size_t i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
+
         compositeBody.mass += childCompositeBody.mass;
         compositeBody.force += childCompositeBody.force;
         compositeBody.torque += cross(childCompositeBody.position - rigidBody.position, childCompositeBody.force) + childCompositeBody.torque;
@@ -129,6 +131,7 @@ inline CompositeBodyStruct updateCompositeBody(
 
     for (size_t i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
+
         compositeBody.inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - compositeBody.centerOfMass));
     }
 
