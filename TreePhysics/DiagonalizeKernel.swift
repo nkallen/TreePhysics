@@ -1,5 +1,6 @@
 import Foundation
 import MetalKit
+import Metal
 
 // The 256 byte aligned size of our uniform structure
 let alignedUniformsSize = (MemoryLayout<float3x3>.size & ~0xFF) + 0x100
@@ -10,6 +11,7 @@ class MetalKernel {
     let device: MTLDevice
     let computePipelineState: MTLComputePipelineState
     let commandQueue: MTLCommandQueue
+    let captureManager: MTLCaptureManager
 
     init(device: MTLDevice, name: String) {
         self.device = device
@@ -17,6 +19,10 @@ class MetalKernel {
         let kernelFunction = library.makeFunction(name: name)!
         self.computePipelineState = try! device.makeComputePipelineState(function: kernelFunction)
         self.commandQueue = device.makeCommandQueue()!
+
+        self.captureManager = MTLCaptureManager.shared()
+        captureManager.startCapture(commandQueue: commandQueue)
+        print(captureManager.isCapturing)
     }
 }
 
@@ -69,7 +75,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     let num: Int
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBody: RigidBody) {
-        let flattened = rigidBody.flattened
+        let flattened = Array(rigidBody.flattened.reversed())
         self.num = flattened.count
         self.rigidBodiesBuffer = UpdateCompositeBodiesKernel.buffer(flattened: flattened, device: device)
         self.compositeBodiesBuffer = device.makeBuffer(length: MemoryLayout<CompositeBodyStruct>.stride * num, options: [.storageModeShared])!
@@ -77,6 +83,10 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     }
 
     func run(cb: @escaping (MTLBuffer) -> ()) {
+//        let rigidBodiesCache = device.makeBuffer(length: MemoryLayout<RigidBodyStruct>.stride * num, options: [.storageModeShared])!
+//        let compositeBodiesCache = device.makeBuffer(length: MemoryLayout<CompositeBodyStruct>.stride * num, options: [.storageModeShared])!
+//        let compositeBodiesDone = device.makeBuffer(length: MemoryLayout<Bool>.stride * num, options: [.storageModeShared])!
+
         let commandBuffer = commandQueue.makeCommandBuffer()!
         commandBuffer.addCompletedHandler{ [weak self] commandBuffer in
             if let strongSelf = self {
@@ -86,20 +96,30 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
 
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(computePipelineState)
-        commandEncoder.label  = "Diagonalize"
+        commandEncoder.label  = "Update Composite Bodies"
         commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
         commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
 
         let width = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(width, 1, 1)
         let threadsPerGrid = MTLSize(
-            width: 1024,
+            width: num,
             height: 1,
             depth: 1)
+
+//        commandEncoder.setBuffer(rigidBodiesCache, offset: 0, index: 2)
+//        commandEncoder.setBuffer(compositeBodiesCache, offset: 0, index: 3)
+//        commandEncoder.setBuffer(compositeBodiesDone, offset: 0, index: 4)
+
+        commandEncoder.setThreadgroupMemoryLength(width * MemoryLayout<RigidBody>.stride, index: ThreadGroupIndex.rigidBodies.rawValue)
+        commandEncoder.setThreadgroupMemoryLength(width * MemoryLayout<CompositeBody>.stride, index: ThreadGroupIndex.compositeBodies.rawValue)
+        commandEncoder.setThreadgroupMemoryLength(width * MemoryLayout<Bool>.stride, index: ThreadGroupIndex.compositeBodiesDone.rawValue)
+
         commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         commandEncoder.endEncoding()
 
         commandBuffer.commit()
+        captureManager.stopCapture()
     }
 
     private static func buffer(flattened: [RigidBody], device: MTLDevice) -> MTLBuffer {
@@ -112,6 +132,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         let rigidBodyStructs = UnsafeMutableRawPointer(buffer.contents())!.bindMemory(to: RigidBodyStruct.self, capacity: flattened.count)
         for (i, rigidBody) in flattened.enumerated() {
             rigidBodyStructs[i] = `struct`(rigidBody: rigidBody, index: index)
+            print((i, `struct`(rigidBody: rigidBody, index: index)))
         }
         return buffer
     }

@@ -118,6 +118,8 @@ inline CompositeBodyStruct updateCompositeBody(
 
     for (size_t i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
+        compositeBody.mass += childCompositeBody.mass;
+        compositeBody.force += childCompositeBody.force;
         compositeBody.torque += cross(childCompositeBody.position - rigidBody.position, childCompositeBody.force) + childCompositeBody.torque;
         compositeBody.centerOfMass += childCompositeBody.mass * childCompositeBody.centerOfMass;
     }
@@ -134,11 +136,11 @@ inline CompositeBodyStruct updateCompositeBody(
 }
 
 kernel void updateCompositeBodies(
-                                  device RigidBodyStruct * rigidBodies [[ buffer(0) ]], // XXX param id
-                                  device CompositeBodyStruct * compositeBodies [[ buffer(1) ]],
-                                  threadgroup CompositeBodyStruct * compositeBodiesCache [[ threadgroup(0) ]],
-                                  threadgroup bool * compositeBodiesDone [[ threadgroup(1) ]],
-                                  threadgroup RigidBodyStruct * rigidBodiesCache [[ threadgroup(2) ]],
+                                  device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
+                                  device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
+                                  threadgroup RigidBodyStruct * rigidBodiesCache [[ threadgroup(ThreadGroupIndexRigidBodies) ]],
+                                  threadgroup CompositeBodyStruct * compositeBodiesCache [[ threadgroup(ThreadGroupIndexCompositeBodies) ]],
+                                  threadgroup bool * compositeBodiesDone [[ threadgroup(ThreadGroupIndexCompositeBodiesDone) ]],
                                   uint gid [[ thread_position_in_grid ]],
                                   uint lid [[thread_position_in_threadgroup]],
                                   uint lsize [[threads_per_threadgroup]],
@@ -151,21 +153,15 @@ kernel void updateCompositeBodies(
     uint maxGidInThreadGroup = minGidInThreadGroup + lsize;
 
     CompositeBodyStruct compositeBody;
-    compositeBody.mass = 1.;
-    compositeBodies[gid] = compositeBody; // xxx
-
-
     uint oldGid = gid;
     do {
-        threadgroup_barrier(mem_flags::mem_threadgroup);
-
         CompositeBodyStruct childCompositeBodies[5];
         for (size_t i = 0; i < rigidBody.childCount; i++) {
             uint childGid = rigidBody.childGids[i];
             int childLid = childGid - minGidInThreadGroup;
             if (childLid > 0) {
-                if (compositeBodiesDone[lid]) {
-                    childCompositeBodies[i] = compositeBodiesCache[lid];
+                if (compositeBodiesDone[childLid]) {
+                    childCompositeBodies[i] = compositeBodiesCache[childLid];
                 } else {
                     return;
                 }
@@ -176,13 +172,15 @@ kernel void updateCompositeBodies(
 
         compositeBody = updateCompositeBody(rigidBody, childCompositeBodies);
         compositeBodiesCache[lid] = compositeBody;
+        compositeBodies[gid] = compositeBody;
         compositeBodiesDone[lid] = true;
 
         oldGid = gid;
         gid = rigidBody.parentGid;
+
         lid = gid - minGidInThreadGroup;
         rigidBody = rigidBodiesCache[lid];
-    } while (gid <= maxGidInThreadGroup && rigidBody.childGids[rigidBody.childCount] == oldGid);
+    } while (gid != -1);
 
-    compositeBodies[gid] = compositeBody;
+//    compositeBodies[gid] = compositeBody;
 }

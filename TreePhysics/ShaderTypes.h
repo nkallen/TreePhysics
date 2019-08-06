@@ -16,6 +16,13 @@ typedef NS_ENUM(NSInteger, BufferIndex)
     BufferIndexCompositeBodies  = 1,
 };
 
+typedef NS_ENUM(NSInteger, ThreadGroupIndex)
+{
+    ThreadGroupIndexRigidBodies = 0,
+    ThreadGroupIndexCompositeBodies  = 1,
+    ThreadGroupIndexCompositeBodiesDone  = 2,
+};
+
 typedef struct {
     vector_float3 position;
     float mass;
