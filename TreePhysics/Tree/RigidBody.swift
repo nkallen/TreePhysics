@@ -122,7 +122,7 @@ final class RigidBody: HasTransform {
 // MARK: Flattening
 
 extension RigidBody {
-    var flatten: [RigidBody] {
+    var flattened: [RigidBody] {
         var result: [RigidBody] = []
         var queue: [RigidBody] = [self]
         searchBreadthFirst(queue: &queue, result: &result)

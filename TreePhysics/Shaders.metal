@@ -1,6 +1,8 @@
 #include <metal_stdlib>
 using namespace metal;
 
+#import "ShaderTypes.h"
+
 // Ported from https://github.com/melax/sandbox/blob/3e267f2db2262a4cc6bf3f576c8c92b3cba79efc/include/geometric.h
 
 float4 qmul(float4 a, float4 b) {
@@ -14,12 +16,15 @@ float4 qmul(float4 a, float4 b) {
 inline float3 qxdir(float4 q) {
     return {q.w*q.w+q.x*q.x-q.y*q.y-q.z*q.z, (q.x*q.y+q.z*q.w)*2, (q.z*q.x-q.y*q.w)*2};
 }
+
 inline float3 qydir (float4 q) {
     return {(q.x*q.y-q.z*q.w)*2, q.w*q.w-q.x*q.x+q.y*q.y-q.z*q.z, (q.y*q.z+q.x*q.w)*2};
 }
+
 inline float3 qzdir (float4 q) {
     return {(q.z*q.x+q.y*q.w)*2, (q.y*q.z-q.x*q.w)*2, q.w*q.w-q.x*q.x-q.y*q.y+q.z*q.z};
 }
+
 inline float3x3 qmat(float4 q) {
     return {qxdir(q), qydir(q), qzdir(q)};
 }
@@ -80,4 +85,104 @@ kernel void diagonalize(
     float4 q = diagonalize(A);
     float3x3 M = transpose(qmat(q)) * A * qmat(q);
     out[gid.y] = float3(M[0][0], M[1][1], M[2][2]);
+}
+
+inline float3 jointRotateVector(
+                                const device JointStruct & joint,
+                                const float3 vector)
+{
+    return joint.worldToLocalRotation * vector;
+}
+
+inline float3x3 sqr(float3x3 A) {
+    return A * A;
+}
+
+inline float3x3 crossMatrix(float3 v) {
+    return float3x3(
+                    float3(0, v.z, -v.y),
+                    float3(-v.z, 0, v.x),
+                    float3(-v.y, -v.x, 0));
+}
+
+inline CompositeBodyStruct updateCompositeBody(
+                                         const RigidBodyStruct rigidBody,
+                                         const CompositeBodyStruct childCompositeBodies[5])
+{
+    CompositeBodyStruct compositeBody;
+
+    compositeBody.mass = rigidBody.mass;
+    compositeBody.force = rigidBody.force;
+    compositeBody.torque = rigidBody.torque;
+    compositeBody.centerOfMass = rigidBody.mass * rigidBody.centerOfMass;
+
+    for (size_t i = 0; i < rigidBody.childCount; i++) {
+        CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
+        compositeBody.torque += cross(childCompositeBody.position - rigidBody.position, childCompositeBody.force) + childCompositeBody.torque;
+        compositeBody.centerOfMass += childCompositeBody.mass * childCompositeBody.centerOfMass;
+    }
+    compositeBody.centerOfMass /= compositeBody.mass;
+
+    compositeBody.inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - compositeBody.centerOfMass));
+
+    for (size_t i = 0; i < rigidBody.childCount; i++) {
+        CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
+        compositeBody.inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - compositeBody.centerOfMass));
+    }
+
+    return compositeBody;
+}
+
+kernel void updateCompositeBodies(
+                                  device RigidBodyStruct * rigidBodies [[ buffer(0) ]], // XXX param id
+                                  device CompositeBodyStruct * compositeBodies [[ buffer(1) ]],
+                                  threadgroup CompositeBodyStruct * compositeBodiesCache [[ threadgroup(0) ]],
+                                  threadgroup bool * compositeBodiesDone [[ threadgroup(1) ]],
+                                  threadgroup RigidBodyStruct * rigidBodiesCache [[ threadgroup(2) ]],
+                                  uint gid [[ thread_position_in_grid ]],
+                                  uint lid [[thread_position_in_threadgroup]],
+                                  uint lsize [[threads_per_threadgroup]],
+                                  uint gsize [[threads_per_grid]])
+{
+    RigidBodyStruct rigidBody = rigidBodies[gid];
+    rigidBodiesCache[lid] = rigidBody;
+    compositeBodiesDone[lid] = false;
+    uint minGidInThreadGroup = gid - lid;
+    uint maxGidInThreadGroup = minGidInThreadGroup + lsize;
+
+    CompositeBodyStruct compositeBody;
+    compositeBody.mass = 1.;
+    compositeBodies[gid] = compositeBody; // xxx
+
+
+    uint oldGid = gid;
+    do {
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+
+        CompositeBodyStruct childCompositeBodies[5];
+        for (size_t i = 0; i < rigidBody.childCount; i++) {
+            uint childGid = rigidBody.childGids[i];
+            int childLid = childGid - minGidInThreadGroup;
+            if (childLid > 0) {
+                if (compositeBodiesDone[lid]) {
+                    childCompositeBodies[i] = compositeBodiesCache[lid];
+                } else {
+                    return;
+                }
+            } else {
+                childCompositeBodies[i] = compositeBodies[childGid];
+            }
+        }
+
+        compositeBody = updateCompositeBody(rigidBody, childCompositeBodies);
+        compositeBodiesCache[lid] = compositeBody;
+        compositeBodiesDone[lid] = true;
+
+        oldGid = gid;
+        gid = rigidBody.parentGid;
+        lid = gid - minGidInThreadGroup;
+        rigidBody = rigidBodiesCache[lid];
+    } while (gid <= maxGidInThreadGroup && rigidBody.childGids[rigidBody.childCount] == oldGid);
+
+    compositeBodies[gid] = compositeBody;
 }

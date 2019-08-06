@@ -8,8 +8,10 @@ class Game: NSObject {
     let attractorField: AttractorField
     let attractor: SCNNode
     let parent: SCNNode
+    let foo: DiagonalizeKernel
 
     override init() {
+        self.foo = DiagonalizeKernel()
         self.scene = SCNScene()
 
         let cameraNode = SCNNode()
@@ -116,5 +118,12 @@ extension Game: SCNSceneRendererDelegate {
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
         simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
+
+        let matrix = float3x3(columns: (
+            float3(2,1,0),
+            float3(1,2,1),
+            float3(0,1,2)))
+
+        foo.run(matrix) { buffer in () }
     }
 }

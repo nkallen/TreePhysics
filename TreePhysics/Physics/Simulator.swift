@@ -9,7 +9,7 @@ final class Simulator {
 
     init(tree: Tree) {
         self.tree = tree
-        self.rigidBodiesLevelOrder = tree.root.flatten.filter { $0.kind == .dynamic }
+        self.rigidBodiesLevelOrder = tree.root.flattened.filter { $0.kind == .dynamic }
         self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
         updateRigidBodies()
     }
@@ -62,7 +62,7 @@ final class Simulator {
             composite.centerOfMass /= composite.mass
 
             composite.inertiaTensor = rigidBody.inertiaTensor -
-                rigidBody.mass * sqr((rigidBody.centerOfMass - rigidBody.composite.centerOfMass).cross_matrix)
+                rigidBody.mass * sqr((rigidBody.centerOfMass - composite.centerOfMass).cross_matrix)
 
             for childJoint in rigidBody.childJoints {
                 let childRigidBody = childJoint.childRigidBody

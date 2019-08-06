@@ -160,7 +160,7 @@ class TreeTests: XCTestCase {
         b2.add(b6)
         b2.add(b7)
 
-        XCTAssertEqual(root.flatten,
+        XCTAssertEqual(root.flattened,
                        [root, b1, b2, b3, b4, b6, b7, b5])
     }
 }
