@@ -27,7 +27,7 @@ class MetalTests: XCTestCase {
     var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
 
     func testUpdateCompositeBodies() {
-        let expectation = XCTestExpectation(description: "wait")
+        let expect = expectation(description: "wait")
 
         let force = float3(0, 1, 0) // world coordinates
         let root = RigidBody()
@@ -65,31 +65,11 @@ class MetalTests: XCTestCase {
             // center of mass
             XCTAssertEqual(b2_composite.centerOfMass, b2.centerOfMass)
             XCTAssertEqual(b1_composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass)/2)
-            XCTAssertEqual(root_composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass + root.centerOfMass) / 3)
+            XCTAssertEqual(root_composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass + root.centerOfMass) / 3, accuracy: 0.001)
 
-            expectation.fulfill()
+            expect.fulfill()
         }
+        waitForExpectations(timeout: 10, handler: {error in})
     }
-
-    //    func testFoo() {
-    //
-    //
-    //        guard let (eigenvalues, eigenvectors) = matrix.eigen_ql else {
-    //            XCTFail()
-    //            return
-    //        }
-    //
-    //        XCTAssertEqual(
-    //            double3(2 - sqrt(2), 2, 2 + sqrt(2.0)),
-    //            eigenvalues, accuracy: 0.0001)
-    //
-    //        XCTAssertEqual(
-    //            double3x3(columns: (
-    //                -double3(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),
-    //                double3(1 / sqrt(2.0), 0, -1/sqrt(2.0)),
-    //                double3(1.0/2, sqrt(2.0) / 2, 1.0/2)
-    //            )),
-    //            eigenvectors, accuracy: 0.001)
-    //    }
 
 }

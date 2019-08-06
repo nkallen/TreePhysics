@@ -105,9 +105,10 @@ inline float3x3 crossMatrix(float3 v) {
                     float3(-v.y, -v.x, 0));
 }
 
-inline CompositeBodyStruct updateCompositeBody(
-                                         const RigidBodyStruct rigidBody,
-                                         const CompositeBodyStruct childCompositeBodies[5])
+inline CompositeBodyStruct
+rigidBody_updateCompositeBody(
+                              const RigidBodyStruct rigidBody,
+                              const CompositeBodyStruct childCompositeBodies[5])
 {
     CompositeBodyStruct compositeBody;
 
@@ -138,52 +139,71 @@ inline CompositeBodyStruct updateCompositeBody(
     return compositeBody;
 }
 
-kernel void updateCompositeBodies(
-                                  device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
-                                  device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
-                                  threadgroup RigidBodyStruct * rigidBodiesCache [[ threadgroup(ThreadGroupIndexRigidBodies) ]],
-                                  threadgroup CompositeBodyStruct * compositeBodiesCache [[ threadgroup(ThreadGroupIndexCompositeBodies) ]],
-                                  threadgroup bool * compositeBodiesDone [[ threadgroup(ThreadGroupIndexCompositeBodiesDone) ]],
-                                  uint gid [[ thread_position_in_grid ]],
-                                  uint lid [[thread_position_in_threadgroup]],
-                                  uint lsize [[threads_per_threadgroup]],
-                                  uint gsize [[threads_per_grid]])
+inline void
+rigidBody_childRigidBodies(
+                           RigidBodyStruct rigidBody,
+                           device RigidBodyStruct * rigidBodies,
+                           RigidBodyStruct childRigidBodies[5])
+{
+    for (size_t i = 0; i < rigidBody.childCount; i++) {
+        uint childGid = rigidBody.childGids[i];
+        childRigidBodies[i] = childRigidBodies[childGid];
+    }
+}
+
+
+inline void
+rigidBody_childCompositeBodies(
+                               const RigidBodyStruct rigidBody,
+                               device CompositeBodyStruct * compositeBodies,
+                               CompositeBodyStruct childCompositeBodies[5])
+{
+    for (size_t i = 0; i < rigidBody.childCount; i++) {
+        uint childGid = rigidBody.childGids[i];
+        childCompositeBodies[i] = compositeBodies[childGid];
+    }
+}
+
+inline CompositeBodyStruct
+rigidBody_updateCompositeBody(
+                              const RigidBodyStruct rigidBody,
+                              device RigidBodyStruct * rigidBodies,
+                              device CompositeBodyStruct * compositeBodies)
+{
+    RigidBodyStruct childRigidBodies[5];
+    rigidBody_childRigidBodies(rigidBody, rigidBodies, childRigidBodies);
+    CompositeBodyStruct childCompositeBodies[5];
+    for (size_t i = 0; i < rigidBody.childCount; i++) {
+        const RigidBodyStruct childRigidBody = childRigidBodies[i];
+        CompositeBodyStruct grandChildCompositeBodies[5];
+        rigidBody_childCompositeBodies(childRigidBody, compositeBodies, grandChildCompositeBodies);
+        CompositeBodyStruct childCompositeBody = rigidBody_updateCompositeBody(rigidBody, grandChildCompositeBodies);
+        childCompositeBodies[i] = childCompositeBody;
+    }
+    return rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
+}
+
+kernel void
+updateCompositeBodies(
+                      device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
+                      device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
+                      uint gid [[ thread_position_in_grid ]])
 {
     RigidBodyStruct rigidBody = rigidBodies[gid];
-    rigidBodiesCache[lid] = rigidBody;
-    compositeBodiesDone[lid] = false;
-    uint minGidInThreadGroup = gid - lid;
-    uint maxGidInThreadGroup = minGidInThreadGroup + lsize;
+    CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies);
+    compositeBodies[gid] = compositeBody;
 
-    CompositeBodyStruct compositeBody;
-    uint oldGid = gid;
-    do {
-        CompositeBodyStruct childCompositeBodies[5];
-        for (size_t i = 0; i < rigidBody.childCount; i++) {
-            uint childGid = rigidBody.childGids[i];
-            int childLid = childGid - minGidInThreadGroup;
-            if (childLid > 0) {
-                if (compositeBodiesDone[childLid]) {
-                    childCompositeBodies[i] = compositeBodiesCache[childLid];
-                } else {
-                    return;
-                }
-            } else {
-                childCompositeBodies[i] = compositeBodies[childGid];
-            }
+    // If this rigid body has a parent with only one child, we can process it immediately.
+    while (rigidBody.parentGid != -1) {
+        int gid = rigidBody.parentGid;
+        rigidBody = rigidBodies[gid];
+        if (rigidBody.childCount == 1) {
+            CompositeBodyStruct childCompositeBodies[5] = {compositeBody};
+            compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
+            compositeBodies[gid] = compositeBody;
+        } else {
+            return;
         }
-
-        compositeBody = updateCompositeBody(rigidBody, childCompositeBodies);
-        compositeBodiesCache[lid] = compositeBody;
-        compositeBodies[gid] = compositeBody;
-        compositeBodiesDone[lid] = true;
-
-        oldGid = gid;
-        gid = rigidBody.parentGid;
-
-        lid = gid - minGidInThreadGroup;
-        rigidBody = rigidBodiesCache[lid];
-    } while (gid != -1);
-
-//    compositeBodies[gid] = compositeBody;
+    }
 }
+

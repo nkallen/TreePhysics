@@ -129,6 +129,23 @@ extension RigidBody {
         return result
     }
 
+    var leaves: [RigidBody] {
+        var result: [RigidBody] = []
+        for childJoint in childJoints {
+            let childRigidBody = childJoint.childRigidBody
+            if childRigidBody.isLeaf {
+                result.append(childRigidBody)
+            } else {
+                result.append(contentsOf: childRigidBody.leaves)
+            }
+        }
+        return result
+    }
+
+    var isLeaf: Bool {
+        return childJoints.count == 0
+    }
+
     private func searchBreadthFirst(queue: inout [RigidBody], result: inout [RigidBody]) {
         while !queue.isEmpty {
             let start = queue.removeFirst()
