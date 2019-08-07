@@ -17,6 +17,8 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         let device = MTLCreateSystemDefaultDevice()!
+        let commandQueue = device.makeCommandQueue()!
+
         let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root)
         let compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
@@ -26,7 +28,9 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
 
         let expect = expectation(description: "wait")
 
-        updateCompositeBodiesKernel.run() {
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
+        commandBuffer.addCompletedHandler { _ in
             let compositeBodies = UnsafeMutableRawPointer(compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
             let b1_composite = compositeBodies[1]
@@ -56,6 +60,7 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
 
             expect.fulfill()
         }
+        commandBuffer.commit()
         waitForExpectations(timeout: 10, handler: {error in})
     }
 }
@@ -74,6 +79,8 @@ class UpdateCompositeBodiesSequentiallyKernelTests: XCTestCase {
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         let device = MTLCreateSystemDefaultDevice()!
+        let commandQueue = device.makeCommandQueue()!
+
         let (count, rigidBodiesBuffer, _) = UpdateCompositeBodiesKernel.buffer(root: root)
         let compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
@@ -84,7 +91,9 @@ class UpdateCompositeBodiesSequentiallyKernelTests: XCTestCase {
 
 
         let expect = expectation(description: "wait")
-        updateCompositeBodiesKernel.run() {
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
+        commandBuffer.addCompletedHandler { _ in
             let compositeBodies = UnsafeMutableRawPointer(compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
             let b1_composite = compositeBodies[1]
@@ -114,28 +123,7 @@ class UpdateCompositeBodiesSequentiallyKernelTests: XCTestCase {
 
             expect.fulfill()
         }
+        commandBuffer.commit()
         waitForExpectations(timeout: 10, handler: {error in})
-    }
-
-}
-
-class MetalTests: XCTestCase {
-    var diagonalizeKernel: DiagonalizeKernel!
-
-    func testDiagonalize() {
-        self.diagonalizeKernel = DiagonalizeKernel()
-        let matrix = float3x3(columns: (
-            float3(2,1,0),
-            float3(1,2,1),
-            float3(0,1,2)))
-
-        let expectation = XCTestExpectation(description: "wait")
-        diagonalizeKernel.run(matrix) { buffer in
-            let eigenvalues = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: float3.self, capacity: 1024)
-            XCTAssertEqual(
-                float3(2 + sqrt(2), 2, 2 - sqrt(2.0)),
-                eigenvalues[0], accuracy: 0.0001)
-            expectation.fulfill()
-        }
     }
 }

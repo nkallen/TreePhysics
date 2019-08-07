@@ -145,9 +145,9 @@ rigidBody_childRigidBodies(
                            device RigidBodyStruct * rigidBodies,
                            RigidBodyStruct childRigidBodies[5])
 {
-    for (size_t i = 0; i < rigidBody.childCount; i++) {
-        uint childGid = rigidBody.childIds[i];
-        childRigidBodies[i] = childRigidBodies[childGid];
+    for (ushort i = 0; i < rigidBody.childCount; i++) {
+        int childId = rigidBody.childIds[i];
+        childRigidBodies[i] = childRigidBodies[childId];
     }
 }
 
@@ -158,8 +158,8 @@ rigidBody_childCompositeBodies(
                                device CompositeBodyStruct * compositeBodies,
                                CompositeBodyStruct childCompositeBodies[5])
 {
-    for (size_t i = 0; i < rigidBody.childCount; i++) {
-        uint childId = rigidBody.childIds[i];
+    for (ushort i = 0; i < rigidBody.childCount; i++) {
+        int childId = rigidBody.childIds[i];
         childCompositeBodies[i] = compositeBodies[childId];
     }
 }
@@ -172,7 +172,7 @@ rigidBody_childCompositeBodies(
                                CompositeBodyStruct childCompositeBodies[5])
 {
     uint missing = 0;
-    for (size_t i = 0; i < rigidBody.childCount; i++) {
+    for (ushort i = 0; i < rigidBody.childCount; i++) {
         uint childId = rigidBody.childIds[i];
         if (childId >= minIdInThreadGroup) {
             missing++;
@@ -187,14 +187,15 @@ inline void
 rigidBody_childCompositeBodies(
                                const RigidBodyStruct rigidBody,
                                device CompositeBodyStruct * compositeBodies,
-                               uint minIdInThreadGroup,
+                               ushort minIdInThreadGroup,
                                threadgroup CompositeBodyStruct * compositeBodiesCache,
                                CompositeBodyStruct childCompositeBodies[5])
 {
-    for (size_t i = 0; i < rigidBody.childCount; i++) {
-        uint childId = rigidBody.childIds[i];
+    for (ushort i = 0; i < rigidBody.childCount; i++) {
+        int childId = rigidBody.childIds[i];
         if (childId >= minIdInThreadGroup) {
-            childCompositeBodies[i] = compositeBodiesCache[childId];
+            ushort lid = childId - minIdInThreadGroup;
+            childCompositeBodies[i] = compositeBodiesCache[lid];
         } else {
             childCompositeBodies[i] = compositeBodies[childId];
         }
@@ -241,7 +242,7 @@ updateCompositeBodies(
                       constant uint * gridOrigin [[ buffer(BufferIndexGridOrigin) ]],
                       uint gid [[ thread_position_in_grid ]])
 {
-    uint id = *gridOrigin + gid;
+    int id = *gridOrigin + gid;
     RigidBodyStruct rigidBody = rigidBodies[id];
     CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies);
     compositeBodies[id] = compositeBody;
@@ -257,19 +258,19 @@ updateCompositeBodies2(
                        threadgroup RigidBodyStruct * rigidBodiesCache [[ threadgroup(ThreadGroupIndexRigidBodies) ]],
                        constant uint * gridOrigin [[ buffer(BufferIndexGridOrigin) ]],
                        uint gid [[ thread_position_in_grid ]],
-                       uint lid [[thread_position_in_threadgroup]],
-                       uint lsize [[threads_per_threadgroup]],
+                       ushort lid [[thread_position_in_threadgroup]],
+                       ushort lsize [[threads_per_threadgroup]],
                        uint gsize [[threads_per_grid]])
 {
     threadgroup atomic_uint compositeBodiesDoneByThreadGroup;
 
-    uint id = *gridOrigin + gid;
-    uint minIdInThreadGroup = id - lid;
+    int id = *gridOrigin + gid;
+    int minIdInThreadGroup = id - lid;
 
     RigidBodyStruct rigidBody = rigidBodies[id];
 
     CompositeBodyStruct childCompositeBodies[5];
-    int missing = rigidBody_childCompositeBodies(rigidBody, compositeBodies, minIdInThreadGroup, childCompositeBodies);
+    ushort missing = rigidBody_childCompositeBodies(rigidBody, compositeBodies, minIdInThreadGroup, childCompositeBodies);
 
     if (missing == 0) {
         CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
@@ -277,7 +278,7 @@ updateCompositeBodies2(
         atomic_fetch_or_explicit(&compositeBodiesDoneByThreadGroup, 1 << lid, memory_order_relaxed);
         rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
 
-        if (rigidBody.parentId >= (int)minIdInThreadGroup) {
+        if (rigidBody.parentId >= minIdInThreadGroup) {
             compositeBodiesCache[lid] = compositeBody;
         }
     } else {
@@ -289,7 +290,7 @@ updateCompositeBodies2(
     thread uint compositeBodiesDoneThread = atomic_load_explicit(&compositeBodiesDoneByThreadGroup, memory_order_relaxed);
 
     if (lid == 0) {
-        for (uint lid = 0; lid < lsize; lid++) {
+        for (ushort lid = 0; lid < lsize; lid++) {
             id = *gridOrigin + minIdInThreadGroup + lid;
             if (!(compositeBodiesDoneThread & (1 << lid))) {
                 RigidBodyStruct rigidBody = rigidBodiesCache[lid];
@@ -299,7 +300,7 @@ updateCompositeBodies2(
                 compositeBodies[id] = compositeBody;
                 rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
 
-                if (rigidBody.parentId >= (int)minIdInThreadGroup) {
+                if (rigidBody.parentId >= minIdInThreadGroup) {
                     compositeBodiesCache[lid] = compositeBody;
                 }
             }

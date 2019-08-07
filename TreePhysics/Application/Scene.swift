@@ -9,8 +9,12 @@ class Game: NSObject {
     let attractor: SCNNode
     let parent: SCNNode
     let updateCompositeBodies: UpdateCompositeBodiesKernel
+    let device: MTLDevice
+    let commandQueue: MTLCommandQueue
 
     override init() {
+        self.device = MTLCreateSystemDefaultDevice()!
+
         self.scene = SCNScene()
 
         let cameraNode = SCNNode()
@@ -101,7 +105,8 @@ class Game: NSObject {
         self.attractorField = attractorField
         self.attractor = attractor
 
-        self.updateCompositeBodies = UpdateCompositeBodiesKernel(root: root)
+        self.commandQueue = device.makeCommandQueue()!
+        self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, root: root)
     }
 }
 
@@ -118,8 +123,12 @@ extension Game: SCNSceneRendererDelegate {
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
         simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
-        updateCompositeBodies.run {
+
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        updateCompositeBodies.encode(commandBuffer: commandBuffer)
+        commandBuffer.addCompletedHandler { _ in
             print("done")
         }
+        commandBuffer.commit()
     }
 }

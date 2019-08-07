@@ -5,7 +5,6 @@ import Metal
 // The 256 byte aligned size of our uniform structure
 let alignedUniformsSize = (MemoryLayout<float3x3>.size & ~0xFF) + 0x100
 let maxBuffersInFlight = 3
-let num = 4096
 
 class MetalKernel {
     let device: MTLDevice
@@ -16,49 +15,6 @@ class MetalKernel {
         let library = device.makeDefaultLibrary()!
         let kernelFunction = library.makeFunction(name: name)!
         self.computePipelineState = try! device.makeComputePipelineState(function: kernelFunction)
-    }
-}
-
-class DiagonalizeKernel: MetalKernel {
-    let buffer: MTLBuffer
-    let outBuffer: MTLBuffer
-    var bufferOffset: Int
-
-    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!) {
-        self.buffer = device.makeBuffer(length: MemoryLayout<float3x3>.size, options: [.storageModeShared])!
-        self.outBuffer = device.makeBuffer(length: MemoryLayout<float3>.size * num, options: [.storageModeShared])!
-        self.bufferOffset = 0
-        super.init(device: device, name: "diagonalize")
-    }
-
-    func run(_ matrix: float3x3, cb: @escaping (MTLBuffer) -> ()) {
-        let foo = UnsafeMutableRawPointer(buffer.contents() + bufferOffset).bindMemory(to: float3x3.self, capacity: 1)
-        foo[0] = matrix
-
-        let commandBuffer = commandQueue.makeCommandBuffer()!
-        commandBuffer.addCompletedHandler{ [weak self] commandBuffer in
-            if let strongSelf = self {
-                cb(strongSelf.outBuffer)
-            }
-        }
-
-        let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-        commandEncoder.setComputePipelineState(computePipelineState)
-        commandEncoder.label  = "Diagonalize"
-        commandEncoder.setBuffer(buffer, offset: bufferOffset, index: 0)
-        commandEncoder.setBuffer(outBuffer, offset: 0, index: 1)
-
-        let width = computePipelineState.threadExecutionWidth
-        let height = computePipelineState.maxTotalThreadsPerThreadgroup / width
-        let threadsPerThreadgroup = MTLSizeMake(width, height, 1)
-        let threadsPerGrid = MTLSize(
-            width: 1,
-            height: num,
-            depth: 1)
-        commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
-        commandEncoder.endEncoding()
-
-        commandBuffer.commit()
     }
 }
 
@@ -77,7 +33,7 @@ final class UpdateCompositeBodiesKernel {
         var sequentialTotal = 0
         var sequentialStart = Int.max
         for (offset, count) in ranges.reversed() {
-            if (sequentialTotal + count > 32) { break }
+            if (sequentialTotal + count > UpdateCompositeBodiesSequentiallyKernel.maxBodiesPerInvocation) { break }
 
             sequentialTotal += count
             sequentialStart = offset
@@ -192,6 +148,8 @@ final class UpdateCompositeBodiesInParallelKernel: MetalKernel {
 }
 
 final class UpdateCompositeBodiesSequentiallyKernel: MetalKernel {
+    static let maxBodiesPerInvocation = 32
+
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
     let range: (Int, Int)
@@ -211,8 +169,8 @@ final class UpdateCompositeBodiesSequentiallyKernel: MetalKernel {
         commandEncoder.label  = "Update Composite Bodies Sequentially"
         commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
         commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
-        commandEncoder.setThreadgroupMemoryLength(MemoryLayout<RigidBodyStruct>.stride * num, index: ThreadGroupIndex.rigidBodies.rawValue)
-        commandEncoder.setThreadgroupMemoryLength(MemoryLayout<CompositeBodyStruct>.stride * num, index: ThreadGroupIndex.compositeBodies.rawValue)
+        commandEncoder.setThreadgroupMemoryLength(MemoryLayout<RigidBodyStruct>.stride * UpdateCompositeBodiesSequentiallyKernel.maxBodiesPerInvocation, index: ThreadGroupIndex.rigidBodies.rawValue)
+        commandEncoder.setThreadgroupMemoryLength(MemoryLayout<CompositeBodyStruct>.stride * UpdateCompositeBodiesSequentiallyKernel.maxBodiesPerInvocation, index: ThreadGroupIndex.compositeBodies.rawValue)
         commandEncoder.setBytes(&gridOrigin, length: MemoryLayout<Int>.size, index: BufferIndex.gridOrigin.rawValue)
 
         let width = computePipelineState.maxTotalThreadsPerThreadgroup
