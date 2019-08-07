@@ -298,6 +298,7 @@ updateCompositeBodies2(
                 CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
                 compositeBodies[id] = compositeBody;
                 rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
+
                 if (rigidBody.parentId >= (int)minIdInThreadGroup) {
                     compositeBodiesCache[lid] = compositeBody;
                 }

@@ -4,7 +4,7 @@ import XCTest
 import MetalKit
 
 class UpdateCompositeBodiesKernelTests: XCTestCase {
-    var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
+    var updateCompositeBodiesKernel: UpdateCompositeBodiesInParallelKernel!
 
     func testUpdateCompositeBodies() {
         let force = float3(0, 1, 0) // world coordinates
@@ -16,12 +16,18 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(root: root)
+        let device = MTLCreateSystemDefaultDevice()!
+        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root)
+        let compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * count,
+            options: [.storageModeShared])!
+
+        self.updateCompositeBodiesKernel = UpdateCompositeBodiesInParallelKernel(rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
 
         let expect = expectation(description: "wait")
 
-        updateCompositeBodiesKernel.run() { buffer in
-            let compositeBodies = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
+        updateCompositeBodiesKernel.run() {
+            let compositeBodies = UnsafeMutableRawPointer(compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
             let b1_composite = compositeBodies[1]
             let root_composite = compositeBodies[2]
@@ -54,8 +60,8 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
     }
 }
 
-class UpdateCompositeBodiesKernel2Tests: XCTestCase {
-    var updateCompositeBodiesKernel: UpdateCompositeBodies2Kernel!
+class UpdateCompositeBodiesSequentiallyKernelTests: XCTestCase {
+    var updateCompositeBodiesKernel: UpdateCompositeBodiesSequentiallyKernel!
 
     func testUpdateCompositeBodies() {
         let force = float3(0, 1, 0) // world coordinates
@@ -68,13 +74,13 @@ class UpdateCompositeBodiesKernel2Tests: XCTestCase {
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         let device = MTLCreateSystemDefaultDevice()!
-        let (rigidBodiesBuffer, _) = UpdateCompositeBodiesKernel.buffer(root: root)
+        let (count, rigidBodiesBuffer, _) = UpdateCompositeBodiesKernel.buffer(root: root)
         let compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * 3,
+            length: MemoryLayout<CompositeBodyStruct>.stride * count,
             options: [.storageModeShared])!
 
         // this range includes just b2
-        self.updateCompositeBodiesKernel = UpdateCompositeBodies2Kernel(rigidBodiesBuffer: rigidBodiesBuffer, range: (0, 1), compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateCompositeBodiesKernel = UpdateCompositeBodiesSequentiallyKernel(rigidBodiesBuffer: rigidBodiesBuffer, range: (0, 1), compositeBodiesBuffer: compositeBodiesBuffer)
 
 
         let expect = expectation(description: "wait")

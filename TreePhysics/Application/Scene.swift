@@ -118,7 +118,7 @@ extension Game: SCNSceneRendererDelegate {
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
         simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
-        updateCompositeBodies.run { _ in
+        updateCompositeBodies.run {
             print("done")
         }
     }

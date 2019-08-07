@@ -10,14 +10,12 @@ let num = 4096
 class MetalKernel {
     let device: MTLDevice
     let computePipelineState: MTLComputePipelineState
-    let commandQueue: MTLCommandQueue
 
     init(device: MTLDevice, name: String) {
         self.device = device
         let library = device.makeDefaultLibrary()!
         let kernelFunction = library.makeFunction(name: name)!
         self.computePipelineState = try! device.makeComputePipelineState(function: kernelFunction)
-        self.commandQueue = device.makeCommandQueue()!
     }
 }
 
@@ -64,57 +62,39 @@ class DiagonalizeKernel: MetalKernel {
     }
 }
 
-final class UpdateCompositeBodiesKernel: MetalKernel {
-    let rigidBodiesBuffer: MTLBuffer
-    let compositeBodiesBuffer: MTLBuffer
-    let ranges: [(Int, Int)]
+final class UpdateCompositeBodiesKernel {
+    let updateCompositeBodiesInParallel: UpdateCompositeBodiesInParallelKernel
+    let updateCompositeBodiesSequentially: UpdateCompositeBodiesSequentiallyKernel
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, root: RigidBody) {
-        let (rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
-        self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.ranges = ranges
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * num,
-            options: [isRunningTests ? .storageModeShared : .storageModePrivate])!
-        super.init(device: device, name: "updateCompositeBodies")
+        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root)
+        let compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * count,
+            options: [.storageModePrivate])!
+//        [(0, 243), (243, 81), (324, 27), (351, 9), (360, 3), (363, 1)]
+
+        var parallelRanges = ranges
+        var sequentialTotal = 0
+        var sequentialStart = Int.max
+        for (offset, count) in ranges.reversed() {
+            if (sequentialTotal + count > 32) { break }
+
+            sequentialTotal += count
+            sequentialStart = offset
+            _ = parallelRanges.popLast()
+        }
+        let sequentialRange = (sequentialStart, sequentialTotal)
+
+        self.updateCompositeBodiesInParallel = UpdateCompositeBodiesInParallelKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: parallelRanges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateCompositeBodiesSequentially = UpdateCompositeBodiesSequentiallyKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, range: sequentialRange, compositeBodiesBuffer: compositeBodiesBuffer)
     }
 
-    func run(cb: @escaping (MTLBuffer) -> ()) {
-        let commandBuffer = commandQueue.makeCommandBuffer()!
-        commandBuffer.addCompletedHandler{ [weak self] commandBuffer in
-            if let strongSelf = self {
-                cb(strongSelf.compositeBodiesBuffer)
-            }
-        }
-
-        var i = 0
-        for (gridOrigin, threadsPerGrid) in ranges {
-            print(gridOrigin, threadsPerGrid)
-            let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-            commandEncoder.setComputePipelineState(computePipelineState)
-            commandEncoder.label  = "Update Composite Bodies \(i)"
-            commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
-            commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
-            var gridOrigin = gridOrigin
-            commandEncoder.setBytes(&gridOrigin, length: MemoryLayout<Int>.size, index: BufferIndex.gridOrigin.rawValue)
-
-            let width = computePipelineState.maxTotalThreadsPerThreadgroup
-            let threadsPerThreadgroup = MTLSizeMake(width, 1, 1)
-            let threadsPerGrid = MTLSize(
-                width: threadsPerGrid,
-                height: 1,
-                depth: 1)
-
-            commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
-            commandEncoder.endEncoding()
-
-            i += 1
-        }
-
-        commandBuffer.commit()
+    func encode(commandBuffer: MTLCommandBuffer) {
+        self.updateCompositeBodiesInParallel.encode(commandBuffer: commandBuffer)
+        self.updateCompositeBodiesSequentially.encode(commandBuffer: commandBuffer)
     }
 
-    static func buffer(root: RigidBody, device: MTLDevice = MTLCreateSystemDefaultDevice()!) -> (MTLBuffer, [(Int, Int)]) {
+    static func buffer(root: RigidBody, device: MTLDevice = MTLCreateSystemDefaultDevice()!) -> (Int, MTLBuffer, [(Int, Int)]) {
         var allRigidBodies: [RigidBody] = []
         var allStragglers: [RigidBody] = []
         var rangesOfWork: [(Int, Int)] = []
@@ -124,7 +104,8 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             allStragglers.append(contentsOf: stragglers)
             rangesOfWork.append(range)
         }
-        return (buffer(flattened: allRigidBodies + allStragglers, device: device), rangesOfWork)
+        let all = allRigidBodies + allStragglers
+        return (all.count, buffer(flattened: all, device: device), rangesOfWork)
     }
 
     static func buffer(flattened: [RigidBody], device: MTLDevice) -> MTLBuffer {
@@ -137,7 +118,6 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         for (i, rigidBody) in flattened.enumerated() {
             rigidBodyStructs[i] = `struct`(rigidBody: rigidBody, index: index)
         }
-        print(index)
         return buffer
     }
 
@@ -172,7 +152,46 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     }
 }
 
-final class UpdateCompositeBodies2Kernel: MetalKernel {
+final class UpdateCompositeBodiesInParallelKernel: MetalKernel {
+    let rigidBodiesBuffer: MTLBuffer
+    let compositeBodiesBuffer: MTLBuffer
+    let ranges: [(Int, Int)]
+
+    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, ranges: [(Int, Int)], compositeBodiesBuffer: MTLBuffer) {
+        self.rigidBodiesBuffer = rigidBodiesBuffer
+        self.ranges = ranges
+        self.compositeBodiesBuffer = compositeBodiesBuffer
+        super.init(device: device, name: "updateCompositeBodies")
+    }
+
+    func encode(commandBuffer: MTLCommandBuffer) {
+        var i = 0
+        for (gridOrigin, threadsPerGrid) in ranges {
+            print(gridOrigin, threadsPerGrid)
+            let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
+            commandEncoder.setComputePipelineState(computePipelineState)
+            commandEncoder.label  = "Update Composite Bodies in Parallel, Round \(i)"
+            commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
+            commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
+            var gridOrigin = gridOrigin
+            commandEncoder.setBytes(&gridOrigin, length: MemoryLayout<Int>.size, index: BufferIndex.gridOrigin.rawValue)
+
+            let width = computePipelineState.maxTotalThreadsPerThreadgroup
+            let threadsPerThreadgroup = MTLSizeMake(width, 1, 1)
+            let threadsPerGrid = MTLSize(
+                width: threadsPerGrid,
+                height: 1,
+                depth: 1)
+
+            commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+            commandEncoder.endEncoding()
+
+            i += 1
+        }
+    }
+}
+
+final class UpdateCompositeBodiesSequentiallyKernel: MetalKernel {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
     let range: (Int, Int)
@@ -184,16 +203,12 @@ final class UpdateCompositeBodies2Kernel: MetalKernel {
         super.init(device: device, name: "updateCompositeBodies2")
     }
 
-    func run(cb: @escaping () -> ()) {
-        let commandBuffer = commandQueue.makeCommandBuffer()!
-        commandBuffer.addCompletedHandler { commandBuffer in
-            cb()
-        }
+    func encode(commandBuffer: MTLCommandBuffer) {
         var (gridOrigin, threadsPerGridWidth) = range
 
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(computePipelineState)
-        commandEncoder.label  = "Update Composite Bodies Serial"
+        commandEncoder.label  = "Update Composite Bodies Sequentially"
         commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
         commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
         commandEncoder.setThreadgroupMemoryLength(MemoryLayout<RigidBodyStruct>.stride * num, index: ThreadGroupIndex.rigidBodies.rawValue)
@@ -209,7 +224,5 @@ final class UpdateCompositeBodies2Kernel: MetalKernel {
 
         commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         commandEncoder.endEncoding()
-
-        commandBuffer.commit()
     }
 }
