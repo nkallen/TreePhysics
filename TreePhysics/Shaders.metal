@@ -212,13 +212,26 @@ rigidBody_updateCompositeBody(
     return rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
 }
 
-inline void
-rigidBody_climb(RigidBodyStruct rigidBody,
-                CompositeBodyStruct compositeBody,
+void
+rigidBody_climb(const RigidBodyStruct rigidBody,
+                const CompositeBodyStruct compositeBody,
                 device RigidBodyStruct * rigidBodies,
                 device CompositeBodyStruct * compositeBodies)
 {
+    RigidBodyStruct currentRigidBody = rigidBody;
+    CompositeBodyStruct currentCompositeBody = compositeBody;
 
+    while (currentRigidBody.parentId != -1) {
+        int parentId = currentRigidBody.parentId;
+        currentRigidBody = rigidBodies[parentId];
+        if (currentRigidBody.childCount == 1) {
+            CompositeBodyStruct childCompositeBodies[5] = {currentCompositeBody};
+            currentCompositeBody = rigidBody_updateCompositeBody(currentRigidBody, childCompositeBodies);
+            compositeBodies[parentId] = currentCompositeBody;
+        } else {
+            return;
+        }
+    }
 }
 
 kernel void
@@ -233,18 +246,7 @@ updateCompositeBodies(
     CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies);
     compositeBodies[id] = compositeBody;
 
-    // If this rigid body has a parent with only one child, we can process it immediately.
-    while (rigidBody.parentId != -1) {
-        int parentId = rigidBody.parentId;
-        rigidBody = rigidBodies[parentId];
-        if (rigidBody.childCount == 1) {
-            CompositeBodyStruct childCompositeBodies[5] = {compositeBody};
-            compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
-            compositeBodies[parentId] = compositeBody;
-        } else {
-            return;
-        }
-    }
+    rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
 }
 
 kernel void
@@ -273,6 +275,7 @@ updateCompositeBodies2(
         CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
         compositeBodies[id] = compositeBody;
         atomic_fetch_or_explicit(&compositeBodiesDoneByThreadGroup, 1 << lid, memory_order_relaxed);
+        rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
 
         if (rigidBody.parentId >= (int)minIdInThreadGroup) {
             compositeBodiesCache[lid] = compositeBody;
@@ -294,6 +297,7 @@ updateCompositeBodies2(
                 rigidBody_childCompositeBodies(rigidBody, compositeBodies, minIdInThreadGroup, compositeBodiesCache, childCompositeBodies);
                 CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
                 compositeBodies[id] = compositeBody;
+                rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
                 if (rigidBody.parentId >= (int)minIdInThreadGroup) {
                     compositeBodiesCache[lid] = compositeBody;
                 }

@@ -67,12 +67,19 @@ class UpdateCompositeBodiesKernel2Tests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodies2Kernel(rigidBodies: [b2, b1, root])
+        let device = MTLCreateSystemDefaultDevice()!
+        let (rigidBodiesBuffer, _) = UpdateCompositeBodiesKernel.buffer(root: root)
+        let compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * 3,
+            options: [.storageModeShared])!
+
+        // this range includes just b2
+        self.updateCompositeBodiesKernel = UpdateCompositeBodies2Kernel(rigidBodiesBuffer: rigidBodiesBuffer, range: (0, 1), compositeBodiesBuffer: compositeBodiesBuffer)
+
 
         let expect = expectation(description: "wait")
-
-        updateCompositeBodiesKernel.run() { buffer in
-            let compositeBodies = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
+        updateCompositeBodiesKernel.run() {
+            let compositeBodies = UnsafeMutableRawPointer(compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
             let b1_composite = compositeBodies[1]
             let root_composite = compositeBodies[2]

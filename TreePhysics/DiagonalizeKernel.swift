@@ -114,16 +114,17 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         commandBuffer.commit()
     }
 
-    private static func buffer(root: RigidBody, device: MTLDevice) -> (MTLBuffer, [(Int, Int)]) {
+    static func buffer(root: RigidBody, device: MTLDevice = MTLCreateSystemDefaultDevice()!) -> (MTLBuffer, [(Int, Int)]) {
         var allRigidBodies: [RigidBody] = []
+        var allStragglers: [RigidBody] = []
         var rangesOfWork: [(Int, Int)] = []
         for (parallel, stragglers) in root.levels {
             let range = (allRigidBodies.count, parallel.count)
             allRigidBodies.append(contentsOf: parallel)
-            allRigidBodies.append(contentsOf: stragglers)
+            allStragglers.append(contentsOf: stragglers)
             rangesOfWork.append(range)
         }
-        return (buffer(flattened: allRigidBodies, device: device), rangesOfWork)
+        return (buffer(flattened: allRigidBodies + allStragglers, device: device), rangesOfWork)
     }
 
     static func buffer(flattened: [RigidBody], device: MTLDevice) -> MTLBuffer {
@@ -174,24 +175,21 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
 final class UpdateCompositeBodies2Kernel: MetalKernel {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
-    let num: Int
+    let range: (Int, Int)
 
-    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodies: [RigidBody]) {
-        self.num = rigidBodies.count
-        self.rigidBodiesBuffer = UpdateCompositeBodiesKernel.buffer(flattened: rigidBodies, device: device)
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * num,
-            options: [isRunningTests ? .storageModeShared : .storageModePrivate])!
+    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, range: (Int, Int), compositeBodiesBuffer: MTLBuffer) {
+        self.rigidBodiesBuffer = rigidBodiesBuffer
+        self.compositeBodiesBuffer = compositeBodiesBuffer
+        self.range = range
         super.init(device: device, name: "updateCompositeBodies2")
     }
 
-    func run(cb: @escaping (MTLBuffer) -> ()) {
+    func run(cb: @escaping () -> ()) {
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        commandBuffer.addCompletedHandler{ [weak self] commandBuffer in
-            if let strongSelf = self {
-                cb(strongSelf.compositeBodiesBuffer)
-            }
+        commandBuffer.addCompletedHandler { commandBuffer in
+            cb()
         }
+        var (gridOrigin, threadsPerGridWidth) = range
 
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(computePipelineState)
@@ -200,11 +198,12 @@ final class UpdateCompositeBodies2Kernel: MetalKernel {
         commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
         commandEncoder.setThreadgroupMemoryLength(MemoryLayout<RigidBodyStruct>.stride * num, index: ThreadGroupIndex.rigidBodies.rawValue)
         commandEncoder.setThreadgroupMemoryLength(MemoryLayout<CompositeBodyStruct>.stride * num, index: ThreadGroupIndex.compositeBodies.rawValue)
+        commandEncoder.setBytes(&gridOrigin, length: MemoryLayout<Int>.size, index: BufferIndex.gridOrigin.rawValue)
 
         let width = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(width, 1, 1)
         let threadsPerGrid = MTLSize(
-            width: num,
+            width: threadsPerGridWidth,
             height: 1,
             depth: 1)
 
