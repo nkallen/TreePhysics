@@ -146,7 +146,7 @@ rigidBody_childRigidBodies(
                            RigidBodyStruct childRigidBodies[5])
 {
     for (size_t i = 0; i < rigidBody.childCount; i++) {
-        uint childGid = rigidBody.childGids[i];
+        uint childGid = rigidBody.childIds[i];
         childRigidBodies[i] = childRigidBodies[childGid];
     }
 }
@@ -159,8 +159,8 @@ rigidBody_childCompositeBodies(
                                CompositeBodyStruct childCompositeBodies[5])
 {
     for (size_t i = 0; i < rigidBody.childCount; i++) {
-        uint childGid = rigidBody.childGids[i];
-        childCompositeBodies[i] = compositeBodies[childGid];
+        uint childId = rigidBody.childIds[i];
+        childCompositeBodies[i] = compositeBodies[childId];
     }
 }
 
@@ -170,16 +170,8 @@ rigidBody_updateCompositeBody(
                               device RigidBodyStruct * rigidBodies,
                               device CompositeBodyStruct * compositeBodies)
 {
-    RigidBodyStruct childRigidBodies[5];
-    rigidBody_childRigidBodies(rigidBody, rigidBodies, childRigidBodies);
     CompositeBodyStruct childCompositeBodies[5];
-    for (size_t i = 0; i < rigidBody.childCount; i++) {
-        const RigidBodyStruct childRigidBody = childRigidBodies[i];
-        CompositeBodyStruct grandChildCompositeBodies[5];
-        rigidBody_childCompositeBodies(childRigidBody, compositeBodies, grandChildCompositeBodies);
-        CompositeBodyStruct childCompositeBody = rigidBody_updateCompositeBody(rigidBody, grandChildCompositeBodies);
-        childCompositeBodies[i] = childCompositeBody;
-    }
+    rigidBody_childCompositeBodies(rigidBody, compositeBodies, childCompositeBodies);
     return rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
 }
 
@@ -187,20 +179,22 @@ kernel void
 updateCompositeBodies(
                       device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
                       device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
+                      constant uint * gridOrigin [[ buffer(BufferIndexGridOrigin) ]],
                       uint gid [[ thread_position_in_grid ]])
 {
-    RigidBodyStruct rigidBody = rigidBodies[gid];
+    uint id = *gridOrigin + gid;
+    RigidBodyStruct rigidBody = rigidBodies[id];
     CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies);
-    compositeBodies[gid] = compositeBody;
+    compositeBodies[id] = compositeBody;
 
     // If this rigid body has a parent with only one child, we can process it immediately.
-    while (rigidBody.parentGid != -1) {
-        int gid = rigidBody.parentGid;
-        rigidBody = rigidBodies[gid];
+    while (rigidBody.parentId != -1) {
+        int parentId = rigidBody.parentId;
+        rigidBody = rigidBodies[parentId];
         if (rigidBody.childCount == 1) {
             CompositeBodyStruct childCompositeBodies[5] = {compositeBody};
             compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
-            compositeBodies[gid] = compositeBody;
+            compositeBodies[parentId] = compositeBody;
         } else {
             return;
         }

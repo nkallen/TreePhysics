@@ -72,13 +72,12 @@ class DiagonalizeKernel: MetalKernel {
 final class UpdateCompositeBodiesKernel: MetalKernel {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
-    var ranges: [Range<Int>] = []
+    let ranges: [(Int, Int)]
 
-    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBody: RigidBody) {
-        let flattened = Array(rigidBody.flattened.reversed())
-        let num = flattened.count
-        ranges.append(0..<1)
-        self.rigidBodiesBuffer = UpdateCompositeBodiesKernel.buffer(flattened: flattened, device: device)
+    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, root: RigidBody) {
+        let (rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        self.rigidBodiesBuffer = rigidBodiesBuffer
+        self.ranges = ranges
         self.compositeBodiesBuffer = device.makeBuffer(length: MemoryLayout<CompositeBodyStruct>.stride * num, options: [.storageModeShared])!
         super.init(device: device, name: "updateCompositeBodies")
     }
@@ -91,17 +90,19 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             }
         }
 
-        for range in ranges {
+        for (gridOrigin, threadsPerGrid) in ranges {
             let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
             commandEncoder.setComputePipelineState(computePipelineState)
             commandEncoder.label  = "Update Composite Bodies"
             commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
             commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
+            var gridOrigin = gridOrigin
+            commandEncoder.setBytes(&gridOrigin, length: MemoryLayout<Int>.size, index: BufferIndex.gridOrigin.rawValue)
 
             let width = computePipelineState.maxTotalThreadsPerThreadgroup
             let threadsPerThreadgroup = MTLSizeMake(width, 1, 1)
             let threadsPerGrid = MTLSize(
-                width: range.max()! + 1,
+                width: threadsPerGrid,
                 height: 1,
                 depth: 1)
 
@@ -113,8 +114,19 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         captureManager.stopCapture()
     }
 
+    private static func buffer(root: RigidBody, device: MTLDevice) -> (MTLBuffer, [(Int, Int)]) {
+        var allRigidBodies: [RigidBody] = []
+        var rangesOfWork: [(Int, Int)] = []
+        for (parallel, stragglers) in root.levels {
+            let range = (allRigidBodies.count * MemoryLayout<RigidBodyStruct>.stride, parallel.count)
+            allRigidBodies.append(contentsOf: parallel)
+            allRigidBodies.append(contentsOf: stragglers)
+            rangesOfWork.append(range)
+        }
+        return (buffer(flattened: allRigidBodies, device: device), rangesOfWork)
+    }
+
     private static func buffer(flattened: [RigidBody], device: MTLDevice) -> MTLBuffer {
-        let device = MTLCreateSystemDefaultDevice()!
         let buffer = device.makeBuffer(length: flattened.count * MemoryLayout<RigidBodyStruct>.stride, options: [.storageModeShared])!
         var index: [RigidBody:Int32] = [:]
         for (i, rigidBody) in flattened.enumerated() {
@@ -131,21 +143,21 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     typealias TupleType = (Int32, Int32, Int32, Int32, Int32)
 
     private static func `struct`(rigidBody: RigidBody, index: [RigidBody:Int32]) -> RigidBodyStruct {
-        let parentGid: Int32
+        let parentId: Int32
         if let parentJoint = rigidBody.parentJoint {
-            parentGid = index[parentJoint.parentRigidBody]!
+            parentId = index[parentJoint.parentRigidBody]!
         } else {
-            parentGid = -1
+            parentId = -1
         }
         let childRigidBodies = rigidBody.childJoints.map { $0.childRigidBody }
         let childRigidBodyIndices = childRigidBodies.map { index[$0] }
         assert(childRigidBodies.count < 5)
-        let childGids = UnsafeMutablePointer<TupleType>.allocate(capacity: 1)
-        memcpy(childGids, childRigidBodyIndices, childRigidBodyIndices.count)
+        let childIds = UnsafeMutablePointer<TupleType>.allocate(capacity: 1)
+        memcpy(childIds, childRigidBodyIndices, childRigidBodyIndices.count)
 
         let strct = RigidBodyStruct(
-            parentGid: parentGid,
-            childGids: childGids.pointee,
+            parentId: parentId,
+            childIds: childIds.pointee,
             childCount: uint(childRigidBodies.count),
             position: rigidBody.position,
             mass: rigidBody.mass,

@@ -3,24 +3,24 @@ import XCTest
 @testable import TreePhysics
 import SceneKit
 
-/**
- root
-  |
-  b1
- /  \
-b2  b3
-    |
-    b4
-    |
-    b5
-   / \
-  b6 b7
-     /\
-    b8 b9
- */
-
 class RigidBodyTests: XCTestCase {
-    func testLevels() {
+    func testLevelsSimple() {
+        let root = RigidBody()
+        let b1 = RigidBody()
+        let b2 = RigidBody()
+        root.add(b1)
+        b1.add(b2)
+
+        let expected: Levels = [
+            ([b2], [b1, root]),
+        ]
+        for ((level1, stragglers1), (level2, stragglers2)) in zip(expected, root.levels) {
+            XCTAssertEqual(level1, level2)
+            XCTAssertEqual(stragglers1, stragglers2)
+        }
+    }
+
+    func testLevelsComplex() {
         let root = RigidBody()
         let b1 = RigidBody()
         let b2 = RigidBody()
@@ -46,7 +46,31 @@ class RigidBodyTests: XCTestCase {
         b7.add(b8)
         b7.add(b9)
 
-        XCTAssertEqual([[b9, b8, b6, b2], [b7], [b5], [b1]],
-            root.levels)
+        let expected: Levels = [
+            ([b9, b8, b6, b2], []),
+            ([b7], []),
+            ([b5], [b4, b3]),
+            ([b1], [root])
+        ]
+        for ((level1, stragglers1), (level2, stragglers2)) in zip(expected, root.levels) {
+            XCTAssertEqual(level1, level2)
+            XCTAssertEqual(stragglers1, stragglers2)
+        }
     }
 }
+
+/**
+ root
+  |
+  b1
+ /  \
+b2  b3
+    |
+    b4
+    |
+    b5
+   / \
+  b6 b7
+     /\
+    b8 b9
+ */

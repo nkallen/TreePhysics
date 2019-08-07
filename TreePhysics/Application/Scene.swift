@@ -8,10 +8,9 @@ class Game: NSObject {
     let attractorField: AttractorField
     let attractor: SCNNode
     let parent: SCNNode
-    let foo: DiagonalizeKernel
+    let updateCompositeBodies: UpdateCompositeBodiesKernel
 
     override init() {
-        self.foo = DiagonalizeKernel()
         self.scene = SCNScene()
 
         let cameraNode = SCNNode()
@@ -36,7 +35,7 @@ class Game: NSObject {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
@@ -82,7 +81,6 @@ class Game: NSObject {
 
         let node = SCNNode(geometry: geometry)
         node.skinner = skinner
-        
 
         scene.rootNode.addChildNode(node)
         scene.rootNode.addChildNode(parent)
@@ -102,6 +100,8 @@ class Game: NSObject {
         self.gravityField = gravityField
         self.attractorField = attractorField
         self.attractor = attractor
+
+        self.updateCompositeBodies = UpdateCompositeBodiesKernel(root: root)
     }
 }
 
@@ -118,12 +118,5 @@ extension Game: SCNSceneRendererDelegate {
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
         simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
-
-        let matrix = float3x3(columns: (
-            float3(2,1,0),
-            float3(1,2,1),
-            float3(0,1,2)))
-
-        foo.run(matrix) { buffer in () }
     }
 }

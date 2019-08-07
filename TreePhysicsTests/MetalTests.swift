@@ -38,7 +38,7 @@ class MetalTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(rigidBody: root)
+        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(root: root)
         updateCompositeBodiesKernel.run() { buffer in
             let compositeBodies = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]

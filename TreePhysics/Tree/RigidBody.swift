@@ -121,30 +121,46 @@ final class RigidBody: HasTransform {
 
 // MARK: Flattening
 
+typealias Levels = [([RigidBody], [RigidBody])]
+
 extension RigidBody {
-    var levels: [[RigidBody]] {
-        var result: [[RigidBody]] = []
+    var hasOneChild: Bool {
+        return childJoints.count == 1
+    }
+
+    var parentRigidBody: RigidBody? {
+        return parentJoint?.parentRigidBody
+    }
+
+    var levels: Levels {
+        var result: [([RigidBody], [RigidBody])] = []
         var visited: Set<RigidBody> = []
 
         var remaining = self.leaves
         repeat {
             var level: [RigidBody] = []
+            var stragglers: [RigidBody] = []
+            var nextRemaining: [RigidBody] = []
             while var n = remaining.popLast() {
-                while let parentJoint = n.parentJoint, n.childJoints.count == 1 {
-                    visited.insert(n)
-                    n = parentJoint.parentRigidBody
-                }
-                if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody) }) &&
-                    !visited.contains(n) &&
-                    !n.isRoot {
+                if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody) }) && !visited.contains(n) {
                     level.append(n)
+                    while let parentRigidBody = n.parentRigidBody, parentRigidBody.hasOneChild {
+                        n = parentRigidBody
+                        if !visited.contains(n) {
+                            visited.insert(n)
+                            stragglers.append(n)
+                        }
+                    }
+                    if let parentJoint = n.parentJoint {
+                        nextRemaining.append(parentJoint.parentRigidBody)
+                    }
                 }
             }
             if !level.isEmpty {
-                result.append(level)
+                result.append((level, stragglers))
             }
             visited = visited.union(level)
-            remaining = Array(Set(level.compactMap { $0.parentJoint?.parentRigidBody }))
+            remaining = Array(Set(nextRemaining))
         } while !remaining.isEmpty
         return result
     }

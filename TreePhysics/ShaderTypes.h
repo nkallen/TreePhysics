@@ -14,6 +14,7 @@ typedef NS_ENUM(NSInteger, BufferIndex)
 {
     BufferIndexRigidBodies = 0,
     BufferIndexCompositeBodies  = 1,
+    BufferIndexGridOrigin = 2,
 };
 
 typedef NS_ENUM(NSInteger, ThreadGroupIndex)
@@ -33,8 +34,8 @@ typedef struct {
 } CompositeBodyStruct;
 
 typedef struct {
-    int parentGid;
-    int childGids[5];
+    int parentId;
+    int childIds[5];
     uint childCount;
     vector_float3 position;
     float mass;
