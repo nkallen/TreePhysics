@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1B22E4F4A700229235 /* TurtleTests.swift */; };
 		9E036B1F22E4F58600229235 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
+		9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E27B86022FA39920030664E /* RigidBodyTests.swift */; };
 		9E3351C122F83DDF00FDC3D6 /* MetalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */; };
 		9E461B3322E5E025008AB788 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
 		9E461B3522E7017F008AB788 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
@@ -80,6 +81,7 @@
 /* Begin PBXFileReference section */
 		9E036B1B22E4F4A700229235 /* TurtleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurtleTests.swift; sourceTree = "<group>"; };
 		9E036B1E22E4F58600229235 /* Turtle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turtle.swift; sourceTree = "<group>"; };
+		9E27B86022FA39920030664E /* RigidBodyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBodyTests.swift; sourceTree = "<group>"; };
 		9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalTests.swift; sourceTree = "<group>"; };
 		9E3351C222F8417000FDC3D6 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		9E461B3222E5E025008AB788 /* Pen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pen.swift; sourceTree = "<group>"; };
@@ -263,6 +265,7 @@
 				9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */,
 				9EEC11DF22EA23000078BBFD /* MathTests.swift */,
 				9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */,
+				9E27B86022FA39920030664E /* RigidBodyTests.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -472,6 +475,7 @@
 				9EEC11E022EA23000078BBFD /* MathTests.swift in Sources */,
 				9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */,
 				9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */,
+				9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

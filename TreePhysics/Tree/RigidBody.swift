@@ -122,6 +122,37 @@ final class RigidBody: HasTransform {
 // MARK: Flattening
 
 extension RigidBody {
+    var levels: [[RigidBody]] {
+        var result: [[RigidBody]] = []
+        var visited: Set<RigidBody> = []
+
+        var remaining = self.leaves
+        repeat {
+            var level: [RigidBody] = []
+            while var n = remaining.popLast() {
+                while let parentJoint = n.parentJoint, n.childJoints.count == 1 {
+                    visited.insert(n)
+                    n = parentJoint.parentRigidBody
+                }
+                if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody) }) &&
+                    !visited.contains(n) &&
+                    !n.isRoot {
+                    level.append(n)
+                }
+            }
+            if !level.isEmpty {
+                result.append(level)
+            }
+            visited = visited.union(level)
+            remaining = Array(Set(level.compactMap { $0.parentJoint?.parentRigidBody }))
+        } while !remaining.isEmpty
+        return result
+    }
+
+    var isRoot: Bool {
+        return parentJoint == nil
+    }
+
     var flattened: [RigidBody] {
         var result: [RigidBody] = []
         var queue: [RigidBody] = [self]
@@ -169,3 +200,10 @@ extension RigidBody: Equatable, Hashable {
     }
 }
 
+extension RigidBody: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return name
+    }
+
+
+}
