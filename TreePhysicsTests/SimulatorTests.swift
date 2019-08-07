@@ -35,8 +35,6 @@ class SimulatorTests: XCTestCase {
         XCTAssertEqual(start.inertiaTensor, float3x3([[0.3333, 0, 0], [0, 0.5, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
         XCTAssertEqual(stop.inertiaTensor, float3x3([[0.3333, 0, 0], [0, 0.5, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
 
-        print(start.composite.inertiaTensor)
-
         XCTAssertEqual(stop.composite.inertiaTensor, float3x3([[0.3333, 0, 0], [0, 0.5, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
         XCTAssertEqual(start.composite.inertiaTensor, float3x3([[1.1666667, 0, 0], [0, 1, 0], [0, 0, 1.1666667]]), accuracy: 0.0001)
 
@@ -49,8 +47,6 @@ class SimulatorTests: XCTestCase {
         XCTAssertEqual((rotation_world2local_stop * stop.composite.inertiaTensor * rotation_world2local_stop.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
         XCTAssertEqual((rotation_world2local_start * start.composite.inertiaTensor * rotation_world2local_start.transpose * float3(0,0,1)).z,
                        Float(1.0/12 * 2 * 2*2 + 1.0/4 * 2 * 1*1), accuracy: 0.0001)
-
-        print(rotation_world2local_start * start.composite.inertiaTensor * rotation_world2local_start.transpose , Float((1.0/12 + 1.0/4) * 2.0))
     }
 
     func testTransform() {

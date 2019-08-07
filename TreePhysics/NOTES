@@ -1,7 +1,54 @@
 
-(0, __C.RigidBodyStruct(parentGid: 1, childGids: (0, 0, 272634087, 1073741824, 2), childCount: 0, mass: 1.0, length: 1.0, radius: 1.0, inertiaTensor: simd_float3x3([[0.5, 1.4901161e-08, 0.0], [1.4901161e-08, 0.33333334, 0.0], [0.0, 0.0, 0.33333334]]), position: SIMD3<Float>(0.70710677, 1.7071068, 0.0), force: SIMD3<Float>(0.0, 1.0, 0.0), torque: SIMD3<Float>(0.0, 0.0, 1.0), centerOfMass: SIMD3<Float>(1.2071068, 1.7071068, 0.0)))
-(1, __C.RigidBodyStruct(parentGid: 2, childGids: (0, 0, 272630055, 1879048192, 1650786306), childCount: 1, mass: 1.0, length: 1.0, radius: 1.0, inertiaTensor: simd_float3x3([[0.4166667, 0.08333333, 0.0], [0.08333333, 0.4166667, 0.0], [0.0, 0.0, 0.33333334]]), position: SIMD3<Float>(0.0, 1.0, 0.0), force: SIMD3<Float>(0.0, 0.0, 0.0), torque: SIMD3<Float>(0.0, 0.0, 0.0), centerOfMass: SIMD3<Float>(0.35355338, 1.3535534, 0.0)))
-(2, __C.RigidBodyStruct(parentGid: -1, childGids: (1, 0, 0, 0, 3), childCount: 1, mass: 1.0, length: 1.0, radius: 1.0, inertiaTensor: simd_float3x3([[0.33333334, 0.0, 0.0], [0.0, 0.5, 0.0], [0.0, 0.0, 0.33333334]]), position: SIMD3<Float>(0.0, 0.0, 0.0), force: SIMD3<Float>(0.0, 0.0, 0.0), torque: SIMD3<Float>(0.0, 0.0, 0.0), centerOfMass: SIMD3<Float>(0.0, 0.5, 0.0)))
+kernel void
+updateCompositeBodies2(
+device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
+device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
+threadgroup CompositeBodyStruct * compositeBodiesCache [[ threadgroup(ThreadGroupIndexCompositeBodies) ]],
+threadgroup RigidBodyStruct * rigidBodiesCache [[ threadgroup(ThreadGroupIndexRigidBodies) ]],
+constant uint * gridOrigin [[ buffer(BufferIndexGridOrigin) ]],
+uint gid [[ thread_position_in_grid ]],
+uint lid [[thread_position_in_threadgroup]],
+uint lsize [[threads_per_threadgroup]],
+uint gsize [[threads_per_grid]])
+{
+threadgroup atomic_uint compositeBodiesDoneByThreadGroup;
 
+uint id = *gridOrigin + gid;
+uint minIdInThreadGroup = id - lid;
 
+RigidBodyStruct rigidBody = rigidBodies[id];
+
+CompositeBodyStruct childCompositeBodies[5];
+int missing = rigidBody_childCompositeBodies(rigidBody, compositeBodies, minIdInThreadGroup, childCompositeBodies);
+
+if (missing == 0) {
+CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
+compositeBodies[id] = compositeBody;
+atomic_fetch_or_explicit(&compositeBodiesDoneByThreadGroup, 1 << lid, memory_order_relaxed);
+
+if (rigidBody.parentId >= (int)minIdInThreadGroup) {
+compositeBodiesCache[lid] = compositeBody;
+}
+} else {
+atomic_fetch_and_explicit(&compositeBodiesDoneByThreadGroup, ~0 ^ (1 << lid), memory_order_relaxed);
+rigidBodiesCache[lid] = rigidBody;
+}
+threadgroup_barrier(mem_flags::mem_threadgroup);
+thread uint compositeBodiesDoneThread = atomic_load_explicit(&compositeBodiesDoneByThreadGroup, memory_order_relaxed);
+
+if (lid == 0) {
+for (uint lid = 0; lid < lsize; lid++) {
+if (!(compositeBodiesDoneThread & (1 << lid))) {
+RigidBodyStruct rigidBody = rigidBodiesCache[lid];
+CompositeBodyStruct childCompositeBodies[5];
+rigidBody_childCompositeBodies(rigidBody, compositeBodies, minIdInThreadGroup, compositeBodiesCache, childCompositeBodies);
+CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
+compositeBodies[id] = compositeBody;
+if (rigidBody.parentId >= (int)minIdInThreadGroup) {
+compositeBodiesCache[lid] = compositeBody;
+}
+}
+}
+}
+}
 

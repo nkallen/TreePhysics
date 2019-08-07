@@ -35,7 +35,7 @@ class Game: NSObject {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
@@ -118,5 +118,8 @@ extension Game: SCNSceneRendererDelegate {
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
         simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
+        updateCompositeBodies.run { _ in
+            print("done")
+        }
     }
 }

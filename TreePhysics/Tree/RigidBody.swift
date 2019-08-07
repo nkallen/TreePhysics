@@ -35,7 +35,6 @@ final class RigidBody: HasTransform {
     init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
         self.name = "Branch[\(i)]"
         i += 1
-        print(self.name)
 
         self.kind = kind
 
@@ -106,11 +105,6 @@ final class RigidBody: HasTransform {
         self.inertiaTensor = rotation * inertiaTensor_local * rotation.transpose
 
         if kind != .static {
-//            print("====")
-//            print("local:   ", (inertiaTensor_local).eigen_ql!)
-//            print("global:", (self.inertiaTensor).eigen_ql!)
-//            print("inverted:", (rotation.inverse * inertiaTensor * rotation).eigen_ql!)
-//            print("<<<<")
             assert(inertiaTensor.isPositiveDefinite)
         }
 
