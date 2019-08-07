@@ -218,17 +218,7 @@ rigidBody_climb(RigidBodyStruct rigidBody,
                 device RigidBodyStruct * rigidBodies,
                 device CompositeBodyStruct * compositeBodies)
 {
-    while (rigidBody.parentId != -1) {
-        int parentId = rigidBody.parentId;
-        rigidBody = rigidBodies[parentId];
-        if (rigidBody.childCount == 1) {
-            CompositeBodyStruct childCompositeBodies[5] = {compositeBody};
-            compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
-            compositeBodies[parentId] = compositeBody;
-        } else {
-            return;
-        }
-    }
+
 }
 
 kernel void
@@ -244,7 +234,17 @@ updateCompositeBodies(
     compositeBodies[id] = compositeBody;
 
     // If this rigid body has a parent with only one child, we can process it immediately.
-    rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
+    while (rigidBody.parentId != -1) {
+        int parentId = rigidBody.parentId;
+        rigidBody = rigidBodies[parentId];
+        if (rigidBody.childCount == 1) {
+            CompositeBodyStruct childCompositeBodies[5] = {compositeBody};
+            compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
+            compositeBodies[parentId] = compositeBody;
+        } else {
+            return;
+        }
+    }
 }
 
 kernel void
@@ -281,11 +281,13 @@ updateCompositeBodies2(
         atomic_fetch_and_explicit(&compositeBodiesDoneByThreadGroup, ~0 ^ (1 << lid), memory_order_relaxed);
         rigidBodiesCache[lid] = rigidBody;
     }
+
     threadgroup_barrier(mem_flags::mem_threadgroup);
     thread uint compositeBodiesDoneThread = atomic_load_explicit(&compositeBodiesDoneByThreadGroup, memory_order_relaxed);
 
     if (lid == 0) {
         for (uint lid = 0; lid < lsize; lid++) {
+            id = *gridOrigin + minIdInThreadGroup + lid;
             if (!(compositeBodiesDoneThread & (1 << lid))) {
                 RigidBodyStruct rigidBody = rigidBodiesCache[lid];
                 CompositeBodyStruct childCompositeBodies[5];

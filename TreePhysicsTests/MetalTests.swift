@@ -3,28 +3,6 @@ import XCTest
 @testable import TreePhysics
 import MetalKit
 
-
-class MetalTests: XCTestCase {
-    var diagonalizeKernel: DiagonalizeKernel!
-
-    func testDiagonalize() {
-        self.diagonalizeKernel = DiagonalizeKernel()
-        let matrix = float3x3(columns: (
-            float3(2,1,0),
-            float3(1,2,1),
-            float3(0,1,2)))
-
-        let expectation = XCTestExpectation(description: "wait")
-        diagonalizeKernel.run(matrix) { buffer in
-            let eigenvalues = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: float3.self, capacity: 1024)
-            XCTAssertEqual(
-                float3(2 + sqrt(2), 2, 2 - sqrt(2.0)),
-                eigenvalues[0], accuracy: 0.0001)
-            expectation.fulfill()
-        }
-    }
-}
-
 class UpdateCompositeBodiesKernelTests: XCTestCase {
     var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
 
@@ -89,7 +67,7 @@ class UpdateCompositeBodiesKernel2Tests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodies2Kernel(rigidBodies: [b1, b2, root])
+        self.updateCompositeBodiesKernel = UpdateCompositeBodies2Kernel(rigidBodies: [b2, b1, root])
 
         let expect = expectation(description: "wait")
 
@@ -126,4 +104,25 @@ class UpdateCompositeBodiesKernel2Tests: XCTestCase {
         waitForExpectations(timeout: 10, handler: {error in})
     }
 
+}
+
+class MetalTests: XCTestCase {
+    var diagonalizeKernel: DiagonalizeKernel!
+
+    func testDiagonalize() {
+        self.diagonalizeKernel = DiagonalizeKernel()
+        let matrix = float3x3(columns: (
+            float3(2,1,0),
+            float3(1,2,1),
+            float3(0,1,2)))
+
+        let expectation = XCTestExpectation(description: "wait")
+        diagonalizeKernel.run(matrix) { buffer in
+            let eigenvalues = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: float3.self, capacity: 1024)
+            XCTAssertEqual(
+                float3(2 + sqrt(2), 2, 2 - sqrt(2.0)),
+                eigenvalues[0], accuracy: 0.0001)
+            expectation.fulfill()
+        }
+    }
 }

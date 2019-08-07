@@ -73,7 +73,9 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         let (rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.ranges = ranges
-        self.compositeBodiesBuffer = device.makeBuffer(length: MemoryLayout<CompositeBodyStruct>.stride * num, options: [.storageModePrivate])!
+        self.compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * num,
+            options: [isRunningTests ? .storageModeShared : .storageModePrivate])!
         super.init(device: device, name: "updateCompositeBodies")
     }
 
@@ -134,6 +136,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         for (i, rigidBody) in flattened.enumerated() {
             rigidBodyStructs[i] = `struct`(rigidBody: rigidBody, index: index)
         }
+        print(index)
         return buffer
     }
 
@@ -176,7 +179,9 @@ final class UpdateCompositeBodies2Kernel: MetalKernel {
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodies: [RigidBody]) {
         self.num = rigidBodies.count
         self.rigidBodiesBuffer = UpdateCompositeBodiesKernel.buffer(flattened: rigidBodies, device: device)
-        self.compositeBodiesBuffer = device.makeBuffer(length: MemoryLayout<CompositeBodyStruct>.stride * num, options: [.storageModePrivate])!
+        self.compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * num,
+            options: [isRunningTests ? .storageModeShared : .storageModePrivate])!
         super.init(device: device, name: "updateCompositeBodies2")
     }
 
