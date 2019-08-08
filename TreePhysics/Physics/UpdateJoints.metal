@@ -38,7 +38,10 @@ updateJoint(
             JointStruct joint,
             RigidBodyStruct parentRigidBody,
             CompositeBodyStruct childCompositeBody,
-            float time)
+            float time,
+            device float3x3 * debugFloat3x3s,
+            device float * debugFloats
+            )
 {
     float3 pr = joint_rotateVector(joint, parentRigidBody, childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody));
 
@@ -58,13 +61,17 @@ updateJoint(
         // i.e., produce the generalized eigendecomposition of I and K
 
         // 1.a. the cholesky decomposition of I
+//        debugFloat3x3s[0] = inertiaTensor_jointSpace;
+
+//        debugFloats[0] = (float)parentRigidBody.parentId;
         float3x3 L = cholesky(inertiaTensor_jointSpace);
+//        debugFloats[1] = -(float)parentRigidBody.parentId;
         float3x3 L_inverse = inverse(L);
         float3x3 L_transpose_inverse = inverse(transpose(L));
 
         // 1.b. the generalized eigenvalue problem A * X = X * Λ
         // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
-        float3x3 A = L_inverse * (joint.k * float3x3(1)) * L_transpose_inverse; // FIXME
+        float3x3 A = L_inverse * (joint.k * float3x3(1)) * L_transpose_inverse;
         float4 q = diagonalize(A);
         float3x3 Λ_M = transpose(qmat(q)) * A * qmat(q);
         float3 Λ = float3(Λ_M[0][0], Λ_M[1][1], Λ_M[2][2]);
@@ -91,7 +98,7 @@ updateJoint(
 
         float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
-        joint.θ = U * θ_diagonal;
+        joint.θ = float3x3(half3x3(U) * half3x3(θ_diagonal));
     }
     return joint;
 }
@@ -101,14 +108,29 @@ updateJoints(
              device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
              device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
              device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
+
+             device RigidBodyStruct * debugRigidBodies [[ buffer(BufferIndexDebugRigidBody) ]],
+             device CompositeBodyStruct * debugCompositeBodies [[ buffer(BufferIndexDebugCompositeBody) ]],
+             device float * debugFloats [[ buffer(BufferIndexDebugFloat) ]],
+             device float3 * debugFloat3s [[ buffer(BufferIndexDebugFloat3) ]],
+             device float3x3 * debugfloat3x3s [[ buffer(BufferIndexDebugFloat3x3) ]],
+
              constant float * time [[ buffer(BufferIndexTime) ]],
              uint gid [[ thread_position_in_grid ]])
 {
     JointStruct joint = joints[gid];
     RigidBodyStruct rigidBody = rigidBodies[gid];
-    RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
-    CompositeBodyStruct compositeBody = compositeBodies[gid];
 
-    joint = updateJoint(joint, parentRigidBody, compositeBody, *time);
-    joints[gid] = joint;
+    if (rigidBody.parentId != -1) {
+        RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
+        CompositeBodyStruct compositeBody = compositeBodies[gid];
+
+//        debugRigidBodies[0] = rigidBody;
+//        debugRigidBodies[1] = parentRigidBody;
+//        debugCompositeBodies[0] = compositeBody;
+
+        joint = updateJoint(joint, parentRigidBody, compositeBody, *time,
+                            debugfloat3x3s, debugFloats);
+        joints[gid] = joint;
+    }
 }

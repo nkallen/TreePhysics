@@ -14,9 +14,9 @@ class MathTests: XCTestCase {
                 float3(4,12,-16),
                 float3(12,37,-43),
                 float3(-16,-43,98)
-            )).cholesky)
+            )).cholesky2)
     }
-
+    
     func testEigenvaluesAnalytical() {
         let matrix = float3x3(columns: (
             float3(2,1,0),

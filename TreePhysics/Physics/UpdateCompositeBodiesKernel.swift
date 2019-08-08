@@ -49,6 +49,10 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             allStragglers.append(contentsOf: stragglers)
             rangesOfWork.append(range)
         }
+
+        // Remove the root:
+        _ = rangesOfWork.popLast()
+
         let all = allRigidBodies + allStragglers
         return (all.count, buffer(flattened: all, device: device), rangesOfWork)
     }

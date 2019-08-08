@@ -18,6 +18,11 @@ typedef NS_ENUM(NSInteger, BufferIndex)
     BufferIndexGridOrigin = 2,
     BufferIndexJoints = 3,
     BufferIndexTime = 4,
+    BufferIndexDebugRigidBody = 5,
+    BufferIndexDebugCompositeBody = 6,
+    BufferIndexDebugFloat = 7,
+    BufferIndexDebugFloat3 = 8,
+    BufferIndexDebugFloat3x3 = 9,
 };
 
 typedef NS_ENUM(NSInteger, ThreadGroupIndex)

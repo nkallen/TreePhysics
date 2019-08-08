@@ -56,10 +56,15 @@ diagonalize(float3x3 A)
         float3 offdiag(D[1][2], D[0][2], D[0][1]); // elements not on the diagonal
         float3 om(fabs(offdiag.x), fabs(offdiag.y), fabs(offdiag.z)); // mag of each offdiag elem
         int k = (om.x>om.y && om.x>om.z) ? 0 : (om.y>om.z) ? 1 : 2; // index of largest element of offdiag
-        int k1 = (k + 1) % 3;
-        int k2 = (k + 2) % 3;
+        float thet;
+        if (om.x>om.y && om.x>om.z) {
+            thet = (D[2][2] - D[1][1]) / (2.0f*offdiag[0]);
+        } else if (om.y>om.z) {
+            thet = (D[0][0] - D[2][2]) / (2.0f*offdiag[1]);
+        } else {
+            thet = (D[1][1] - D[0][0]) / (2.0f*offdiag[2]);
+        }
         if (offdiag[k] == 0.0f) break;  // diagonal already
-        float thet = (D[k2][k2] - D[k1][k1]) / (2.0f*offdiag[k]);
         float sgn = sign(thet);
         thet *= sgn; // make it positive
         float t = sgn / (thet + ((thet<1.E6f) ? sqrt(thet*thet + 1.0f) : thet)); // sign(T)/(|T|+sqrt(T^2+1))
@@ -86,6 +91,11 @@ diagonalize(float3x3 A)
 }
 
 // MARK: General
+
+inline float
+sqr(float a) {
+    return a * a;
+}
 
 inline float3x3
 sqr(float3x3 A)
@@ -122,15 +132,27 @@ inline float3x3
 cholesky(float3x3 A)
 {
     float3x3 L = float3x3(0);
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j <= i; j++) {
-            float s = 0;
-            for (int k = 0; k < j; k++)
-                s += L[k][i] * L[k][j];
-            L[j][i] = (i == j) ?
-            sqrt(A[i][i] - s) :
-            (1.0 / L[j][j] * (A[j][i] - s));
-        }
+
+    // Load A into registers
+
+    float a00 = A[0][0];
+    float a01 = A[0][1], a11 = A[1][1];
+    float a02 = A[0][2], a12 = A[1][2], a22 = A[2][2];
+
+    // Factorize A
+    float l00 = sqrt(a00);
+    float l01 = a01/l00;
+    float l02 = a02/l00;
+
+    float l11 = sqrt(a11 - sqr(l01));
+    float l12 = (a12 - l02 * l01) / l11;
+
+    float l22 = sqrt(a22 - sqr(l02) - sqr(l12));
+
+    // Store L into memory
+    L[0][0] = l00;
+    L[0][1] = l01; L[1][1] = l11;
+    L[0][2] = l02; L[1][2] = l12; L[2][2] = l22;
 
     return L;
 }

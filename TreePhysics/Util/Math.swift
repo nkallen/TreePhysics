@@ -315,24 +315,31 @@ extension matrix_float3x3 {
         ))
     }
 
+    // unrolled: cf https://hal.archives-ouvertes.fr/hal-01550129/document
     var cholesky: float3x3 {
         var result = matrix_float3x3(0)
-        for i in 0..<3 {
-            for j in 0...i {
-                var sum: Float = 0
-                if j == i {
-                    for k in 0..<j {
-                        sum += powf(result[k, j], 2)
-                    }
-                    result[j, j] = sqrt(self[j, j] - sum)
-                } else {
-                    for k in 0..<j {
-                        sum += result[k, i] * result[k, j]
-                    }
-                    result[j, i] = (self[j, i] - sum) / result[j, j]
-                }
-            }
-        }
+
+        // Load A into registers
+
+        let a00 = self[0, 0]
+        let a01 = self[0, 1], a11 = self[1, 1]
+        let a02 = self[0, 2], a12 = self[1, 2], a22 = self[2, 2]
+
+        // Factorize A
+        let l00 = sqrt(a00)
+        let l01 = a01/l00
+        let l02 = a02/l00
+
+        let l11 = sqrt(a11 - sqr(l01))
+        let l12 = (a12 - l02 * l01) / l11
+
+        let l22 = sqrt(a22 - sqr(l02) - sqr(l12))
+
+        // Store L into memory
+        result[0, 0] = l00
+        result[0, 1] = l01; result[1, 1] = l11
+        result[0, 2] = l02; result[1, 2] = l12; result[2, 2] = l22
+
         return result
     }
 

@@ -113,8 +113,8 @@ class Game: NSObject {
             options: [.storageModePrivate])!
         self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
 
-        let (numJoints, jointsBuffer) = UpdateJointsKernel.buffer(root: root, device: device)
-        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: numJoints)
+        let jointsBuffer = UpdateJointsKernel.buffer(count: count, device: device)
+        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: count)
     }
 }
 
@@ -129,12 +129,12 @@ extension Game: SCNSceneRendererDelegate {
             1,
             radius * cosf(Float(start.timeIntervalSinceNow)))
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
-        simulator.update(at: 1.0 / 60)
+        // simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
-//        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         commandBuffer.addCompletedHandler { _ in
             print("done")
         }
