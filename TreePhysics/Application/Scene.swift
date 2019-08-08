@@ -8,7 +8,7 @@ class Game: NSObject {
     let attractorField: AttractorField
     let attractor: SCNNode
     let parent: SCNNode
-    let updateCompositeBodies: UpdateCompositeBodiesInParallelKernel
+    let updateCompositeBodies: UpdateCompositeBodiesKernel
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
 
@@ -110,7 +110,7 @@ class Game: NSObject {
         let compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
             options: [.storageModePrivate])!
-        self.updateCompositeBodies = UpdateCompositeBodiesInParallelKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
     }
 }
 

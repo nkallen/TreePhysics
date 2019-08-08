@@ -66,6 +66,9 @@
 		9EE7EBCA22E0F27900535997 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9EE7EBCC22E1078200535997 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBCB22E1078200535997 /* NOTES */; };
 		9EE801A222FC44AC00198166 /* TestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A122FC44AC00198166 /* TestHelper.swift */; };
+		9EE801A422FC450D00198166 /* UpdateJoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJoints.swift */; };
+		9EE801A722FC459000198166 /* MetalKernal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernal.swift */; };
+		9EE801A822FC459100198166 /* MetalKernal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernal.swift */; };
 		9EEC11E022EA23000078BBFD /* MathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11DF22EA23000078BBFD /* MathTests.swift */; };
 		9EEC11E222EA50920078BBFD /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
 /* End PBXBuildFile section */
@@ -124,6 +127,8 @@
 		9EE7EBC922E0F27900535997 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		9EE7EBCB22E1078200535997 /* NOTES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTES; sourceTree = "<group>"; };
 		9EE801A122FC44AC00198166 /* TestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelper.swift; sourceTree = "<group>"; };
+		9EE801A322FC450D00198166 /* UpdateJoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateJoints.swift; sourceTree = "<group>"; };
+		9EE801A522FC451E00198166 /* MetalKernal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalKernal.swift; sourceTree = "<group>"; };
 		9EEC11DF22EA23000078BBFD /* MathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTests.swift; sourceTree = "<group>"; };
 		9EEC11E122EA50920078BBFD /* Diagonalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diagonalization.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -180,8 +185,11 @@
 		9E9D4B6422F313BD007DCF49 /* Physics */ = {
 			isa = PBXGroup;
 			children = (
+				9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */,
 				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
 				9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */,
+				9EE801A322FC450D00198166 /* UpdateJoints.swift */,
+				9EE801A522FC451E00198166 /* MetalKernal.swift */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -252,7 +260,6 @@
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
 				9EE7EBA722DDDC6E00535997 /* Assets.xcassets */,
-				9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -427,6 +434,7 @@
 				9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */,
 				9E9D4B7322F37244007DCF49 /* Diagonalization.swift in Sources */,
 				9E9D4B7422F37244007DCF49 /* Joint.swift in Sources */,
+				9EE801A722FC459000198166 /* MetalKernal.swift in Sources */,
 				9E9D4B7522F37244007DCF49 /* Simulator.swift in Sources */,
 				9E9D4B9722F43D43007DCF49 /* GameViewController.swift in Sources */,
 				9E9D4B7622F37244007DCF49 /* RigidBodyPen.swift in Sources */,
@@ -455,6 +463,7 @@
 				9E56C94522E78FCF0095C8AC /* Joint.swift in Sources */,
 				9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */,
 				9E56C94B22E792820095C8AC /* RigidBodyPen.swift in Sources */,
+				9EE801A822FC459100198166 /* MetalKernal.swift in Sources */,
 				9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */,
 				9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */,
 				9EE7250022F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift in Sources */,
@@ -482,6 +491,7 @@
 				9EE801A222FC44AC00198166 /* TestHelper.swift in Sources */,
 				9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */,
 				9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */,
+				9EE801A422FC450D00198166 /* UpdateJoints.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
