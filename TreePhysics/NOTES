@@ -1,54 +1,73 @@
+For updatecompositebodyies:
 
-kernel void
-updateCompositeBodies2(
-device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
-device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
-threadgroup CompositeBodyStruct * compositeBodiesCache [[ threadgroup(ThreadGroupIndexCompositeBodies) ]],
-threadgroup RigidBodyStruct * rigidBodiesCache [[ threadgroup(ThreadGroupIndexRigidBodies) ]],
-constant uint * gridOrigin [[ buffer(BufferIndexGridOrigin) ]],
-uint gid [[ thread_position_in_grid ]],
-uint lid [[thread_position_in_threadgroup]],
-uint lsize [[threads_per_threadgroup]],
-uint gsize [[threads_per_grid]])
-{
-threadgroup atomic_uint compositeBodiesDoneByThreadGroup;
+suppose we have a tree:
 
-uint id = *gridOrigin + gid;
-uint minIdInThreadGroup = id - lid;
+0
+  1
+  2
+    4
+    5
+    6
+  3
+    7
+    8
 
-RigidBodyStruct rigidBody = rigidBodies[id];
+we can use level order, organizing into quads:
 
-CompositeBodyStruct childCompositeBodies[5];
-int missing = rigidBody_childCompositeBodies(rigidBody, compositeBodies, minIdInThreadGroup, childCompositeBodies);
+[4 5 6 x | 7 8 x x | ... ]
+[1 2 3 x]
 
-if (missing == 0) {
-CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
-compositeBodies[id] = compositeBody;
-atomic_fetch_or_explicit(&compositeBodiesDoneByThreadGroup, 1 << lid, memory_order_relaxed);
+that implies at every level we do children and the parent:
 
-if (rigidBody.parentId >= (int)minIdInThreadGroup) {
-compositeBodiesCache[lid] = compositeBody;
-}
-} else {
-atomic_fetch_and_explicit(&compositeBodiesDoneByThreadGroup, ~0 ^ (1 << lid), memory_order_relaxed);
-rigidBodiesCache[lid] = rigidBody;
-}
-threadgroup_barrier(mem_flags::mem_threadgroup);
-thread uint compositeBodiesDoneThread = atomic_load_explicit(&compositeBodiesDoneByThreadGroup, memory_order_relaxed);
+[4 5 6 x] -> no children, so process:
+[4 -> 1, 5, 6, x] -> 5, 6, and x become inactive, and 4 shuffles the other values and then does the work.
 
-if (lid == 0) {
-for (uint lid = 0; lid < lsize; lid++) {
-if (!(compositeBodiesDoneThread & (1 << lid))) {
-RigidBodyStruct rigidBody = rigidBodiesCache[lid];
-CompositeBodyStruct childCompositeBodies[5];
-rigidBody_childCompositeBodies(rigidBody, compositeBodies, minIdInThreadGroup, compositeBodiesCache, childCompositeBodies);
-CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
-compositeBodies[id] = compositeBody;
-if (rigidBody.parentId >= (int)minIdInThreadGroup) {
-compositeBodiesCache[lid] = compositeBody;
-}
-}
-}
-}
-}
+In general, for each quad: Load 4*4 children, compute*4, store 4, shuffle down and compute*1, store
+
+iteration 1:
+
+[4 5 6 x | 7 8 x x | ... ]
+
+basically this is an optimization to process two levels at a time; but potentially multiplying the number of threads by 4.
+
+In the above case we save five reads, in this case:
+
+0
+  1
+  2
+    4
+      9
+      10
+    5
+      11
+    6
+  3
+    7
+    8
+      12
+
+Original:
+
+[9 10 x x | 11 x x x | 12 x x x] 0 reads, 4 writes
+[4 5  6 x | 7  8 x x] 4 reads, 5 writes
+[1 2  3 x ] 5 reads, 3 writes
+
+total: 9 reads, 12 writes
+
+New:
+
+[9 10 x x | 11 x x x | x x x x | x x x x | 12 x x x] 0 reads, 4 + 5 writes
+[1 2  3 x ] 5 reads, 3 writes
+
+5 reads, 12 writes
+
+In general, we remove 50% of reads
+
+In general, for a tree like:
+
+1 4 4^2 4^3 4^4 4^5 4^6
+
+There should be 4^6 + 4^5 + 4^4 + 4^3 + 4^2 = 5456 reads
+
+Whereas for the optimizatio we expect: 4^5 + 4^3 = 1088
 

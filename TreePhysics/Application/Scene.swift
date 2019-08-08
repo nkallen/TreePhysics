@@ -8,7 +8,7 @@ class Game: NSObject {
     let attractorField: AttractorField
     let attractor: SCNNode
     let parent: SCNNode
-    let updateCompositeBodies: UpdateCompositeBodiesKernel
+    let updateCompositeBodies: UpdateCompositeBodiesInParallelKernel
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
 
@@ -40,7 +40,7 @@ class Game: NSObject {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 6)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
@@ -106,7 +106,11 @@ class Game: NSObject {
         self.attractor = attractor
 
         self.commandQueue = device.makeCommandQueue()!
-        self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, root: root)
+        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root)
+        let compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * count,
+            options: [.storageModePrivate])!
+        self.updateCompositeBodies = UpdateCompositeBodiesInParallelKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
     }
 }
 

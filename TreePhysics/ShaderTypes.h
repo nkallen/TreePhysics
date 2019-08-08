@@ -21,7 +21,6 @@ typedef NS_ENUM(NSInteger, ThreadGroupIndex)
 {
     ThreadGroupIndexRigidBodies = 0,
     ThreadGroupIndexCompositeBodies  = 1,
-    ThreadGroupIndexCompositeBodiesDone  = 2,
 };
 
 typedef struct {
@@ -36,7 +35,7 @@ typedef struct {
 typedef struct {
     int parentId;
     int childIds[5];
-    uint childCount;
+    ushort childCount;
     vector_float3 position;
     float mass;
     float length;
