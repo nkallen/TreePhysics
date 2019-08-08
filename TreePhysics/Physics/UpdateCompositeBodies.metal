@@ -1,8 +1,7 @@
 #include <metal_stdlib>
-using namespace metal;
-
 #import "ShaderTypes.h"
 #import "Math.metal"
+using namespace metal;
 
 inline CompositeBodyStruct
 rigidBody_updateCompositeBody(

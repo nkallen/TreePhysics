@@ -4,6 +4,7 @@
 #ifdef __METAL_VERSION__
 #define NS_ENUM(_type, _name) enum _name : _type _name; enum _name : _type
 #define NSInteger metal::int32_t
+
 #else
 #import <Foundation/Foundation.h>
 #endif
@@ -38,6 +39,7 @@ typedef struct {
     int childIds[5];
     ushort childCount;
     vector_float3 position;
+    matrix_float3x3 rotation;
     float mass;
     float length;
     float radius;
@@ -49,9 +51,7 @@ typedef struct {
 } RigidBodyStruct;
 
 typedef struct {
-    CompositeBodyStruct childCompositeBody;
-    matrix_float3x3 worldToLocalRotation;
-    matrix_float3x3 theta;
+    matrix_float3x3 θ;
     float k;
 } JointStruct;
 

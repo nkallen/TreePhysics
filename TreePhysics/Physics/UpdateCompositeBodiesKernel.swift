@@ -86,6 +86,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             childIds: childIds,
             childCount: ushort(childRigidBodies.count),
             position: rigidBody.position,
+            rotation: rigidBody.rotation,
             mass: rigidBody.mass,
             length: rigidBody.length,
             radius: rigidBody.radius,

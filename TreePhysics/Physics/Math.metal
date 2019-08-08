@@ -5,7 +5,8 @@ using namespace metal;
 
 // Quaternion and diagonalization ported from https://github.com/melax/sandbox/blob/3e267f2db2262a4cc6bf3f576c8c92b3cba79efc/include/geometric.h
 
-float4 qmul(float4 a, float4 b) {
+inline float4
+qmul(float4 a, float4 b) {
     return float4(
                   a.x*b.w+a.w*b.x+a.y*b.z-a.z*b.y,
                   a.y*b.w+a.w*b.y+a.z*b.x-a.x*b.z,
@@ -13,25 +14,30 @@ float4 qmul(float4 a, float4 b) {
                   a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z);
 }
 
-inline float3 qxdir(float4 q) {
+inline float3
+qxdir(float4 q) {
     return {q.w*q.w+q.x*q.x-q.y*q.y-q.z*q.z, (q.x*q.y+q.z*q.w)*2, (q.z*q.x-q.y*q.w)*2};
 }
 
-inline float3 qydir (float4 q) {
+inline float3
+qydir (float4 q) {
     return {(q.x*q.y-q.z*q.w)*2, q.w*q.w-q.x*q.x+q.y*q.y-q.z*q.z, (q.y*q.z+q.x*q.w)*2};
 }
 
-inline float3 qzdir (float4 q) {
+inline float3
+qzdir (float4 q) {
     return {(q.z*q.x+q.y*q.w)*2, (q.y*q.z-q.x*q.w)*2, q.w*q.w-q.x*q.x-q.y*q.y+q.z*q.z};
 }
 
-inline float3x3 qmat(float4 q) {
+inline float3x3
+qmat(float4 q) {
     return {qxdir(q), qydir(q), qzdir(q)};
 }
 
 // MARK: Diagonlization
 
-inline float4 diagonalize(float3x3 A)
+inline float4
+diagonalize(float3x3 A)
 {
     // A must be a symmetric matrix.
     // returns orientation of the principle axes.
@@ -54,7 +60,7 @@ inline float4 diagonalize(float3x3 A)
         int k2 = (k + 2) % 3;
         if (offdiag[k] == 0.0f) break;  // diagonal already
         float thet = (D[k2][k2] - D[k1][k1]) / (2.0f*offdiag[k]);
-        float sgn = (thet>0.0f) ? 1.0f : -1.0f;
+        float sgn = sign(thet);
         thet *= sgn; // make it positive
         float t = sgn / (thet + ((thet<1.E6f) ? sqrt(thet*thet + 1.0f) : thet)); // sign(T)/(|T|+sqrt(T^2+1))
         float c = 1.0f / sqrt(t*t + 1.0f); //  c= 1/(t^2+1) , t=s/c
@@ -81,22 +87,21 @@ inline float4 diagonalize(float3x3 A)
 
 // MARK: General
 
-inline float3 jointRotateVector(
-                                const device JointStruct & joint,
-                                const float3 vector)
+inline float3x3
+sqr(float3x3 A)
 {
-    return joint.worldToLocalRotation * vector;
-}
-
-inline float3x3 sqr(float3x3 A) {
     return A * A;
 }
 
-inline half3x3 sqr(half3x3 A) {
+inline half3x3
+sqr(half3x3 A)
+{
     return A * A;
 }
 
-inline float3x3 crossMatrix(float3 v) {
+inline
+float3x3 crossMatrix(float3 v)
+{
     return float3x3(
                     float3(0, v.z, -v.y),
                     float3(-v.z, 0, v.x),
@@ -104,9 +109,209 @@ inline float3x3 crossMatrix(float3 v) {
 }
 
 
-inline half3x3 crossMatrix(half3 v) {
+inline half3x3
+crossMatrix(half3 v)
+{
     return half3x3(
                    half3(0, v.z, -v.y),
                    half3(-v.z, 0, v.x),
                    half3(-v.y, -v.x, 0));
+}
+
+inline float3x3
+cholesky(float3x3 A)
+{
+    float3x3 L = float3x3(0);
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j <= i; j++) {
+            float s = 0;
+            for (int k = 0; k < j; k++)
+                s += L[k][i] * L[k][j];
+            L[j][i] = (i == j) ?
+            sqrt(A[i][i] - s) :
+            (1.0 / L[j][j] * (A[j][i] - s));
+        }
+
+    return L;
+}
+
+inline float3x3
+inverse(float3x3 m)
+{
+    float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
+    float a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];
+    float a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];
+
+
+    float b10 = a22 * a11 - a21 * a12;
+    float b11 = -a22 * a01 + a21 * a02;
+    float b12 = a12 * a01 - a11 * a02;
+
+    float det = a00 * b10 + a10 * b11 + a20 * b12;
+
+    return 1/det * float3x3(float3(b10, b11, b12),
+                            float3((-a22 * a10 + a20 * a12), (a22 * a00 - a20 * a02), (-a12 * a00 + a10 * a02)),
+                            float3((a21 * a10 - a20 * a11), (-a21 * a00 + a20 * a01), (a11 * a00 - a10 * a01)));
+}
+
+inline float2x2
+inverse(float2x2 m) {
+    return float2x2(float2(m[1][1],-m[0][1]),
+                    float2(-m[1][0], m[0][0]) / (m[0][0]*m[1][1] - m[1][0]*m[0][1]));
+}
+
+// MARK: - Differential Equations
+
+enum QuadraticSolutionType
+{
+    QuadraticSolutionTypeReal,
+    QuadraticSolutionTypeRealDistinct,
+    QuadraticSolutionTypeComplex,
+};
+
+struct QuadraticSolution
+{
+    QuadraticSolutionType type;
+    float a;
+    float b;
+};
+
+struct DifferentialSolution {
+    QuadraticSolutionType type;
+    float c1;
+    float c2;
+    float x;
+    float y;
+    float z;
+};
+
+inline QuadraticSolution
+solveQuadratic(float a, float b, float c) {
+    //    (-b +/- sqrt(b^2 - 4ac)) / 2a
+    //    where r2 = c/ar1, cf: https://math.stackexchange.com/questions/311382/solving-a-quadratic-equation-with-precision-when-using-floating-point-variables
+    float b2_4ac = b*b - 4.0*a*c;
+    float _2a = 2.0*a;
+
+    if (b2_4ac == 0) {
+        return {
+            QuadraticSolutionTypeReal,
+            -b / _2a
+        };
+    } else if (b2_4ac > 0) {
+        float r2 = (-b - sqrt(b2_4ac)) / (2.0*a);
+        float r1 = c / (a * r2);
+        return {
+            QuadraticSolutionTypeRealDistinct,
+            r1,
+            r2
+        };
+    } else {
+        float imaginaryPart = sqrt(-b2_4ac) / _2a;
+        float realPart = -b / _2a;
+        return {
+            QuadraticSolutionTypeComplex,
+            realPart,
+            imaginaryPart
+        };
+    }
+}
+
+inline DifferentialSolution
+solveDifferential(float a, float b, float c, float g, float y_0, float y_ddt_0)
+{
+    QuadraticSolution quadraticSolution = solveQuadratic(a, b, c);
+    switch (quadraticSolution.type) {
+        case QuadraticSolutionTypeReal: {
+            float2x2 system = float2x2(float2(1, quadraticSolution.a), float2(0, 1));
+            float2 solution = inverse(system) * float2(y_0, y_ddt_0);
+            return {
+                QuadraticSolutionTypeReal,
+                solution.x,
+                solution.y,
+                quadraticSolution.a,
+                g/c
+            };
+        }
+        case QuadraticSolutionTypeRealDistinct: {
+            float2x2 system = float2x2(float2(1, quadraticSolution.a), float2(1, quadraticSolution.b));
+            float2 solution = inverse(system) * float2(y_0, y_ddt_0);
+            return {
+                QuadraticSolutionTypeRealDistinct,
+                solution.x,
+                solution.y,
+                quadraticSolution.a,
+                quadraticSolution.b,
+                g/c
+            };
+        }
+        case QuadraticSolutionTypeComplex: {
+            float c1 = y_0;
+            float c2 = (y_ddt_0 - quadraticSolution.a * c1) / quadraticSolution.b;
+            return {
+                QuadraticSolutionTypeComplex,
+                c1,
+                c2,
+                quadraticSolution.a,
+                quadraticSolution.b,
+                g/c
+            };
+        }
+    }
+}
+
+// Evaluate 2nd-order differential equation given its analytic solution
+inline float3
+evaluateDifferential(DifferentialSolution differentialSolution, float t)
+{
+    switch (differentialSolution.type) {
+        case QuadraticSolutionTypeComplex: {
+            float c1 = differentialSolution.c1;
+            float c2 = differentialSolution.c2;
+            float λ = differentialSolution.x;
+            float μ = differentialSolution.y;
+            float k = differentialSolution.z;
+
+            float y = c1*pow(M_E_F,λ*t)*cos(μ*t) + c2*pow(M_E_F,λ*t)*sin(μ*t) + k;
+            float y_ddt = λ*c1*pow(M_E_F,λ*t)*cos(μ*t) - μ*c1*pow(M_E_F,λ*t)*sin(μ*t) +
+            λ*c2*pow(M_E_F,λ*t)*sin(μ*t) + μ*c2*pow(M_E_F,λ*t)*cos(μ*t);
+            float y_d2dt = λ*λ*c1*pow(M_E_F,λ*t)*cos(μ*t) - μ*λ*c1*pow(M_E_F,λ*t)*sin(μ*t) -
+            (λ*μ*c1*pow(M_E_F,λ*t)*sin(μ*t) + μ*μ*c1*pow(M_E_F,λ*t)*cos(μ*t)) +
+            λ*λ*c2*pow(M_E_F,λ*t)*sin(μ*t) + μ*λ*c2*pow(M_E_F,λ*t)*cos(μ*t) +
+            λ*μ*c2*pow(M_E_F,λ*t)*cos(μ*t) - μ*μ*c2*pow(M_E_F,λ*t)*sin(μ*t);
+            return float3(y, y_ddt, y_d2dt);
+        }
+        case QuadraticSolutionTypeReal: {
+            float c1 = differentialSolution.c1;
+            float c2 = differentialSolution.c2;
+            float r = differentialSolution.x;
+            float k = differentialSolution.y;
+
+            float y = c1*pow(M_E_F,r*t) + c2*t*pow(M_E_F,r*t) + k;
+            float y_ddt = r*c1*pow(M_E_F,r*t) +
+            c2*pow(M_E_F,r*t) + r*c2*t*pow(M_E_F,r*t);
+            float y_d2dt = r*r*c1*pow(M_E_F,r*t) +
+            r*c2*pow(M_E_F,r*t) +
+            r*c2*pow(M_E_F,r*t) + r*r*c2*t*pow(M_E_F,r*t);
+            return float3(y, y_ddt, y_d2dt);
+        }
+        case QuadraticSolutionTypeRealDistinct: {
+            float c1 = differentialSolution.c1;
+            float c2 = differentialSolution.c2;
+            float r1 = differentialSolution.x;
+            float r2 = differentialSolution.y;
+            float k = differentialSolution.z;
+
+            float y = c1*pow(M_E_F,r1*t) + c2*pow(M_E_F,r2*t) + k;
+            float y_ddt = r1*c1*pow(M_E_F,r1*t) + r2*c2*pow(M_E_F,r2*t);
+            float y_d2dt = r1*r1*c1 * pow(M_E_F,r1*t) + r2*r2*c2 * pow(M_E_F,r2*t);
+            return float3(y, y_ddt, y_d2dt);
+        }
+    }
+}
+
+inline float3
+evaluateDifferential(float a, float b, float c, float g, float y_0, float y_ddt_0, float t)
+{
+    DifferentialSolution differentialSolution = solveDifferential(a, b, c, g, y_0, y_ddt_0);
+    return evaluateDifferential(differentialSolution, t);
 }
