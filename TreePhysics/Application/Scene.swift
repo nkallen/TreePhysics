@@ -9,6 +9,7 @@ class Game: NSObject {
     let attractor: SCNNode
     let parent: SCNNode
     let updateCompositeBodies: UpdateCompositeBodiesKernel
+    let updateJoints: UpdateJointsKernel
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
 
@@ -106,11 +107,14 @@ class Game: NSObject {
         self.attractor = attractor
 
         self.commandQueue = device.makeCommandQueue()!
-        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root)
+        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         let compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
             options: [.storageModePrivate])!
         self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+
+        let (numJoints, jointsBuffer) = UpdateJointsKernel.buffer(root: root, device: device)
+        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: numJoints)
     }
 }
 
@@ -130,8 +134,9 @@ extension Game: SCNSceneRendererDelegate {
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
+//        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         commandBuffer.addCompletedHandler { _ in
-//            print("done")
+            print("done")
         }
         commandBuffer.commit()
     }

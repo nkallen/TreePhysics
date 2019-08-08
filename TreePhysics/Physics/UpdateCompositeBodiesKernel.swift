@@ -39,7 +39,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         }
     }
 
-    static func buffer(root: RigidBody, device: MTLDevice = MTLCreateSystemDefaultDevice()!) -> (Int, MTLBuffer, [(Int, Int)]) {
+    static func buffer(root: RigidBody, device: MTLDevice) -> (Int, MTLBuffer, [(Int, Int)]) {
         var allRigidBodies: [RigidBody] = []
         var allStragglers: [RigidBody] = []
         var rangesOfWork: [(Int, Int)] = []

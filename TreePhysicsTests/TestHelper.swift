@@ -1,4 +1,7 @@
 import Foundation
+import XCTest
+@testable import TreePhysics
+import simd
 
 func XCTAssertEqual(_ a: double2, _ b: double2, accuracy: Double, file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.x, b.x, accuracy: accuracy, file: file, line: line)

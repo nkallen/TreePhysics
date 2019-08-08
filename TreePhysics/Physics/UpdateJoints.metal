@@ -19,9 +19,9 @@ inline float3 joint_rotateVector(
 }
 
 inline float3x3 joint_rotateTensor(
-                                 JointStruct joint,
-                                 RigidBodyStruct parentRigidBody,
-                                 float3x3 tensor)
+                                   JointStruct joint,
+                                   RigidBodyStruct parentRigidBody,
+                                   float3x3 tensor)
 {
     return joint_worldToLocalRotation(joint, parentRigidBody) * tensor * transpose(joint_worldToLocalRotation(joint, parentRigidBody));
 }
@@ -33,7 +33,7 @@ inline float3 joint_position(
     return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
 }
 
-inline void
+inline JointStruct
 updateJoint(
             JointStruct joint,
             RigidBodyStruct parentRigidBody,
@@ -64,7 +64,7 @@ updateJoint(
 
         // 1.b. the generalized eigenvalue problem A * X = X * Λ
         // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
-        float3x3 A = L_inverse * (joint.k * float3x3(1)) * L_transpose_inverse;
+        float3x3 A = L_inverse * (joint.k * float3x3(1)) * L_transpose_inverse; // FIXME
         float4 q = diagonalize(A);
         float3x3 Λ_M = transpose(qmat(q)) * A * qmat(q);
         float3 Λ = float3(Λ_M[0][0], Λ_M[1][1], Λ_M[2][2]);
@@ -93,11 +93,22 @@ updateJoint(
 
         joint.θ = U * θ_diagonal;
     }
+    return joint;
 }
 
 kernel void
 updateJoints(
-                      device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
-                      uint gid [[ thread_position_in_grid ]])
+             device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
+             device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
+             device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
+             constant float * time [[ buffer(BufferIndexTime) ]],
+             uint gid [[ thread_position_in_grid ]])
 {
+    JointStruct joint = joints[gid];
+    RigidBodyStruct rigidBody = rigidBodies[gid];
+    RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
+    CompositeBodyStruct compositeBody = compositeBodies[gid];
+
+    joint = updateJoint(joint, parentRigidBody, compositeBody, *time);
+    joints[gid] = joint;
 }
