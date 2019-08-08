@@ -69,5 +69,6 @@ In general, for a tree like:
 
 There should be 4^6 + 4^5 + 4^4 + 4^3 + 4^2 = 5456 reads
 
-Whereas for the optimizatio we expect: 4^5 + 4^3 = 1088
+Whereas for the optimizatio we expect: 4^5 + 4^3 = 1088 reads
 
+Finally, when the min, max is within a threadgroup, we can use a threadgroup cache

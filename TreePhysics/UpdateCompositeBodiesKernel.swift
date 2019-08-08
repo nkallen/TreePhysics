@@ -123,7 +123,6 @@ final class UpdateCompositeBodiesInParallelKernel: MetalKernel {
     func encode(commandBuffer: MTLCommandBuffer) {
         var i = 0
         for (gridOrigin, threadsPerGrid) in ranges {
-            print(gridOrigin, threadsPerGrid)
             let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
             commandEncoder.setComputePipelineState(computePipelineState)
             commandEncoder.label  = "Update Composite Bodies in Parallel, Round \(i)"
