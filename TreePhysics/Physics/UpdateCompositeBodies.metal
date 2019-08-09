@@ -38,6 +38,7 @@ rigidBody_updateCompositeBody(
     return compositeBody;
 }
 
+// Just a duplicate for one child; eventually we'll unroll all of these.
 inline CompositeBodyStruct
 rigidBody_updateCompositeBody(
                               const RigidBodyStruct rigidBody,

@@ -8,22 +8,26 @@ final class UpdateJointsKernel: MetalKernel {
     let jointsBuffer: MTLBuffer
     let numJoints: Int
 
+    /*
     let debugRigidBodies: MTLBuffer
     let debugCompositeBodies: MTLBuffer
     let debugFloats: MTLBuffer
     let debugFloat3s: MTLBuffer
     let debugFloat3x3s: MTLBuffer
+*/
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, compositeBodiesBuffer: MTLBuffer, jointsBuffer: MTLBuffer, numJoints: Int) {
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.jointsBuffer = jointsBuffer
         self.compositeBodiesBuffer = compositeBodiesBuffer
         self.numJoints = numJoints
+        /*
         self.debugRigidBodies = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.debugCompositeBodies = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.debugFloats = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.debugFloat3s = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.debugFloat3x3s = device.makeBuffer(length: 1024, options: [.storageModeShared])!
+ */
         super.init(device: device, name: "updateJoints")
     }
 
@@ -36,6 +40,8 @@ final class UpdateJointsKernel: MetalKernel {
         commandEncoder.setBuffer(jointsBuffer, offset: 0, index: BufferIndex.joints.rawValue)
         var time = time
         commandEncoder.setBytes(&time, length: MemoryLayout<Float>.size, index: BufferIndex.time.rawValue)
+
+        /*
 
         commandEncoder.setBuffer(debugRigidBodies, offset: 0, index: BufferIndex.debugRigidBody.rawValue)
         commandEncoder.setBuffer(debugCompositeBodies, offset: 0, index: BufferIndex.debugCompositeBody.rawValue)
@@ -58,6 +64,7 @@ final class UpdateJointsKernel: MetalKernel {
 
 //            fatalError()
         }
+ */
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)

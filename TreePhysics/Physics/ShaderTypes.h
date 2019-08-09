@@ -44,11 +44,12 @@ typedef struct {
     int parentId;
     int childIds[5];
     ushort childCount;
-    vector_float3 position;
-    matrix_float3x3 rotation;
     float mass;
     float length;
     float radius;
+
+    vector_float3 position;
+    matrix_float3x3 rotation;
     matrix_float3x3 inertiaTensor;
 
     vector_float3 force;

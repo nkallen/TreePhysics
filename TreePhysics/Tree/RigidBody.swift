@@ -104,10 +104,6 @@ final class RigidBody: HasTransform {
         let rotation = matrix3x3_rotation(from: transform)
         self.inertiaTensor = rotation * inertiaTensor_local * rotation.transpose
 
-        if kind != .static {
-            assert(inertiaTensor.isPositiveDefinite)
-        }
-
         self.centerOfMass = convert(position: centerOfMass_local)
         if self.centerOfMass.x.isNaN { fatalError() }
     }

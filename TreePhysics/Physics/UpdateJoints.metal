@@ -38,9 +38,9 @@ updateJoint(
             JointStruct joint,
             RigidBodyStruct parentRigidBody,
             CompositeBodyStruct childCompositeBody,
-            float time,
+            float time /*,
             device float3x3 * debugFloat3x3s,
-            device float * debugFloats
+            device float * debugFloats */
             )
 {
     float3 pr = joint_rotateVector(joint, parentRigidBody, childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody));
@@ -108,13 +108,13 @@ updateJoints(
              device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
              device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
              device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
-
+/*
              device RigidBodyStruct * debugRigidBodies [[ buffer(BufferIndexDebugRigidBody) ]],
              device CompositeBodyStruct * debugCompositeBodies [[ buffer(BufferIndexDebugCompositeBody) ]],
              device float * debugFloats [[ buffer(BufferIndexDebugFloat) ]],
              device float3 * debugFloat3s [[ buffer(BufferIndexDebugFloat3) ]],
              device float3x3 * debugfloat3x3s [[ buffer(BufferIndexDebugFloat3x3) ]],
-
+*/
              constant float * time [[ buffer(BufferIndexTime) ]],
              uint gid [[ thread_position_in_grid ]])
 {
@@ -124,13 +124,13 @@ updateJoints(
     if (rigidBody.parentId != -1) {
         RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
         CompositeBodyStruct compositeBody = compositeBodies[gid];
-
+/*
         debugRigidBodies[gid] = rigidBody;
 //        debugRigidBodies[1] = parentRigidBody;
         debugCompositeBodies[gid] = compositeBody;
-
-        joint = updateJoint(joint, parentRigidBody, compositeBody, *time,
-                            debugfloat3x3s, debugFloats);
+*/
+        joint = updateJoint(joint, parentRigidBody, compositeBody, *time /*,
+                            debugfloat3x3s, debugFloats */);
         joints[gid] = joint;
     }
 }
