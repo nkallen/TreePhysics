@@ -56,8 +56,8 @@ updateRigidBodies(
         int width = range.y;
         if ((int)gid >= offset && (int)gid < offset + width) {
             int id = offset + gid;
-            RigidBodyStruct rigidBody = rigidBodies[i];
-            JointStruct parentJoint = joints[i];
+            RigidBodyStruct rigidBody = rigidBodies[id];
+            JointStruct parentJoint = joints[id];
             if (rigidBody.parentId != -1) {
                 RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
                 float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
