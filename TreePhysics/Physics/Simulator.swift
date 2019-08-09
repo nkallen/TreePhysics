@@ -62,7 +62,7 @@ final class Simulator {
             composite.centerOfMass /= composite.mass
 
             composite.inertiaTensor = rigidBody.inertiaTensor -
-                rigidBody.mass * sqr((rigidBody.centerOfMass - composite.centerOfMass).cross_matrix)
+                rigidBody.mass * sqr((rigidBody.centerOfMass - composite.centerOfMass).crossMatrix)
 
             for childJoint in rigidBody.childJoints {
                 let childRigidBody = childJoint.childRigidBody
@@ -70,7 +70,7 @@ final class Simulator {
 
                 // using the parallel axis theorem I' = I + md^2, but with tensors:
                 composite.inertiaTensor += childComposite.inertiaTensor -
-                    childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).cross_matrix)
+                    childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).crossMatrix)
             }
         }
     }
@@ -84,7 +84,7 @@ final class Simulator {
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
 
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
-                    rigidBody.composite.mass * sqr(pr.cross_matrix)
+                    rigidBody.composite.mass * sqr(pr.crossMatrix)
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
 
                 if parentJoint.k == .infinity {

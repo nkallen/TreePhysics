@@ -56,9 +56,9 @@ rigidBody_updateCompositeBody(
     compositeBody.torque += cross(childCompositeBody.position - rigidBody.position, childCompositeBody.force) + childCompositeBody.torque;
     compositeBody.centerOfMass += childCompositeBody.mass * childCompositeBody.centerOfMass;
     compositeBody.centerOfMass /= compositeBody.mass;
-    
+
     compositeBody.inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - compositeBody.centerOfMass));
-    
+
     compositeBody.inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - compositeBody.centerOfMass));
 
     return compositeBody;

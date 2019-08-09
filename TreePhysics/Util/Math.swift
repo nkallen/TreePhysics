@@ -243,7 +243,7 @@ extension float3 {
         return float2(x, y)
     }
 
-    var cross_matrix: float3x3 {
+    var crossMatrix: float3x3 {
         return matrix_float3x3.init(columns:
             (float3(0, self.z, -self.y),
              float3(-self.z, 0, self.x),

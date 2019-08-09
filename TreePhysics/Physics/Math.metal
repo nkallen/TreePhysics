@@ -115,7 +115,7 @@ float3x3 crossMatrix(float3 v)
     return float3x3(
                     float3(0, v.z, -v.y),
                     float3(-v.z, 0, v.x),
-                    float3(-v.y, -v.x, 0));
+                    float3(v.y, -v.x, 0));
 }
 
 

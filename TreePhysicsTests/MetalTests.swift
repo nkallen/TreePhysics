@@ -71,12 +71,12 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
 
             // inertia tensor
             XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor)
-            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - b1_composite.centerOfMass).cross_matrix)
-            b1_inertiaTensor += b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).cross_matrix)
+            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - b1_composite.centerOfMass).crossMatrix)
+            b1_inertiaTensor += b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).crossMatrix)
             XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.0001)
-            var root_inertiaTensor = self.root.inertiaTensor - self.root.mass * sqr((self.root.centerOfMass - root_composite.centerOfMass).cross_matrix)
-            root_inertiaTensor += b1_composite.inertiaTensor - b1_composite.mass * sqr((b1_composite.centerOfMass - root_composite.centerOfMass).cross_matrix)
-            XCTAssertEqual(root_composite.inertiaTensor, root_inertiaTensor)
+            var root_inertiaTensor = self.root.inertiaTensor - self.root.mass * sqr((self.root.centerOfMass - root_composite.centerOfMass).crossMatrix)
+            root_inertiaTensor += b1_composite.inertiaTensor - b1_composite.mass * sqr((b1_composite.centerOfMass - root_composite.centerOfMass).crossMatrix)
+            XCTAssertEqual(root_composite.inertiaTensor, root_inertiaTensor, accuracy: 0.0001)
 
             expect.fulfill()
         }
