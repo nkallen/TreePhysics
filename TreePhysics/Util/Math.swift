@@ -326,19 +326,18 @@ extension matrix_float3x3 {
         let a02 = self[0, 2], a12 = self[1, 2], a22 = self[2, 2]
 
         // Factorize A
-        let l00 = sqrt(a00)
-        let l01 = a01/l00
-        let l02 = a02/l00
+        let sqrt_a00 = sqrt(a00)
+        let l0 = float3(a00, a01, a02) / sqrt_a00
+        let l01 = l0.y, l02 = l0.z
 
         let l11 = sqrt(a11 - sqr(l01))
         let l12 = (a12 - l02 * l01) / l11
 
         let l22 = sqrt(a22 - sqr(l02) - sqr(l12))
 
-        // Store L into memory
-        result[0, 0] = l00
-        result[0, 1] = l01; result[1, 1] = l11
-        result[0, 2] = l02; result[1, 2] = l12; result[2, 2] = l22
+        result[0] = l0
+        result[1] = float3(0, l11, l12)
+        result[2, 2] = l22
 
         return result
     }
