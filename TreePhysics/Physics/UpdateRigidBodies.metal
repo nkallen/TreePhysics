@@ -13,7 +13,7 @@ inline float3 joint_position(
 }
 
 inline float3x3 joint_localRotation(
-                           JointStruct joint)
+                                    JointStruct joint)
 {
     return matrix_rotate(joint.θ[0]);
 }
@@ -37,18 +37,53 @@ inline float3x3 rigidBody_localInertiaTensor(
 }
 
 inline float3 rigidBody_localCenterOfMass(
-                                            RigidBodyStruct rigidBody)
+                                          RigidBodyStruct rigidBody)
 {
     return float3(0, 1, 0) * rigidBody.length / 2;
 }
 
+inline RigidBodyStruct
+updateRigidBody(
+                const RigidBodyStruct parentRigidBody,
+                const JointStruct parentJoint,
+                RigidBodyStruct rigidBody)
+{
+    float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
+    float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
+    float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
+
+    rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
+    rigidBody.position = parentJointPosition;
+
+    rigidBody.inertiaTensor = rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * transpose(rigidBody.rotation);
+    rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
+
+    return rigidBody;
+}
+
+inline void
+rigidBody_climbDown(
+                    const RigidBodyStruct rigidBody,
+                    device RigidBodyStruct * rigidBodies,
+                    device JointStruct * joints)
+{
+    RigidBodyStruct currentRigidBody = rigidBody;
+
+    while (currentRigidBody.childCount == 1) {
+        int childId = currentRigidBody.childIds[0];
+        RigidBodyStruct parentRigidBody = rigidBody;
+        currentRigidBody = rigidBodies[childId];
+        JointStruct parentJoint = joints[childId];
+        rigidBodies[childId] = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
+    }
+}
+
 kernel void
 updateRigidBodies(
-             device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
-             device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
-             device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
-             constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
-             uint gid [[ thread_position_in_grid ]])
+                  device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
+                  device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
+                  constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
+                  uint gid [[ thread_position_in_grid ]])
 {
     for (int i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
@@ -60,15 +95,8 @@ updateRigidBodies(
             JointStruct parentJoint = joints[id];
             if (rigidBody.parentId != -1) {
                 RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
-                float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
-                float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
-                float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
-
-                rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
-                rigidBody.position = parentJointPosition;
-
-                rigidBody.inertiaTensor = rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * transpose(rigidBody.rotation);
-                rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
+                rigidBodies[id] = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
+                rigidBody_climbDown(rigidBody, rigidBodies, joints);
             }
         }
         threadgroup_barrier(mem_flags::mem_threadgroup);
