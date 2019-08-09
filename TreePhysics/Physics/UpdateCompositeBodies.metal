@@ -34,6 +34,33 @@ rigidBody_updateCompositeBody(
         compositeBody.inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - compositeBody.centerOfMass));
     }
 
+    
+    return compositeBody;
+}
+
+inline CompositeBodyStruct
+rigidBody_updateCompositeBody(
+                              const RigidBodyStruct rigidBody,
+                              const CompositeBodyStruct childCompositeBody)
+{
+    CompositeBodyStruct compositeBody;
+    
+    compositeBody.mass = rigidBody.mass;
+    compositeBody.force = rigidBody.force;
+    compositeBody.torque = rigidBody.torque;
+    compositeBody.centerOfMass = rigidBody.mass * rigidBody.centerOfMass;
+    compositeBody.position = rigidBody.position;
+    
+    compositeBody.mass += childCompositeBody.mass;
+    compositeBody.force += childCompositeBody.force;
+    compositeBody.torque += cross(childCompositeBody.position - rigidBody.position, childCompositeBody.force) + childCompositeBody.torque;
+    compositeBody.centerOfMass += childCompositeBody.mass * childCompositeBody.centerOfMass;
+    compositeBody.centerOfMass /= compositeBody.mass;
+    
+    compositeBody.inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - compositeBody.centerOfMass));
+    
+    compositeBody.inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - compositeBody.centerOfMass));
+
     return compositeBody;
 }
 
@@ -56,10 +83,27 @@ rigidBody_childCompositeBodies(
                                device CompositeBodyStruct * compositeBodies,
                                CompositeBodyStruct childCompositeBodies[5])
 {
-    for (ushort i = 0; i < rigidBody.childCount; i++) {
-        int childId = rigidBody.childIds[i];
-        childCompositeBodies[i] = compositeBodies[childId];
-    }
+    if (rigidBody.childCount == 0) return;
+
+    int childId;
+    childId = rigidBody.childIds[0];
+    childCompositeBodies[0] = compositeBodies[childId];
+    //if (rigidBody.childCount == 1) return;
+
+    childId = rigidBody.childIds[1];
+    childCompositeBodies[1] = compositeBodies[childId];
+    //if (rigidBody.childCount == 2) return;
+
+    childId = rigidBody.childIds[2];
+    childCompositeBodies[2] = compositeBodies[childId];
+    //if (rigidBody.childCount == 3) return;
+
+    childId = rigidBody.childIds[3];
+    childCompositeBodies[3] = compositeBodies[childId];
+    //if (rigidBody.childCount == 4) return;
+
+    childId = rigidBody.childIds[4];
+    childCompositeBodies[4] = compositeBodies[childId];
 }
 
 inline uint
@@ -124,8 +168,7 @@ rigidBody_climb(const RigidBodyStruct rigidBody,
         int parentId = currentRigidBody.parentId;
         currentRigidBody = rigidBodies[parentId];
         if (currentRigidBody.childCount == 1) {
-            CompositeBodyStruct childCompositeBodies[5] = {currentCompositeBody};
-            currentCompositeBody = rigidBody_updateCompositeBody(currentRigidBody, childCompositeBodies);
+            currentCompositeBody = rigidBody_updateCompositeBody(currentRigidBody, currentCompositeBody);
             compositeBodies[parentId] = currentCompositeBody;
         } else {
             return;

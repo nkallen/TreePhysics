@@ -51,7 +51,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         }
 
         // Remove the root:
-        _ = rangesOfWork.popLast()
+//        _ = rangesOfWork.popLast() FIXME
 
         let all = allRigidBodies + allStragglers
         return (all.count, buffer(flattened: all, device: device), rangesOfWork)
