@@ -136,6 +136,27 @@ class SimulatorTests: XCTestCase {
         XCTAssertEqual(b1.composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass)/2)
         XCTAssertEqual(root.composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass + root.centerOfMass) / 3)
     }
+
+    func testUpdateJoints() {
+        simulator.updateCompositeBodies()
+        simulator.updateJoints(at: 1/60)
+
+        XCTAssertEqual(
+            float3x3(
+                float3(0,0,0.005), // i.e., a small rotation about the z axis
+                float3(0,0,0),
+                float3(0,0,0)
+            ),
+            b2.parentJoint!.θ, accuracy: 0.0001)
+
+        XCTAssertEqual(
+            float3x3(
+                float3(0,0,0.008535533), // a slightly larger rotation since the torque on b1 is greater
+                float3(0,0,0),
+                float3(0,0,0)
+            ),
+            b1.parentJoint!.θ, accuracy: 0.0001)
+    }
 }
 
 class TreeTests: XCTestCase {

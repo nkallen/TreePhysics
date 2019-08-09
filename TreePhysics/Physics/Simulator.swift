@@ -21,7 +21,7 @@ final class Simulator {
     func update(at time: TimeInterval) {
         updateFields(at: time)
         updateCompositeBodies()
-        updateSprings(at: time)
+        updateJoints(at: time)
         updateRigidBodies()
     }
 
@@ -75,7 +75,7 @@ final class Simulator {
         }
     }
 
-    func updateSprings(at time: TimeInterval) {
+    func updateJoints(at time: TimeInterval) {
         for rigidBody in rigidBodiesLevelOrder { // Order does not matter
             if let parentJoint = rigidBody.parentJoint {
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)

@@ -12,7 +12,6 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
 
     var root, b1, b2: RigidBody!
     let force: float3 = float3(0, 1, 0) // world coordinates
-    var forceAppliedPosition: float3!
 
     override func setUp() {
         super.setUp()
@@ -26,7 +25,6 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         root.add(b1, at: float3(0,0,-Float.pi/4))
         b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
-        self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.compositeBodiesBuffer = device.makeBuffer(
@@ -37,6 +35,8 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
     }
 
     func testUpdateCompositeBodies() {
+        let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
+
         let expect = expectation(description: "wait")
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
@@ -59,9 +59,9 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
 
             // torque
             XCTAssertEqual(b2_composite.torque, self.b2.torque)
-            let r_b1 = self.forceAppliedPosition - self.b1.parentJoint!.position
+            let r_b1 = forceAppliedPosition - self.b1.parentJoint!.position
             XCTAssertEqual(b1_composite.torque, cross(r_b1, self.force))
-            let r_root = self.forceAppliedPosition - self.root.position
+            let r_root = forceAppliedPosition - self.root.position
             XCTAssertEqual(root_composite.torque, cross(r_root, self.force))
 
             // center of mass
@@ -75,12 +75,14 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         waitForExpectations(timeout: 10, handler: {error in})
     }
 }
-/*
+
 class UpdateJointsKernelTests: XCTestCase {
-    var updateJointsKernel: UpdateCompositeBodiesKernel!
+    var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
+    var updateJointsKernel: UpdateJointsKernel!
 
     var device: MTLDevice!
     var commandQueue: MTLCommandQueue!
+    var jointsBuffer: MTLBuffer!
 
     var root, b1, b2: RigidBody!
     let force: float3 = float3(0, 1, 0) // world coordinates
@@ -99,8 +101,46 @@ class UpdateJointsKernelTests: XCTestCase {
         b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
+
+        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * count,
+            options: [.storageModePrivate])!
+        self.jointsBuffer = UpdateJointsKernel.buffer(count: count, device: device)
+
+        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateJointsKernel = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: count)
     }
 
+    func testUpdateJoints() {
+        let expect = expectation(description: "wait")
+
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
+        updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1/60)
+        commandBuffer.addCompletedHandler { _ in
+            XCTAssertEqual(
+                float3x3(
+                    float3(0,0,0.005), // i.e., a small rotation about the z axis
+                    float3(0,0,0),
+                    float3(0,0,0)
+                ),
+                self.b2.parentJoint!.θ, accuracy: 0.0001)
+
+            XCTAssertEqual(
+                float3x3(
+                    float3(0,0,0.008535533), // a slightly larger rotation since the torque on b1 is greater
+                    float3(0,0,0),
+                    float3(0,0,0)
+                ),
+                self.b1.parentJoint!.θ, accuracy: 0.0001)
+
+            expect.fulfill()
+        }
+        commandBuffer.commit()
+        waitForExpectations(timeout: 10, handler: {error in})
+    }
+/*
     func testUpdateJoints() {
         XCTAssertEqual(b2.inertiaTensor,
                        float3x3([[0.5, -2.4835266e-08, 0], [-2.4835263e-08, 0.33333328, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
@@ -133,5 +173,6 @@ class UpdateJointsKernelTests: XCTestCase {
         XCTAssertEqual(b1.parentJoint!.transform,
                        float4x4([[0.9999636, 0.008535428, 0, 0], [-0.008535428, 0.9999636, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]), accuracy: 0.0001)
     }
+ */
 }
-*/
+

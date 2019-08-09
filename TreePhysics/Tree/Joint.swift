@@ -9,6 +9,7 @@ final class Joint: HasTransform {
     let childRigidBody: RigidBody
 
     var transform: matrix_float4x4 = matrix_identity_float4x4
+    // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3 = float3x3(0)
     private(set) var rotation_world2local: float3x3 = matrix_identity_float3x3
     private let translation_local: float4x4
