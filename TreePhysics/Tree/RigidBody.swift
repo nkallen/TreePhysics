@@ -28,7 +28,7 @@ final class RigidBody: HasTransform {
     var force: float3 = float3.zero
     var torque: float3 = float3.zero
     let centerOfMass_local: float3
-    private var rotation_local: float4x4 = matrix_identity_float4x4
+    var rotation_local: float4x4 = matrix_identity_float4x4
 
     let node: SCNNode
 
@@ -105,7 +105,6 @@ final class RigidBody: HasTransform {
         self.inertiaTensor = rotation * inertiaTensor_local * rotation.transpose
 
         self.centerOfMass = convert(position: centerOfMass_local)
-        if self.centerOfMass.x.isNaN { fatalError() }
     }
 }
 

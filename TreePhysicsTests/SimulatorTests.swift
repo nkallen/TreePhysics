@@ -25,63 +25,6 @@ class SimulatorTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
     }
 
-    func testInertiaTensorsInCompositeBodies() {
-        let start = RigidBody()
-        let stop = RigidBody()
-        start.add(stop, at: float3.zero)
-        let simulator = Simulator(tree: Tree(start))
-        simulator.updateCompositeBodies()
-
-        XCTAssertEqual(start.inertiaTensor, float3x3([[0.3333, 0, 0], [0, 0.5, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
-        XCTAssertEqual(stop.inertiaTensor, float3x3([[0.3333, 0, 0], [0, 0.5, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
-
-        XCTAssertEqual(stop.composite.inertiaTensor, float3x3([[0.3333, 0, 0], [0, 0.5, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
-        XCTAssertEqual(start.composite.inertiaTensor, float3x3([[1.1666667, 0, 0], [0, 1, 0], [0, 0, 1.1666667]]), accuracy: 0.0001)
-
-        let rotation_world2local_stop = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: stop.transform)
-        let rotation_world2local_start = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: start.transform)
-
-        XCTAssertEqual((rotation_world2local_stop * stop.inertiaTensor * rotation_world2local_stop.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
-        XCTAssertEqual((rotation_world2local_start * start.inertiaTensor * rotation_world2local_start.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
-
-        XCTAssertEqual((rotation_world2local_stop * stop.composite.inertiaTensor * rotation_world2local_stop.transpose * float3(0,0,1)).z, 1.0/12 + 1.0/4, accuracy: 0.0001)
-        XCTAssertEqual((rotation_world2local_start * start.composite.inertiaTensor * rotation_world2local_start.transpose * float3(0,0,1)).z,
-                       Float(1.0/12 * 2 * 2*2 + 1.0/4 * 2 * 1*1), accuracy: 0.0001)
-    }
-
-    func testTransform() {
-        XCTAssertEqual(b2.inertiaTensor,
-                       float3x3([[0.5, -2.4835266e-08, 0], [-2.4835263e-08, 0.33333328, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
-        XCTAssertEqual(b2.transform,
-                       float4x4([[1.4901161e-07, -1, 0, 0], [1, 1.4901161e-07, 0, 0], [0, 0, 1, 0], [1/sqrt2, 1.7071068, 0, 1]]), accuracy: Float(0.0001))
-        XCTAssertEqual(b2.parentJoint!.transform, float4x4([[1/sqrt2, -1/sqrt2, 0, 0], [1/sqrt2, 1/sqrt2, 0, 0], [0, 0, 1, 0], [1/sqrt2, 1.7071068, 0, 1]]), accuracy: 0.0001)
-        XCTAssertEqual(b1.inertiaTensor,
-                       float3x3([[0.41666663, -0.08333331, 0], [-0.08333333, 0.4166667, 0], [0, 0, 0.3333]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.transform,
-                       float4x4([[1/sqrt2, -1/sqrt2, 0, 0], [1/sqrt2, 1.0/sqrt2, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.parentJoint!.transform,
-                       float4x4([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]), accuracy: 0.0001)
-
-        simulator.update(at: 1.0 / 60)
-
-        XCTAssertEqual(b2.inertiaTensor,
-                       float3x3([[0.49996945, -0.0022556656, 0], [-0.0022556656, 0.33336386, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
-        XCTAssertEqual(b2.transform,
-                       float4x4([[0.013535231, -0.9999084, 0, 0], [0.9999084, 0.013535231, 0, 0], [0, 0, 1, 0], [0.7010455, 1.7131165, 0, 1]]), accuracy: Float(0.0001))
-        XCTAssertEqual(b2.parentJoint!.transform, float4x4([[0.7166128, -0.6974712, 0, 0], [0.6974712, 0.7166128, 0, 0], [0, 0, 1, 0], [0.7010455, 1.7131165, 0, 1]]), accuracy: 0.0001)
-
-        XCTAssertEqual(b1.inertiaTensor,
-                       float3x3([[0.41524416, -0.083321184, 0], [-0.083321184, 0.4180892, 0], [0, 0, 0.3333]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.transform,
-                       float4x4([[0.7131165, -0.7010455, 0, 0], [0.7010455, 0.7131165, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.parentJoint!.transform,
-                       float4x4([[0.9999636, 0.008535428, 0, 0], [-0.008535428, 0.9999636, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]), accuracy: 0.0001)
-    }
-
     func testApplyForce() {
         XCTAssertEqual(b2.mass, 1)
         XCTAssertEqual(b2.force, force)
@@ -166,6 +109,65 @@ class SimulatorTests: XCTestCase {
             ),
             b1.parentJoint!.θ, accuracy: 0.0001)
     }
+
+    func testUpdateRigidBodies() {
+        XCTAssertEqual(
+            float3(1/sqrt2, 1+1/sqrt2, 0),
+            b2.position)
+        XCTAssertEqual(
+            float3x3(
+            float3(0,-1,0),
+            float3(1,0,0),
+            float3(0,0,1)),
+            b2.rotation, accuracy: 0.0001)
+        XCTAssertEqual(
+            float4x4(
+                [[1.4901161e-07, -1, 0, 0], [1, 1.4901161e-07, 0, 0], [0, 0, 1, 0], [1/sqrt2, 1+1/sqrt2, 0, 1]]),
+            b2.transform, accuracy: Float(0.0001))
+
+        XCTAssertEqual(
+            float3(0, 1, 0),
+            b1.position)
+        XCTAssertEqual(
+            float3x3(
+                float3(1/sqrt(2),-1/sqrt2,0),
+                float3(1/sqrt(2),1/sqrt(2),0),
+                float3(0,0,1)),
+            b1.rotation, accuracy: 0.0001)
+        XCTAssertEqual(
+            float4x4([[1/sqrt2, -1/sqrt2, 0, 0], [1/sqrt2, 1.0/sqrt2, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
+            b1.transform, accuracy: 0.0001)
+
+        simulator.update(at: 1.0 / 60)
+
+        XCTAssertEqual(
+            float3(0.7010456, 1.7131165, 0),
+            b2.position, accuracy: 0.0001)
+        XCTAssertEqual(
+            float3x3(
+                float3(0.013535142,-1,0),
+                float3(1,0.013535142,0),
+                float3(0,0,1)),
+            b2.rotation, accuracy: 0.0001)
+        XCTAssertEqual(
+            float4x4(
+                [[0.013535231, -0.9999084, 0, 0], [0.9999084, 0.013535231, 0, 0], [0, 0, 1, 0], [0.7010455, 1.7131165, 0, 1]]),
+            b2.transform, accuracy: Float(0.0001))
+
+        XCTAssertEqual(
+            float3(0, 1, 0),
+            b1.position)
+        XCTAssertEqual(
+            float3x3(
+                float3(0.7131165,-0.7010456,0),
+                float3(0.7010456,0.7131165,0),
+                float3(0,0,1)),
+            b1.rotation, accuracy: 0.0001)
+        XCTAssertEqual(
+            float4x4([[0.7131165, -0.7010455, 0, 0], [0.7010455, 0.7131165, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
+            b1.transform, accuracy: 0.0001)
+    }
+
 }
 
 class TreeTests: XCTestCase {

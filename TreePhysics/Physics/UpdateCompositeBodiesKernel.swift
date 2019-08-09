@@ -8,8 +8,8 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     let ranges: [(Int, Int)]
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, ranges: [(Int, Int)], compositeBodiesBuffer: MTLBuffer) {
-        self.rigidBodiesBuffer = rigidBodiesBuffer
         self.ranges = ranges
+        self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = compositeBodiesBuffer
         super.init(device: device, name: "updateCompositeBodies")
     }
@@ -92,14 +92,15 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             mass: rigidBody.mass,
             length: rigidBody.length,
             radius: rigidBody.radius,
+            localRotation: matrix3x3_rotation(rotation: rigidBody.rotation_local),
 
             position: rigidBody.position,
             rotation: rigidBody.rotation,
             inertiaTensor: rigidBody.inertiaTensor,
+            centerOfMass: rigidBody.centerOfMass,
 
             force: rigidBody.force,
-            torque: rigidBody.torque,
-            centerOfMass: rigidBody.centerOfMass)
+            torque: rigidBody.torque)
         return strct
     }
 }

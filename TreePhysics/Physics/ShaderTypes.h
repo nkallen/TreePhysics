@@ -18,17 +18,24 @@ typedef NS_ENUM(NSInteger, BufferIndex)
     BufferIndexGridOrigin = 2,
     BufferIndexJoints = 3,
     BufferIndexTime = 4,
-    BufferIndexDebugRigidBody = 5,
-    BufferIndexDebugCompositeBody = 6,
-    BufferIndexDebugFloat = 7,
-    BufferIndexDebugFloat3 = 8,
-    BufferIndexDebugFloat3x3 = 9,
+    BufferIndexRanges = 5,
+    
+    BufferIndexDebugRigidBody = 10,
+    BufferIndexDebugCompositeBody = 11,
+    BufferIndexDebugFloat = 12,
+    BufferIndexDebugFloat3 = 13,
+    BufferIndexDebugFloat3x3 = 14,
 };
 
 typedef NS_ENUM(NSInteger, ThreadGroupIndex)
 {
     ThreadGroupIndexRigidBodies = 0,
     ThreadGroupIndexCompositeBodies  = 1,
+};
+
+typedef NS_ENUM(NSInteger, FunctionConstantIndex)
+{
+    FunctionConstantIndexRangeCount = 0,
 };
 
 typedef struct {
@@ -41,20 +48,22 @@ typedef struct {
 } CompositeBodyStruct;
 
 typedef struct {
+    // const:
     int parentId;
     int childIds[5];
     ushort childCount;
     float mass;
     float length;
     float radius;
-
+    matrix_float3x3 localRotation;
+    
     vector_float3 position;
     matrix_float3x3 rotation;
     matrix_float3x3 inertiaTensor;
-
+    vector_float3 centerOfMass;
+    
     vector_float3 force;
     vector_float3 torque;
-    vector_float3 centerOfMass;
 } RigidBodyStruct;
 
 typedef struct {

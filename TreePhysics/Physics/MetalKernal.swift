@@ -10,7 +10,12 @@ class MetalKernel {
     init(device: MTLDevice, name: String) {
         self.device = device
         let library = device.makeDefaultLibrary()!
-        let kernelFunction = library.makeFunction(name: name)!
-        self.computePipelineState = try! device.makeComputePipelineState(function: kernelFunction)
+        let function = library.makeFunction(name: name)!
+        self.computePipelineState = try! device.makeComputePipelineState(function: function)
+    }
+
+    init(device: MTLDevice, function: MTLFunction) {
+        self.device = device
+        self.computePipelineState = try! device.makeComputePipelineState(function: function)
     }
 }

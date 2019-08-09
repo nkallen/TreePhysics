@@ -67,7 +67,7 @@ rigidBody_updateCompositeBody(
 
 inline void
 rigidBody_childRigidBodies(
-                           RigidBodyStruct rigidBody,
+                           const RigidBodyStruct rigidBody,
                            device RigidBodyStruct * rigidBodies,
                            RigidBodyStruct childRigidBodies[5])
 {

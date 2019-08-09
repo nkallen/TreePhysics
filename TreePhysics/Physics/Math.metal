@@ -182,6 +182,25 @@ inverse(float2x2 m) {
                     float2(-m[1][0], m[0][0]) / (m[0][0]*m[1][1] - m[1][0]*m[0][1]));
 }
 
+inline float3x3 matrix_rotate(float3 rotation)
+{
+    float pitch = rotation.x;
+    float yaw = rotation.y;
+    float roll = rotation.z;
+
+    float cb = cos(pitch);
+    float sb = sin(pitch);
+    float ch = cos(yaw);
+    float sh = sin(yaw);
+    float ca = cos(roll);
+    float sa = sin(roll);
+
+    return float3x3(
+                    float3(ch*ca,          sa,     -sh*ca),
+                    float3(sh*sb-ch*sa*cb, ca*cb,  sh*sa*cb+ch*sb),
+                    float3(ch*sa*sb+sh*cb, -ca*sb, -sh*sa*sb + ch*cb));
+}
+
 // MARK: - Differential Equations
 
 enum QuadraticSolutionType
