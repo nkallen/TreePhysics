@@ -135,6 +135,15 @@ class SimulatorTests: XCTestCase {
         XCTAssertEqual(b2.composite.centerOfMass, b2.centerOfMass)
         XCTAssertEqual(b1.composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass)/2)
         XCTAssertEqual(root.composite.centerOfMass, (b1.centerOfMass + b2.centerOfMass + root.centerOfMass) / 3)
+
+        // inertia tensor
+        XCTAssertEqual(b2.composite.inertiaTensor, b2.inertiaTensor)
+        var b1_inertiaTensor = b1.inertiaTensor - b1.mass * sqr((b1.centerOfMass - b1.composite.centerOfMass).cross_matrix)
+        b1_inertiaTensor += b2.composite.inertiaTensor - b2.composite.mass * sqr((b2.composite.centerOfMass - b1.composite.centerOfMass).cross_matrix)
+        XCTAssertEqual(b1.composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.0001)
+        var root_inertiaTensor = root.inertiaTensor - root.mass * sqr((root.centerOfMass - root.composite.centerOfMass).cross_matrix)
+        root_inertiaTensor += b1.composite.inertiaTensor - b1.composite.mass * sqr((b1.composite.centerOfMass - root.composite.centerOfMass).cross_matrix)
+        XCTAssertEqual(root.composite.inertiaTensor, root_inertiaTensor)
     }
 
     func testUpdateJoints() {

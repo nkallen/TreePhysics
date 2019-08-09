@@ -1,3 +1,9 @@
+FIXES:
+
+look into position/rotation for the structs (compositebody etc)
+
+===
+
 For updatecompositebodyies:
 
 suppose we have a tree:

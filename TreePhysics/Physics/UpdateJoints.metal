@@ -125,9 +125,9 @@ updateJoints(
         RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
         CompositeBodyStruct compositeBody = compositeBodies[gid];
 
-//        debugRigidBodies[0] = rigidBody;
+        debugRigidBodies[gid] = rigidBody;
 //        debugRigidBodies[1] = parentRigidBody;
-//        debugCompositeBodies[0] = compositeBody;
+        debugCompositeBodies[gid] = compositeBody;
 
         joint = updateJoint(joint, parentRigidBody, compositeBody, *time,
                             debugfloat3x3s, debugFloats);

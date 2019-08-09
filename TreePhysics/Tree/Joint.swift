@@ -47,3 +47,9 @@ final class Joint: HasTransform {
 //        return Tree.E * .pi * radius * radius / length
     }
 }
+
+extension Joint: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "Joint \(parentRigidBody.name): k=\(k), θ=\(θ)"
+    }
+}

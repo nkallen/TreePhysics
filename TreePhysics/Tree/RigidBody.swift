@@ -212,8 +212,6 @@ extension RigidBody: Equatable, Hashable {
 
 extension RigidBody: CustomDebugStringConvertible {
     var debugDescription: String {
-        return name
+        return "RigidBody \(name): position=\(position), rotation=\(rotation), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
     }
-
-
 }

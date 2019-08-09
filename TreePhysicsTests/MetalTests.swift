@@ -69,6 +69,15 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
             XCTAssertEqual(b1_composite.centerOfMass, (self.b1.centerOfMass + self.b2.centerOfMass)/2)
             XCTAssertEqual(root_composite.centerOfMass, (self.b1.centerOfMass + self.b2.centerOfMass + self.root.centerOfMass) / 3, accuracy: 0.001)
 
+            // inertia tensor
+            XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor)
+            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - b1_composite.centerOfMass).cross_matrix)
+            b1_inertiaTensor += b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).cross_matrix)
+            XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.0001)
+            var root_inertiaTensor = self.root.inertiaTensor - self.root.mass * sqr((self.root.centerOfMass - root_composite.centerOfMass).cross_matrix)
+            root_inertiaTensor += b1_composite.inertiaTensor - b1_composite.mass * sqr((b1_composite.centerOfMass - root_composite.centerOfMass).cross_matrix)
+            XCTAssertEqual(root_composite.inertiaTensor, root_inertiaTensor)
+
             expect.fulfill()
         }
         commandBuffer.commit()
@@ -82,7 +91,7 @@ class UpdateJointsKernelTests: XCTestCase {
 
     var device: MTLDevice!
     var commandQueue: MTLCommandQueue!
-    var jointsBuffer: MTLBuffer!
+    var compositeBodiesBuffer, jointsBuffer: MTLBuffer!
 
     var root, b1, b2: RigidBody!
     let force: float3 = float3(0, 1, 0) // world coordinates
@@ -103,9 +112,9 @@ class UpdateJointsKernelTests: XCTestCase {
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
-        let compositeBodiesBuffer = device.makeBuffer(
+        self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
-            options: [.storageModePrivate])!
+            options: [.storageModeShared])!
         self.jointsBuffer = UpdateJointsKernel.buffer(count: count, device: device)
 
         self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
@@ -119,13 +128,18 @@ class UpdateJointsKernelTests: XCTestCase {
         updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
         updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1/60)
         commandBuffer.addCompletedHandler { _ in
+            let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: 2)
+
+            let b2_parentJoint = joints[0]
+            let b1_parentJoint = joints[1]
+
             XCTAssertEqual(
                 float3x3(
                     float3(0,0,0.005), // i.e., a small rotation about the z axis
                     float3(0,0,0),
                     float3(0,0,0)
                 ),
-                self.b2.parentJoint!.θ, accuracy: 0.0001)
+                b2_parentJoint.θ, accuracy: 0.0001)
 
             XCTAssertEqual(
                 float3x3(
@@ -133,46 +147,12 @@ class UpdateJointsKernelTests: XCTestCase {
                     float3(0,0,0),
                     float3(0,0,0)
                 ),
-                self.b1.parentJoint!.θ, accuracy: 0.0001)
+                b1_parentJoint.θ, accuracy: 0.0001)
 
             expect.fulfill()
         }
         commandBuffer.commit()
         waitForExpectations(timeout: 10, handler: {error in})
     }
-/*
-    func testUpdateJoints() {
-        XCTAssertEqual(b2.inertiaTensor,
-                       float3x3([[0.5, -2.4835266e-08, 0], [-2.4835263e-08, 0.33333328, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
-        XCTAssertEqual(b2.transform,
-                       float4x4([[1.4901161e-07, -1, 0, 0], [1, 1.4901161e-07, 0, 0], [0, 0, 1, 0], [1/sqrt2, 1.7071068, 0, 1]]), accuracy: Float(0.0001))
-        XCTAssertEqual(b2.parentJoint!.transform, float4x4([[1/sqrt2, -1/sqrt2, 0, 0], [1/sqrt2, 1/sqrt2, 0, 0], [0, 0, 1, 0], [1/sqrt2, 1.7071068, 0, 1]]), accuracy: 0.0001)
-        XCTAssertEqual(b1.inertiaTensor,
-                       float3x3([[0.41666663, -0.08333331, 0], [-0.08333333, 0.4166667, 0], [0, 0, 0.3333]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.transform,
-                       float4x4([[1/sqrt2, -1/sqrt2, 0, 0], [1/sqrt2, 1.0/sqrt2, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.parentJoint!.transform,
-                       float4x4([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]), accuracy: 0.0001)
-
-        simulator.update(at: 1.0 / 60)
-
-        XCTAssertEqual(b2.inertiaTensor,
-                       float3x3([[0.49996945, -0.0022556656, 0], [-0.0022556656, 0.33336386, 0], [0, 0, 0.3333]]), accuracy: 0.0001)
-        XCTAssertEqual(b2.transform,
-                       float4x4([[0.013535231, -0.9999084, 0, 0], [0.9999084, 0.013535231, 0, 0], [0, 0, 1, 0], [0.7010455, 1.7131165, 0, 1]]), accuracy: Float(0.0001))
-        XCTAssertEqual(b2.parentJoint!.transform, float4x4([[0.7166128, -0.6974712, 0, 0], [0.6974712, 0.7166128, 0, 0], [0, 0, 1, 0], [0.7010455, 1.7131165, 0, 1]]), accuracy: 0.0001)
-
-        XCTAssertEqual(b1.inertiaTensor,
-                       float3x3([[0.41524416, -0.083321184, 0], [-0.083321184, 0.4180892, 0], [0, 0, 0.3333]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.transform,
-                       float4x4([[0.7131165, -0.7010455, 0, 0], [0.7010455, 0.7131165, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
-                       accuracy: 0.0001)
-        XCTAssertEqual(b1.parentJoint!.transform,
-                       float4x4([[0.9999636, 0.008535428, 0, 0], [-0.008535428, 0.9999636, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]), accuracy: 0.0001)
-    }
- */
 }
 

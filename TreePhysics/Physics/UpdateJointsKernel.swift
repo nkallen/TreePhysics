@@ -43,7 +43,6 @@ final class UpdateJointsKernel: MetalKernel {
         commandEncoder.setBuffer(debugFloat3s, offset: 0, index: BufferIndex.debugFloat3.rawValue)
         commandEncoder.setBuffer(debugFloat3x3s, offset: 0, index: BufferIndex.debugFloat3x3.rawValue)
 
-        /*
         commandBuffer.addCompletedHandler { _ in
             let rigidBodies = UnsafeMutableRawPointer(self.debugRigidBodies.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 1)
             let compositeBodies = UnsafeMutableRawPointer(self.debugCompositeBodies.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 1)
@@ -51,15 +50,14 @@ final class UpdateJointsKernel: MetalKernel {
             let float3s = UnsafeMutableRawPointer(self.debugFloat3s.contents()).bindMemory(to: float3.self, capacity: 1)
             let float3x3s = UnsafeMutableRawPointer(self.debugFloat3x3s.contents()).bindMemory(to: float3x3.self, capacity: 1)
 
+            print("RigidBody:", rigidBodies[0])
+            print("CompositeBody:", compositeBodies[0])
 
-            print("Rigid bodies:", "\n", rigidBodies[0], "\n", rigidBodies[1])
-            print("Composite bodies:", compositeBodies[0])
-            print("Float3x3s:", "\n", float3x3s[0])
-            print("Float:", "\n", floats[0], floats[1])
-//            print("Debug output:", foo[1])
+            print("RigidBody:", rigidBodies[1])
+            print("CompositeBody:", compositeBodies[1])
+
 //            fatalError()
         }
- */
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)
