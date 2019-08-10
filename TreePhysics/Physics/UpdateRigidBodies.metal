@@ -82,9 +82,9 @@ rigidBody_climbDown(
 
         int id = parentRigidBody.childIds[0];
 
-        parentRigidBody = currentRigidBody;
         currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody, DEBUG_PARAMETERS);
         rigidBodies[id] = currentRigidBody;
+        parentRigidBody = currentRigidBody;
     }
     return parentRigidBody;
 }
