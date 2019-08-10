@@ -43,6 +43,28 @@ class MTLCommandBufferProxy: NSObject, MTLCommandBuffer {
         underlying.present(drawable, atTime: presentationTime)
     }
 
+    #if os(iOS)
+    func present(_ drawable: MTLDrawable, afterMinimumDuration presentationTime: CFTimeInterval) {
+        underlying.present(drawable, afterMinimumDuration: presentationTime)
+    }
+
+    var kernelStartTime: CFTimeInterval {
+        return underlying.kernelStartTime
+    }
+
+    var kernelEndTime: CFTimeInterval {
+        return underlying.kernelEndTime
+    }
+
+    var gpuStartTime: CFTimeInterval {
+        return underlying.gpuStartTime
+    }
+
+    var gpuEndTime: CFTimeInterval {
+        return underlying.gpuEndTime
+    }
+    #endif
+
     func waitUntilScheduled() {
         underlying.waitUntilScheduled()
     }
@@ -233,4 +255,10 @@ class MTLComputeCommandEncoderProxy: NSObject, MTLComputeCommandEncoder {
     func popDebugGroup() {
         underlying.popDebugGroup()
     }
+
+    #if os(iOS)
+    func setImageblockWidth(_ width: Int, height: Int) {
+        underlying.setImageblockWidth(width, height: height)
+    }
+    #endif
 }

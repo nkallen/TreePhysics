@@ -10,6 +10,7 @@ class Game: NSObject {
     let parent: SCNNode
     let updateCompositeBodies: UpdateCompositeBodiesKernel
     let updateJoints: UpdateJointsKernel
+    let updateRigidBodies: UpdateRigidBodiesKernel
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
 
@@ -115,6 +116,8 @@ class Game: NSObject {
 
         let jointsBuffer = UpdateJointsKernel.buffer(count: count, device: device)
         self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: count)
+
+        self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
     }
 }
 
@@ -134,7 +137,8 @@ extension Game: SCNSceneRendererDelegate {
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
-//        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
+        updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
             print("done")
         }

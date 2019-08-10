@@ -117,36 +117,30 @@ updateRigidBodies(
                   KERNEL_DEBUG_FORMAL_PARAMETERS
                   )
 {
-    RigidBodyStruct rigidBody = rigidBodies[0];
-    if (rigidBody.parentId != -1) {
-        if (rigidBody.climberCount > 0) {
-            const JointStruct parentJoint = joints[0];
+    for (int i = 0; i < rangeCount; i++) {
+        int2 range = ranges[i];
+        int lowerBound = range.x;
+        int upperBound = range.y;
+        if ((int)gid >= lowerBound && (int)gid < upperBound) {
+            int id = lowerBound + gid;
 
-            RigidBodyStruct climbers[10];
-            JointStruct climberJoints[10];
-            RigidBodyStruct parentRigidBody = rigidBody_climbers(rigidBody, rigidBodies, joints, climbers, climberJoints, DEBUG_PARAMETERS);
-            parentRigidBody = rigidBody_climbDown(rigidBody, parentRigidBody, climbers, climberJoints, rigidBodies, DEBUG_PARAMETERS);
+            RigidBodyStruct rigidBody = rigidBodies[id];
+            if (rigidBody.parentId != -1) {
+                const JointStruct parentJoint = joints[0];
+                RigidBodyStruct parentRigidBody;
+                if (rigidBody.climberCount > 0) {
+
+                    RigidBodyStruct climbers[10];
+                    JointStruct climberJoints[10];
+                    parentRigidBody = rigidBody_climbers(rigidBody, rigidBodies, joints, climbers, climberJoints, DEBUG_PARAMETERS);
+                    parentRigidBody = rigidBody_climbDown(rigidBody, parentRigidBody, climbers, climberJoints, rigidBodies, DEBUG_PARAMETERS);
+                } else {
+                    parentRigidBody = rigidBodies[rigidBody.parentId];
+                }
                 rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody, DEBUG_PARAMETERS);
-                rigidBodies[0] = rigidBody;
+                rigidBodies[id] = rigidBody;
+            }
         }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
     }
-
-    /*
-     for (int i = 0; i < rangeCount; i++) {
-     int2 range = ranges[i];
-     int offset = range.x;
-     int width = range.y;
-     if ((int)gid >= offset && (int)gid < offset + width) {
-     int id = offset + gid;
-     RigidBodyStruct rigidBody = rigidBodies[id];
-     JointStruct parentJoint = joints[id];
-     RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
-     rigidBodies[id] = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
-     rigidBody_climbDown(rigidBody, rigidBodies, joints);
-     } else {
-     rigidBody_climbDown(rigidBody, rigidBodies, joints);
-     }
-     }
-     threadgroup_barrier(mem_flags::mem_threadgroup);
-     } */
 }

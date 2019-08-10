@@ -17,6 +17,8 @@
 		9E461B3322E5E025008AB788 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
 		9E461B3522E7017F008AB788 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
+		9E51B02422FF23660081CA4C /* UpdateRigidBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */; };
+		9E51B02522FF238A0081CA4C /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
 		9E56C94522E78FCF0095C8AC /* Joint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94422E78FCF0095C8AC /* Joint.swift */; };
 		9E56C94722E78FEC0095C8AC /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94622E78FEC0095C8AC /* RigidBody.swift */; };
@@ -458,10 +460,12 @@
 				9EE801A722FC459000198166 /* MetalKernal.swift in Sources */,
 				9E9D4B7522F37244007DCF49 /* Simulator.swift in Sources */,
 				9E9D4B9722F43D43007DCF49 /* GameViewController.swift in Sources */,
+				9E51B02522FF238A0081CA4C /* MetalProxy.swift in Sources */,
 				9EE801AF22FC492300198166 /* UpdateJoints.metal in Sources */,
 				9E9D4B7622F37244007DCF49 /* RigidBodyPen.swift in Sources */,
 				9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */,
 				9EE801AE22FC48DB00198166 /* Math.metal in Sources */,
+				9E51B02422FF23660081CA4C /* UpdateRigidBodiesKernel.swift in Sources */,
 				9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */,
 				9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */,
 				9EE801B122FC492900198166 /* UpdateJointsKernel.swift in Sources */,
