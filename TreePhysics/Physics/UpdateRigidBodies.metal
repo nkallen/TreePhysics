@@ -47,9 +47,7 @@ inline RigidBodyStruct
 updateRigidBody(
                 const RigidBodyStruct parentRigidBody,
                 const JointStruct parentJoint,
-                RigidBodyStruct rigidBody,
-                FUNCTION_DEBUG_FORMAL_PARAMETERS
-                )
+                RigidBodyStruct rigidBody)
 {
     float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
     float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
@@ -70,9 +68,7 @@ rigidBody_climbDown(
                     RigidBodyStruct parentRigidBody,
                     RigidBodyStruct climbers[10],
                     JointStruct joints[10],
-                    device RigidBodyStruct * rigidBodies,
-                    FUNCTION_DEBUG_FORMAL_PARAMETERS
-                    )
+                    device RigidBodyStruct * rigidBodies)
 {
     RigidBodyStruct currentRigidBody;
 
@@ -82,7 +78,7 @@ rigidBody_climbDown(
 
         int id = parentRigidBody.childIds[0];
 
-        currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody, DEBUG_PARAMETERS);
+        currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody);
         rigidBodies[id] = currentRigidBody;
         parentRigidBody = currentRigidBody;
     }
@@ -94,9 +90,7 @@ inline RigidBodyStruct rigidBody_climbers(
                                           device RigidBodyStruct * rigidBodies,
                                           device JointStruct * joints,
                                           RigidBodyStruct climbers[10],
-                                          JointStruct climberJoints[10],
-                                          FUNCTION_DEBUG_FORMAL_PARAMETERS
-                                          )
+                                          JointStruct climberJoints[10])
 {
     for (ushort i = 0; i < 10; i++) {
         int climberId = rigidBody.climberIds[i];
@@ -113,9 +107,7 @@ updateRigidBodies(
                   device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
                   device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
                   constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
-                  uint gid [[ thread_position_in_grid ]],
-                  KERNEL_DEBUG_FORMAL_PARAMETERS
-                  )
+                  uint gid [[ thread_position_in_grid ]])
 {
     for (int i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
@@ -132,12 +124,12 @@ updateRigidBodies(
 
                     RigidBodyStruct climbers[10];
                     JointStruct climberJoints[10];
-                    parentRigidBody = rigidBody_climbers(rigidBody, rigidBodies, joints, climbers, climberJoints, DEBUG_PARAMETERS);
-                    parentRigidBody = rigidBody_climbDown(rigidBody, parentRigidBody, climbers, climberJoints, rigidBodies, DEBUG_PARAMETERS);
+                    parentRigidBody = rigidBody_climbers(rigidBody, rigidBodies, joints, climbers, climberJoints);
+                    parentRigidBody = rigidBody_climbDown(rigidBody, parentRigidBody, climbers, climberJoints, rigidBodies);
                 } else {
                     parentRigidBody = rigidBodies[rigidBody.parentId];
                 }
-                rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody, DEBUG_PARAMETERS);
+                rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
                 rigidBodies[id] = rigidBody;
             }
         }

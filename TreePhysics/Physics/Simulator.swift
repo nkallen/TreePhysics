@@ -78,9 +78,6 @@ final class Simulator {
     func updateJoints(at time: TimeInterval) {
         for rigidBody in rigidBodiesReverseLevelOrder { // Order does not matter
             if let parentJoint = rigidBody.parentJoint {
-                print("RigidBody:", rigidBody)
-                print("CompositeBody:", rigidBody.composite)
-
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
 
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -

@@ -76,13 +76,11 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             for unitOfWork in level {
                 let id = index[unitOfWork.rigidBody]!
                 rigidBodyStructs[id] = `struct`(rigidBody: unitOfWork.rigidBody, climbers: unitOfWork.climbers, index: index)
-                print(id, rigidBodyStructs[id])
             }
         }
         for rigidBody in allClimbers {
             let id = index[rigidBody]!
             rigidBodyStructs[id] = `struct`(rigidBody: rigidBody, index: index)
-            print(id, rigidBodyStructs[id])
         }
         rigidBodyStructs[index[root]!] = `struct`(rigidBody: root, index: index)
         return (count, buffer, rangesOfWork)
