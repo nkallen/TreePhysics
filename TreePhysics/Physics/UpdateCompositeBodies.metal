@@ -89,19 +89,15 @@ rigidBody_childCompositeBodies(
     int childId;
     childId = rigidBody.childIds[0];
     childCompositeBodies[0] = compositeBodies[childId];
-    //if (rigidBody.childCount == 1) return;
 
     childId = rigidBody.childIds[1];
     childCompositeBodies[1] = compositeBodies[childId];
-    //if (rigidBody.childCount == 2) return;
 
     childId = rigidBody.childIds[2];
     childCompositeBodies[2] = compositeBodies[childId];
-    //if (rigidBody.childCount == 3) return;
 
     childId = rigidBody.childIds[3];
     childCompositeBodies[3] = compositeBodies[childId];
-    //if (rigidBody.childCount == 4) return;
 
     childId = rigidBody.childIds[4];
     childCompositeBodies[4] = compositeBodies[childId];

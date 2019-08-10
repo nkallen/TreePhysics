@@ -9,7 +9,7 @@ final class Simulator {
 
     init(tree: Tree) {
         self.tree = tree
-        self.rigidBodiesLevelOrder = tree.root.flattened.filter { $0.kind == .dynamic }
+        self.rigidBodiesLevelOrder = tree.root.flattened().filter { $0.kind == .dynamic }
         self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
         updateRigidBodies()
     }

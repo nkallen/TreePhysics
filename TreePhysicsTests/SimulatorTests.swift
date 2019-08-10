@@ -170,29 +170,6 @@ class SimulatorTests: XCTestCase {
 
 }
 
-class TreeTests: XCTestCase {
-    func testFlattenIsBreadthFirst() {
-        let root = RigidBody()
-        let b1 = RigidBody()
-        let b2 = RigidBody()
-        let b3 = RigidBody()
-        let b4 = RigidBody()
-        let b5 = RigidBody()
-        let b6 = RigidBody()
-        let b7 = RigidBody()
-        root.add(b1)
-        root.add(b2)
-        b1.add(b3)
-        b1.add(b4)
-        b4.add(b5)
-        b2.add(b6)
-        b2.add(b7)
-
-        XCTAssertEqual(root.flattened,
-                       [root, b1, b2, b3, b4, b6, b7, b5])
-    }
-}
-
 class QuadraticTests: XCTestCase {
     func testRealDistinct() {
         XCTAssertEqual(solve_quadratic(a: 1, b: 11, c: 24),

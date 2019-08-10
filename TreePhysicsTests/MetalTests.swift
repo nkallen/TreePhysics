@@ -211,9 +211,6 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
             let b2 = rigidBodies[0]
             let b1 = rigidBodies[1]
 
-            print("parent joint position:", debug.float3s[0])
-            print("parent joint rotatino:", debug.float3x3s[0])
-
             XCTAssertEqual(
                 float3(0.7010456, 1.7131165, 0),
                 b2.position, accuracy: 0.0001)

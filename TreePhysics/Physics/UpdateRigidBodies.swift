@@ -6,10 +6,9 @@ final class UpdateRigidBodiesKernel: MetalKernel {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
     let jointsBuffer: MTLBuffer
-    let ranges: [(Int, Int)]
+    let ranges: [Range<Int>]
 
-    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, compositeBodiesBuffer: MTLBuffer, jointsBuffer: MTLBuffer, ranges: [(Int, Int)]) {
-        // FIXME rethink ranges (Int, Int) datatype.
+    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, compositeBodiesBuffer: MTLBuffer, jointsBuffer: MTLBuffer, ranges: [Range<Int>]) {
         precondition(ranges.count > 0)
 
         let library = device.makeDefaultLibrary()!
@@ -19,7 +18,7 @@ final class UpdateRigidBodiesKernel: MetalKernel {
         let function = try! library.makeFunction(name: "updateRigidBodies", constantValues: constantValues)
 
 //        self.ranges = ranges.reversed()
-        self.ranges = [(2, 1)] // FIXME!!!!
+        self.ranges = [2..<3]
 
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.jointsBuffer = jointsBuffer
@@ -34,10 +33,10 @@ final class UpdateRigidBodiesKernel: MetalKernel {
         commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
         commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
         commandEncoder.setBuffer(jointsBuffer, offset: 0, index: BufferIndex.joints.rawValue)
-        var ranges = self.ranges.map { int2(Int32($0.0), Int32($0.1)) }
+        var ranges = self.ranges.map { int2(Int32($0.lowerBound), Int32($0.upperBound)) }
         commandEncoder.setBytes(&ranges, length: MemoryLayout<int2>.stride * ranges.count, index: BufferIndex.ranges.rawValue)
 
-        let (_, maxWidth) = self.ranges[0]
+        let maxWidth = self.ranges[0].count
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)

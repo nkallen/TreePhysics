@@ -5,9 +5,9 @@ import Metal
 final class UpdateCompositeBodiesKernel: MetalKernel {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
-    let ranges: [(Int, Int)]
+    let ranges: [Range<Int>]
 
-    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, ranges: [(Int, Int)], compositeBodiesBuffer: MTLBuffer) {
+    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, ranges: [Range<Int>], compositeBodiesBuffer: MTLBuffer) {
         self.ranges = ranges
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = compositeBodiesBuffer
@@ -16,19 +16,20 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
 
     func encode(commandBuffer: MTLCommandBuffer) {
         var i = 0
-        for (gridOrigin, threadsPerGrid) in ranges {
+        for range in ranges {
+            var gridOrigin = range.lowerBound
+
             let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
             commandEncoder.setComputePipelineState(computePipelineState)
             commandEncoder.label  = "Update Composite Bodies in Parallel, Round \(i)"
             commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
             commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
-            var gridOrigin = gridOrigin
             commandEncoder.setBytes(&gridOrigin, length: MemoryLayout<Int>.size, index: BufferIndex.gridOrigin.rawValue)
 
             let width = computePipelineState.maxTotalThreadsPerThreadgroup
             let threadsPerThreadgroup = MTLSizeMake(width, 1, 1)
             let threadsPerGrid = MTLSize(
-                width: threadsPerGrid,
+                width: range.count,
                 height: 1,
                 depth: 1)
 
@@ -39,56 +40,81 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         }
     }
 
-    static func buffer(root: RigidBody, device: MTLDevice) -> (Int, MTLBuffer, [(Int, Int)]) {
-        var allRigidBodies: [RigidBody] = []
-        var allStragglers: [RigidBody] = []
-        var rangesOfWork: [(Int, Int)] = []
-        for (parallel, stragglers) in root.levels {
-            let range = (allRigidBodies.count, parallel.count)
-            allRigidBodies.append(contentsOf: parallel)
-            allStragglers.append(contentsOf: stragglers)
+    static func buffer(root: RigidBody, device: MTLDevice) -> (Int, MTLBuffer, [Range<Int>]) {
+        var rangesOfWork: [Range<Int>] = []
+        let levels = root.levels()
+        var offset = 0
+        var id = 0
+        var index: [RigidBody:Int] = [:]
+        var allClimbers: [RigidBody] = []
+
+        // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
+        for level in levels {
+            for unitOfWork in level {
+                allClimbers.append(contentsOf: unitOfWork.climbers)
+                index[unitOfWork.rigidBody] = id
+                id += 1
+            }
+
+            let range = offset..<(offset+level.count)
             rangesOfWork.append(range)
+            offset += level.count
+        }
+        for rigidBody in allClimbers {
+            index[rigidBody] = id
+            id += 1
         }
 
-        // Remove the root:
-//        _ = rangesOfWork.popLast() FIXME
+        // Step 1: Allocate the buffer
+        let count = offset + allClimbers.count
+        let buffer = device.makeBuffer(length: count * MemoryLayout<RigidBodyStruct>.stride, options: [.storageModeShared])!
 
-        let all = allRigidBodies + allStragglers
-        return (all.count, buffer(flattened: all, device: device), rangesOfWork)
+        // Step 3: Store data into the buffer
+        let rigidBodyStructs = UnsafeMutableRawPointer(buffer.contents())!.bindMemory(to: RigidBodyStruct.self, capacity: count)
+        for level in levels {
+            for unitOfWork in level {
+                let id = index[unitOfWork.rigidBody]!
+                rigidBodyStructs[id] = `struct`(rigidBody: unitOfWork.rigidBody, climbers: unitOfWork.climbers, index: index)
+            }
+        }
+        for rigidBody in allClimbers {
+            let id = index[rigidBody]!
+            rigidBodyStructs[id] = `struct`(rigidBody: rigidBody, index: index)
+        }
+        return (count, buffer, rangesOfWork)
     }
 
-    static func buffer(flattened: [RigidBody], device: MTLDevice) -> MTLBuffer {
-        let buffer = device.makeBuffer(length: flattened.count * MemoryLayout<RigidBodyStruct>.stride, options: [.storageModeShared])!
-        var index: [RigidBody:Int32] = [:]
-        for (i, rigidBody) in flattened.enumerated() {
-            index[rigidBody] = Int32(i)
-        }
-        let rigidBodyStructs = UnsafeMutableRawPointer(buffer.contents())!.bindMemory(to: RigidBodyStruct.self, capacity: flattened.count)
-        for (i, rigidBody) in flattened.enumerated() {
-            rigidBodyStructs[i] = `struct`(rigidBody: rigidBody, index: index)
-        }
-        return buffer
-    }
+    typealias ChildIdsType = (Int32, Int32, Int32, Int32, Int32)
+    typealias ClimberIdsType = (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32)
 
-    typealias TupleType = (Int32, Int32, Int32, Int32, Int32)
-
-    private static func `struct`(rigidBody: RigidBody, index: [RigidBody:Int32]) -> RigidBodyStruct {
+    private static func `struct`(rigidBody: RigidBody, climbers: [RigidBody] = [], index: [RigidBody:Int]) -> RigidBodyStruct {
+        // Parent
         let parentId: Int32
         if let parentJoint = rigidBody.parentJoint {
-            parentId = index[parentJoint.parentRigidBody]!
+            parentId = Int32(index[parentJoint.parentRigidBody]!)
         } else {
             parentId = -1
         }
+
+        // Child
         let childRigidBodies = rigidBody.childJoints.map { $0.childRigidBody }
+        assert(childRigidBodies.count <= 5)
         let childRigidBodyIndices = childRigidBodies.map { index[$0] }
-        assert(childRigidBodies.count < 5)
-        var childIds: TupleType = (0,0,0,0,0)
+        var childIds: ChildIdsType = (0,0,0,0,0)
         memcpy(&childIds, childRigidBodyIndices, childRigidBodyIndices.count)
+
+        // Climbers
+        assert(climbers.count <= 10)
+        let climberIndices = climbers.map { index[$0] }
+        var climberIds: ClimberIdsType = (0,0,0,0,0,0,0,0,0,0)
+        memcpy(&climberIds, climberIndices, climberIndices.count)
 
         let strct = RigidBodyStruct(
             parentId: parentId,
             childIds: childIds,
             childCount: ushort(childRigidBodies.count),
+            climberIds: climberIds,
+            climberCount: ushort(climbers.count),
             mass: rigidBody.mass,
             length: rigidBody.length,
             radius: rigidBody.radius,

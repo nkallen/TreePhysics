@@ -52,6 +52,8 @@ typedef struct {
     int parentId;
     int childIds[5];
     ushort childCount;
+    int climberIds[10];
+    ushort climberCount;
     float mass;
     float length;
     float radius;

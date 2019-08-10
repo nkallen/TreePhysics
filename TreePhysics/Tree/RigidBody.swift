@@ -110,7 +110,11 @@ final class RigidBody: HasTransform {
 
 // MARK: Flattening
 
-typealias Levels = [([RigidBody], [RigidBody])]
+struct UnitOfWork {
+    let rigidBody: RigidBody
+    let climbers: [RigidBody]
+}
+typealias Level = [UnitOfWork]
 
 extension RigidBody {
     var hasOneChild: Bool {
@@ -121,34 +125,37 @@ extension RigidBody {
         return parentJoint?.parentRigidBody
     }
 
-    var levels: Levels {
-        var result: [([RigidBody], [RigidBody])] = []
+    func levels() -> [Level] {
+        var result: [Level] = []
         var visited: Set<RigidBody> = []
 
         var remaining = self.leaves
         repeat {
-            var level: [RigidBody] = []
-            var stragglers: [RigidBody] = []
+            var level: Level = []
             var nextRemaining: [RigidBody] = []
             while var n = remaining.popLast() {
                 if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody) }) && !visited.contains(n) {
-                    level.append(n)
+                    var climbers: [RigidBody] = []
+                    let beforeClimb = n
                     while let parentRigidBody = n.parentRigidBody, parentRigidBody.hasOneChild {
                         n = parentRigidBody
                         if !visited.contains(n) {
                             visited.insert(n)
-                            stragglers.append(n)
+                            climbers.append(n)
                         }
                     }
+                    level.append(
+                        UnitOfWork(rigidBody: beforeClimb, climbers: climbers))
                     if let parentJoint = n.parentJoint {
                         nextRemaining.append(parentJoint.parentRigidBody)
                     }
                 }
             }
             if !level.isEmpty {
-                result.append((level, stragglers))
+                result.append(level)
             }
-            visited = visited.union(level)
+            let beforeClimbs = level.map { $0.rigidBody }
+            visited = visited.union(beforeClimbs)
             remaining = Array(Set(nextRemaining))
         } while !remaining.isEmpty
         return result
@@ -158,7 +165,7 @@ extension RigidBody {
         return parentJoint == nil
     }
 
-    var flattened: [RigidBody] {
+    func flattened() -> [RigidBody] {
         var result: [RigidBody] = []
         var queue: [RigidBody] = [self]
         searchBreadthFirst(queue: &queue, result: &result)
