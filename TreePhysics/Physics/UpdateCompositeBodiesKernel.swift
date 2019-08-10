@@ -64,9 +64,10 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             index[rigidBody] = id
             id += 1
         }
+        index[root] = id
 
         // Step 1: Allocate the buffer
-        let count = offset + allClimbers.count
+        let count = offset + allClimbers.count + 1 // +1 for root
         let buffer = device.makeBuffer(length: count * MemoryLayout<RigidBodyStruct>.stride, options: [.storageModeShared])!
 
         // Step 3: Store data into the buffer
@@ -75,12 +76,15 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             for unitOfWork in level {
                 let id = index[unitOfWork.rigidBody]!
                 rigidBodyStructs[id] = `struct`(rigidBody: unitOfWork.rigidBody, climbers: unitOfWork.climbers, index: index)
+                print(id, rigidBodyStructs[id])
             }
         }
         for rigidBody in allClimbers {
             let id = index[rigidBody]!
             rigidBodyStructs[id] = `struct`(rigidBody: rigidBody, index: index)
+            print(id, rigidBodyStructs[id])
         }
+        rigidBodyStructs[index[root]!] = `struct`(rigidBody: root, index: index)
         return (count, buffer, rangesOfWork)
     }
 

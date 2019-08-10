@@ -11,7 +11,7 @@
 		9E036B1F22E4F58600229235 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
 		9E1797E622FB704F00FA3892 /* UpdateCompositeBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */; };
 		9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E27B86022FA39920030664E /* RigidBodyTests.swift */; };
-		9E31BE9622FDABE800AF908B /* UpdateRigidBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */; };
+		9E31BE9622FDABE800AF908B /* UpdateRigidBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */; };
 		9E31BE9822FDAE4600AF908B /* UpdateRigidBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */; };
 		9E3351C122F83DDF00FDC3D6 /* MetalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */; };
 		9E461B3322E5E025008AB788 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
@@ -96,7 +96,7 @@
 		9E036B1B22E4F4A700229235 /* TurtleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurtleTests.swift; sourceTree = "<group>"; };
 		9E036B1E22E4F58600229235 /* Turtle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turtle.swift; sourceTree = "<group>"; };
 		9E27B86022FA39920030664E /* RigidBodyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBodyTests.swift; sourceTree = "<group>"; };
-		9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRigidBodies.swift; sourceTree = "<group>"; };
+		9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRigidBodiesKernel.swift; sourceTree = "<group>"; };
 		9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UpdateRigidBodies.metal; sourceTree = "<group>"; };
 		9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalTests.swift; sourceTree = "<group>"; };
 		9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UpdateCompositeBodies.metal; sourceTree = "<group>"; };
@@ -203,7 +203,7 @@
 				9E62078322F8A7E6005E99C8 /* ShaderTypes.h */,
 				9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */,
 				9EE801A922FC468700198166 /* UpdateJoints.metal */,
-				9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */,
+				9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */,
 				9EE801AB22FC483B00198166 /* Math.metal */,
 				9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */,
 				9EE801A322FC450D00198166 /* UpdateJointsKernel.swift */,
@@ -499,7 +499,7 @@
 				9EE7EBC422E08E4000535997 /* Math.swift in Sources */,
 				9EE7250222F84D57000D0A2F /* UpdateCompositeBodies.metal in Sources */,
 				9EE801B222FC492A00198166 /* UpdateJointsKernel.swift in Sources */,
-				9E31BE9622FDABE800AF908B /* UpdateRigidBodies.swift in Sources */,
+				9E31BE9622FDABE800AF908B /* UpdateRigidBodiesKernel.swift in Sources */,
 				9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */,
 				9E9D4B6622F313D0007DCF49 /* PhysicsField.swift in Sources */,
 				9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */,

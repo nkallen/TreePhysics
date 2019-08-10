@@ -84,23 +84,10 @@ rigidBody_childCompositeBodies(
                                device CompositeBodyStruct * compositeBodies,
                                CompositeBodyStruct childCompositeBodies[5])
 {
-    if (rigidBody.childCount == 0) return;
-
-    int childId;
-    childId = rigidBody.childIds[0];
-    childCompositeBodies[0] = compositeBodies[childId];
-
-    childId = rigidBody.childIds[1];
-    childCompositeBodies[1] = compositeBodies[childId];
-
-    childId = rigidBody.childIds[2];
-    childCompositeBodies[2] = compositeBodies[childId];
-
-    childId = rigidBody.childIds[3];
-    childCompositeBodies[3] = compositeBodies[childId];
-
-    childId = rigidBody.childIds[4];
-    childCompositeBodies[4] = compositeBodies[childId];
+    for (int i = 0; i < 5; i++) {
+        int childId = rigidBody.childIds[i];
+        childCompositeBodies[i] = compositeBodies[childId];
+    }
 }
 
 inline uint

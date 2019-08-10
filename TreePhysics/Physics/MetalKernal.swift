@@ -23,6 +23,7 @@ class MetalKernel {
 class KernelDebugger {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
+    let jointsBuffer: MTLBuffer
     let floatsBuffer: MTLBuffer
     let float3sBuffer: MTLBuffer
     let float3x3sBuffer: MTLBuffer
@@ -30,6 +31,7 @@ class KernelDebugger {
     init(device: MTLDevice) {
         self.rigidBodiesBuffer = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.compositeBodiesBuffer = device.makeBuffer(length: 1024, options: [.storageModeShared])!
+        self.jointsBuffer = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.floatsBuffer = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.float3sBuffer = device.makeBuffer(length: 1024, options: [.storageModeShared])!
         self.float3x3sBuffer = device.makeBuffer(length: 1024, options: [.storageModeShared])!
@@ -38,6 +40,7 @@ class KernelDebugger {
     func encode(commandEncoder: MTLComputeCommandEncoder) {
         commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.debugRigidBody.rawValue)
         commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.debugCompositeBody.rawValue)
+        commandEncoder.setBuffer(jointsBuffer, offset: 0, index: BufferIndex.debugJoint.rawValue)
         commandEncoder.setBuffer(floatsBuffer, offset: 0, index: BufferIndex.debugFloat.rawValue)
         commandEncoder.setBuffer(float3sBuffer, offset: 0, index: BufferIndex.debugFloat3.rawValue)
         commandEncoder.setBuffer(float3x3sBuffer, offset: 0, index: BufferIndex.debugFloat3x3.rawValue)
@@ -55,6 +58,10 @@ class KernelDebugger {
         return UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 10)
     }
 
+    var joints: UnsafeMutablePointer<JointStruct> {
+        return UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: 10)
+    }
+    
     var floats: UnsafeMutablePointer<Float> {
         return UnsafeMutableRawPointer(self.floatsBuffer.contents()).bindMemory(to: Float.self, capacity: 10)
     }

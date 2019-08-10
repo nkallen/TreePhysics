@@ -22,9 +22,10 @@ typedef NS_ENUM(NSInteger, BufferIndex)
     
     BufferIndexDebugRigidBody = 10,
     BufferIndexDebugCompositeBody = 11,
-    BufferIndexDebugFloat = 12,
-    BufferIndexDebugFloat3 = 13,
-    BufferIndexDebugFloat3x3 = 14,
+    BufferIndexDebugJoint = 13,
+    BufferIndexDebugFloat = 14,
+    BufferIndexDebugFloat3 = 15,
+    BufferIndexDebugFloat3x3 = 16,
 };
 
 typedef NS_ENUM(NSInteger, ThreadGroupIndex)

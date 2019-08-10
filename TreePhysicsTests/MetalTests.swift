@@ -211,6 +211,10 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
             let b2 = rigidBodies[0]
             let b1 = rigidBodies[1]
 
+            print("====", debug.floats[0], debug.floats[1])
+            print(">>>>>", debug.rigidBodies[0])
+            print(">>>>>", debug.joints[0])
+
             XCTAssertEqual(
                 float3(0.7010456, 1.7131165, 0),
                 b2.position, accuracy: 0.0001)

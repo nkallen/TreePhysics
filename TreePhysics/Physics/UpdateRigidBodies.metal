@@ -54,8 +54,6 @@ updateRigidBody(
     float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
     float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
     float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
-    debugFloat3s[0] = parentJointPosition;
-    debugFloat3x3s[0] = parentJointRotation;
 
     rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
     rigidBody.position = parentJointPosition;
@@ -66,24 +64,48 @@ updateRigidBody(
     return rigidBody;
 }
 
-inline void
+inline RigidBodyStruct
 rigidBody_climbDown(
                     const RigidBodyStruct rigidBody,
+                    RigidBodyStruct parentRigidBody,
+                    RigidBodyStruct climbers[10],
+                    JointStruct joints[10],
                     device RigidBodyStruct * rigidBodies,
-                    device JointStruct * joints,
                     FUNCTION_DEBUG_FORMAL_PARAMETERS
                     )
 {
-    RigidBodyStruct currentRigidBody = rigidBody;
+    RigidBodyStruct currentRigidBody;
 
-    while (currentRigidBody.childCount == 1) {
-        int childId = currentRigidBody.childIds[0];
-        RigidBodyStruct parentRigidBody = currentRigidBody;
-        currentRigidBody = rigidBodies[childId];
-        JointStruct parentJoint = joints[childId];
+    for (short i = rigidBody.climberCount - 1; i >= 0; i--) {
+        currentRigidBody = climbers[i];
+        JointStruct parentJoint = joints[i];
+
+        int id = parentRigidBody.childIds[0];
+
+        parentRigidBody = currentRigidBody;
         currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody, DEBUG_PARAMETERS);
-        rigidBodies[childId] = currentRigidBody;
+        rigidBodies[id] = currentRigidBody;
     }
+    return parentRigidBody;
+}
+
+inline RigidBodyStruct rigidBody_climbers(
+                                          const RigidBodyStruct rigidBody,
+                                          device RigidBodyStruct * rigidBodies,
+                                          device JointStruct * joints,
+                                          RigidBodyStruct climbers[10],
+                                          JointStruct climberJoints[10],
+                                          FUNCTION_DEBUG_FORMAL_PARAMETERS
+                                          )
+{
+    for (ushort i = 0; i < 10; i++) {
+        int climberId = rigidBody.climberIds[i];
+        RigidBodyStruct climber = rigidBodies[climberId];
+        climbers[i] = climber;
+        climberJoints[i] = joints[climberId];
+    }
+
+    return rigidBodies[climbers[rigidBody.climberCount - 1].parentId];
 }
 
 kernel void
@@ -95,25 +117,36 @@ updateRigidBodies(
                   KERNEL_DEBUG_FORMAL_PARAMETERS
                   )
 {
-    RigidBodyStruct root = rigidBodies[2];
-    rigidBody_climbDown(root, rigidBodies, joints, DEBUG_PARAMETERS);
-    /*
-    for (int i = 0; i < rangeCount; i++) {
-        int2 range = ranges[i];
-        int offset = range.x;
-        int width = range.y;
-        if ((int)gid >= offset && (int)gid < offset + width) {
-            int id = offset + gid;
-            RigidBodyStruct rigidBody = rigidBodies[id];
-            JointStruct parentJoint = joints[id];
-            if (rigidBody.parentId != -1) {
-                RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
-                rigidBodies[id] = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
-                rigidBody_climbDown(rigidBody, rigidBodies, joints);
-            } else {
-                rigidBody_climbDown(rigidBody, rigidBodies, joints);
-            }
+    RigidBodyStruct rigidBody = rigidBodies[0];
+    if (rigidBody.parentId != -1) {
+        if (rigidBody.climberCount > 0) {
+            const JointStruct parentJoint = joints[0];
+
+            RigidBodyStruct climbers[10];
+            JointStruct climberJoints[10];
+            RigidBodyStruct parentRigidBody = rigidBody_climbers(rigidBody, rigidBodies, joints, climbers, climberJoints, DEBUG_PARAMETERS);
+            parentRigidBody = rigidBody_climbDown(rigidBody, parentRigidBody, climbers, climberJoints, rigidBodies, DEBUG_PARAMETERS);
+                rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody, DEBUG_PARAMETERS);
+                rigidBodies[0] = rigidBody;
         }
-        threadgroup_barrier(mem_flags::mem_threadgroup);
-    } */
+    }
+
+    /*
+     for (int i = 0; i < rangeCount; i++) {
+     int2 range = ranges[i];
+     int offset = range.x;
+     int width = range.y;
+     if ((int)gid >= offset && (int)gid < offset + width) {
+     int id = offset + gid;
+     RigidBodyStruct rigidBody = rigidBodies[id];
+     JointStruct parentJoint = joints[id];
+     RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
+     rigidBodies[id] = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
+     rigidBody_climbDown(rigidBody, rigidBodies, joints);
+     } else {
+     rigidBody_climbDown(rigidBody, rigidBodies, joints);
+     }
+     }
+     threadgroup_barrier(mem_flags::mem_threadgroup);
+     } */
 }

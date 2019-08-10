@@ -33,7 +33,7 @@ class RigidBodyTests: XCTestCase {
         b1.add(b2)
 
         let expected: [Level] = [
-            [UnitOfWork(rigidBody: b2, climbers: [b1, root])],
+            [UnitOfWork(rigidBody: b2, climbers: [b1])],
         ]
         XCTAssertEqual(expected, root.levels())
     }
@@ -74,7 +74,7 @@ class RigidBodyTests: XCTestCase {
                 UnitOfWork(rigidBody: b2, climbers: empty)],
             [UnitOfWork(rigidBody: b7, climbers: empty)],
             [UnitOfWork(rigidBody: b5, climbers: [b4, b3])],
-            [UnitOfWork(rigidBody: b1, climbers: [root])]
+            [UnitOfWork(rigidBody: b1, climbers: [])]
         ]
         XCTAssertEqual(expected, root.levels())
     }
