@@ -118,6 +118,7 @@ class Game: NSObject {
         self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: count)
 
         self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
+
     }
 }
 
@@ -132,7 +133,7 @@ extension Game: SCNSceneRendererDelegate {
             1,
             radius * cosf(Float(start.timeIntervalSinceNow)))
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
-        // simulator.update(at: 1.0 / 60)
+//        simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
@@ -140,7 +141,6 @@ extension Game: SCNSceneRendererDelegate {
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
-            print("done")
         }
         commandBuffer.commit()
     }

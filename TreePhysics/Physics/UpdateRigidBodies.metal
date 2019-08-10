@@ -113,7 +113,7 @@ updateRigidBodies(
         int2 range = ranges[i];
         int lowerBound = range.x;
         int upperBound = range.y;
-        if ((int)gid >= lowerBound && (int)gid < upperBound) {
+        if ((int)gid >= 0 && (int)gid < upperBound - lowerBound) {
             int id = lowerBound + gid;
 
             RigidBodyStruct rigidBody = rigidBodies[id];
@@ -121,7 +121,6 @@ updateRigidBodies(
                 const JointStruct parentJoint = joints[0];
                 RigidBodyStruct parentRigidBody;
                 if (rigidBody.climberCount > 0) {
-
                     RigidBodyStruct climbers[10];
                     JointStruct climberJoints[10];
                     parentRigidBody = rigidBody_climbers(rigidBody, rigidBodies, joints, climbers, climberJoints);
@@ -136,3 +135,4 @@ updateRigidBodies(
         threadgroup_barrier(mem_flags::mem_threadgroup);
     }
 }
+
