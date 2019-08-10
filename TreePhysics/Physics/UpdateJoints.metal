@@ -38,10 +38,7 @@ updateJoint(
             JointStruct joint,
             RigidBodyStruct parentRigidBody,
             CompositeBodyStruct childCompositeBody,
-            float time /*,
-            device float3x3 * debugFloat3x3s,
-            device float * debugFloats */
-            )
+            float time)
 {
     float3 pr = joint_rotateVector(joint, parentRigidBody, childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody));
 
@@ -61,11 +58,7 @@ updateJoint(
         // i.e., produce the generalized eigendecomposition of I and K
 
         // 1.a. the cholesky decomposition of I
-//        debugFloat3x3s[0] = inertiaTensor_jointSpace;
-
-//        debugFloats[0] = (float)parentRigidBody.parentId;
         float3x3 L = cholesky(inertiaTensor_jointSpace);
-//        debugFloats[1] = -(float)parentRigidBody.parentId;
         float3x3 L_inverse = inverse(L);
         float3x3 L_transpose_inverse = inverse(transpose(L));
 
@@ -108,13 +101,6 @@ updateJoints(
              device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
              device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
              device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
-/*
-             device RigidBodyStruct * debugRigidBodies [[ buffer(BufferIndexDebugRigidBody) ]],
-             device CompositeBodyStruct * debugCompositeBodies [[ buffer(BufferIndexDebugCompositeBody) ]],
-             device float * debugFloats [[ buffer(BufferIndexDebugFloat) ]],
-             device float3 * debugFloat3s [[ buffer(BufferIndexDebugFloat3) ]],
-             device float3x3 * debugfloat3x3s [[ buffer(BufferIndexDebugFloat3x3) ]],
-*/
              constant float * time [[ buffer(BufferIndexTime) ]],
              uint gid [[ thread_position_in_grid ]])
 {
@@ -124,13 +110,7 @@ updateJoints(
     if (rigidBody.parentId != -1) {
         RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
         CompositeBodyStruct compositeBody = compositeBodies[gid];
-/*
-        debugRigidBodies[gid] = rigidBody;
-//        debugRigidBodies[1] = parentRigidBody;
-        debugCompositeBodies[gid] = compositeBody;
-*/
-        joint = updateJoint(joint, parentRigidBody, compositeBody, *time /*,
-                            debugfloat3x3s, debugFloats */);
+        joint = updateJoint(joint, parentRigidBody, compositeBody, *time);
         joints[gid] = joint;
     }
 }

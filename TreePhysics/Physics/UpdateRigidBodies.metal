@@ -1,6 +1,7 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
+#import "Debug.metal"
 using namespace metal;
 
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
@@ -46,11 +47,15 @@ inline RigidBodyStruct
 updateRigidBody(
                 const RigidBodyStruct parentRigidBody,
                 const JointStruct parentJoint,
-                RigidBodyStruct rigidBody)
+                RigidBodyStruct rigidBody,
+                FUNCTION_DEBUG_FORMAL_PARAMETERS
+                )
 {
     float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
     float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
     float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
+    debugFloat3s[0] = parentJointPosition;
+    debugFloat3x3s[0] = parentJointRotation;
 
     rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
     rigidBody.position = parentJointPosition;
@@ -65,16 +70,19 @@ inline void
 rigidBody_climbDown(
                     const RigidBodyStruct rigidBody,
                     device RigidBodyStruct * rigidBodies,
-                    device JointStruct * joints)
+                    device JointStruct * joints,
+                    FUNCTION_DEBUG_FORMAL_PARAMETERS
+                    )
 {
     RigidBodyStruct currentRigidBody = rigidBody;
 
     while (currentRigidBody.childCount == 1) {
         int childId = currentRigidBody.childIds[0];
-        RigidBodyStruct parentRigidBody = rigidBody;
+        RigidBodyStruct parentRigidBody = currentRigidBody;
         currentRigidBody = rigidBodies[childId];
         JointStruct parentJoint = joints[childId];
-        rigidBodies[childId] = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
+        currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody, DEBUG_PARAMETERS);
+        rigidBodies[childId] = currentRigidBody;
     }
 }
 
@@ -83,8 +91,13 @@ updateRigidBodies(
                   device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
                   device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
                   constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
-                  uint gid [[ thread_position_in_grid ]])
+                  uint gid [[ thread_position_in_grid ]],
+                  KERNEL_DEBUG_FORMAL_PARAMETERS
+                  )
 {
+    RigidBodyStruct root = rigidBodies[2];
+    rigidBody_climbDown(root, rigidBodies, joints, DEBUG_PARAMETERS);
+    /*
     for (int i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
         int offset = range.x;
@@ -97,8 +110,10 @@ updateRigidBodies(
                 RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
                 rigidBodies[id] = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
                 rigidBody_climbDown(rigidBody, rigidBodies, joints);
+            } else {
+                rigidBody_climbDown(rigidBody, rigidBodies, joints);
             }
         }
         threadgroup_barrier(mem_flags::mem_threadgroup);
-    }
+    } */
 }

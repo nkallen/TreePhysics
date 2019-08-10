@@ -201,14 +201,18 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
         let expect = expectation(description: "wait")
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
+        let debug = KernelDebugger(device: device)
         updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
         updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1/60)
-        updateRigidBodiesKernel.encode(commandBuffer: commandBuffer)
+        updateRigidBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
         commandBuffer.addCompletedHandler { _ in
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 2)
 
             let b2 = rigidBodies[0]
             let b1 = rigidBodies[1]
+
+            print("parent joint position:", debug.float3s[0])
+            print("parent joint rotatino:", debug.float3x3s[0])
 
             XCTAssertEqual(
                 float3(0.7010456, 1.7131165, 0),

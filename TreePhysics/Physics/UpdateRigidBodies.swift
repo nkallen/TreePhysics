@@ -18,8 +18,9 @@ final class UpdateRigidBodiesKernel: MetalKernel {
         constantValues.setConstantValue(&rangeCount, type: .int, index: FunctionConstantIndex.rangeCount.rawValue)
         let function = try! library.makeFunction(name: "updateRigidBodies", constantValues: constantValues)
 
-        self.ranges = ranges.reversed()
-        
+//        self.ranges = ranges.reversed()
+        self.ranges = [(2, 1)] // FIXME!!!!
+
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.jointsBuffer = jointsBuffer
         self.compositeBodiesBuffer = compositeBodiesBuffer
