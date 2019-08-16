@@ -5,39 +5,45 @@ using namespace metal;
 
 // Quaternion and diagonalization ported from https://github.com/melax/sandbox/blob/3e267f2db2262a4cc6bf3f576c8c92b3cba79efc/include/geometric.h
 
-inline float4
-qmul(float4 a, float4 b) {
-    return float4(
-                  a.x*b.w+a.w*b.x+a.y*b.z-a.z*b.y,
-                  a.y*b.w+a.w*b.y+a.z*b.x-a.x*b.z,
-                  a.z*b.w+a.w*b.z+a.x*b.y-a.y*b.x,
-                  a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z);
+template <class T>
+inline vec<T, 4>
+qmul(vec<T, 4> a, vec<T, 4> b) {
+    return vec<T, 4>(
+                     a.x*b.w+a.w*b.x+a.y*b.z-a.z*b.y,
+                     a.y*b.w+a.w*b.y+a.z*b.x-a.x*b.z,
+                     a.z*b.w+a.w*b.z+a.x*b.y-a.y*b.x,
+                     a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z);
 }
 
-inline float3
-qxdir(float4 q) {
+template <class T>
+inline vec<T, 3>
+qxdir(vec<T, 4> q) {
     return {q.w*q.w+q.x*q.x-q.y*q.y-q.z*q.z, (q.x*q.y+q.z*q.w)*2, (q.z*q.x-q.y*q.w)*2};
 }
 
-inline float3
-qydir (float4 q) {
+template <class T>
+inline vec<T, 3>
+qydir (vec<T, 4> q) {
     return {(q.x*q.y-q.z*q.w)*2, q.w*q.w-q.x*q.x+q.y*q.y-q.z*q.z, (q.y*q.z+q.x*q.w)*2};
 }
 
-inline float3
-qzdir (float4 q) {
+template <class T>
+inline vec<T, 3>
+qzdir (vec<T, 4> q) {
     return {(q.z*q.x+q.y*q.w)*2, (q.y*q.z-q.x*q.w)*2, q.w*q.w-q.x*q.x-q.y*q.y+q.z*q.z};
 }
 
-inline float3x3
-qmat(float4 q) {
-    return {qxdir(q), qydir(q), qzdir(q)};
+template <class T>
+inline matrix<T, 3, 3>
+qmat(vec<T, 4> q) {
+    return matrix<T, 3, 3>(qxdir(q), qydir(q), qzdir(q));
 }
 
 // MARK: Diagonlization
 
-inline float4
-diagonalize(float3x3 A)
+template <class T>
+inline vec<T, 4>
+diagonalize(matrix<T, 3, 3> A)
 {
     // A must be a symmetric matrix.
     // returns orientation of the principle axes.
@@ -48,15 +54,15 @@ diagonalize(float3x3 A)
     // As per 'col' convention if float3x3 Q = qgetmatrix(q); then Q*v = q*v*conj(q)
     int maxsteps = 24;  // certainly wont need that many.
     int i;
-    float4 q(0, 0, 0, 1);
+    vec<T, 4> q(0, 0, 0, 1);
     for (i = 0; i<maxsteps; i++)
     {
-        float3x3 Q = qmat(q); // Q*v == q*v*conj(q)
-        float3x3 D = transpose(Q) * A * Q;  // A = Q*D*Q^T
-        float3 offdiag(D[1][2], D[0][2], D[0][1]); // elements not on the diagonal
-        float3 om(fabs(offdiag.x), fabs(offdiag.y), fabs(offdiag.z)); // mag of each offdiag elem
+        matrix<T, 3, 3> Q = qmat(q); // Q*v == q*v*conj(q)
+        matrix<T, 3, 3> D = transpose(Q) * A * Q;  // A = Q*D*Q^T
+        vec<T, 3> offdiag(D[1][2], D[0][2], D[0][1]); // elements not on the diagonal
+        vec<T, 3> om(fabs(offdiag.x), fabs(offdiag.y), fabs(offdiag.z)); // mag of each offdiag elem
         int k = (om.x>om.y && om.x>om.z) ? 0 : (om.y>om.z) ? 1 : 2; // index of largest element of offdiag
-        float thet;
+        T thet;
         if (om.x>om.y && om.x>om.z) {
             thet = (D[2][2] - D[1][1]) / (2.0f*offdiag[0]);
         } else if (om.y>om.z) {
@@ -65,12 +71,12 @@ diagonalize(float3x3 A)
             thet = (D[1][1] - D[0][0]) / (2.0f*offdiag[2]);
         }
         if (offdiag[k] == 0.0f) break;  // diagonal already
-        float sgn = sign(thet);
+        T sgn = sign(thet);
         thet *= sgn; // make it positive
-        float t = sgn / (thet + ((thet<1.E6f) ? sqrt(thet*thet + 1.0f) : thet)); // sign(T)/(|T|+sqrt(T^2+1))
-        float c = rsqrt(t*t + 1.0f); //  c= 1/(t^2+1) , t=s/c
+        T t = sgn / (thet + ((thet<1.E6f) ? sqrt(thet*thet + 1.0f) : thet)); // sign(T)/(|T|+sqrt(T^2+1))
+        T c = rsqrt(t*t + 1.0f); //  c= 1/(t^2+1) , t=s/c
         if (c == 1.0f) break;  // no room for improvement - reached machine precision.
-        float4 jr(0, 0, 0, 0); // jacobi rotation for this iteration.
+        vec<T, 4> jr(0, 0, 0, 0); // jacobi rotation for this iteration.
         jr[k] = sgn*sqrt((1.0f - c) / 2.0f);  // using 1/2 angle identity sin(a/2) = sqrt((1-cos(a))/2)
         jr[k] *= -1.0f; // note we want a final result semantic that takes D to A, not A to D
         jr.w = sqrt(1.0f - (jr[k] * jr[k]));
@@ -78,76 +84,58 @@ diagonalize(float3x3 A)
         q = qmul(q, jr);
         q = normalize(q);
     }
-    float h = 1.0f/sqrt(2.0f);  // M_SQRT2
-    float3x3 M = transpose(qmat(q)) * A * qmat(q);
-    float3 e = float3(M[0][0],M[1][1],M[2][2]);
-    q = (e.x < e.z)  ? qmul(q, float4( 0, h, 0, h )) : q;
-    q = (e.y < e.z)  ? qmul(q, float4( h, 0, 0, h )) : q;
-    q = (e.x < e.y)  ? qmul(q, float4( 0, 0, h, h )) : q;   // size order z,y,x so xy spans a planeish spread
-    q = (qzdir(q).z < 0) ? qmul(q, float4( 1, 0, 0, 0 )) : q;
-    q = (qydir(q).y < 0) ? qmul(q, float4( 0, 0, 1, 0 )) : q;
+    T h = 1.0f/sqrt(2.0f);  // M_SQRT1_2
+    matrix<T, 3, 3> M = transpose(qmat(q)) * A * qmat(q);
+    vec<T, 3> e = vec<T, 3>(M[0][0],M[1][1],M[2][2]);
+    q = (e.x < e.z)  ? qmul(q, vec<T, 4>( 0, h, 0, h )) : q;
+    q = (e.y < e.z)  ? qmul(q, vec<T, 4>( h, 0, 0, h )) : q;
+    q = (e.x < e.y)  ? qmul(q, vec<T, 4>( 0, 0, h, h )) : q;   // size order z,y,x so xy spans a planeish spread
+    q = (qzdir(q).z < 0) ? qmul(q, vec<T, 4>( 1, 0, 0, 0 )) : q;
+    q = (qydir(q).y < 0) ? qmul(q, vec<T, 4>( 0, 0, 1, 0 )) : q;
     q = (q.w < 0) ? -q : q;
     return q;
 }
 
 // MARK: General
 
-inline float
-sqr(float a) {
-    return a * a;
-}
-
-inline float3x3
-sqr(float3x3 A)
+template <class T>
+inline T
+sqr(T A)
 {
     return A * A;
 }
 
-inline half3x3
-sqr(half3x3 A)
+template <class T>
+inline matrix<T, 3, 3>
+crossMatrix(vec<T, 3> v)
 {
-    return A * A;
+    return matrix<T, 3, 3>(
+                           vec<T, 3>(0, v.z, -v.y),
+                           vec<T, 3>(-v.z, 0, v.x),
+                           vec<T, 3>(v.y, -v.x, 0));
 }
 
-inline
-float3x3 crossMatrix(float3 v)
+template <class T>
+inline matrix<T, 3, 3>
+cholesky(matrix<T, 3, 3> A)
 {
-    return float3x3(
-                    float3(0, v.z, -v.y),
-                    float3(-v.z, 0, v.x),
-                    float3(v.y, -v.x, 0));
-}
-
-
-inline half3x3
-crossMatrix(half3 v)
-{
-    return half3x3(
-                   half3(0, v.z, -v.y),
-                   half3(-v.z, 0, v.x),
-                   half3(v.y, -v.x, 0));
-}
-
-inline float3x3
-cholesky(float3x3 A)
-{
-    float3x3 L = float3x3(0);
+    matrix<T, 3, 3> L = matrix<T, 3, 3>(0);
 
     // Load A into registers
 
-    float a00 = A[0][0];
-    float a01 = A[0][1], a11 = A[1][1];
-    float a02 = A[0][2], a12 = A[1][2], a22 = A[2][2];
+    T a00 = A[0][0];
+    T a01 = A[0][1], a11 = A[1][1];
+    T a02 = A[0][2], a12 = A[1][2], a22 = A[2][2];
 
     // Factorize A
-    float l00 = sqrt(a00);
-    float l01 = a01/l00;
-    float l02 = a02/l00;
+    T l00 = sqrt(a00);
+    T l01 = a01/l00;
+    T l02 = a02/l00;
 
-    float l11 = sqrt(a11 - sqr(l01));
-    float l12 = (a12 - l02 * l01) / l11;
+    T l11 = sqrt(a11 - sqr(l01));
+    T l12 = (a12 - l02 * l01) / l11;
 
-    float l22 = sqrt(a22 - sqr(l02) - sqr(l12));
+    T l22 = sqrt(a22 - sqr(l02) - sqr(l12));
 
     // Store L into memory
     L[0][0] = l00;
@@ -157,29 +145,31 @@ cholesky(float3x3 A)
     return L;
 }
 
-inline float3x3
-inverse(float3x3 m)
+template <class T>
+inline matrix<T, 3, 3>
+inverse(matrix<T, 3, 3> m)
 {
-    float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
-    float a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];
-    float a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];
+    T a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
+    T a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];
+    T a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];
 
 
-    float b10 = a22 * a11 - a21 * a12;
-    float b11 = -a22 * a01 + a21 * a02;
-    float b12 = a12 * a01 - a11 * a02;
+    T b10 = a22 * a11 - a21 * a12;
+    T b11 = -a22 * a01 + a21 * a02;
+    T b12 = a12 * a01 - a11 * a02;
 
-    float det = a00 * b10 + a10 * b11 + a20 * b12;
+    T det = a00 * b10 + a10 * b11 + a20 * b12;
 
-    return 1/det * float3x3(float3(b10, b11, b12),
-                            float3((-a22 * a10 + a20 * a12), (a22 * a00 - a20 * a02), (-a12 * a00 + a10 * a02)),
-                            float3((a21 * a10 - a20 * a11), (-a21 * a00 + a20 * a01), (a11 * a00 - a10 * a01)));
+    return 1/det * matrix<T, 3, 3>(vec<T, 3>(b10, b11, b12),
+                                   vec<T, 3>((-a22 * a10 + a20 * a12), (a22 * a00 - a20 * a02), (-a12 * a00 + a10 * a02)),
+                                   vec<T, 3>((a21 * a10 - a20 * a11), (-a21 * a00 + a20 * a01), (a11 * a00 - a10 * a01)));
 }
 
-inline float2x2
-inverse(float2x2 m) {
-    return float2x2(float2(m[1][1],-m[0][1]),
-                    float2(-m[1][0], m[0][0]) / (m[0][0]*m[1][1] - m[1][0]*m[0][1]));
+template <class T>
+inline matrix<T, 2, 2>
+inverse(matrix<T, 2, 2> m) {
+    return matrix<T, 2, 2>(vec<T, 2>(m[1][1],-m[0][1]),
+                           vec<T, 2>(-m[1][0], m[0][0]) / (m[0][0]*m[1][1] - m[1][0]*m[0][1]));
 }
 
 inline float3x3 matrix_rotate(float3 rotation)
