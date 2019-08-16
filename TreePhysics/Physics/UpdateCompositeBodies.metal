@@ -90,44 +90,6 @@ rigidBody_childCompositeBodies(
     }
 }
 
-inline uint
-rigidBody_childCompositeBodies(
-                               const RigidBodyStruct rigidBody,
-                               device CompositeBodyStruct * compositeBodies,
-                               int minIdInThreadGroup,
-                               CompositeBodyStruct childCompositeBodies[5])
-{
-    uint missing = 0;
-    for (ushort i = 0; i < rigidBody.childCount; i++) {
-        int childId = rigidBody.childIds[i];
-        if (childId >= minIdInThreadGroup) {
-            missing++;
-        } else {
-            childCompositeBodies[i] = compositeBodies[childId];
-        }
-    }
-    return missing;
-}
-
-inline void
-rigidBody_childCompositeBodies(
-                               const RigidBodyStruct rigidBody,
-                               device CompositeBodyStruct * compositeBodies,
-                               ushort minIdInThreadGroup,
-                               threadgroup CompositeBodyStruct * compositeBodiesCache,
-                               CompositeBodyStruct childCompositeBodies[5])
-{
-    for (ushort i = 0; i < rigidBody.childCount; i++) {
-        int childId = rigidBody.childIds[i];
-        if (childId >= minIdInThreadGroup) {
-            ushort lid = childId - minIdInThreadGroup;
-            childCompositeBodies[i] = compositeBodiesCache[lid];
-        } else {
-            childCompositeBodies[i] = compositeBodies[childId];
-        }
-    }
-}
-
 inline CompositeBodyStruct
 rigidBody_updateCompositeBody(
                               const RigidBodyStruct rigidBody,
