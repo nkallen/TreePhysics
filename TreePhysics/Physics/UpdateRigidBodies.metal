@@ -132,7 +132,7 @@ updateRigidBodies(
                 rigidBodies[id] = rigidBody;
             }
         }
-        threadgroup_barrier(mem_flags::mem_threadgroup);
+        threadgroup_barrier(mem_flags::mem_device);
     }
 }
 

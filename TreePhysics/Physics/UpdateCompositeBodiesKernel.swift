@@ -24,29 +24,25 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     }
 
     func encode(commandBuffer: MTLCommandBuffer) {
-        var i = 0
-        for range in ranges {
-            var gridOrigin = range.lowerBound
+        let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
+        commandEncoder.setComputePipelineState(computePipelineState)
+        commandEncoder.label  = "Update Composite Bodies"
+        commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
+        commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
+        var ranges = self.ranges.map { int2(Int32($0.lowerBound), Int32($0.upperBound)) }
+        commandEncoder.setBytes(&ranges, length: MemoryLayout<int2>.stride * ranges.count, index: BufferIndex.ranges.rawValue)
 
-            let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
-            commandEncoder.setComputePipelineState(computePipelineState)
-            commandEncoder.label  = "Update Composite Bodies in Parallel, Round \(i)"
-            commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
-            commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
-            commandEncoder.setBytes(&gridOrigin, length: MemoryLayout<Int>.size, index: BufferIndex.gridOrigin.rawValue)
+        let maxWidth = self.ranges.last!.upperBound
 
-            let width = computePipelineState.maxTotalThreadsPerThreadgroup
-            let threadsPerThreadgroup = MTLSizeMake(width, 1, 1)
-            let threadsPerGrid = MTLSize(
-                width: range.count,
-                height: 1,
-                depth: 1)
+        let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
+        let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)
+        let threadsPerGrid = MTLSize(
+            width: maxWidth,
+            height: 1,
+            depth: 1)
 
-            commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
-            commandEncoder.endEncoding()
-
-            i += 1
-        }
+        commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+        commandEncoder.endEncoding()
     }
 
     static func buffer(root: RigidBody, device: MTLDevice) -> (Int, MTLBuffer, [Range<Int>]) {
