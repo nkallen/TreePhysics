@@ -65,42 +65,26 @@ updateRigidBody(
 inline RigidBodyStruct
 rigidBody_climbDown(
                     const RigidBodyStruct rigidBody,
-                    RigidBodyStruct parentRigidBody,
-                    RigidBodyStruct climbers[10],
-                    JointStruct joints[10],
-                    device RigidBodyStruct * rigidBodies)
+                    device RigidBodyStruct * rigidBodies,
+                    device JointStruct * joints)
 {
-    RigidBodyStruct currentRigidBody;
-
+    RigidBodyStruct parentRigidBody, currentRigidBody;
     for (short i = rigidBody.climberCount - 1; i >= 0; i--) {
-        currentRigidBody = climbers[i];
-        JointStruct parentJoint = joints[i];
+        int id = rigidBody.climberOffset + i;
 
-        int id = parentRigidBody.childIds[0];
+        RigidBodyStruct next = rigidBodies[id];
+        JointStruct parentJoint = joints[id];
+        if (i == rigidBody.climberCount - 1) {
+            parentRigidBody = rigidBodies[next.parentId];
+        } else {
+            parentRigidBody = currentRigidBody;
+        }
+        currentRigidBody = next;
 
         currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody);
         rigidBodies[id] = currentRigidBody;
-        parentRigidBody = currentRigidBody;
     }
-    return parentRigidBody;
-}
-
-inline RigidBodyStruct rigidBody_climbers(
-                                          const RigidBodyStruct rigidBody,
-                                          device RigidBodyStruct * rigidBodies,
-                                          device JointStruct * joints,
-                                          RigidBodyStruct climbers[10],
-                                          JointStruct climberJoints[10])
-{
-/*    for (ushort i = 0; i < 10; i++) {
-        int climberId = rigidBody.climberIds[i];
-        RigidBodyStruct climber = rigidBodies[climberId];
-        climbers[i] = climber;
-        climberJoints[i] = joints[climberId];
-    }
-
-    return rigidBodies[climbers[rigidBody.climberCount - 1].parentId];
- */
+    return currentRigidBody;
 }
 
 kernel void
@@ -114,21 +98,20 @@ updateRigidBodies(
         int2 range = ranges[i];
         int lowerBound = range.x;
         int upperBound = range.y;
-        if ((int)gid >= 0 && (int)gid < upperBound - lowerBound) {
+        if ((int)gid < upperBound - lowerBound) {
             int id = lowerBound + gid;
 
             RigidBodyStruct rigidBody = rigidBodies[id];
             if (rigidBody.parentId != -1) {
-                const JointStruct parentJoint = joints[0];
                 RigidBodyStruct parentRigidBody;
                 if (rigidBody.climberCount > 0) {
-                    RigidBodyStruct climbers[10];
-                    JointStruct climberJoints[10];
-                    parentRigidBody = rigidBody_climbers(rigidBody, rigidBodies, joints, climbers, climberJoints);
-                    parentRigidBody = rigidBody_climbDown(rigidBody, parentRigidBody, climbers, climberJoints, rigidBodies);
+                    parentRigidBody = rigidBody_climbDown(rigidBody, rigidBodies, joints);
                 } else {
                     parentRigidBody = rigidBodies[rigidBody.parentId];
                 }
+                // potentially can optimize away:
+                const JointStruct parentJoint = joints[id];
+
                 rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
                 rigidBodies[id] = rigidBody;
             }

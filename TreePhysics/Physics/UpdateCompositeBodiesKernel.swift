@@ -32,7 +32,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         var ranges = self.ranges.map { int2(Int32($0.lowerBound), Int32($0.upperBound)) }
         commandEncoder.setBytes(&ranges, length: MemoryLayout<int2>.stride * ranges.count, index: BufferIndex.ranges.rawValue)
 
-        let maxWidth = self.ranges.last!.upperBound
+        let maxWidth = self.ranges.first!.count
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)

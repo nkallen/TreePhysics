@@ -68,7 +68,7 @@ diagonalize(float3x3 A)
         float sgn = sign(thet);
         thet *= sgn; // make it positive
         float t = sgn / (thet + ((thet<1.E6f) ? sqrt(thet*thet + 1.0f) : thet)); // sign(T)/(|T|+sqrt(T^2+1))
-        float c = 1.0f / sqrt(t*t + 1.0f); //  c= 1/(t^2+1) , t=s/c
+        float c = rsqrt(t*t + 1.0f); //  c= 1/(t^2+1) , t=s/c
         if (c == 1.0f) break;  // no room for improvement - reached machine precision.
         float4 jr(0, 0, 0, 0); // jacobi rotation for this iteration.
         jr[k] = sgn*sqrt((1.0f - c) / 2.0f);  // using 1/2 angle identity sin(a/2) = sqrt((1-cos(a))/2)
