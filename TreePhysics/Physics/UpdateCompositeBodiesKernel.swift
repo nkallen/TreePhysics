@@ -92,7 +92,6 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     }
 
     typealias ChildIdsType = (Int32, Int32, Int32, Int32, Int32)
-    typealias ClimberIdsType = (Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32)
 
     private static func `struct`(rigidBody: RigidBody, climbers: [RigidBody] = [], index: [RigidBody:Int]) -> RigidBodyStruct {
         // Parent
@@ -112,15 +111,13 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
 
         // Climbers
         assert(climbers.count <= 10)
-        let climberIndices = climbers.map { index[$0] }
-        var climberIds: ClimberIdsType = (0,0,0,0,0,0,0,0,0,0)
-        memcpy(&climberIds, climberIndices, climberIndices.count)
+        let climberOffset = Int32(climbers.first.map { index[$0]! } ?? 0)
 
         let strct = RigidBodyStruct(
             parentId: parentId,
             childIds: childIds,
             childCount: ushort(childRigidBodies.count),
-            climberIds: climberIds,
+            climberOffset: climberOffset,
             climberCount: ushort(climbers.count),
             mass: rigidBody.mass,
             length: rigidBody.length,

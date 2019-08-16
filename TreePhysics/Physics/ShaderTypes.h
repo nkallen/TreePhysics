@@ -53,7 +53,7 @@ typedef struct {
     int parentId;
     int childIds[5];
     ushort childCount;
-    int climberIds[10];
+    int climberOffset;
     ushort climberCount;
     float mass;
     float length;

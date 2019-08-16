@@ -92,7 +92,7 @@ inline RigidBodyStruct rigidBody_climbers(
                                           RigidBodyStruct climbers[10],
                                           JointStruct climberJoints[10])
 {
-    for (ushort i = 0; i < 10; i++) {
+/*    for (ushort i = 0; i < 10; i++) {
         int climberId = rigidBody.climberIds[i];
         RigidBodyStruct climber = rigidBodies[climberId];
         climbers[i] = climber;
@@ -100,6 +100,7 @@ inline RigidBodyStruct rigidBody_climbers(
     }
 
     return rigidBodies[climbers[rigidBody.climberCount - 1].parentId];
+ */
 }
 
 kernel void

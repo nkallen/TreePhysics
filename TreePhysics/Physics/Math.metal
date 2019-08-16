@@ -125,7 +125,7 @@ crossMatrix(half3 v)
     return half3x3(
                    half3(0, v.z, -v.y),
                    half3(-v.z, 0, v.x),
-                   half3(-v.y, -v.x, 0));
+                   half3(v.y, -v.x, 0));
 }
 
 inline float3x3
