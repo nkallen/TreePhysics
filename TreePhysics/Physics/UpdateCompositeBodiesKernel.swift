@@ -8,10 +8,19 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
     let ranges: [Range<Int>]
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, ranges: [Range<Int>], compositeBodiesBuffer: MTLBuffer) {
+        precondition(ranges.count > 0)
+
         self.ranges = ranges
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = compositeBodiesBuffer
-        super.init(device: device, name: "updateCompositeBodies")
+
+        let library = device.makeDefaultLibrary()!
+        let constantValues = MTLFunctionConstantValues()
+        var rangeCount = ranges.count
+        constantValues.setConstantValue(&rangeCount, type: .int, index: FunctionConstantIndex.rangeCount.rawValue)
+        let function = try! library.makeFunction(name: "updateCompositeBodies", constantValues: constantValues)
+
+        super.init(device: device, function: function)
     }
 
     func encode(commandBuffer: MTLCommandBuffer) {

@@ -3,6 +3,8 @@
 #import "Math.metal"
 using namespace metal;
 
+constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
+
 inline CompositeBodyStruct
 rigidBody_updateCompositeBody(
                               const RigidBodyStruct rigidBody,
