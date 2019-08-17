@@ -95,13 +95,6 @@ b2  b3
      /\
     b8 b9
  */
-//
-//[root] -> [b1]
-//[b3] -> [b4, b5]
-//[b7]
-//[b2 b6 b8 b9]
-//
-//[b1] [b5] [b7] [b2 b6 b8 b9]
 
 extension UnitOfWork: Equatable {
     public static func == (lhs: UnitOfWork, rhs: UnitOfWork) -> Bool {

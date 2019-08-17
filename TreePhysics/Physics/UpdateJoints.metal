@@ -91,7 +91,7 @@ updateJoint(
 
         float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
-        joint.θ = float3x3(half3x3(U) * half3x3(θ_diagonal));
+        joint.θ = U * θ_diagonal;
     }
     return joint;
 }

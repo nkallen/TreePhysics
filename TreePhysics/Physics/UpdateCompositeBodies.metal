@@ -1,6 +1,7 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
+#import "Print.metal"
 using namespace metal;
 
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
@@ -143,8 +144,8 @@ rigidBody_climb(const RigidBodyStruct rigidBody,
                 device CompositeBodyStruct * compositeBodies)
 {
     CompositeBodyStruct currentCompositeBody = compositeBody;
-        
-    for (ushort i = 0; i < 5; i++) {
+
+    for (ushort i = 0; i < rigidBody.climberCount; i++) {
         RigidBodyStruct currentRigidBody = rigidBodies[rigidBody.climberOffset + i];
         currentCompositeBody = rigidBody_updateCompositeBody(currentRigidBody, currentCompositeBody);
         compositeBodies[rigidBody.climberOffset + i] = currentCompositeBody;
@@ -156,20 +157,26 @@ updateCompositeBodies(
                       device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
                       device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
                       constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
-                      uint gid [[ thread_position_in_grid ]])
+                      uint gid [[ thread_position_in_grid ]],
+                      device char *buf [[ buffer(BufferIndexDebugString) ]])
 {
-    for (int i = 0; i < rangeCount; i++) {
+    Debug debug = Debug(buf + (gid * 1024), 1024);
+    debug << "gid: " << 10 << "\n";
+
+    for (ushort i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
+        debug << "range " << i << range << "\n";
         int lowerBound = range.x;
         int upperBound = range.y;
         if ((int)gid < upperBound - lowerBound) {
             int id = lowerBound + gid;
-            
+            debug << "id: " << id << "\n";
+
             RigidBodyStruct rigidBody = rigidBodies[id];
             CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies);
             compositeBodies[id] = compositeBody;
             
-           rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
+            rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
         }
         threadgroup_barrier(mem_flags::mem_device);
     }

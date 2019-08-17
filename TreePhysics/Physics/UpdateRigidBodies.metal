@@ -1,7 +1,6 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
-#import "Debug.metal"
 using namespace metal;
 
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];

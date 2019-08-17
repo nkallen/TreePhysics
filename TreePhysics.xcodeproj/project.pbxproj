@@ -26,8 +26,8 @@
 		9E56C94922E78FFC0095C8AC /* CompositeBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94822E78FFC0095C8AC /* CompositeBody.swift */; };
 		9E56C94B22E792820095C8AC /* RigidBodyPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94A22E792820095C8AC /* RigidBodyPen.swift */; };
 		9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
-		9E6372A022FEC3D7001D4466 /* Debug.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E63729F22FEC3D7001D4466 /* Debug.metal */; };
 		9E6372A222FEC7AA001D4466 /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
+		9E8E27BF2307335300652DAC /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
 		9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
 		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
 		9E9D4B6622F313D0007DCF49 /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
@@ -113,8 +113,8 @@
 		9E56C94A22E792820095C8AC /* RigidBodyPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBodyPen.swift; sourceTree = "<group>"; };
 		9E56C94C22E7929B0095C8AC /* SkinningPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinningPen.swift; sourceTree = "<group>"; };
 		9E62078322F8A7E6005E99C8 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
-		9E63729F22FEC3D7001D4466 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9E6372A122FEC7AA001D4466 /* MetalProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalProxy.swift; sourceTree = "<group>"; };
+		9E8E27BE2307335300652DAC /* Print.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Print.metal; sourceTree = "<group>"; };
 		9E9C1E7F22E86B290030DB0E /* Rewriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rewriter.swift; sourceTree = "<group>"; };
 		9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriterTests.swift; sourceTree = "<group>"; };
 		9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsField.swift; sourceTree = "<group>"; };
@@ -214,7 +214,7 @@
 				9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */,
 				9EE801A522FC451E00198166 /* MetalKernal.swift */,
 				9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */,
-				9E63729F22FEC3D7001D4466 /* Debug.metal */,
+				9E8E27BE2307335300652DAC /* Print.metal */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -484,6 +484,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */,
+				9E8E27BF2307335300652DAC /* Print.metal in Sources */,
 				9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */,
 				9E31BE9822FDAE4600AF908B /* UpdateRigidBodies.metal in Sources */,
 				9EE7EBCA22E0F27900535997 /* main.swift in Sources */,
@@ -511,7 +512,6 @@
 				9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */,
 				9E036B1F22E4F58600229235 /* Turtle.swift in Sources */,
 				9E56C94722E78FEC0095C8AC /* RigidBody.swift in Sources */,
-				9E6372A022FEC3D7001D4466 /* Debug.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

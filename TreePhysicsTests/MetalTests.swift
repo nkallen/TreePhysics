@@ -40,10 +40,9 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         let expect = expectation(description: "wait")
-        let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
+        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
             let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
@@ -230,3 +229,131 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
     }
 }
 
+class AdvancedMetalTests: XCTestCase {
+    var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
+    var updateJointsKernel: UpdateJointsKernel!
+    var updateRigidBodiesKernel: UpdateRigidBodiesKernel!
+
+    var device: MTLDevice!
+    var commandQueue: MTLCommandQueue!
+    var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
+
+    var root, b1, b2, b3, b4, b5, b6, b7, b8, b9: RigidBody!
+    let force: float3 = float3(0, 1, 0) // world coordinates
+
+    var simulator: Simulator!
+
+    var expecteds: [RigidBody]!
+
+    override func setUp() {
+        super.setUp()
+
+        self.device = MTLCreateSystemDefaultDevice()!
+        self.commandQueue = device.makeCommandQueue()!
+
+        self.root = RigidBody()
+        self.b1 = RigidBody()
+        self.b2 = RigidBody()
+        self.b3 = RigidBody()
+        self.b4 = RigidBody()
+        self.b5 = RigidBody()
+        self.b6 = RigidBody()
+        self.b7 = RigidBody()
+        self.b8 = RigidBody()
+        self.b9 = RigidBody()
+
+        root.add(b1)
+        b1.add(b2)
+        b1.add(b3)
+        b3.add(b4)
+        b4.add(b5)
+        b5.add(b6)
+        b5.add(b7)
+        b7.add(b8)
+        b7.add(b9)
+
+        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        self.rigidBodiesBuffer = rigidBodiesBuffer
+        self.compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * count,
+            options: [.storageModeShared])!
+        self.jointsBuffer = UpdateJointsKernel.buffer(count: count, device: device)
+
+        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateJointsKernel = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: count)
+        self.updateRigidBodiesKernel = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
+
+        simulator = Simulator(tree: Tree(root))
+        self.expecteds = [b9, b8, b6, b2, b7, b5, b1, b4, b3]
+    }
+
+    func testNoOp() {
+        let expect = expectation(description: "wait")
+
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
+        updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1/60)
+        updateRigidBodiesKernel.encode(commandBuffer: commandBuffer)
+
+        simulator.update(at: 1.0 / 60)
+
+        commandBuffer.addCompletedHandler { _ in
+            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 9)
+
+            for i in 0..<1 {
+                let rigidBody = rigidBodies[i]
+                let expected = self.expecteds[i]
+
+                XCTAssertEqual(expected.position, rigidBody.position, accuracy: 0.0001)
+                XCTAssertEqual(expected.rotation, rigidBody.rotation, accuracy: 0.0001)
+            }
+
+            expect.fulfill()
+        }
+        commandBuffer.commit()
+        waitForExpectations(timeout: 10, handler: {error in})
+    }
+
+    func testUpdateRigidBodies() {
+        let expect = expectation(description: "wait")
+
+        let debug = KernelDebugger(device: device)
+
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
+//        updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1.0/60)
+//        updateRigidBodiesKernel.encode(commandBuffer: commandBuffer)
+
+//        b9.apply(force: force, at: 1)
+        simulator.update(at: 1.0 / 60)
+
+        commandBuffer.addCompletedHandler { _ in
+            print(debug.strings[0])
+
+//            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 9)
+            let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 9)
+
+            for i in 0..<5 {
+//                let rigidBody = rigidBodies[i]
+                let compositeBody = compositeBodies[i]
+                let expected = self.expecteds[i]
+
+                // mass force torque com nertia
+                XCTAssertEqual(expected.composite.mass, compositeBody.mass, accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.force, compositeBody.force, accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.torque, compositeBody.torque, accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.centerOfMass, compositeBody.centerOfMass, accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.inertiaTensor, compositeBody.inertiaTensor, accuracy: 0.0001)
+
+                //                XCTAssertEqual(
+//                    expected.position, rigidBody.position, accuracy: 0.01)
+//                XCTAssertEqual(
+//                    expected.rotation, rigidBody.rotation, accuracy: 0.01)
+            }
+
+            expect.fulfill()
+        }
+        commandBuffer.commit()
+        waitForExpectations(timeout: 10, handler: {error in})
+    }
+}
