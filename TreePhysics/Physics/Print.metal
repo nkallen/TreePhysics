@@ -25,12 +25,6 @@ using namespace metal;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-// \brief Tiny printf, sprintf and (v)snprintf implementation, optimized for speed on
-//        embedded systems with a very limited resources. These routines are thread
-//        safe and reentrant!
-//        Use this instead of the bloated standard/newlib printf cause these use
-//        malloc for printf (and may not be thread safe).
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 // define this globally (e.g. gcc -DPRINTF_INCLUDE_CONFIG_H ...) to include the
@@ -384,6 +378,8 @@ static size_t _ftoa(out_fct_type out, device char* buffer, size_t idx, size_t ma
     return _out_rev(out, buffer, idx, maxlen, buf, len, width, flags);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 class Debug
 {
 private:
@@ -419,6 +415,14 @@ public:
     }
 
     thread Debug & operator <<(unsigned int x)
+    {
+        unsigned int flags = 0U, base = 10U, precision = 0U, width = 0U;
+
+        idx = _ntoa_int(_out_buffer, buf, idx, maxlen, (unsigned int)(x > 0 ? x : 0 - x), false, base, precision, width, flags);
+        return *this;
+    }
+
+    thread Debug & operator <<(half x)
     {
         unsigned int flags = 0U, base = 10U, precision = 0U, width = 0U;
 

@@ -105,9 +105,9 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         // Child
         let childRigidBodies = rigidBody.childJoints.map { $0.childRigidBody }
         assert(childRigidBodies.count <= 5)
-        let childRigidBodyIndices = childRigidBodies.map { index[$0] }
+        var childRigidBodyIndices: [Int32] = childRigidBodies.map { Int32(index[$0]!) }
         var childIds: ChildIdsType = (0,0,0,0,0)
-        memcpy(&childIds, childRigidBodyIndices, childRigidBodyIndices.count)
+        memcpy(&childIds, &childRigidBodyIndices, childRigidBodyIndices.count * MemoryLayout<Int32>.stride)
 
         // Climbers
         assert(climbers.count <= 10)

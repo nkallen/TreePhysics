@@ -23,6 +23,7 @@ final class Simulator {
         updateCompositeBodies()
         updateJoints(at: time)
         updateRigidBodies()
+        resetForces()
     }
 
     func updateFields(at time: TimeInterval) {
@@ -140,6 +141,11 @@ final class Simulator {
             for joint in rigidBody.childJoints {
                 joint.updateTransform()
             }
+        }
+    }
+
+    func resetForces() {
+        for rigidBody in rigidBodiesLevelOrder {
             rigidBody.resetForces()
         }
     }
