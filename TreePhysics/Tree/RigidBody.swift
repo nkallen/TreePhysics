@@ -204,8 +204,6 @@ extension RigidBody {
     }
 }
 
-// FIXME: I think only unit tests use this for now:
-
 extension RigidBody: Equatable, Hashable {
     static func == (lhs: RigidBody, rhs: RigidBody) -> Bool {
         return lhs === rhs

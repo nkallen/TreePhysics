@@ -14,7 +14,7 @@ rigidBody_updateCompositeBody(
     half mass = half(rigidBody.mass);
     half3 force = half3(rigidBody.force);
     half3 torque = half3(rigidBody.torque);
-    float3 centerOfMass = rigidBody.mass * rigidBody.centerOfMass;
+    half3 centerOfMass = rigidBody.mass * rigidBody.centerOfMass;
     half3 position = half3(rigidBody.position);
 
     debug << "mass: " << mass << "\n";
@@ -31,21 +31,21 @@ rigidBody_updateCompositeBody(
 
     debug << "mass: " << mass << "\n";
 
-    float3x3 inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - (float3)centerOfMass));
+    half3x3 inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass));
     
     for (ushort i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
         
-        inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - (float3)centerOfMass));
+        inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass));
     }
     
     CompositeBodyStruct compositeBody = {
-        .mass = float(mass),
-        .force = float3(force),
-        .torque = float3(torque),
-        .centerOfMass = float3(centerOfMass),
-        .position = float3(position),
-        .inertiaTensor = float3x3(inertiaTensor)
+        .mass = mass,
+        .force = force,
+        .torque = torque,
+        .centerOfMass = centerOfMass,
+        .position = position,
+        .inertiaTensor = inertiaTensor
     };
     
     return compositeBody;
@@ -56,29 +56,29 @@ rigidBody_updateCompositeBody(
                               const RigidBodyStruct rigidBody,
                               const CompositeBodyStruct childCompositeBody)
 {
-    half mass = half(rigidBody.mass);
-    half3 force = half3(rigidBody.force);
-    half3 torque = half3(rigidBody.torque);
-    half3 centerOfMass = mass * half3(rigidBody.centerOfMass);
-    half3 position = half3(rigidBody.position);
+    half mass = rigidBody.mass;
+    half3 force = rigidBody.force;
+    half3 torque = rigidBody.torque;
+    half3 centerOfMass = mass * rigidBody.centerOfMass;
+    half3 position = rigidBody.position;
     
-    mass += half(childCompositeBody.mass);
-    force += half3(childCompositeBody.force);
-    torque += cross(half3(childCompositeBody.position) - position, half3(childCompositeBody.force)) + half3(childCompositeBody.torque);
-    centerOfMass += half(childCompositeBody.mass) * half3(childCompositeBody.centerOfMass);
+    mass += childCompositeBody.mass;
+    force += childCompositeBody.force;
+    torque += cross(childCompositeBody.position - position, childCompositeBody.force) + childCompositeBody.torque;
+    centerOfMass += childCompositeBody.mass * childCompositeBody.centerOfMass;
     centerOfMass /= mass;
     
-    half3x3 inertiaTensor = half3x3(rigidBody.inertiaTensor) - half(rigidBody.mass) * sqr(crossMatrix(half3(rigidBody.centerOfMass) - centerOfMass));
+    half3x3 inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass));
     
-    inertiaTensor += half3x3(childCompositeBody.inertiaTensor) - half(childCompositeBody.mass) * sqr(crossMatrix(half3(childCompositeBody.centerOfMass) - centerOfMass));
+    inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass));
     
     CompositeBodyStruct compositeBody = {
-        .mass = float(mass),
-        .force = float3(force),
-        .torque = float3(torque),
-        .centerOfMass = float3(centerOfMass),
-        .position = float3(position),
-        .inertiaTensor = float3x3(inertiaTensor)
+        .mass = mass,
+        .force = force,
+        .torque = torque,
+        .centerOfMass = centerOfMass,
+        .position = position,
+        .inertiaTensor = inertiaTensor
     };
     
     return compositeBody;
@@ -101,19 +101,6 @@ rigidBody_updateCompositeBody(
 }
 
 inline void
-rigidBody_childRigidBodies(
-                           const RigidBodyStruct rigidBody,
-                           device RigidBodyStruct * rigidBodies,
-                           RigidBodyStruct childRigidBodies[5])
-{
-    for (ushort i = 0; i < rigidBody.childCount; i++) {
-        int childId = rigidBody.childIds[i];
-        childRigidBodies[i] = childRigidBodies[childId];
-    }
-}
-
-
-inline void
 rigidBody_childCompositeBodies(
                                const RigidBodyStruct rigidBody,
                                device CompositeBodyStruct * compositeBodies,
@@ -130,13 +117,17 @@ inline void
 rigidBody_climb(const RigidBodyStruct rigidBody,
                 const CompositeBodyStruct compositeBody,
                 device RigidBodyStruct * rigidBodies,
-                device CompositeBodyStruct * compositeBodies)
+                device CompositeBodyStruct * compositeBodies, thread Debug & debug)
 {
     CompositeBodyStruct currentCompositeBody = compositeBody;
 
+    debug << "in climb -- " << "\n";
+
     for (ushort i = 0; i < rigidBody.climberCount; i++) {
+        debug << "climbing iteration: " << i << " and id: " << rigidBody.climberOffset + i << "\n";
         RigidBodyStruct currentRigidBody = rigidBodies[rigidBody.climberOffset + i];
         currentCompositeBody = rigidBody_updateCompositeBody(currentRigidBody, currentCompositeBody);
+        debug << "set mass to: " << currentCompositeBody.mass << "\n";
         compositeBodies[rigidBody.climberOffset + i] = currentCompositeBody;
     }
 }
@@ -181,7 +172,7 @@ updateCompositeBodies(
             CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies, debug);
             compositeBodies[id] = compositeBody;
             
-            rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
+            rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies, debug);
         }
         debug << "---------------------\n";
         threadgroup_barrier(mem_flags::mem_device);

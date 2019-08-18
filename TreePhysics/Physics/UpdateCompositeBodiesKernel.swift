@@ -116,21 +116,21 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         let strct = RigidBodyStruct(
             parentId: parentId,
             childIds: childIds,
-            childCount: ushort(childRigidBodies.count),
             climberOffset: climberOffset,
+            childCount: ushort(childRigidBodies.count),
             climberCount: ushort(climbers.count),
-            mass: rigidBody.mass,
-            length: rigidBody.length,
-            radius: rigidBody.radius,
-            localRotation: matrix3x3_rotation(rotation: rigidBody.rotation_local),
+            mass: half(rigidBody.mass),
+            length: half(rigidBody.length),
+            radius: half(rigidBody.radius),
+            localRotation: half3x3(matrix3x3_rotation(rotation: rigidBody.rotation_local)),
 
-            position: rigidBody.position,
-            rotation: rigidBody.rotation,
-            inertiaTensor: rigidBody.inertiaTensor,
-            centerOfMass: rigidBody.centerOfMass,
+            position: half3(rigidBody.position),
+            rotation: half3x3(rigidBody.rotation),
+            inertiaTensor: half3x3(rigidBody.inertiaTensor),
+            centerOfMass: half3(rigidBody.centerOfMass),
 
-            force: rigidBody.force,
-            torque: rigidBody.torque)
+            force: half3(rigidBody.force),
+            torque: half3(rigidBody.torque))
         return strct
     }
 }

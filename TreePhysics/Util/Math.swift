@@ -2,6 +2,8 @@ import Foundation
 import Darwin
 import simd
 
+typealias half3 = vector_half3
+
 enum QuadraticSolution: Equatable {
     case real(Float)
     case realDistinct(Float, Float)
@@ -368,19 +370,79 @@ extension matrix_float3x3 {
     }
 }
 
-func conditionx(_ a: (float3, float3x3)) -> (float3, float3x3) {
-    var (eigenvalues, eigenvectors) = a
-    if eigenvalues.x < 0 {
-        eigenvalues.x = -eigenvalues.x
-//        eigenvectors[0] = -eigenvectors[0]
+extension half3 {
+    init(_ x: half, _ y: half, _ z: half) {
+        self.init()
+        self.x = x
+        self.y = y
+        self.z = z
     }
-    if eigenvalues.y < 0 {
-        eigenvalues.y = -eigenvalues.y
-//        eigenvectors[1] = -eigenvectors[1]
+
+    init(_ vec: float3) {
+        self.init(half(vec.x), half(vec.y), half(vec.z))
     }
-    if eigenvalues.z < 0 {
-        eigenvalues.z = -eigenvalues.z
-//        eigenvectors[2] = -eigenvectors[2]
+}
+
+extension half3: Equatable {
+    public static func == (lhs: vector_half3, rhs: vector_half3) -> Bool {
+        return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z
     }
-    return (eigenvalues, eigenvectors)
+}
+
+extension half3x3 {
+    init(_ scalar: half) {
+        self.init()
+        self.columns = (
+            half3(scalar, scalar, scalar),
+            half3(scalar, scalar, scalar),
+            half3(scalar, scalar, scalar)
+        )
+    }
+
+    init(_ mat: float3x3) {
+        self.init()
+        self.columns = (
+            half3(mat[0]),
+            half3(mat[1]),
+            half3(mat[2])
+        )
+    }
+
+    subscript(_ i: Int) -> half3 {
+        switch i {
+        case 0:
+            return columns.0
+        case 1:
+            return columns.1
+        case 2:
+            return columns.2
+        default: fatalError()
+        }
+    }
+}
+
+func half(_ x: Float) -> half {
+    return float16_from_float32(x)
+}
+
+func float(_ x: half) -> Float {
+    return float32_from_float16(x)
+}
+
+extension half {
+    init (_ x: Float) {
+        self = float16_from_float32(x)
+    }
+}
+
+extension float3 {
+    init(_ h: half3) {
+        self = float3(float(h.x), float(h.y), float(h.z))
+    }
+}
+
+extension float3x3 {
+    init(_ h: half3x3) {
+        self = float3x3(float3(h[0]), float3(h[1]), float3(h[2]))
+    }
 }

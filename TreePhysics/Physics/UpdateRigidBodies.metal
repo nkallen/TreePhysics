@@ -5,41 +5,41 @@ using namespace metal;
 
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
 
-inline float3 joint_position(
+inline half3 joint_position(
                              JointStruct joint,
                              RigidBodyStruct parentRigidBody)
 {
-    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
+    return parentRigidBody.position + parentRigidBody.rotation * half3(0, parentRigidBody.length, 0);
 }
 
-inline float3x3 joint_localRotation(
+inline half3x3 joint_localRotation(
                                     JointStruct joint)
 {
     return matrix_rotate(joint.θ[0]);
 }
 
-inline float3x3 rigidBody_localInertiaTensor(
+inline half3x3 rigidBody_localInertiaTensor(
                                              RigidBodyStruct rigidBody)
 {
-    float mass = rigidBody.mass;
-    float length = rigidBody.length;
-    float radius = rigidBody.radius;
+    half mass = rigidBody.mass;
+    half length = rigidBody.length;
+    half radius = rigidBody.radius;
 
-    float momentOfInertiaAboutY = 1.0/12 * mass * length * length; // Moment of Inertia of a rod about its center of mass;
-    float momentOfInertiaAboutX = 1.0/4 * mass * radius * radius; // MoI of a disc about its center
-    float momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius; // ditto
+    half momentOfInertiaAboutY = 1.0/12 * mass * length * length; // Moment of Inertia of a rod about its center of mass;
+    half momentOfInertiaAboutX = 1.0/4 * mass * radius * radius; // MoI of a disc about its center
+    half momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius; // ditto
 
     // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
     // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-    return float3x3(momentOfInertiaAboutY + momentOfInertiaAboutX,
+    return half3x3(momentOfInertiaAboutY + momentOfInertiaAboutX,
                     momentOfInertiaAboutZ + momentOfInertiaAboutX,
                     momentOfInertiaAboutX + momentOfInertiaAboutY);
 }
 
-inline float3 rigidBody_localCenterOfMass(
+inline half3 rigidBody_localCenterOfMass(
                                           RigidBodyStruct rigidBody)
 {
-    return float3(0, 1, 0) * rigidBody.length / 2;
+    return half3(0, 1, 0) * rigidBody.length / 2;
 }
 
 inline RigidBodyStruct
@@ -48,9 +48,9 @@ updateRigidBody(
                 const JointStruct parentJoint,
                 RigidBodyStruct rigidBody)
 {
-    float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
-    float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
-    float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
+    half3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
+    half3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
+    half3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
 
     rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
     rigidBody.position = parentJointPosition;

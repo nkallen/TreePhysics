@@ -7,6 +7,7 @@
 
 #else
 #import <Foundation/Foundation.h>
+#import "Half.h"
 #endif
 
 #include <simd/simd.h>
@@ -36,38 +37,38 @@ typedef NS_ENUM(NSInteger, FunctionConstantIndex)
 };
 
 typedef struct {
-    vector_float3 position;
-    float mass;
-    matrix_float3x3 inertiaTensor;
-    vector_float3 force;
-    vector_float3 torque;
-    vector_float3 centerOfMass;
+    vector_half3 position;
+    half mass;
+    matrix_half3x3 inertiaTensor;
+    vector_half3 force;
+    vector_half3 torque;
+    vector_half3 centerOfMass;
 } CompositeBodyStruct;
 
 typedef struct {
     // const:
     int parentId;
-    int childIds[5];
-    ushort childCount;
+    int childIds[5]; // Q: if we do level order, can we just do like climberOffset
     int climberOffset;
+    ushort childCount;
     ushort climberCount;
-    float mass;
-    float length;
-    float radius;
-    matrix_float3x3 localRotation;
+    half mass;
+    half length;
+    half radius;
+    matrix_half3x3 localRotation;
+
+    vector_half3 position;
+    matrix_half3x3 rotation;
+    matrix_half3x3 inertiaTensor;
+    vector_half3 centerOfMass;
     
-    vector_float3 position;
-    matrix_float3x3 rotation;
-    matrix_float3x3 inertiaTensor;
-    vector_float3 centerOfMass;
-    
-    vector_float3 force;
-    vector_float3 torque;
+    vector_half3 force;
+    vector_half3 torque;
 } RigidBodyStruct;
 
 typedef struct {
-    matrix_float3x3 θ;
-    float k;
+    matrix_half3x3 θ;
+    half k;
 } JointStruct;
 
 #endif /* ShaderTypes_h */

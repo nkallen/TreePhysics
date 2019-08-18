@@ -41,16 +41,18 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
 
         let expect = expectation(description: "wait")
 
+        let debug = KernelDebugger(device: device)
+
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
+        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
         commandBuffer.addCompletedHandler { _ in
             let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
             let b1_composite = compositeBodies[1]
 
             // mass
-            XCTAssertEqual(b2_composite.mass, 1)
-            XCTAssertEqual(b1_composite.mass, 2)
+            XCTAssertEqual(b2_composite.mass, 1.0)
+            XCTAssertEqual(b1_composite.mass, 2.0)
 
             // force
             XCTAssertEqual(b2_composite.force, self.force)
@@ -59,17 +61,17 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
             // torque
             XCTAssertEqual(b2_composite.torque, self.b2.torque)
             let r_b1 = forceAppliedPosition - self.b1.parentJoint!.position
-            XCTAssertEqual(b1_composite.torque, cross(r_b1, self.force))
+            XCTAssertEqual(b1_composite.torque, cross(r_b1, self.force), accuracy: 0.0001)
 
             // center of mass
-            XCTAssertEqual(b2_composite.centerOfMass, self.b2.centerOfMass)
-            XCTAssertEqual(b1_composite.centerOfMass, (self.b1.centerOfMass + self.b2.centerOfMass)/2)
+            XCTAssertEqual(b2_composite.centerOfMass, self.b2.centerOfMass, accuracy: 0.0001)
+            XCTAssertEqual(b1_composite.centerOfMass, (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
 
             // inertia tensor
-            XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor)
-            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - b1_composite.centerOfMass).crossMatrix)
-            b1_inertiaTensor += b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).crossMatrix)
-            XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.0001)
+            XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor, accuracy: 0.0001)
+            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - float3(b1_composite.centerOfMass)).crossMatrix)
+            b1_inertiaTensor += float3x3(b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).crossMatrix))
+            XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
 
             expect.fulfill()
         }
