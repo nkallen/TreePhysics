@@ -91,7 +91,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         return (count, buffer, rangesOfWork)
     }
 
-    typealias ChildIdsType = (Int32, Int32, Int32, Int32, Int32)
+    typealias ChildIdsType = (Int32, Int32, Int32)
 
     private static func `struct`(rigidBody: RigidBody, climbers: [RigidBody] = [], index: [RigidBody:Int]) -> RigidBodyStruct {
         // Parent
@@ -106,7 +106,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         let childRigidBodies = rigidBody.childJoints.map { $0.childRigidBody }
         assert(childRigidBodies.count <= 5)
         var childRigidBodyIndices: [Int32] = childRigidBodies.map { Int32(index[$0]!) }
-        var childIds: ChildIdsType = (0,0,0,0,0)
+        var childIds: ChildIdsType = (0,0,0)
         memcpy(&childIds, &childRigidBodyIndices, childRigidBodyIndices.count * MemoryLayout<Int32>.stride)
 
         // Climbers

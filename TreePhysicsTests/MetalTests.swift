@@ -291,7 +291,7 @@ class AdvancedMetalTests: XCTestCase {
         self.expecteds = [b9, b8, b6, b2, b7, b5, b1, b4, b3]
     }
 
-    func xtestNoOp() {
+    func testNoOp() {
         let expect = expectation(description: "wait")
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
@@ -308,8 +308,8 @@ class AdvancedMetalTests: XCTestCase {
                 let rigidBody = rigidBodies[i]
                 let expected = self.expecteds[i]
 
-                XCTAssertEqual(expected.position, rigidBody.position, accuracy: 0.0001)
-                XCTAssertEqual(expected.rotation, rigidBody.rotation, accuracy: 0.0001)
+                XCTAssertEqual(expected.position, rigidBody.position, accuracy: 0.001)
+                XCTAssertEqual(expected.rotation, rigidBody.rotation, accuracy: 0.001)
             }
 
             expect.fulfill()
@@ -346,15 +346,15 @@ class AdvancedMetalTests: XCTestCase {
                 XCTAssertEqual(expected.composite.mass, compositeBody.mass, accuracy: 0.0001)
                 XCTAssertEqual(expected.composite.force, compositeBody.force, accuracy: 0.0001)
                 XCTAssertEqual(expected.composite.torque, compositeBody.torque, accuracy: 0.0001)
-                XCTAssertEqual(expected.composite.centerOfMass, compositeBody.centerOfMass, accuracy: 0.0001)
-                XCTAssertEqual(expected.composite.inertiaTensor, compositeBody.inertiaTensor, accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.centerOfMass, compositeBody.centerOfMass, accuracy: 0.001)
+                XCTAssertEqual(expected.composite.inertiaTensor, compositeBody.inertiaTensor, accuracy: 0.001)
 
                 XCTAssertEqual(expected.parentJoint!.θ, joint.θ, accuracy: 0.0001)
 
                 XCTAssertEqual(
-                    expected.position, rigidBody.position, accuracy: 0.0001)
+                    expected.position, rigidBody.position, accuracy: 0.001)
                 XCTAssertEqual(
-                    expected.rotation, rigidBody.rotation, accuracy: 0.0001)
+                    expected.rotation, rigidBody.rotation, accuracy: 0.001)
             }
 
             expect.fulfill()

@@ -450,4 +450,19 @@ public:
         }
         return *this;
     }
+
+    template <class T>
+    thread Debug & operator <<(matrix<T, 3, 3> a)
+    {
+        *this << "(";
+        for (size_t i = 0; i < 3; i++) {
+            *this << "(";
+            for (size_t j = 0; j < 3; j++) {
+                *this << a[i];
+                *this << (i < 3 - 1 ? "," : ")");
+            }
+        }
+        *this << ")";
+        return *this;
+    }
 };

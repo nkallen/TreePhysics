@@ -48,7 +48,7 @@ typedef struct {
 typedef struct {
     // const:
     int parentId;
-    int childIds[5]; // Q: if we do level order, can we just do like climberOffset
+    int childIds[3]; // Q: if we do level order, can we just do like climberOffset
     int climberOffset;
     ushort childCount;
     ushort climberCount;
