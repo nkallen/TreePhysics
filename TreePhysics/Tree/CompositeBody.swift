@@ -8,9 +8,3 @@ final class CompositeBody {
     var torque: float3 = float3.zero
     var centerOfMass: float3 = float3.zero
 }
-
-extension CompositeBody: CustomDebugStringConvertible {
-    var debugDescription: String {
-        return "Composite Body: mass=\(mass), inertiaTensor=\(inertiaTensor), force=\(force), torque=\(torque), centerOfMass=\(centerOfMass)"
-    }
-}

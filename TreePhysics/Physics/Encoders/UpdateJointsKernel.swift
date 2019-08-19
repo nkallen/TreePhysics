@@ -38,6 +38,7 @@ final class UpdateJointsKernel: MetalKernel {
     }
 
     static func buffer(count: Int, device: MTLDevice) -> MTLBuffer {
+        // FIXME make storage private
         let buffer = device.makeBuffer(length: count * MemoryLayout<JointStruct>.stride, options: [.storageModeShared])!
         let jointStructs = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: JointStruct.self, capacity: count)
         for i in 0..<count {

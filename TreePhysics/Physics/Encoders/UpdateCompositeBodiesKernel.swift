@@ -1,6 +1,7 @@
 import Foundation
 import MetalKit
 import Metal
+import SceneKit
 
 final class UpdateCompositeBodiesKernel: MetalKernel {
     let rigidBodiesBuffer: MTLBuffer
@@ -45,13 +46,14 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         commandEncoder.endEncoding()
     }
 
-    static func buffer(root: RigidBody, device: MTLDevice) -> (Int, MTLBuffer, [Range<Int>]) {
+    static func buffer(root: RigidBody, device: MTLDevice) -> (Int, MTLBuffer, [Range<Int>], [SCNNode]) {
         var rangesOfWork: [Range<Int>] = []
         let levels = root.levels()
         var offset = 0
         var id = 0
         var index: [RigidBody:Int] = [:]
         var allClimbers: [RigidBody] = []
+        var nodes: [SCNNode] = []
 
         // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
         for level in levels {
@@ -81,14 +83,17 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             for unitOfWork in level {
                 let id = index[unitOfWork.rigidBody]!
                 rigidBodyStructs[id] = `struct`(rigidBody: unitOfWork.rigidBody, climbers: unitOfWork.climbers, index: index)
+                nodes.append(unitOfWork.rigidBody.node)
             }
         }
         for rigidBody in allClimbers {
             let id = index[rigidBody]!
             rigidBodyStructs[id] = `struct`(rigidBody: rigidBody, index: index)
+            nodes.append(rigidBody.node)
         }
         rigidBodyStructs[index[root]!] = `struct`(rigidBody: root, index: index)
-        return (count, buffer, rangesOfWork)
+        nodes.append(root.node)
+        return (count, buffer, rangesOfWork, nodes)
     }
 
     typealias ChildIdsType = (Int32, Int32, Int32)

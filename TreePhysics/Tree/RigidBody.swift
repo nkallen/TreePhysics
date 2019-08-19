@@ -213,9 +213,3 @@ extension RigidBody: Equatable, Hashable {
         hasher.combine(ObjectIdentifier(self))
     }
 }
-
-extension RigidBody: CustomDebugStringConvertible {
-    var debugDescription: String {
-        return "RigidBody \(name): position=\(position), rotation=\(rotation), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
-    }
-}

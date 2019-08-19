@@ -28,7 +28,7 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
-        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (count, rigidBodiesBuffer, ranges, _) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
             options: [.storageModeShared])!
@@ -51,27 +51,27 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
             let b1_composite = compositeBodies[1]
 
             // mass
-            XCTAssertEqual(b2_composite.mass, 1.0)
-            XCTAssertEqual(b1_composite.mass, 2.0)
+            XCTAssertEqual(float(b2_composite.mass), 1)
+            XCTAssertEqual(float(b1_composite.mass), 2)
 
             // force
-            XCTAssertEqual(b2_composite.force, self.force)
-            XCTAssertEqual(b1_composite.force, self.force)
+            XCTAssertEqual(float3(b2_composite.force), self.force)
+            XCTAssertEqual(float3(b1_composite.force), self.force)
 
             // torque
-            XCTAssertEqual(b2_composite.torque, self.b2.torque)
+            XCTAssertEqual(float3(b2_composite.torque), self.b2.torque)
             let r_b1 = forceAppliedPosition - self.b1.parentJoint!.position
-            XCTAssertEqual(b1_composite.torque, cross(r_b1, self.force), accuracy: 0.0001)
+            XCTAssertEqual(float3(b1_composite.torque), cross(r_b1, self.force), accuracy: 0.0001)
 
             // center of mass
-            XCTAssertEqual(b2_composite.centerOfMass, self.b2.centerOfMass, accuracy: 0.0001)
-            XCTAssertEqual(b1_composite.centerOfMass, (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
+            XCTAssertEqual(float3(b2_composite.centerOfMass), self.b2.centerOfMass, accuracy: 0.0001)
+            XCTAssertEqual(float3(b1_composite.centerOfMass), (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
 
             // inertia tensor
-            XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor, accuracy: 0.0001)
+            XCTAssertEqual(float3x3(b2_composite.inertiaTensor), self.b2.inertiaTensor, accuracy: 0.0001)
             var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - float3(b1_composite.centerOfMass)).crossMatrix)
             b1_inertiaTensor += float3x3(b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).crossMatrix))
-            XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
+            XCTAssertEqual(float3x3(b1_composite.inertiaTensor), b1_inertiaTensor, accuracy: 0.001)
 
             expect.fulfill()
         }
@@ -106,7 +106,7 @@ class UpdateJointsKernelTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (count, rigidBodiesBuffer, ranges, _) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
             options: [.storageModeShared])!
@@ -134,7 +134,7 @@ class UpdateJointsKernelTests: XCTestCase {
                     float3(0,0,0),
                     float3(0,0,0)
                 ),
-                b2_parentJoint.θ, accuracy: 0.0001)
+                float3x3(b2_parentJoint.θ), accuracy: 0.0001)
 
             XCTAssertEqual(
                 float3x3(
@@ -142,7 +142,7 @@ class UpdateJointsKernelTests: XCTestCase {
                     float3(0,0,0),
                     float3(0,0,0)
                 ),
-                b1_parentJoint.θ, accuracy: 0.0001)
+                float3x3(b1_parentJoint.θ), accuracy: 0.0001)
 
             expect.fulfill()
         }
@@ -178,7 +178,7 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (count, rigidBodiesBuffer, ranges, _) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
@@ -206,23 +206,23 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
 
             XCTAssertEqual(
                 float3(0.7010456, 1.7131165, 0),
-                b2.position, accuracy: 0.0001)
+                float3(b2.position), accuracy: 0.001)
             XCTAssertEqual(
                 float3x3(
                     float3(0.013535142,-1,0),
                     float3(1,0.013535142,0),
                     float3(0,0,1)),
-                b2.rotation, accuracy: 0.0001)
+                float3x3(b2.rotation), accuracy: 0.001)
 
             XCTAssertEqual(
                 float3(0, 1, 0),
-                b1.position)
+                float3(b1.position))
             XCTAssertEqual(
                 float3x3(
                     float3(0.7131165,-0.7010456,0),
                     float3(0.7010456,0.7131165,0),
                     float3(0,0,1)),
-                b1.rotation, accuracy: 0.0001)
+                float3x3(b1.rotation), accuracy: 0.001)
 
             expect.fulfill()
         }
@@ -276,7 +276,7 @@ class AdvancedMetalTests: XCTestCase {
 
         b9.apply(force: force, at: 1)
 
-        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (count, rigidBodiesBuffer, ranges, _) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * count,
@@ -308,8 +308,8 @@ class AdvancedMetalTests: XCTestCase {
                 let rigidBody = rigidBodies[i]
                 let expected = self.expecteds[i]
 
-                XCTAssertEqual(expected.position, rigidBody.position, accuracy: 0.001)
-                XCTAssertEqual(expected.rotation, rigidBody.rotation, accuracy: 0.001)
+                XCTAssertEqual(expected.position, float3(rigidBody.position), accuracy: 0.001)
+                XCTAssertEqual(expected.rotation, float3x3(rigidBody.rotation), accuracy: 0.001)
             }
 
             expect.fulfill()
@@ -343,18 +343,18 @@ class AdvancedMetalTests: XCTestCase {
                 let rigidBody = rigidBodies[i]
                 let expected = self.expecteds[i]
 
-                XCTAssertEqual(expected.composite.mass, compositeBody.mass, accuracy: 0.0001)
-                XCTAssertEqual(expected.composite.force, compositeBody.force, accuracy: 0.0001)
-                XCTAssertEqual(expected.composite.torque, compositeBody.torque, accuracy: 0.0001)
-                XCTAssertEqual(expected.composite.centerOfMass, compositeBody.centerOfMass, accuracy: 0.001)
-                XCTAssertEqual(expected.composite.inertiaTensor, compositeBody.inertiaTensor, accuracy: 0.01) // FIXME this loss of precision isn't good
+                XCTAssertEqual(expected.composite.mass, float(compositeBody.mass), accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.force, float3(compositeBody.force), accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.torque, float3(compositeBody.torque), accuracy: 0.0001)
+                XCTAssertEqual(expected.composite.centerOfMass, float3(compositeBody.centerOfMass), accuracy: 0.001)
+                XCTAssertEqual(expected.composite.inertiaTensor, float3x3(compositeBody.inertiaTensor), accuracy: 0.01) // FIXME this loss of precision isn't good
 
-                XCTAssertEqual(expected.parentJoint!.θ, joint.θ, accuracy: 0.0001)
+                XCTAssertEqual(expected.parentJoint!.θ, float3x3(joint.θ), accuracy: 0.0001)
 
                 XCTAssertEqual(
-                    expected.position, rigidBody.position, accuracy: 0.001)
+                    expected.position, float3(rigidBody.position), accuracy: 0.001)
                 XCTAssertEqual(
-                    expected.rotation, rigidBody.rotation, accuracy: 0.001)
+                    expected.rotation, float3x3(rigidBody.rotation), accuracy: 0.001)
             }
 
             expect.fulfill()

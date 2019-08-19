@@ -71,6 +71,8 @@
 		9E9D4B9722F43D43007DCF49 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9522F43CAE007DCF49 /* GameViewController.swift */; };
 		9E9D4B9822F43D98007DCF49 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9322F438FA007DCF49 /* Scene.swift */; };
 		9E9D4B9A22F44123007DCF49 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9922F44123007DCF49 /* Info.plist */; };
+		9EA619CC230AE78400BE2213 /* PrettyPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA619CB230AE78400BE2213 /* PrettyPrint.swift */; };
+		9EA619CD230AE86800BE2213 /* PrettyPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA619CB230AE78400BE2213 /* PrettyPrint.swift */; };
 		9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* Simulator.swift */; };
 		9EE7250022F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */; };
 		9EE7250222F84D57000D0A2F /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
@@ -142,6 +144,7 @@
 		9E9D4B9322F438FA007DCF49 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
 		9E9D4B9522F43CAE007DCF49 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		9E9D4B9922F44123007DCF49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9EA619CB230AE78400BE2213 /* PrettyPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrettyPrint.swift; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* Simulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Simulator.swift; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodiesKernel.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -350,6 +353,7 @@
 				9EEC11E122EA50920078BBFD /* Diagonalization.swift */,
 				9EE7EBC322E08E4000535997 /* Math.swift */,
 				9E6372A122FEC7AA001D4466 /* MetalProxy.swift */,
+				9EA619CB230AE78400BE2213 /* PrettyPrint.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -501,6 +505,7 @@
 				9E9D4B7422F37244007DCF49 /* Joint.swift in Sources */,
 				9EE801A722FC459000198166 /* MetalKernal.swift in Sources */,
 				9E9D4B7522F37244007DCF49 /* Simulator.swift in Sources */,
+				9EA619CD230AE86800BE2213 /* PrettyPrint.swift in Sources */,
 				9E9D4B9722F43D43007DCF49 /* GameViewController.swift in Sources */,
 				9E0674E5230AD24E0044C3C4 /* Print.metal in Sources */,
 				9E51B02522FF238A0081CA4C /* MetalProxy.swift in Sources */,
@@ -542,6 +547,7 @@
 				9E56C94522E78FCF0095C8AC /* Joint.swift in Sources */,
 				9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */,
 				9E56C94B22E792820095C8AC /* RigidBodyPen.swift in Sources */,
+				9EA619CC230AE78400BE2213 /* PrettyPrint.swift in Sources */,
 				9EE801A822FC459100198166 /* MetalKernal.swift in Sources */,
 				9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */,
 				9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */,

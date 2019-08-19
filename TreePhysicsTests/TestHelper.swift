@@ -80,54 +80,6 @@ func XCTAssertEqual(_ a: DifferentialSolution, _ b: DifferentialSolution, accura
     }
 }
 
-func XCTAssertEqual(_ a: Float, _ b: half, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a, float(b), file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: half, _ b: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(float(a), b, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: Float, _ b: half, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a, float(b), accuracy: accuracy, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: half, _ b: Float, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(float(a), b, accuracy: accuracy, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: float3, _ b: half3, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a, float3(b), file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: half3, _ b: float3, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(float3(a), b, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: float3, _ b: half3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a, float3(b), accuracy: accuracy, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: half3, _ b: float3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(float3(a), b, accuracy: accuracy, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: float3x3, _ b: half3x3, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a, float3x3(b), file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: half3x3, _ b: float3x3, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(float3x3(a), b, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: float3x3, _ b: half3x3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a, float3x3(b), accuracy: accuracy, file: file, line: line)
-}
-
-func XCTAssertEqual(_ a: half3x3, _ b: float3x3, accuracy: Float, file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(float3x3(a), b, accuracy: accuracy, file: file, line: line)
-}
-
 // MARK: Half Arithmetic (should only be used in tests, NOT PRODUCTION CODE!!)
 
 func sqr(_ x: half3x3) -> half3x3 {

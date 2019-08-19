@@ -16,6 +16,13 @@ class Game: NSObject {
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
 
+    let rigidBodiesCount: Int
+    let rigidBodiesBuffer: MTLBuffer
+    let compositeBodiesBuffer: MTLBuffer
+    let jointsBuffer: MTLBuffer
+
+    let foo: [SCNNode]
+
     override init() {
         self.device = MTLCreateSystemDefaultDevice()!
 
@@ -44,7 +51,7 @@ class Game: NSObject {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 6)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 2)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
@@ -110,19 +117,22 @@ class Game: NSObject {
         self.attractor = attractor
 
         self.commandQueue = device.makeCommandQueue()!
-        let (count, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
-        let compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * count,
-            options: [.storageModePrivate])!
+        let (rigidBodiesCount, rigidBodiesBuffer, ranges, nodes) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        self.rigidBodiesCount = rigidBodiesCount
+        self.rigidBodiesBuffer = rigidBodiesBuffer
+        self.foo = nodes
+        self.compositeBodiesBuffer = device.makeBuffer(
+            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodiesCount,
+            options: [.storageModeShared])!
         self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
 
-        let jointsBuffer = UpdateJointsKernel.buffer(count: count, device: device)
-        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: count)
+        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodiesCount, device: device)
+        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodiesCount)
 
         self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
 
-        self.resetForces = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: count)
-        self.applyPhysicsFields = ApplyPhysicsFieldsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: count)
+        self.resetForces = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodiesCount)
+        self.applyPhysicsFields = ApplyPhysicsFieldsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodiesCount)
     }
 }
 
@@ -142,12 +152,26 @@ extension Game: SCNSceneRendererDelegate {
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         resetForces.encode(commandBuffer: commandBuffer)
-        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
+//        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
-        updateRigidBodies.encode(commandBuffer: commandBuffer)
-//        commandBuffer.addCompletedHandler { _ in
-//        }
+//        updateRigidBodies.encode(commandBuffer: commandBuffer)
+        commandBuffer.addCompletedHandler { _ in
+            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodiesCount)
+            let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.rigidBodiesCount)
+            let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodiesCount)
+            for i in 0..<self.rigidBodiesCount {
+                let rigidBody = rigidBodies[i]
+                let compositeBody = compositeBodies[i]
+                let joint = joints[i]
+                if i < 10 {
+                    print("composite body", compositeBody)
+                    print("joint theta", joint)
+                    print("rigid body", rigidBody)
+                }
+            }
+            print("=====")
+        }
         commandBuffer.commit()
     }
 }
