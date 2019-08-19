@@ -9,8 +9,17 @@
 /* Begin PBXBuildFile section */
 		9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1B22E4F4A700229235 /* TurtleTests.swift */; };
 		9E036B1F22E4F58600229235 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
+		9E0674DB230ACFB10044C3C4 /* ResetForces.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DA230ACFB10044C3C4 /* ResetForces.metal */; };
+		9E0674DE230AD0DE0044C3C4 /* ResetForcesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForcesKernel.swift */; };
+		9E0674DF230AD22F0044C3C4 /* ResetForcesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForcesKernel.swift */; };
+		9E0674E0230AD23D0044C3C4 /* ResetForces.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DA230ACFB10044C3C4 /* ResetForces.metal */; };
+		9E0674E1230AD2420044C3C4 /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
+		9E0674E2230AD2450044C3C4 /* UpdateJoints.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A922FC468700198166 /* UpdateJoints.metal */; };
+		9E0674E3230AD2490044C3C4 /* Math.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801AB22FC483B00198166 /* Math.metal */; };
+		9E0674E4230AD24C0044C3C4 /* UpdateRigidBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */; };
+		9E0674E5230AD24E0044C3C4 /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
+		9E0674E6230AD2570044C3C4 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
 		9E0D67C8230962F9008912E7 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
-		9E0D67C92309632E008912E7 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
 		9E1797E622FB704F00FA3892 /* UpdateCompositeBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */; };
 		9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E27B86022FA39920030664E /* RigidBodyTests.swift */; };
 		9E31BE9622FDABE800AF908B /* UpdateRigidBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */; };
@@ -21,7 +30,6 @@
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
 		9E51B02422FF23660081CA4C /* UpdateRigidBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */; };
 		9E51B02522FF238A0081CA4C /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
-		9E51B02622FF25970081CA4C /* UpdateRigidBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */; };
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
 		9E56C94522E78FCF0095C8AC /* Joint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94422E78FCF0095C8AC /* Joint.swift */; };
 		9E56C94722E78FEC0095C8AC /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94622E78FEC0095C8AC /* RigidBody.swift */; };
@@ -61,7 +69,6 @@
 		9E9D4B9A22F44123007DCF49 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9922F44123007DCF49 /* Info.plist */; };
 		9EB2159D22E1D1B000B1C6FC /* Simulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* Simulator.swift */; };
 		9EE7250022F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */; };
-		9EE7250122F84D56000D0A2F /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
 		9EE7250222F84D57000D0A2F /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
@@ -78,8 +85,6 @@
 		9EE801A722FC459000198166 /* MetalKernal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernal.swift */; };
 		9EE801A822FC459100198166 /* MetalKernal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernal.swift */; };
 		9EE801AD22FC48DA00198166 /* Math.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801AB22FC483B00198166 /* Math.metal */; };
-		9EE801AE22FC48DB00198166 /* Math.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801AB22FC483B00198166 /* Math.metal */; };
-		9EE801AF22FC492300198166 /* UpdateJoints.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A922FC468700198166 /* UpdateJoints.metal */; };
 		9EE801B022FC492300198166 /* UpdateJoints.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A922FC468700198166 /* UpdateJoints.metal */; };
 		9EE801B122FC492900198166 /* UpdateJointsKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJointsKernel.swift */; };
 		9EE801B222FC492A00198166 /* UpdateJointsKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJointsKernel.swift */; };
@@ -100,6 +105,8 @@
 /* Begin PBXFileReference section */
 		9E036B1B22E4F4A700229235 /* TurtleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurtleTests.swift; sourceTree = "<group>"; };
 		9E036B1E22E4F58600229235 /* Turtle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turtle.swift; sourceTree = "<group>"; };
+		9E0674DA230ACFB10044C3C4 /* ResetForces.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ResetForces.metal; sourceTree = "<group>"; };
+		9E0674DD230AD0DE0044C3C4 /* ResetForcesKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetForcesKernel.swift; sourceTree = "<group>"; };
 		9E0D67C6230962F9008912E7 /* Half.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Half.h; sourceTree = "<group>"; };
 		9E0D67C7230962F9008912E7 /* Half.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Half.c; sourceTree = "<group>"; };
 		9E27B86022FA39920030664E /* RigidBodyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBodyTests.swift; sourceTree = "<group>"; };
@@ -193,6 +200,22 @@
 			path = "L-Systems";
 			sourceTree = "<group>";
 		};
+		9E0674DC230ACFC90044C3C4 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				9E0674DA230ACFB10044C3C4 /* ResetForces.metal */,
+				9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */,
+				9EE801A922FC468700198166 /* UpdateJoints.metal */,
+				9EE801AB22FC483B00198166 /* Math.metal */,
+				9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */,
+				9E8E27BE2307335300652DAC /* Print.metal */,
+				9E0D67C6230962F9008912E7 /* Half.h */,
+				9E0D67C7230962F9008912E7 /* Half.c */,
+				9E62078322F8A7E6005E99C8 /* ShaderTypes.h */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
 		9E56C94322E78FA90095C8AC /* Tree */ = {
 			isa = PBXGroup;
 			children = (
@@ -207,20 +230,14 @@
 		9E9D4B6422F313BD007DCF49 /* Physics */ = {
 			isa = PBXGroup;
 			children = (
-				9E62078322F8A7E6005E99C8 /* ShaderTypes.h */,
-				9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */,
-				9EE801A922FC468700198166 /* UpdateJoints.metal */,
+				9E0674DC230ACFC90044C3C4 /* Shaders */,
 				9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */,
-				9EE801AB22FC483B00198166 /* Math.metal */,
 				9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */,
 				9EE801A322FC450D00198166 /* UpdateJointsKernel.swift */,
 				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
 				9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */,
 				9EE801A522FC451E00198166 /* MetalKernal.swift */,
-				9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */,
-				9E8E27BE2307335300652DAC /* Print.metal */,
-				9E0D67C6230962F9008912E7 /* Half.h */,
-				9E0D67C7230962F9008912E7 /* Half.c */,
+				9E0674DD230AD0DE0044C3C4 /* ResetForcesKernel.swift */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -455,32 +472,35 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E9D4B6E22F37244007DCF49 /* HasTransform.swift in Sources */,
+				9E0674E2230AD2450044C3C4 /* UpdateJoints.metal in Sources */,
+				9E0674E1230AD2420044C3C4 /* UpdateCompositeBodies.metal in Sources */,
 				9E9D4B6F22F37244007DCF49 /* Tree.swift in Sources */,
 				9E9D4B7022F37244007DCF49 /* main.swift in Sources */,
 				9E9D4B9822F43D98007DCF49 /* Scene.swift in Sources */,
 				9E1797E622FB704F00FA3892 /* UpdateCompositeBodiesKernel.swift in Sources */,
-				9E0D67C92309632E008912E7 /* Half.c in Sources */,
-				9EE7250122F84D56000D0A2F /* UpdateCompositeBodies.metal in Sources */,
 				9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */,
 				9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */,
+				9E0674E0230AD23D0044C3C4 /* ResetForces.metal in Sources */,
 				9E9D4B7322F37244007DCF49 /* Diagonalization.swift in Sources */,
 				9E9D4B7422F37244007DCF49 /* Joint.swift in Sources */,
 				9EE801A722FC459000198166 /* MetalKernal.swift in Sources */,
 				9E9D4B7522F37244007DCF49 /* Simulator.swift in Sources */,
-				9E51B02622FF25970081CA4C /* UpdateRigidBodies.metal in Sources */,
 				9E9D4B9722F43D43007DCF49 /* GameViewController.swift in Sources */,
+				9E0674E5230AD24E0044C3C4 /* Print.metal in Sources */,
 				9E51B02522FF238A0081CA4C /* MetalProxy.swift in Sources */,
-				9EE801AF22FC492300198166 /* UpdateJoints.metal in Sources */,
 				9E9D4B7622F37244007DCF49 /* RigidBodyPen.swift in Sources */,
+				9E0674E6230AD2570044C3C4 /* Half.c in Sources */,
+				9E0674DF230AD22F0044C3C4 /* ResetForcesKernel.swift in Sources */,
 				9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */,
-				9EE801AE22FC48DB00198166 /* Math.metal in Sources */,
 				9E51B02422FF23660081CA4C /* UpdateRigidBodiesKernel.swift in Sources */,
+				9E0674E4230AD24C0044C3C4 /* UpdateRigidBodies.metal in Sources */,
 				9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */,
 				9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */,
 				9EE801B122FC492900198166 /* UpdateJointsKernel.swift in Sources */,
 				9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */,
 				9E9D4B7C22F37244007DCF49 /* PhysicsField.swift in Sources */,
 				9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */,
+				9E0674E3230AD2490044C3C4 /* Math.metal in Sources */,
 				9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */,
 				9E9D4B7F22F37244007DCF49 /* RigidBody.swift in Sources */,
 			);
@@ -508,11 +528,13 @@
 				9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */,
 				9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */,
 				9EE801B022FC492300198166 /* UpdateJoints.metal in Sources */,
+				9E0674DB230ACFB10044C3C4 /* ResetForces.metal in Sources */,
 				9EE7250022F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift in Sources */,
 				9E461B3522E7017F008AB788 /* CylinderPen.swift in Sources */,
 				9EE801AD22FC48DA00198166 /* Math.metal in Sources */,
 				9EE7EBC422E08E4000535997 /* Math.swift in Sources */,
 				9EE7250222F84D57000D0A2F /* UpdateCompositeBodies.metal in Sources */,
+				9E0674DE230AD0DE0044C3C4 /* ResetForcesKernel.swift in Sources */,
 				9EE801B222FC492A00198166 /* UpdateJointsKernel.swift in Sources */,
 				9E31BE9622FDABE800AF908B /* UpdateRigidBodiesKernel.swift in Sources */,
 				9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */,
@@ -581,7 +603,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/ShaderTypes.h;
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -607,7 +629,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/ShaderTypes.h;
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -670,7 +692,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/ShaderTypes.h;
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -725,7 +747,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/ShaderTypes.h;
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
@@ -745,7 +767,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
 				PRODUCT_NAME = TreePhysics;
-				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/ShaderTypes.h;
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -765,7 +787,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
 				PRODUCT_NAME = TreePhysics;
-				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/ShaderTypes.h;
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -785,6 +807,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysicsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreePhysics.app/Contents/MacOS/TreePhysics";
 			};
@@ -805,6 +828,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysicsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = TreePhysics/Physics/Shaders/ShaderTypes.h;
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreePhysics.app/Contents/MacOS/TreePhysics";
 			};
