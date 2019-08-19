@@ -12,6 +12,7 @@ class Game: NSObject {
     let updateJoints: UpdateJointsKernel
     let updateRigidBodies: UpdateRigidBodiesKernel
     let resetForces: ResetForcesKernel
+    let applyPhysicsFields: ApplyPhysicsFieldsKernel
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
 
@@ -121,6 +122,7 @@ class Game: NSObject {
         self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
 
         self.resetForces = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: count)
+        self.applyPhysicsFields = ApplyPhysicsFieldsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: count)
     }
 }
 
@@ -139,10 +141,11 @@ extension Game: SCNSceneRendererDelegate {
         renderer.isPlaying = true
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
+        resetForces.encode(commandBuffer: commandBuffer)
+        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
-        resetForces.encode(commandBuffer: commandBuffer)
 //        commandBuffer.addCompletedHandler { _ in
 //        }
         commandBuffer.commit()

@@ -4,6 +4,7 @@ import simd
 protocol PhysicsField {
     var position: float3 { get }
     var halfExtent: float3? { get }
+    var `struct`: PhysicsFieldStruct { get }
     func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3
 }
 
@@ -27,6 +28,12 @@ final class GravityField: PhysicsField {
     func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
         return g * mass
     }
+
+    var `struct`: PhysicsFieldStruct {
+        return PhysicsFieldStruct(
+            position: half3(position),
+            halfExtent: half3(halfExtent ?? float3(repeating: -1)))
+    }
 }
 
 final class AttractorField: PhysicsField {
@@ -37,12 +44,17 @@ final class AttractorField: PhysicsField {
     let b: Float = 0.01
     let c: Float = 0.1
 
-
     func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
         let delta = self.position - position
         let distance = length(delta)
         let direction = normalize(delta)
         // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
         return direction * a * powf(.e, -sqr(distance - b)/(2*c))
+    }
+
+    var `struct`: PhysicsFieldStruct {
+        return PhysicsFieldStruct(
+            position: half3(position),
+            halfExtent: half3(halfExtent ?? float3(repeating: -1)))
     }
 }

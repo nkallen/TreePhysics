@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, BufferIndex)
     BufferIndexJoints = 3,
     BufferIndexTime = 4,
     BufferIndexRanges = 5,
+    BufferIndexPhysicsField = 6, 
 
     BufferIndexDebugString = 10,
 
@@ -70,5 +71,11 @@ typedef struct {
     matrix_half3x3 θ;
     half k;
 } JointStruct;
+
+typedef struct {
+    vector_half3 position;
+    vector_half3 halfExtent;
+
+} PhysicsFieldStruct;
 
 #endif /* ShaderTypes_h */
