@@ -1,80 +1,8 @@
-FIXES:
+The biggest optimization for doing highly detailed trees is by analogy to tesselation;
 
-look into position/rotation for the structs (compositebody etc)
+Let each RigidBody have a set (16) of turtle instructions: 16 bytes
+If we need any constants (step size, etc.), store 8 halfs => 32 bytes
 
-===
+For each updatCompositeBodies step (which is leaf to root order) replay the turtle commands (in reverse order in this step -- is that possible?) accumulating the force, torque, etc.
 
-For updatecompositebodyies:
-
-suppose we have a tree:
-
-0
-  1
-  2
-    4
-    5
-    6
-  3
-    7
-    8
-
-we can use level order, organizing into quads:
-
-[4 5 6 x | 7 8 x x | ... ]
-[1 2 3 x]
-
-that implies at every level we do children and the parent:
-
-[4 5 6 x] -> no children, so process:
-[4 -> 1, 5, 6, x] -> 5, 6, and x become inactive, and 4 shuffles the other values and then does the work.
-
-In general, for each quad: Load 4*4 children, compute*4, store 4, shuffle down and compute*1, store
-
-iteration 1:
-
-[4 5 6 x | 7 8 x x | ... ]
-
-basically this is an optimization to process two levels at a time; but potentially multiplying the number of threads by 4.
-
-In the above case we save five reads, in this case:
-
-0
-  1
-  2
-    4
-      9
-      10
-    5
-      11
-    6
-  3
-    7
-    8
-      12
-
-Original:
-
-[9 10 x x | 11 x x x | 12 x x x] 0 reads, 4 writes
-[4 5  6 x | 7  8 x x] 4 reads, 5 writes
-[1 2  3 x ] 5 reads, 3 writes
-
-total: 9 reads, 12 writes
-
-New:
-
-[9 10 x x | 11 x x x | x x x x | x x x x | 12 x x x] 0 reads, 4 + 5 writes
-[1 2  3 x ] 5 reads, 3 writes
-
-5 reads, 12 writes
-
-In general, we remove 50% of reads
-
-In general, for a tree like:
-
-1 4 4^2 4^3 4^4 4^5 4^6
-
-There should be 4^6 + 4^5 + 4^4 + 4^3 + 4^2 = 5456 reads
-
-Whereas for the optimizatio we expect: 4^5 + 4^3 = 1088 reads
-
-Finally, when the min, max is within a threadgroup, we can use a threadgroup cache
+Calculate the joint angles immediately -- there's no avoiding this, unfortunately.

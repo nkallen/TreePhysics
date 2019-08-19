@@ -19,7 +19,7 @@ rigidBody_updateCompositeBody(
 
     for (ushort i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
-        
+
         mass += childCompositeBody.mass;
         force += childCompositeBody.force;
         torque += cross(childCompositeBody.position - position, childCompositeBody.force) + childCompositeBody.torque;
@@ -28,13 +28,13 @@ rigidBody_updateCompositeBody(
     centerOfMass /= mass;
 
     half3x3 inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass));
-    
+
     for (ushort i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
-        
+
         inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass));
     }
-    
+
     CompositeBodyStruct compositeBody = {
         .mass = mass,
         .force = force,
@@ -43,7 +43,7 @@ rigidBody_updateCompositeBody(
         .position = position,
         .inertiaTensor = inertiaTensor
     };
-    
+
     return compositeBody;
 }
 
@@ -57,17 +57,17 @@ rigidBody_updateCompositeBody(
     half3 torque = rigidBody.torque;
     half3 centerOfMass = mass * rigidBody.centerOfMass;
     half3 position = rigidBody.position;
-    
+
     mass += childCompositeBody.mass;
     force += childCompositeBody.force;
     torque += cross(childCompositeBody.position - position, childCompositeBody.force) + childCompositeBody.torque;
     centerOfMass += childCompositeBody.mass * childCompositeBody.centerOfMass;
     centerOfMass /= mass;
-    
+
     half3x3 inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass));
-    
+
     inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass));
-    
+
     CompositeBodyStruct compositeBody = {
         .mass = mass,
         .force = force,
@@ -76,7 +76,7 @@ rigidBody_updateCompositeBody(
         .position = position,
         .inertiaTensor = inertiaTensor
     };
-    
+
     return compositeBody;
 }
 
@@ -92,7 +92,7 @@ rigidBody_updateCompositeBody(
         .position = rigidBody.position,
         .inertiaTensor = rigidBody.inertiaTensor
     };
-    
+
     return compositeBody;
 }
 
@@ -155,7 +155,7 @@ updateCompositeBodies(
             RigidBodyStruct rigidBody = rigidBodies[id];
             CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies);
             compositeBodies[id] = compositeBody;
-            
+
             rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
         }
         threadgroup_barrier(mem_flags::mem_device);

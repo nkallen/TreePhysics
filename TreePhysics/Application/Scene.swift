@@ -138,11 +138,10 @@ extension Game: SCNSceneRendererDelegate {
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
-//        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
-//        updateRigidBodies.encode(commandBuffer: commandBuffer)
-        commandBuffer.addCompletedHandler { _ in
-            print("ok")
-        }
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
+        updateRigidBodies.encode(commandBuffer: commandBuffer)
+//        commandBuffer.addCompletedHandler { _ in
+//        }
         commandBuffer.commit()
     }
 }

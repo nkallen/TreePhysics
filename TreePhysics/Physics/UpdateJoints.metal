@@ -4,11 +4,17 @@
 #import "Print.metal"
 using namespace metal;
 
+inline half3x3 joint_localRotation(
+                                   JointStruct joint)
+{
+    return matrix_rotate(joint.θ[0]);
+}
+
 inline half3x3 joint_worldToLocalRotation(
                                            JointStruct joint,
                                            RigidBodyStruct parentRigidBody)
 {
-    return transpose(parentRigidBody.rotation);
+    return transpose(parentRigidBody.rotation * joint_localRotation(joint));
 }
 
 inline half3 joint_rotateVector(
