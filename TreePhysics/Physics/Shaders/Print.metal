@@ -424,9 +424,13 @@ public:
 
     thread Debug & operator <<(half x)
     {
-        unsigned int flags = 0U, base = 10U, precision = 0U, width = 0U;
+        unsigned int flags, width, precision;
 
-        idx = _ntoa_int(_out_buffer, buf, idx, maxlen, (unsigned int)(x > 0 ? x : 0 - x), false, base, precision, width, flags);
+        flags = 0U;
+        precision = 0U;
+        width = 0U;
+
+        idx = _ftoa(_out_buffer, buf, idx, maxlen, x, precision, width, flags);
         return *this;
     }
 

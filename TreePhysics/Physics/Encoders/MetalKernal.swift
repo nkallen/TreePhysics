@@ -22,9 +22,13 @@ class MetalKernel {
 
 class KernelDebugger {
     let stringBuffer: MTLBuffer
+    let count: Int
+    let maxChars: Int
 
-    init(device: MTLDevice) {
-        self.stringBuffer = device.makeBuffer(length: 1024 * 16, options: [.storageModeShared])!
+    init(device: MTLDevice, count: Int = 16, maxChars: Int = 2048) {
+        self.maxChars = maxChars
+        self.stringBuffer = device.makeBuffer(length: maxChars * count, options: [.storageModeShared])!
+        self.count = count
     }
 
     func encode(commandEncoder: MTLComputeCommandEncoder) {
@@ -36,19 +40,20 @@ class KernelDebugger {
     }
 
     var strings: [String] {
-        var pointer = UnsafeMutableRawPointer(self.stringBuffer.contents()).bindMemory(to: CChar.self, capacity: 1024 * 16)
+        var pointer = UnsafeMutableRawPointer(self.stringBuffer.contents()).bindMemory(to: CChar.self, capacity: maxChars * count)
         var result: [String] = []
-        for _ in 0..<16 {
+        for _ in 0..<count {
             result.append(String(cString: pointer))
-            pointer = pointer.advanced(by: 1024)
+            pointer = pointer.advanced(by: maxChars)
         }
 
         return result
     }
 
-    func print() {
-        for string in strings {
-            Swift.print(string)
+    func print(count: Int? = nil) {
+        let count = count ?? self.count
+        for i in 0..<count {
+            Swift.print("\(i): ", strings[i])
         }
     }
 }

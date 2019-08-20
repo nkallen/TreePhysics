@@ -168,24 +168,25 @@ inverse(matrix<T, 3, 3> m)
 template <class T>
 inline matrix<T, 2, 2>
 inverse(matrix<T, 2, 2> m) {
-    return matrix<T, 2, 2>(vec<T, 2>(m[1][1],-m[0][1]),
-                           vec<T, 2>(-m[1][0], m[0][0]) / (m[0][0]*m[1][1] - m[1][0]*m[0][1]));
+    return (1.0 / determinant(m)) *
+    matrix<T, 2, 2>(vec<T, 2>(m[1][1],-m[0][1]),
+                    vec<T, 2>(-m[1][0], m[0][0]));
 }
 
 template <class T>
 inline matrix<T, 3, 3>
 matrix_rotate(vec<T, 3> rotation)
 {
-    float pitch = rotation.x;
-    float yaw = rotation.y;
-    float roll = rotation.z;
+    T pitch = rotation.x;
+    T yaw = rotation.y;
+    T roll = rotation.z;
 
-    float cb = cos(pitch);
-    float sb = sin(pitch);
-    float ch = cos(yaw);
-    float sh = sin(yaw);
-    float ca = cos(roll);
-    float sa = sin(roll);
+    T cb = cos(pitch);
+    T sb = sin(pitch);
+    T ch = cos(yaw);
+    T sh = sin(yaw);
+    T ca = cos(roll);
+    T sa = sin(roll);
 
     return matrix<T, 3, 3>(
                     vec<T, 3>(ch*ca,          sa,     -sh*ca),

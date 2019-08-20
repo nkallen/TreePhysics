@@ -8,20 +8,18 @@ class Game: NSObject {
     let attractorField: AttractorField
     let attractor: SCNNode
     let parent: SCNNode
+
+    let device: MTLDevice, commandQueue: MTLCommandQueue
     let updateCompositeBodies: UpdateCompositeBodiesKernel
     let updateJoints: UpdateJointsKernel
     let updateRigidBodies: UpdateRigidBodiesKernel
     let resetForces: ResetForcesKernel
     let applyPhysicsFields: ApplyPhysicsFieldsKernel
-    let device: MTLDevice
-    let commandQueue: MTLCommandQueue
 
-    let rigidBodiesCount: Int
+    let rigidBodies: [RigidBody]
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
     let jointsBuffer: MTLBuffer
-
-    let foo: [SCNNode]
 
     override init() {
         self.device = MTLCreateSystemDefaultDevice()!
@@ -74,6 +72,7 @@ class Game: NSObject {
 
         self.parent = SCNNode()
 
+        // FIXME move this into the skinng pen
         for (boneIndex, bone) in skinningPen.bones.enumerated() {
             let (vertexIndices, rigidBody) = bone
             let node = rigidBody.node
@@ -117,22 +116,21 @@ class Game: NSObject {
         self.attractor = attractor
 
         self.commandQueue = device.makeCommandQueue()!
-        let (rigidBodiesCount, rigidBodiesBuffer, ranges, nodes) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
-        self.rigidBodiesCount = rigidBodiesCount
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        self.rigidBodies = rigidBodies
         self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.foo = nodes
         self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodiesCount,
+            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
             options: [.storageModeShared])!
         self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
 
-        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodiesCount, device: device)
-        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodiesCount)
+        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodies.count, device: device)
+        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
 
         self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
 
-        self.resetForces = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodiesCount)
-        self.applyPhysicsFields = ApplyPhysicsFieldsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodiesCount)
+        self.resetForces = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
+        self.applyPhysicsFields = ApplyPhysicsFieldsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
     }
 }
 
@@ -147,30 +145,26 @@ extension Game: SCNSceneRendererDelegate {
             1,
             radius * cosf(Float(start.timeIntervalSinceNow)))
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
-//        simulator.update(at: 1.0 / 60)
+        //        simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         resetForces.encode(commandBuffer: commandBuffer)
-//        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
+        let debugPhys = KernelDebugger(device: device, count: rigidBodies.count)
+        applyPhysicsFields.encode(commandBuffer: debugPhys.wrap(commandBuffer: commandBuffer), field: self.attractorField)
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
-        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
-//        updateRigidBodies.encode(commandBuffer: commandBuffer)
+        let debugJoint = KernelDebugger(device: device, count: rigidBodies.count)
+        updateJoints.encode(commandBuffer: debugJoint.wrap(commandBuffer: commandBuffer), at: 1.0 / 60)
+        updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
-            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodiesCount)
-            let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.rigidBodiesCount)
-            let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodiesCount)
-            for i in 0..<self.rigidBodiesCount {
+            //            debugPhys.print()
+            //            debugJoint.print()
+
+            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodies.count)
+            for i in 0..<self.rigidBodies.count {
                 let rigidBody = rigidBodies[i]
-                let compositeBody = compositeBodies[i]
-                let joint = joints[i]
-                if i < 10 {
-                    print("composite body", compositeBody)
-                    print("joint theta", joint)
-                    print("rigid body", rigidBody)
-                }
+                self.rigidBodies[i].node.simdPosition = float3(rigidBody.position)
             }
-            print("=====")
         }
         commandBuffer.commit()
     }

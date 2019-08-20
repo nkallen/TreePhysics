@@ -18,22 +18,22 @@ inline half3x3 joint_localRotation(
     return matrix_rotate(joint.θ[0]);
 }
 
-inline half3x3 rigidBody_localInertiaTensor(
+inline float3x3 rigidBody_localInertiaTensor(
                                              RigidBodyStruct rigidBody)
 {
     half mass = rigidBody.mass;
     half length = rigidBody.length;
     half radius = rigidBody.radius;
 
-    half momentOfInertiaAboutY = 1.0/12 * mass * length * length; // Moment of Inertia of a rod about its center of mass;
-    half momentOfInertiaAboutX = 1.0/4 * mass * radius * radius; // MoI of a disc about its center
-    half momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius; // ditto
+    float momentOfInertiaAboutY = 1.0/12 * mass * length * length; // Moment of Inertia of a rod about its center of mass;
+    float momentOfInertiaAboutX = 1.0/4 * mass * radius * radius; // MoI of a disc about its center
+    float momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius; // ditto
 
     // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
     // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-    return half3x3(momentOfInertiaAboutY + momentOfInertiaAboutX,
-                    momentOfInertiaAboutZ + momentOfInertiaAboutX,
-                    momentOfInertiaAboutX + momentOfInertiaAboutY);
+    return float3x3(momentOfInertiaAboutY + momentOfInertiaAboutX, 0, 0,
+                    0, momentOfInertiaAboutZ + momentOfInertiaAboutX, 0,
+                    0, 0, momentOfInertiaAboutX + momentOfInertiaAboutY);
 }
 
 inline half3 rigidBody_localCenterOfMass(
@@ -55,7 +55,7 @@ updateRigidBody(
     rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
     rigidBody.position = parentJointPosition;
 
-    rigidBody.inertiaTensor = rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * transpose(rigidBody.rotation);
+    rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * (float3x3)transpose(rigidBody.rotation);
     rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
 
     return rigidBody;

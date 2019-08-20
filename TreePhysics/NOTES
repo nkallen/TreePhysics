@@ -6,3 +6,11 @@ If we need any constants (step size, etc.), store 8 halfs => 32 bytes
 For each updatCompositeBodies step (which is leaf to root order) replay the turtle commands (in reverse order in this step -- is that possible?) accumulating the force, torque, etc.
 
 Calculate the joint angles immediately -- there's no avoiding this, unfortunately.
+
+
+===
+
+This is my favorite error:
+
+Fatal error: 'try!' expression unexpectedly raised an error: Error Domain=AGXMetalA11 Code=3 "Failed to materializeAll." UserInfo={NSLocalizedDescription=Failed to materializeAll.}: file /Users/nickkallen/Documents/TreePhysics/TreePhysics/Physics/Encoders/MetalKernal.swift, line 14
+

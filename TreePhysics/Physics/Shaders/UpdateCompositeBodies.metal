@@ -27,12 +27,12 @@ rigidBody_updateCompositeBody(
     }
     centerOfMass /= mass;
 
-    half3x3 inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass));
+    float3x3 inertiaTensor = rigidBody.inertiaTensor - float3x3(rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass)));
 
     for (ushort i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
 
-        inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass));
+        inertiaTensor += childCompositeBody.inertiaTensor - float3x3(childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass)));
     }
 
     CompositeBodyStruct compositeBody = {
@@ -64,9 +64,9 @@ rigidBody_updateCompositeBody(
     centerOfMass += childCompositeBody.mass * childCompositeBody.centerOfMass;
     centerOfMass /= mass;
 
-    half3x3 inertiaTensor = rigidBody.inertiaTensor - rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass));
+    float3x3 inertiaTensor = rigidBody.inertiaTensor - float3x3(rigidBody.mass * sqr(crossMatrix(rigidBody.centerOfMass - centerOfMass)));
 
-    inertiaTensor += childCompositeBody.inertiaTensor - childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass));
+    inertiaTensor += childCompositeBody.inertiaTensor - float3x3(childCompositeBody.mass * sqr(crossMatrix(childCompositeBody.centerOfMass - centerOfMass)));
 
     CompositeBodyStruct compositeBody = {
         .mass = mass,

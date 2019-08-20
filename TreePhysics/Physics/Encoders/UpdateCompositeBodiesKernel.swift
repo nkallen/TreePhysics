@@ -3,6 +3,7 @@ import MetalKit
 import Metal
 import SceneKit
 
+// FIXME rename encoder
 final class UpdateCompositeBodiesKernel: MetalKernel {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
@@ -46,14 +47,14 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
         commandEncoder.endEncoding()
     }
 
-    static func buffer(root: RigidBody, device: MTLDevice) -> (Int, MTLBuffer, [Range<Int>], [SCNNode]) {
+    static func buffer(root: RigidBody, device: MTLDevice) -> ([RigidBody], MTLBuffer, [Range<Int>]) {
         var rangesOfWork: [Range<Int>] = []
         let levels = root.levels()
         var offset = 0
         var id = 0
         var index: [RigidBody:Int] = [:]
         var allClimbers: [RigidBody] = []
-        var nodes: [SCNNode] = []
+        var rigidBodies: [RigidBody] = []
 
         // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
         for level in levels {
@@ -83,17 +84,17 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             for unitOfWork in level {
                 let id = index[unitOfWork.rigidBody]!
                 rigidBodyStructs[id] = `struct`(rigidBody: unitOfWork.rigidBody, climbers: unitOfWork.climbers, index: index)
-                nodes.append(unitOfWork.rigidBody.node)
+                rigidBodies.append(unitOfWork.rigidBody)
             }
         }
         for rigidBody in allClimbers {
             let id = index[rigidBody]!
             rigidBodyStructs[id] = `struct`(rigidBody: rigidBody, index: index)
-            nodes.append(rigidBody.node)
+            rigidBodies.append(rigidBody)
         }
         rigidBodyStructs[index[root]!] = `struct`(rigidBody: root, index: index)
-        nodes.append(root.node)
-        return (count, buffer, rangesOfWork, nodes)
+        rigidBodies.append(root)
+        return (rigidBodies, buffer, rangesOfWork)
     }
 
     typealias ChildIdsType = (Int32, Int32, Int32)
@@ -131,7 +132,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
 
             position: half3(rigidBody.position),
             rotation: half3x3(rigidBody.rotation),
-            inertiaTensor: half3x3(rigidBody.inertiaTensor),
+            inertiaTensor: rigidBody.inertiaTensor,
             centerOfMass: half3(rigidBody.centerOfMass),
 
             force: half3(rigidBody.force),

@@ -371,6 +371,13 @@ extension matrix_float3x3 {
 }
 
 extension half3 {
+    init(_ x: Float, _ y: Float, _ z: Float) {
+        self.init()
+        self.x = half(x)
+        self.y = half(y)
+        self.z = half(z)
+    }
+
     init(_ x: half, _ y: half, _ z: half) {
         self.init()
         self.x = x

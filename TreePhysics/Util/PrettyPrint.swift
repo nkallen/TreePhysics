@@ -20,7 +20,7 @@ extension RigidBody: CustomDebugStringConvertible {
 
 extension RigidBodyStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "RigidBody: position=\(float3(position)), rotation=\(float3x3(rotation)), mass=\(float(mass)), length=\(float(length)), radius=\(float(radius)), centerOfMass=\(float3(centerOfMass)), force=\(float3(force)), torque=\(float3(torque)), inertiaTensor=\(float3x3(inertiaTensor))"
+        return "RigidBody: parentId=\(parentId) position=\(float3(position)), rotation=\(float3x3(rotation)), mass=\(float(mass)), length=\(float(length)), radius=\(float(radius)), centerOfMass=\(float3(centerOfMass)), force=\(float3(force)), torque=\(float3(torque)), inertiaTensor=\(float3x3(inertiaTensor))"
     }
 }
 
@@ -32,6 +32,6 @@ extension CompositeBody: CustomDebugStringConvertible {
 
 extension CompositeBodyStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "Composite Body: mass=\(float(mass)), inertiaTensor=\(float3x3(inertiaTensor)), force=\(float3(force)), torque=\(float3(torque)), centerOfMass=\(float3(centerOfMass))"
+        return "CompositeBodyStruct(position: \(float3(position)), mass: \(float(mass)), inertiaTensor: \(float3x3(inertiaTensor)), force: \(float3(force)), torque: \(float3(torque)), centerOfMass: \(float3(centerOfMass)))"
     }
 }

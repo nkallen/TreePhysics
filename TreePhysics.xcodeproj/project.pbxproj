@@ -22,9 +22,9 @@
 		9E0674E8230AD4590044C3C4 /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
 		9E0674EA230AD8290044C3C4 /* ApplyPhysicsFieldsKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFieldsKernel.swift */; };
 		9E0674EC230ADBE40044C3C4 /* ApplyPhysicsFieldsKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFieldsKernel.swift */; };
-		9E0674ED230ADC3C0044C3C4 /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
 		9E0D67C8230962F9008912E7 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
 		9E1797E622FB704F00FA3892 /* UpdateCompositeBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */; };
+		9E1C70F9230C6FB200DA9929 /* SCRATCH in Resources */ = {isa = PBXBuildFile; fileRef = 9E1C70F8230C6FB200DA9929 /* SCRATCH */; };
 		9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E27B86022FA39920030664E /* RigidBodyTests.swift */; };
 		9E31BE9622FDABE800AF908B /* UpdateRigidBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */; };
 		9E31BE9822FDAE4600AF908B /* UpdateRigidBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */; };
@@ -117,6 +117,7 @@
 		9E0674E9230AD8290044C3C4 /* ApplyPhysicsFieldsKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplyPhysicsFieldsKernel.swift; sourceTree = "<group>"; };
 		9E0D67C6230962F9008912E7 /* Half.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Half.h; sourceTree = "<group>"; };
 		9E0D67C7230962F9008912E7 /* Half.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Half.c; sourceTree = "<group>"; };
+		9E1C70F8230C6FB200DA9929 /* SCRATCH */ = {isa = PBXFileReference; lastKnownFileType = text; path = SCRATCH; sourceTree = "<group>"; };
 		9E27B86022FA39920030664E /* RigidBodyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBodyTests.swift; sourceTree = "<group>"; };
 		9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateRigidBodiesKernel.swift; sourceTree = "<group>"; };
 		9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UpdateRigidBodies.metal; sourceTree = "<group>"; };
@@ -325,6 +326,7 @@
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
 				9EE7EBA722DDDC6E00535997 /* Assets.xcassets */,
+				9E1C70F8230C6FB200DA9929 /* SCRATCH */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -472,6 +474,7 @@
 				9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */,
 				9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */,
 				9EE7EBCC22E1078200535997 /* NOTES in Resources */,
+				9E1C70F9230C6FB200DA9929 /* SCRATCH in Resources */,
 				9E9D4B9A22F44123007DCF49 /* Info.plist in Resources */,
 				9EE7EBA622DDDC6C00535997 /* art.scnassets in Resources */,
 			);
@@ -523,7 +526,6 @@
 				9E9D4B7C22F37244007DCF49 /* PhysicsField.swift in Sources */,
 				9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */,
 				9E0674E3230AD2490044C3C4 /* Math.metal in Sources */,
-				9E0674ED230ADC3C0044C3C4 /* ApplyPhysicsFields.metal in Sources */,
 				9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */,
 				9E9D4B7F22F37244007DCF49 /* RigidBody.swift in Sources */,
 			);

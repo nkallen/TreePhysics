@@ -37,10 +37,12 @@ typedef NS_ENUM(NSInteger, FunctionConstantIndex)
     FunctionConstantIndexRangeCount = 0,
 };
 
+// NOTE: Inertia tensors need to be floats; they can have really small values
+
 typedef struct {
     vector_half3 position;
     half mass;
-    matrix_half3x3 inertiaTensor;
+    matrix_float3x3 inertiaTensor;
     vector_half3 force;
     vector_half3 torque;
     vector_half3 centerOfMass;
@@ -60,7 +62,7 @@ typedef struct {
 
     vector_half3 position;
     matrix_half3x3 rotation;
-    matrix_half3x3 inertiaTensor;
+    matrix_float3x3 inertiaTensor;
     vector_half3 centerOfMass;
     
     vector_half3 force;
