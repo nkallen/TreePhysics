@@ -37,11 +37,18 @@ typedef NS_ENUM(NSInteger, FunctionConstantIndex)
     FunctionConstantIndexRangeCount = 0,
 };
 
-// NOTE: Inertia tensors need to be floats; they can have really small values
+/*
+ Some notes on floating-point precision (half vs float). The mass of objects can very small (a fraction of a gram) depending on how the tree is designed. Since we divide by mass to calculate centerOfMass, it's important that mass not get rounded down to zero or we get divide by zero errors.
+
+ The inertia tensor also can have very small numbers because of the r^2 terms. Calculating its inverse also involves division, so it's important to be very careful here.
+
+ In both cases, we need to work with floats and not halfs.
+
+ */
 
 typedef struct {
     vector_half3 position;
-    half mass;
+    float mass;
     matrix_float3x3 inertiaTensor;
     vector_half3 force;
     vector_half3 torque;
@@ -55,7 +62,7 @@ typedef struct {
     int climberOffset;
     ushort childCount;
     ushort climberCount;
-    half mass;
+    float mass;
     half length;
     half radius;
     matrix_half3x3 localRotation;

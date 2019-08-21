@@ -24,18 +24,20 @@ class KernelDebugger {
     let stringBuffer: MTLBuffer
     let count: Int
     let maxChars: Int
+    let label: String
 
-    init(device: MTLDevice, count: Int = 16, maxChars: Int = 2048) {
+    init(device: MTLDevice, count: Int = 16, maxChars: Int = 2048, label: String = "") {
         self.maxChars = maxChars
         self.stringBuffer = device.makeBuffer(length: maxChars * count, options: [.storageModeShared])!
         self.count = count
+        self.label = label
     }
 
     func encode(commandEncoder: MTLComputeCommandEncoder) {
         commandEncoder.setBuffer(stringBuffer, offset: 0, index: BufferIndex.debugString.rawValue)
     }
 
-    func wrap(commandBuffer: MTLCommandBuffer) -> MTLCommandBuffer {
+    func wrap(_ commandBuffer: MTLCommandBuffer) -> MTLCommandBuffer {
         return KernelDebuggerCommandBufferProxy(commandBuffer, debugger: self)
     }
 
@@ -53,7 +55,11 @@ class KernelDebugger {
     func print(count: Int? = nil) {
         let count = count ?? self.count
         for i in 0..<count {
-            Swift.print("\(i): ", strings[i])
+            let string = strings[i]
+            let lines = string.split { $0.isNewline }
+            for line in lines {
+                Swift.print("\(label)[\(i)]: ", line)
+            }
         }
     }
 }

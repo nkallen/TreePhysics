@@ -125,7 +125,7 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             climberOffset: climberOffset,
             childCount: ushort(childRigidBodies.count),
             climberCount: ushort(climbers.count),
-            mass: half(rigidBody.mass),
+            mass: rigidBody.mass,
             length: half(rigidBody.length),
             radius: half(rigidBody.radius),
             localRotation: half3x3(matrix3x3_rotation(rotation: rigidBody.rotation_local)),

@@ -47,13 +47,4 @@ final class UpdateRigidBodiesKernel: MetalKernel {
         commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         commandEncoder.endEncoding()
     }
-
-    static func buffer(count: Int, device: MTLDevice) -> MTLBuffer {
-        let buffer = device.makeBuffer(length: count * MemoryLayout<JointStruct>.stride, options: [.storageModeShared])!
-        let jointStructs = UnsafeMutableRawPointer(buffer.contents()).bindMemory(to: JointStruct.self, capacity: count)
-        for i in 0..<count {
-            jointStructs[i] = JointStruct(θ: half3x3(0), k: 200)
-        }
-        return buffer
-    }
 }

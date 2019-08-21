@@ -25,6 +25,7 @@
 		9E0D67C8230962F9008912E7 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
 		9E1797E622FB704F00FA3892 /* UpdateCompositeBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodiesKernel.swift */; };
 		9E1C70F9230C6FB200DA9929 /* SCRATCH in Resources */ = {isa = PBXBuildFile; fileRef = 9E1C70F8230C6FB200DA9929 /* SCRATCH */; };
+		9E1C70FA230C802700DA9929 /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
 		9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E27B86022FA39920030664E /* RigidBodyTests.swift */; };
 		9E31BE9622FDABE800AF908B /* UpdateRigidBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */; };
 		9E31BE9822FDAE4600AF908B /* UpdateRigidBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9722FDAE4600AF908B /* UpdateRigidBodies.metal */; };
@@ -502,6 +503,7 @@
 				9E9D4B9822F43D98007DCF49 /* Scene.swift in Sources */,
 				9E1797E622FB704F00FA3892 /* UpdateCompositeBodiesKernel.swift in Sources */,
 				9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */,
+				9E1C70FA230C802700DA9929 /* ApplyPhysicsFields.metal in Sources */,
 				9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */,
 				9E0674E0230AD23D0044C3C4 /* ResetForces.metal in Sources */,
 				9E9D4B7322F37244007DCF49 /* Diagonalization.swift in Sources */,

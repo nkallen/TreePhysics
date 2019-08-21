@@ -2,6 +2,7 @@
 #import "ShaderTypes.h"
 #import "Math.metal"
 #import "Print.metal"
+
 using namespace metal;
 
 inline half3x3 joint_localRotation(
@@ -14,7 +15,7 @@ inline half3x3 joint_worldToLocalRotation(
                                           JointStruct joint,
                                           RigidBodyStruct parentRigidBody)
 {
-    return transpose(parentRigidBody.rotation);
+    return transpose(parentRigidBody.rotation * joint_localRotation(joint));
 }
 
 template <class T>
@@ -32,7 +33,8 @@ inline matrix<T, 3, 3> joint_rotateTensor(
                                           RigidBodyStruct parentRigidBody,
                                           matrix<T, 3, 3> tensor)
 {
-    return matrix<T, 3, 3>(joint_worldToLocalRotation(joint, parentRigidBody)) * tensor * matrix<T, 3, 3>(transpose(joint_worldToLocalRotation(joint, parentRigidBody)));
+    matrix<T, 3, 3> R = matrix<T, 3, 3>(joint_worldToLocalRotation(joint, parentRigidBody));
+    return R * tensor * transpose(R);
 }
 
 inline half3 joint_position(
@@ -100,6 +102,7 @@ updateJoint(
         float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
         joint.θ = (half3x3)(U * θ_diagonal);
+//        joint.θ[0] = joint.θ[0] + 0.0001;
     }
     return joint;
 }

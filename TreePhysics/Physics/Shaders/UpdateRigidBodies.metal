@@ -1,6 +1,8 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
+#import "Print.metal"
+
 using namespace metal;
 
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
@@ -46,14 +48,23 @@ inline RigidBodyStruct
 updateRigidBody(
                 const RigidBodyStruct parentRigidBody,
                 const JointStruct parentJoint,
-                RigidBodyStruct rigidBody)
+                RigidBodyStruct rigidBody,
+                thread Debug & debug)
 {
+//    debug << "updating rigid body\n";
     half3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
     half3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
     half3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
 
+//    debug << "joint.θ[0]=" << parentJoint.θ[0] << "\n";
+//    debug << "parentJointLocalRotation=" << parentJointLocalRotation << "\n";
+//    debug << "parentJointRotation=" << parentRigidBody.rotation << " * " << parentJointLocalRotation << " = " << parentJointRotation << "\n";
+
     rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
     rigidBody.position = parentJointPosition;
+
+//    debug << "rotation=" << rigidBody.rotation << "\n";
+//    debug << "position=" << rigidBody.position << "\n";
 
     rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * (float3x3)transpose(rigidBody.rotation);
     rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
@@ -65,11 +76,13 @@ inline RigidBodyStruct
 rigidBody_climbDown(
                     const RigidBodyStruct rigidBody,
                     device RigidBodyStruct * rigidBodies,
-                    device JointStruct * joints)
+                    device JointStruct * joints,
+                    thread Debug & debug)
 {
     RigidBodyStruct parentRigidBody, currentRigidBody;
     for (short i = rigidBody.climberCount - 1; i >= 0; i--) {
         int id = rigidBody.climberOffset + i;
+//        debug << "climbing down id: " << id << "\n";
 
         RigidBodyStruct next = rigidBodies[id];
         JointStruct parentJoint = joints[id];
@@ -80,7 +93,7 @@ rigidBody_climbDown(
         }
         currentRigidBody = next;
 
-        currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody);
+        currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody, debug);
         rigidBodies[id] = currentRigidBody;
     }
     return currentRigidBody;
@@ -91,8 +104,12 @@ updateRigidBodies(
                   device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
                   device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
                   constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
-                  uint gid [[ thread_position_in_grid ]])
+                  uint gid [[ thread_position_in_grid ]],
+                  device char * buf [[ buffer(BufferIndexDebugString) ]]
+                  )
 {
+    Debug debug = Debug(buf + gid*8192, 8192);
+
     for (int i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
         int lowerBound = range.x;
@@ -100,18 +117,21 @@ updateRigidBodies(
         if ((int)gid < upperBound - lowerBound) {
             int id = lowerBound + gid;
 
+//            debug << "id: " << id << "\n";
             RigidBodyStruct rigidBody = rigidBodies[id];
-            if (rigidBody.parentId != -1) {
+            if (rigidBody.parentId != -1) { // FIXME shouldn't be necessary anymore?
                 RigidBodyStruct parentRigidBody;
                 if (rigidBody.climberCount > 0) {
-                    parentRigidBody = rigidBody_climbDown(rigidBody, rigidBodies, joints);
+//                    debug << "has climbers: " << rigidBody.climberCount << "\n";
+                    parentRigidBody = rigidBody_climbDown(rigidBody, rigidBodies, joints, debug);
                 } else {
+//                    debug << "no climbers: " << "\n";
                     parentRigidBody = rigidBodies[rigidBody.parentId];
                 }
                 // potentially can optimize away:
                 const JointStruct parentJoint = joints[id];
 
-                rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
+                rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody, debug);
                 rigidBodies[id] = rigidBody;
             }
         }
