@@ -38,7 +38,7 @@ final class GravityField: PhysicsField {
 
 final class AttractorField: PhysicsField {
     var position: float3 = float3.zero
-    var halfExtent: float3? = float3(0.1, 0.1, 0.1)
+    let halfExtent: float3? = float3(0.1, 0.1, 0.1)
 
     let a: Float = 0.05
     let b: Float = 0.01

@@ -19,11 +19,11 @@ final class Simulator {
     }
 
     func update(at time: TimeInterval) {
+        resetForces()
         updateFields(at: time)
         updateCompositeBodies()
         updateJoints(at: time)
         updateRigidBodies()
-        resetForces()
     }
 
     func updateFields(at time: TimeInterval) {
