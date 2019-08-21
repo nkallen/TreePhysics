@@ -51,14 +51,14 @@ class Game: NSObject {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
         
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,
             thicknessScale: 0.9,
-            stepSize: 0.2,
+            stepSize: 0.1,
             stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
@@ -147,7 +147,7 @@ extension Game: SCNSceneRendererDelegate {
             1,
             radius * cosf(Float(start.timeIntervalSinceNow)))
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
-        simulator.update(at: 1.0 / 60)
+//        simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
         
         let commandBuffer = commandQueue.makeCommandBuffer()!
@@ -166,13 +166,11 @@ extension Game: SCNSceneRendererDelegate {
                 for i in 0..<self.rigidBodies.count {
                     let forceDiff = self.rigidBodies[i].force - float3(rigidBodies[i].force)
                     let torqueDiff = self.rigidBodies[i].torque - float3(rigidBodies[i].torque)
-                    print(length(forceDiff))
-                    print(length(torqueDiff))
 
                     if float3(compositeBodies[i].centerOfMass).x.isNaN {
                         quit = true
                     }
-//                    self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
+                    self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
                 }
                 if quit {
                     debug.print()

@@ -28,9 +28,9 @@ func XCTAssertEqual(_ a: double3, _ b: double3, accuracy: Double, _ message: @au
 }
 
 func XCTAssertEqual(_ a: float3x3, _ b: float3x3, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a.columns.0, b.columns.0, accuracy: accuracy, message() + "[0]", file: file, line: line)
-    XCTAssertEqual(a.columns.1, b.columns.1, accuracy: accuracy, message() + "[1]", file: file, line: line)
-    XCTAssertEqual(a.columns.2, b.columns.2, accuracy: accuracy, message() + "[2]", file: file, line: line)
+    XCTAssertEqual(a.columns.0, b.columns.0, accuracy: accuracy, message() + ".columns.0", file: file, line: line)
+    XCTAssertEqual(a.columns.1, b.columns.1, accuracy: accuracy, message() + ".columns.1", file: file, line: line)
+    XCTAssertEqual(a.columns.2, b.columns.2, accuracy: accuracy, message() + ".columns.2", file: file, line: line)
 }
 
 func XCTAssertEqual(_ a: float4x4, _ b: float4x4, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {

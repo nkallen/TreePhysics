@@ -460,11 +460,7 @@ public:
     {
         *this << "(";
         for (size_t i = 0; i < 3; i++) {
-            *this << "(";
-            for (size_t j = 0; j < 3; j++) {
-                *this << a[i];
-                *this << (i < 3 - 1 ? "," : ")");
-            }
+            *this << a[i];
         }
         *this << ")";
         return *this;

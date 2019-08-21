@@ -85,52 +85,48 @@ final class Simulator {
                     rigidBody.composite.mass * sqr(pr.crossMatrix)
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
 
-                if parentJoint.k == .infinity {
-                    // static bodies, like the root of the tree
-                    parentJoint.θ = matrix_float3x3(0)
-                } else {
-                    // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
-                    // K is a spring stiffness matrix, θ = euler angles of the joint,
-                    // θ' = angular velocities (i.e., first derivative), etc.
+                // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
+                // K is a spring stiffness matrix, θ = euler angles of the joint,
+                // θ' = angular velocities (i.e., first derivative), etc.
 
-                    // 1. First we need to diagonalize I and K (so we can solve the diff equations) --
-                    // i.e., produce the generalized eigendecomposition of I and K
+                // 1. First we need to diagonalize I and K (so we can solve the diff equations) --
+                // i.e., produce the generalized eigendecomposition of I and K
 
-                    // 1.a. the cholesky decomposition of I
-                    let L = inertiaTensor_jointSpace.cholesky
-                    let L_inverse = L.inverse, L_transpose_inverse = L.transpose.inverse
+                // 1.a. the cholesky decomposition of I
+                let L = inertiaTensor_jointSpace.cholesky
+                let L_inverse = L.inverse, L_transpose_inverse = L.transpose.inverse
 
-                    // 1.b. the generalized eigenvalue problem A * X = X * Λ
-                    // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
-                    let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
-                    let (Λ, X) = A.eigen_ql!
+                // 1.b. the generalized eigenvalue problem A * X = X * Λ
+                // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
+                let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
 
-                    // 2. Now we can restate the differential equation in terms of other (diagonal)
-                    // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
+                let (Λ, X) = A.eigen_ql!
 
-                    let U = L_transpose_inverse * X
-                    let U_transpose = U.transpose, U_inverse = U.inverse
+                // 2. Now we can restate the differential equation in terms of other (diagonal)
+                // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
 
-                    let torque_diagonal = U_transpose * torque_jointSpace
-                    let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
-                    let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
-                    let βΛ = Tree.B * Λ
+                let U = L_transpose_inverse * X
+                let U_transpose = U.transpose, U_inverse = U.inverse
 
-                    // 2.a. thanks to diagonalization, we now have three independent 2nd-order
-                    // differential equations, θ'' + bθ' + kθ = f 
+                let torque_diagonal = U_transpose * torque_jointSpace
+                let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
+                let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
+                let βΛ = Tree.B * Λ
 
-                    // FIXME cleanup and make similar to metal impl
-                    let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: θ_diagonal_0.x, y_ddt_0: θ_ddt_diagonal_0.x)
-                    let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y)
-                    let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z)
+                // 2.a. thanks to diagonalization, we now have three independent 2nd-order
+                // differential equations, θ'' + bθ' + kθ = f
 
-                    let θ_diagonal = matrix_float3x3(rows: [
-                        evaluate(differential: solution_i, at: Float(time)),
-                        evaluate(differential: solution_ii, at: Float(time)),
-                        evaluate(differential: solution_iii, at: Float(time))])
+                // FIXME cleanup and make similar to metal impl
+                let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: θ_diagonal_0.x, y_ddt_0: θ_ddt_diagonal_0.x)
+                let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y)
+                let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z)
 
-                    parentJoint.θ = U * θ_diagonal
-                }
+                let θ_diagonal = matrix_float3x3(rows: [
+                    evaluate(differential: solution_i, at: Float(time)),
+                    evaluate(differential: solution_ii, at: Float(time)),
+                    evaluate(differential: solution_iii, at: Float(time))])
+
+                parentJoint.θ = U * θ_diagonal
             }
         }
     }

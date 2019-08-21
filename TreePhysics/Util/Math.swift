@@ -255,11 +255,11 @@ extension float3 {
     var allPositive: Bool {
         return x >= 0 && y >= 0 && z >= 0
     }
-}
 
-extension float3: Comparable {
-    public static func < (lhs: float3, rhs: float3) -> Bool {
-        return lhs.x < rhs.x && lhs.y < rhs.y && lhs.z < rhs.z
+    func `in`(min: float3, max: float3) -> Bool {
+        return self.x >= min.x && self.x <= max.x &&
+            self.y >= min.y && self.y <= max.y &&
+            self.z >= min.z && self.z <= max.z
     }
 }
 

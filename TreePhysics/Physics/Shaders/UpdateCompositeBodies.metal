@@ -9,8 +9,7 @@ constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]]
 inline CompositeBodyStruct
 rigidBody_updateCompositeBody(
                               const RigidBodyStruct rigidBody,
-                              const CompositeBodyStruct childCompositeBodies[3],
-                              thread Debug & debug)
+                              const CompositeBodyStruct childCompositeBodies[3])
 {
     float mass = rigidBody.mass;
     float3 force = rigidBody.force;
@@ -58,8 +57,7 @@ rigidBody_updateCompositeBody(
 inline CompositeBodyStruct
 rigidBody_updateCompositeBody(
                               const RigidBodyStruct rigidBody,
-                              const CompositeBodyStruct childCompositeBody,
-                              thread Debug & debug)
+                              const CompositeBodyStruct childCompositeBody)
 {
     float mass = rigidBody.mass;
     float3 force = rigidBody.force;
@@ -99,8 +97,7 @@ rigidBody_updateCompositeBody(
 
 inline CompositeBodyStruct
 rigidBody_updateCompositeBody(
-                              const RigidBodyStruct rigidBody,
-                              thread Debug & debug)
+                              const RigidBodyStruct rigidBody)
 {
     // debug << "update composite body 0 child\n";
     // debug << "centerOfMass=" << rigidBody.centerOfMass << "\n";
@@ -122,8 +119,7 @@ inline void
 rigidBody_childCompositeBodies(
                                const RigidBodyStruct rigidBody,
                                device CompositeBodyStruct * compositeBodies,
-                               CompositeBodyStruct childCompositeBodies[5],
-                               thread Debug & debug)
+                               CompositeBodyStruct childCompositeBodies[5])
 {
     for (int i = 0; i < rigidBody.childCount; i++) {
         int childId = rigidBody.childIds[i];
@@ -137,8 +133,7 @@ inline void
 rigidBody_climb(const RigidBodyStruct rigidBody,
                 const CompositeBodyStruct compositeBody,
                 device RigidBodyStruct * rigidBodies,
-                device CompositeBodyStruct * compositeBodies,
-                thread Debug & debug)
+                device CompositeBodyStruct * compositeBodies)
 {
     CompositeBodyStruct currentCompositeBody = compositeBody;
 
@@ -147,7 +142,7 @@ rigidBody_climb(const RigidBodyStruct rigidBody,
         // debug << "climbing up: " << id << "\n";
 
         RigidBodyStruct currentRigidBody = rigidBodies[id];
-        currentCompositeBody = rigidBody_updateCompositeBody(currentRigidBody, currentCompositeBody, debug);
+        currentCompositeBody = rigidBody_updateCompositeBody(currentRigidBody, currentCompositeBody);
         compositeBodies[id] = currentCompositeBody;
     }
 }
@@ -156,17 +151,16 @@ inline CompositeBodyStruct
 rigidBody_updateCompositeBody(
                               const RigidBodyStruct rigidBody,
                               device RigidBodyStruct * rigidBodies,
-                              device CompositeBodyStruct * compositeBodies,
-                              thread Debug & debug)
+                              device CompositeBodyStruct * compositeBodies)
 {
     if (rigidBody.childCount == 0) {
         // debug << "no children: " << "\n";
-        return rigidBody_updateCompositeBody(rigidBody, debug);
+        return rigidBody_updateCompositeBody(rigidBody);
     } else {
         // debug << "child count: " << rigidBody.childCount << "\n";
         CompositeBodyStruct childCompositeBodies[3];
-        rigidBody_childCompositeBodies(rigidBody, compositeBodies, childCompositeBodies, debug);
-        return rigidBody_updateCompositeBody(rigidBody, childCompositeBodies, debug);
+        rigidBody_childCompositeBodies(rigidBody, compositeBodies, childCompositeBodies);
+        return rigidBody_updateCompositeBody(rigidBody, childCompositeBodies);
     }
 }
 
@@ -175,11 +169,8 @@ updateCompositeBodies(
                       device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
                       device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
                       constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
-                      uint gid [[ thread_position_in_grid ]],
-                      device char * buf [[ buffer(BufferIndexDebugString) ]])
+                      uint gid [[ thread_position_in_grid ]])
 {
-    Debug debug = Debug(buf + gid*8192, 8192);
-
     for (ushort i = 0; i < rangeCount; i++) {
         // debug << "i: " << i << "\n";
         int2 range = ranges[i];
@@ -192,10 +183,10 @@ updateCompositeBodies(
 //            debug << "id: " << id << "\n";
 
             RigidBodyStruct rigidBody = rigidBodies[id];
-            CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies, debug);
+            CompositeBodyStruct compositeBody = rigidBody_updateCompositeBody(rigidBody, rigidBodies, compositeBodies);
             compositeBodies[id] = compositeBody;
 
-            rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies, debug);
+            rigidBody_climb(rigidBody, compositeBody, rigidBodies, compositeBodies);
         }
         threadgroup_barrier(mem_flags::mem_device);
     }

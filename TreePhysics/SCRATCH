@@ -1,1 +1,189 @@
-
+have half extent
+position: SIMD3<Float>(-1.2518101e-08, 0.16159295, -0.05250473)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.10000002, -0.061592944, 0.15250473)
+distance: 0.19248737
+direction: SIMD3<Float>(0.5195147, -0.31998435, 0.7922843)
+force: SIMD3<Float>(0.021991469, -0.013545193, 0.033538025)
+have half extent
+position: SIMD3<Float>(-0.052174494, 0.16057658, 6.2196834e-09)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.1521745, -0.06057658, 0.099999994)
+distance: 0.19190258
+direction: SIMD3<Float>(0.79297787, -0.31566316, 0.52109766)
+force: SIMD3<Float>(0.033603165, -0.013376517, 0.022081994)
+have half extent
+position: SIMD3<Float>(0.0, 0.11467618, 0.03726054)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.1, -0.014676176, 0.06273946)
+distance: 0.11896063
+direction: SIMD3<Float>(0.8406143, -0.12337004, 0.5273969)
+force: SIMD3<Float>(0.039608296, -0.005812983, 0.024850031)
+have half extent
+position: SIMD3<Float>(-6.815522e-09, 0.08797982, -0.028586375)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.10000001, 0.012020178, 0.12858638)
+distance: 0.1633369
+direction: SIMD3<Float>(0.6122316, 0.07359132, 0.7872464)
+force: SIMD3<Float>(0.027216336, 0.0032714517, 0.0349965)
+have half extent
+position: SIMD3<Float>(-0.024467783, 0.0753041, 2.9167868e-09)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.12446778, 0.024695903, 0.1)
+distance: 0.1615615
+direction: SIMD3<Float>(0.77040493, 0.1528576, 0.61895937)
+force: SIMD3<Float>(0.034340642, 0.006813596, 0.027589986)
+have half extent
+position: SIMD3<Float>(0.0, 0.058674224, 0.019064406)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.1, 0.041325778, 0.0809356)
+distance: 0.13512363
+direction: SIMD3<Float>(0.7400631, 0.3058368, 0.59897447)
+force: SIMD3<Float>(0.034217034, 0.014140454, 0.027693762)
+have half extent
+position: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.1, 0.1, 0.1)
+distance: 0.17320508
+direction: SIMD3<Float>(0.5773503, 0.5773503, 0.5773503)
+force: SIMD3<Float>(0.025267968, 0.025267968, 0.025267968)
+have half extent
+position: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.1, 0.1, 0.1)
+distance: 0.17320508
+direction: SIMD3<Float>(0.5773503, 0.5773503, 0.5773503)
+force: SIMD3<Float>(0.025267968, 0.025267968, 0.025267968)
+have half extent
+position: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
+self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
+position >= self.position - halfExtent true
+position <= self.position + halfExtent true
+does apply
+delta: SIMD3<Float>(0.1, 0.1, 0.1)
+distance: 0.17320508
+direction: SIMD3<Float>(0.5773503, 0.5773503, 0.5773503)
+force: SIMD3<Float>(0.025267968, 0.025267968, 0.025267968)
+metal[0]:  have half extent
+metal[0]:  position: (-0.000000,0.161593,-0.052505)
+metal[0]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[0]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[0]:  position >= self.position - halfExtent: (0,1,0)
+metal[0]:  position <= self.position + halfExtent: (1,1,1)
+metal[1]:  have half extent
+metal[1]:  position: (-0.052174,0.160577,0.000000)
+metal[1]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[1]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[1]:  position >= self.position - halfExtent: (0,1,1)
+metal[1]:  position <= self.position + halfExtent: (1,1,1)
+metal[2]:  have half extent
+metal[2]:  position: (0.000000,0.114676,0.037261)
+metal[2]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[2]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[2]:  position >= self.position - halfExtent: (1,1,1)
+metal[2]:  position <= self.position + halfExtent: (1,1,1)
+metal[2]:  does apply
+metal[2]:  delta: (0.100000,-0.014676,0.062739)
+metal[2]:  distance: 0.118961
+metal[2]:  direction: (0.840614,-0.123370,0.527397)
+metal[2]:  force: (0.039608,-0.005813,0.024850)
+metal[3]:  have half extent
+metal[3]:  position: (-0.000000,0.087980,-0.028586)
+metal[3]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[3]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[3]:  position >= self.position - halfExtent: (0,1,0)
+metal[3]:  position <= self.position + halfExtent: (1,1,1)
+metal[4]:  have half extent
+metal[4]:  position: (0.000000,0.000000,0.000000)
+metal[4]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[4]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[4]:  position >= self.position - halfExtent: (1,1,1)
+metal[4]:  position <= self.position + halfExtent: (1,1,1)
+metal[4]:  does apply
+metal[4]:  delta: (0.100000,0.100000,0.100000)
+metal[4]:  distance: 0.173205
+metal[4]:  direction: (0.577350,0.577350,0.577350)
+metal[4]:  force: (0.025268,0.025268,0.025268)
+metal[5]:  have half extent
+metal[5]:  position: (-0.024468,0.075304,0.000000)
+metal[5]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[5]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[5]:  position >= self.position - halfExtent: (0,1,1)
+metal[5]:  position <= self.position + halfExtent: (1,1,1)
+metal[6]:  have half extent
+metal[6]:  position: (0.000000,0.000000,0.000000)
+metal[6]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[6]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[6]:  position >= self.position - halfExtent: (1,1,1)
+metal[6]:  position <= self.position + halfExtent: (1,1,1)
+metal[6]:  does apply
+metal[6]:  delta: (0.100000,0.100000,0.100000)
+metal[6]:  distance: 0.173205
+metal[6]:  direction: (0.577350,0.577350,0.577350)
+metal[6]:  force: (0.025268,0.025268,0.025268)
+metal[7]:  have half extent
+metal[7]:  position: (0.000000,0.058674,0.019064)
+metal[7]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[7]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[7]:  position >= self.position - halfExtent: (1,1,1)
+metal[7]:  position <= self.position + halfExtent: (1,1,1)
+metal[7]:  does apply
+metal[7]:  delta: (0.100000,0.041326,0.080936)
+metal[7]:  distance: 0.135124
+metal[7]:  direction: (0.740063,0.305837,0.598974)
+metal[7]:  force: (0.034217,0.014140,0.027694)
+metal[8]:  have half extent
+metal[8]:  position: (0.000000,0.000000,0.000000)
+metal[8]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[8]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[8]:  position >= self.position - halfExtent: (1,1,1)
+metal[8]:  position <= self.position + halfExtent: (1,1,1)
+metal[8]:  does apply
+metal[8]:  delta: (0.100000,0.100000,0.100000)
+metal[8]:  distance: 0.173205
+metal[8]:  direction: (0.577350,0.577350,0.577350)
+metal[8]:  force: (0.025268,0.025268,0.025268)
+metal[9]:  have half extent
+metal[9]:  position: (0.000000,0.000000,0.000000)
+metal[9]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
+metal[9]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
+metal[9]:  position >= self.position - halfExtent: (1,1,1)
+metal[9]:  position <= self.position + halfExtent: (1,1,1)
+metal[9]:  does apply
+metal[9]:  delta: (0.100000,0.100000,0.100000)
+metal[9]:  distance: 0.173205
+metal[9]:  direction: (0.577350,0.577350,0.577350)
+metal[9]:  force: (0.025268,0.025268,0.025268)

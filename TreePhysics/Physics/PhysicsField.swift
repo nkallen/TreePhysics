@@ -12,7 +12,7 @@ extension PhysicsField {
     func applies(to position: float3) -> Bool {
         guard let halfExtent = halfExtent else { return true }
 
-        return position >= self.position - halfExtent && position <= self.position + halfExtent
+        return position.in(min: self.position - halfExtent, max: self.position + halfExtent)
     }
 }
 
@@ -38,19 +38,25 @@ final class GravityField: PhysicsField {
 
 final class AttractorField: PhysicsField {
     var position: float3 = float3.zero
-    let halfExtent: float3? = float3(0.1, 0.1, 0.1)
+    let halfExtent: float3? = float3(1, 1, 1)
 
     let a: Float = 0.05
     let b: Float = 0.01
     let c: Float = 0.1
 
     func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
+//        print("does apply")
         let delta = self.position - position
         let distance = length(delta)
+//        print("delta:", delta)
+//        print("distance:", distance)
         if (distance > 0) {
             let direction = normalize(delta)
+//            print("direction:", direction)
             // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
-            return direction * a * powf(.e, -sqr(distance - b)/(2*c))
+            let force = direction * a * powf(.e, -sqr(distance - b)/(2*c))
+//            print("force:", force)
+            return force
         } else {
             return float3(repeating: 0)
         }

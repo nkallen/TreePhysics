@@ -10,9 +10,9 @@ class MetalSimulator {
     private let resetForces: ResetForcesKernel
     private let applyPhysicsFields: ApplyPhysicsFieldsKernel
 
-    private let compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer
+    internal let compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer
 
-    private var rigidBodies: [RigidBody]
+    internal var rigidBodies: [RigidBody]
 
     private var fields: [PhysicsField] = []
 
@@ -41,19 +41,11 @@ class MetalSimulator {
         self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
     }
 
-    func update(at time: TimeInterval, cb: @escaping (MTLBuffer, MTLBuffer, MTLBuffer, [RigidBody]) -> ()) {
-        let commandBuffer = commandQueue.makeCommandBuffer()!
-
+    func encode(commandBuffer: MTLCommandBuffer, at time: TimeInterval) {
         resetForces.encode(commandBuffer: commandBuffer)
         applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.fields.first!)
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
-
-        commandBuffer.addCompletedHandler { _ in
-            cb(self.compositeBodiesBuffer, self.jointsBuffer, self.rigidBodiesBuffer, self.rigidBodies)
-        }
-
-        commandBuffer.commit()
     }
 }

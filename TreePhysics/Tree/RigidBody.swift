@@ -70,9 +70,7 @@ final class RigidBody: HasTransform {
     }
     
     func add(_ child: RigidBody, at rotation: matrix_float4x4) {
-        let joint = Joint(parent: self,
-                          child: child,
-                          k: kind == .static ? Float.infinity : nil)
+        let joint = Joint(parent: self, child: child)
         childJoints.append(joint)
         child.parentJoint = joint
         child.rotation_local = rotation

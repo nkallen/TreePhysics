@@ -12,6 +12,8 @@ class SimulatorComparisonTests: XCTestCase {
 
     var attractorField: AttractorField!
 
+    var debug: KernelDebugger!
+
     override func setUp() {
         super.setUp()
         self.device = MTLCreateSystemDefaultDevice()!
@@ -19,7 +21,7 @@ class SimulatorComparisonTests: XCTestCase {
 
         let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)
         let rigidBodyPen = RigidBodyPen(parent: root)
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFA]/////[!"&FFFA]/////[!"&FFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
         let configuration = Interpreter<RigidBodyPen>.Configuration(
             randomScale: 0.4,
@@ -40,6 +42,8 @@ class SimulatorComparisonTests: XCTestCase {
         metalSimulator.add(field: attractorField)
 
         attractorField.position = float3(0.1, 0.1, 0.1)
+
+        self.debug = KernelDebugger(device: device, count: metalSimulator.rigidBodies.count, maxChars: 8192, label: "metal")
     }
 
     func testUpdate() {
@@ -54,25 +58,28 @@ class SimulatorComparisonTests: XCTestCase {
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
         cpuSimulator.update(at: 1.0 / 60)
-        metalSimulator.update(at: 1.0 / 60) { (compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer, rigidBodies_) in // FIXME rename
-            let rigidBodies = UnsafeMutableRawPointer(rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: rigidBodies_.count)
-            let compositeBodies = UnsafeMutableRawPointer(compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: rigidBodies_.count)
-            let joints = UnsafeMutableRawPointer(jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: rigidBodies_.count)
+        metalSimulator.encode(commandBuffer: debug.wrap(commandBuffer), at: 1.0 / 60)
+        commandBuffer.addCompletedHandler { _ in
+            self.debug.print()
+            let metalSimulator = self.metalSimulator!
 
-            for i in 0..<(rigidBodies_.count-1) {
-                let message = "[\(i)]"
-                XCTAssertEqual(rigidBodies[i].force, rigidBodies_[i].force, accuracy: 0.00001, message)
-                XCTAssertEqual(rigidBodies[i].torque, rigidBodies_[i].torque, accuracy: 0.00001, message)
+            let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let compositeBodies = UnsafeMutableRawPointer(metalSimulator.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let joints = UnsafeMutableRawPointer(metalSimulator.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: metalSimulator.rigidBodies.count)
 
-                XCTAssertEqual(compositeBodies[i].force,  rigidBodies_[i].composite.force, accuracy: 0.00001, message)
-                XCTAssertEqual(compositeBodies[i].torque, rigidBodies_[i].composite.torque, accuracy: 0.00001, message)
+            for i in 0..<(metalSimulator.rigidBodies.count-1) {
+                let message = "iteration[\(i)]"
+                XCTAssertEqual(rigidBodies[i].force, metalSimulator.rigidBodies[i].force, accuracy: 0.00001, message)
+                XCTAssertEqual(rigidBodies[i].torque, metalSimulator.rigidBodies[i].torque, accuracy: 0.00001, message)
 
-                XCTAssertEqual(joints[i].θ,  rigidBodies_[i].parentJoint!.θ, accuracy: 0.00001, message)
-                XCTAssertEqual(joints[i].θ, rigidBodies_[i].parentJoint!.θ, accuracy: 0.00001, message)
+                XCTAssertEqual(compositeBodies[i].force,  metalSimulator.rigidBodies[i].composite.force, accuracy: 0.00001, message)
+                XCTAssertEqual(compositeBodies[i].torque, metalSimulator.rigidBodies[i].composite.torque, accuracy: 0.00001, message)
 
-//                XCTAssertEqual(rigidBodies[i].position, rigidBodies_[i].position, message)
-//                XCTAssertEqual(rigidBodies[i].centerOfMass, rigidBodies_[i].centerOfMass, message)
-//                XCTAssertEqual(rigidBodies[i].inertiaTensor, rigidBodies_[i].inertiaTensor, accuracy: 0.00001, message)
+//                XCTAssertEqual(joints[i].θ,  metalSimulator.rigidBodies[i].parentJoint!.θ, accuracy: 0.00001, message)
+//
+//                XCTAssertEqual(rigidBodies[i].position, metalSimulator.rigidBodies[i].position, message)
+//                XCTAssertEqual(rigidBodies[i].centerOfMass, metalSimulator.rigidBodies[i].centerOfMass, accuracy: 0.00001, message)
+//                XCTAssertEqual(rigidBodies[i].inertiaTensor, metalSimulator.rigidBodies[i].inertiaTensor, accuracy: 0.00001, message)
             }
 
             self.tick(n - 1, expect)

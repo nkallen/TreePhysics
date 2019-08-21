@@ -16,15 +16,14 @@ final class Joint: HasTransform {
 
     let k: Float
 
-    init(parent: RigidBody, child: RigidBody, k: Float? = nil) {
+    init(parent: RigidBody, child: RigidBody) {
         self.parentRigidBody = parent
         self.childRigidBody = child
-        self.k = k ?? Joint.computeK(radius: parent.radius, length: parent.length)
+        self.k = Joint.computeK(radius: parent.radius, length: parent.length)
         self.translation_local = matrix4x4_translation(0, parentRigidBody.length, 0)
         updateTransform()
     }
 
-    @inline(__always)
     func updateTransform() {
         let eulerAngles = θ[0]
         let rotation_local = matrix4x4_rotation(rotation: eulerAngles)
