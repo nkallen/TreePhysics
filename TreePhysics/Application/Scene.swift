@@ -158,33 +158,26 @@ extension Game: SCNSceneRendererDelegate {
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         updateRigidBodies.encode(commandBuffer: debug.wrap(commandBuffer))
         commandBuffer.addCompletedHandler { _ in
-            //            self.queue.async {
-            //                SCNTransaction.begin()
-            //            debug.print()
-            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodies.count)
-            let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.rigidBodies.count)
-            let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodies.count)
-            var quit = false
-            for i in 0..<self.rigidBodies.count {
-                //                print(i, compositeBodies[i])
-                //                print(i, joints[i])
-                //                print(i, rigidBodies[i])
-                if float3(compositeBodies[i].centerOfMass).x.isNaN {
-                    quit = true
-                }
-                //                    print(i, float3(rigidBody.position))
-                self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
-                //                }
-                //                SCNTransaction.commit()
-            }
-            if quit {
-                debug.print()
+            self.queue.async {
+                let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodies.count)
+                let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.rigidBodies.count)
+                let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodies.count)
+                var quit = false
                 for i in 0..<self.rigidBodies.count {
-                    print(i, compositeBodies[i])
-                    //                print(i, joints[i])
-                    print(i, rigidBodies[i])
+                    if float3(compositeBodies[i].centerOfMass).x.isNaN {
+                        quit = true
+                    }
+                    self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
                 }
-                fatalError()
+                if quit {
+                    debug.print()
+                    for i in 0..<self.rigidBodies.count {
+                        print(i, compositeBodies[i])
+                        print(i, joints[i])
+                        print(i, rigidBodies[i])
+                    }
+                    fatalError()
+                }
             }
         }
         commandBuffer.commit()
