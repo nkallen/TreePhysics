@@ -10,7 +10,7 @@ resetForces(
 {
     RigidBodyStruct rigidBody = rigidBodies[gid];
     
-    rigidBody.force = half3(0);
-    rigidBody.torque = half3(0);
+    rigidBody.force = float3(0);
+    rigidBody.torque = float3(0);
     rigidBodies[gid] = rigidBody;
 }

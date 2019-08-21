@@ -126,17 +126,17 @@ final class UpdateCompositeBodiesKernel: MetalKernel {
             childCount: ushort(childRigidBodies.count),
             climberCount: ushort(climbers.count),
             mass: rigidBody.mass,
-            length: half(rigidBody.length),
-            radius: half(rigidBody.radius),
-            localRotation: half3x3(matrix3x3_rotation(rotation: rigidBody.rotation_local)),
+            length: rigidBody.length,
+            radius: rigidBody.radius,
+            localRotation: matrix3x3_rotation(rotation: rigidBody.rotation_local),
 
-            position: half3(rigidBody.position),
-            rotation: half3x3(rigidBody.rotation),
+            position: rigidBody.position,
+            rotation: rigidBody.rotation,
             inertiaTensor: rigidBody.inertiaTensor,
-            centerOfMass: half3(rigidBody.centerOfMass),
+            centerOfMass: rigidBody.centerOfMass,
 
-            force: half3(rigidBody.force),
-            torque: half3(rigidBody.torque))
+            force: rigidBody.force,
+            torque: rigidBody.torque)
         return strct
     }
 }

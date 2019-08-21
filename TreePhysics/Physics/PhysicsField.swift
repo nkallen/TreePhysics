@@ -31,8 +31,8 @@ final class GravityField: PhysicsField {
 
     var `struct`: PhysicsFieldStruct {
         return PhysicsFieldStruct(
-            position: half3(position),
-            halfExtent: half3(halfExtent ?? float3(repeating: -1)))
+            position: position,
+            halfExtent: halfExtent ?? float3(repeating: -1))
     }
 }
 
@@ -54,7 +54,7 @@ final class AttractorField: PhysicsField {
 
     var `struct`: PhysicsFieldStruct {
         return PhysicsFieldStruct(
-            position: half3(position),
-            halfExtent: half3(halfExtent ?? float3(repeating: -1)))
+            position: position,
+            halfExtent: halfExtent ?? float3(repeating: -1))
     }
 }

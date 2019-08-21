@@ -13,10 +13,10 @@ rigidBody_updateCompositeBody(
                               thread Debug & debug)
 {
     float mass = rigidBody.mass;
-    half3 force = rigidBody.force;
-    half3 torque = rigidBody.torque;
+    float3 force = rigidBody.force;
+    float3 torque = rigidBody.torque;
     float3 centerOfMass = rigidBody.mass * (float3)rigidBody.centerOfMass;
-    half3 position = rigidBody.position;
+    float3 position = rigidBody.position;
 
     // debug << "update composite body N child\n";
     // debug << "centerOfMass=" << centerOfMass << "\n";
@@ -47,7 +47,7 @@ rigidBody_updateCompositeBody(
         .mass = mass,
         .force = force,
         .torque = torque,
-        .centerOfMass = half3(centerOfMass),
+        .centerOfMass = float3(centerOfMass),
         .position = position,
         .inertiaTensor = inertiaTensor
     };
@@ -62,10 +62,10 @@ rigidBody_updateCompositeBody(
                               thread Debug & debug)
 {
     float mass = rigidBody.mass;
-    half3 force = rigidBody.force;
-    half3 torque = rigidBody.torque;
+    float3 force = rigidBody.force;
+    float3 torque = rigidBody.torque;
     float3 centerOfMass = mass * (float3)rigidBody.centerOfMass;
-    half3 position = rigidBody.position;
+    float3 position = rigidBody.position;
 
     // debug << "update composite body 1 child\n";
     // debug << "rigidBody.centerOfMass=" << rigidBody.centerOfMass << "\n";
@@ -89,7 +89,7 @@ rigidBody_updateCompositeBody(
         .mass = mass,
         .force = force,
         .torque = torque,
-        .centerOfMass = (half3)centerOfMass,
+        .centerOfMass = (float3)centerOfMass,
         .position = position,
         .inertiaTensor = inertiaTensor
     };

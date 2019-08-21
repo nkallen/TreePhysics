@@ -47,12 +47,12 @@ typedef NS_ENUM(NSInteger, FunctionConstantIndex)
  */
 
 typedef struct {
-    vector_half3 position;
+    vector_float3 position;
     float mass;
     matrix_float3x3 inertiaTensor;
-    vector_half3 force;
-    vector_half3 torque;
-    vector_half3 centerOfMass;
+    vector_float3 force;
+    vector_float3 torque;
+    vector_float3 centerOfMass;
 } CompositeBodyStruct;
 
 typedef struct {
@@ -63,27 +63,27 @@ typedef struct {
     ushort childCount;
     ushort climberCount;
     float mass;
-    half length;
-    half radius;
-    matrix_half3x3 localRotation;
+    float length;
+    float radius;
+    matrix_float3x3 localRotation;
 
-    vector_half3 position;
-    matrix_half3x3 rotation;
+    vector_float3 position;
+    matrix_float3x3 rotation;
     matrix_float3x3 inertiaTensor;
-    vector_half3 centerOfMass;
+    vector_float3 centerOfMass;
     
-    vector_half3 force;
-    vector_half3 torque;
+    vector_float3 force;
+    vector_float3 torque;
 } RigidBodyStruct;
 
 typedef struct {
-    matrix_half3x3 θ;
-    half k;
+    matrix_float3x3 θ;
+    float k;
 } JointStruct;
 
 typedef struct {
-    vector_half3 position;
-    vector_half3 halfExtent;
+    vector_float3 position;
+    vector_float3 halfExtent;
 
 } PhysicsFieldStruct;
 

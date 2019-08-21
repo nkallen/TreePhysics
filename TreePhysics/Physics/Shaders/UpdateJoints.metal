@@ -5,13 +5,13 @@
 
 using namespace metal;
 
-inline half3x3 joint_localRotation(
+inline float3x3 joint_localRotation(
                                    JointStruct joint)
 {
     return matrix_rotate(joint.θ[0]);
 }
 
-inline half3x3 joint_worldToLocalRotation(
+inline float3x3 joint_worldToLocalRotation(
                                           JointStruct joint,
                                           RigidBodyStruct parentRigidBody)
 {
@@ -37,11 +37,11 @@ inline matrix<T, 3, 3> joint_rotateTensor(
     return R * tensor * transpose(R);
 }
 
-inline half3 joint_position(
+inline float3 joint_position(
                             JointStruct joint,
                             RigidBodyStruct parentRigidBody)
 {
-    return parentRigidBody.position + parentRigidBody.rotation * half3(0, parentRigidBody.length, 0);
+    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
 }
 
 inline JointStruct
@@ -49,7 +49,7 @@ updateJoint(
             JointStruct joint,
             RigidBodyStruct parentRigidBody,
             CompositeBodyStruct childCompositeBody,
-            half time)
+            float time)
 {
     float3 pr = joint_rotateVector(joint, parentRigidBody, float3(childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)));
 
@@ -58,7 +58,7 @@ updateJoint(
 
     if (joint.k < 0) {
         // static bodies, like the root of the tree
-        joint.θ = half3x3(0);
+        joint.θ = float3x3(0);
     } else {
         // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
         // K is a spring stiffness matrix, θ = euler angles of the joint,
@@ -101,7 +101,7 @@ updateJoint(
 
         float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
-        joint.θ = (half3x3)(U * θ_diagonal);
+        joint.θ = (float3x3)(U * θ_diagonal);
 //        joint.θ[0] = joint.θ[0] + 0.0001;
     }
     return joint;

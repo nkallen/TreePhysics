@@ -8,7 +8,7 @@ extension Joint: CustomDebugStringConvertible {
 
 extension JointStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "Joint: k=\(float(k)), θ=\(float3x3(θ))"
+        return "Joint: k=\(k), θ=\(float3x3(θ))"
     }
 }
 
@@ -20,7 +20,7 @@ extension RigidBody: CustomDebugStringConvertible {
 
 extension RigidBodyStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "RigidBody: parentId=\(parentId) position=\(float3(position)), rotation=\(float3x3(rotation)), mass=\(mass), length=\(float(length)), radius=\(float(radius)), centerOfMass=\(float3(centerOfMass)), force=\(float3(force)), torque=\(float3(torque)), inertiaTensor=\(float3x3(inertiaTensor))"
+        return "RigidBody: parentId=\(parentId) position=\(float3(position)), rotation=\(float3x3(rotation)), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(float3(centerOfMass)), force=\(float3(force)), torque=\(float3(torque)), inertiaTensor=\(float3x3(inertiaTensor))"
     }
 }
 

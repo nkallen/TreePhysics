@@ -4,16 +4,16 @@
 
 using namespace metal;
 
-constant half a = 0.05;
-constant half b = 0.01;
-constant half c = 0.1;
+constant float a = 0.05;
+constant float b = 0.01;
+constant float c = 0.1;
 
 inline bool
 physicsField_applies(
                      PhysicsFieldStruct physicsField,
                      RigidBodyStruct rigidBody)
 {
-    half3 halfExtent = physicsField.halfExtent;
+    float3 halfExtent = physicsField.halfExtent;
     
     if (halfExtent.x < 0 || halfExtent.y < 0 || halfExtent.z < 0) return false;
     
@@ -21,10 +21,10 @@ physicsField_applies(
     return all.x == true && all.y == true && all.z == true;
 }
 
-inline half3
+inline float3
 rigidBody_convert(
                   RigidBodyStruct rigidBody,
-                  half3 position)
+                  float3 position)
 {
     return rigidBody.position + rigidBody.rotation * position;
 }
@@ -34,13 +34,13 @@ rigidBody_convert(
 inline RigidBodyStruct
 rigidBody_applyForce(
                      RigidBodyStruct rigidBody,
-                     half3 force,
-                     half distance)
+                     float3 force,
+                     float distance)
 {
     if (distance < 0 || distance > 1) return rigidBody;
     
     rigidBody.force += force;
-    rigidBody.torque += cross(rigidBody_convert(rigidBody, half3(0, 1, 0) * distance * rigidBody.length) - rigidBody.position, force);
+    rigidBody.torque += cross(rigidBody_convert(rigidBody, float3(0, 1, 0) * distance * rigidBody.length) - rigidBody.position, force);
     
     return rigidBody;
 }
@@ -54,12 +54,12 @@ applyPhysicsFields(
     RigidBodyStruct rigidBody = rigidBodies[gid];
     
     if (physicsField_applies(physicsField, rigidBody)) {
-        half3 delta = physicsField.position - rigidBody.position;
-        half distance = length(delta);
+        float3 delta = physicsField.position - rigidBody.position;
+        float distance = length(delta);
         if (distance > 0) {
-            half3 direction = normalize(delta);
+            float3 direction = normalize(delta);
             // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
-            half3 force = direction * a * pow(M_E_H, -sqr(distance - b)/(2*c));
+            float3 force = direction * a * pow(M_E_F, -sqr(distance - b)/(2*c));
 
             rigidBody = rigidBody_applyForce(rigidBody, force, 0.5);
 
