@@ -47,9 +47,13 @@ final class AttractorField: PhysicsField {
     func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
         let delta = self.position - position
         let distance = length(delta)
-        let direction = normalize(delta)
-        // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
-        return direction * a * powf(.e, -sqr(distance - b)/(2*c))
+        if (distance > 0) {
+            let direction = normalize(delta)
+            // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
+            return direction * a * powf(.e, -sqr(distance - b)/(2*c))
+        } else {
+            return float3(repeating: 0)
+        }
     }
 
     var `struct`: PhysicsFieldStruct {

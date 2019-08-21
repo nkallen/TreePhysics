@@ -34,7 +34,7 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        applyPhysicsFieldsKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer), field: AttractorField())
+        applyPhysicsFieldsKernel.encode(commandBuffer: commandBuffer, field: AttractorField())
         commandBuffer.addCompletedHandler { _ in
             debug.print()
             
@@ -83,15 +83,15 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
+        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer))
         commandBuffer.addCompletedHandler { _ in
             let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
             let b1_composite = compositeBodies[1]
 
             // mass
-            XCTAssertEqual(float(b2_composite.mass), 1)
-            XCTAssertEqual(float(b1_composite.mass), 2)
+            XCTAssertEqual(b2_composite.mass, 1)
+            XCTAssertEqual(b1_composite.mass, 2)
 
             // force
             XCTAssertEqual(float3(b2_composite.force), self.force)
@@ -234,7 +234,7 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
         let debug = KernelDebugger(device: device)
         updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
         updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1/60)
-        updateRigidBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
+        updateRigidBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer))
         commandBuffer.addCompletedHandler { _ in
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 2)
 
@@ -335,7 +335,7 @@ class AdvancedMetalTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
+        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer))
         updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1.0/60)
         updateRigidBodiesKernel.encode(commandBuffer: commandBuffer)
         resetForcesKernel.encode(commandBuffer: commandBuffer)
@@ -422,7 +422,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer: commandBuffer))
+        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0/60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
 

@@ -164,13 +164,15 @@ extension Game: SCNSceneRendererDelegate {
                 let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodies.count)
                 var quit = false
                 for i in 0..<self.rigidBodies.count {
-                    let diff = self.rigidBodies[i].position - float3(rigidBodies[i].position)
-                    print(length(diff))
+                    let forceDiff = self.rigidBodies[i].force - float3(rigidBodies[i].force)
+                    let torqueDiff = self.rigidBodies[i].torque - float3(rigidBodies[i].torque)
+                    print(length(forceDiff))
+                    print(length(torqueDiff))
 
                     if float3(compositeBodies[i].centerOfMass).x.isNaN {
                         quit = true
                     }
-                    self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
+//                    self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
                 }
                 if quit {
                     debug.print()

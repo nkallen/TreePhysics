@@ -43,6 +43,9 @@
 		9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
 		9E6372A222FEC7AA001D4466 /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
 		9E8E27BF2307335300652DAC /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
+		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
+		9E8F711F230D87C200583AAE /* MetalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711E230D87C200583AAE /* MetalSimulator.swift */; };
+		9E8F7120230D87C200583AAE /* MetalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711E230D87C200583AAE /* MetalSimulator.swift */; };
 		9E9C1E8022E86B290030DB0E /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
 		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
 		9E9D4B6622F313D0007DCF49 /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
@@ -136,6 +139,8 @@
 		9E62078322F8A7E6005E99C8 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		9E6372A122FEC7AA001D4466 /* MetalProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalProxy.swift; sourceTree = "<group>"; };
 		9E8E27BE2307335300652DAC /* Print.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Print.metal; sourceTree = "<group>"; };
+		9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorComparisonTests.swift; sourceTree = "<group>"; };
+		9E8F711E230D87C200583AAE /* MetalSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalSimulator.swift; sourceTree = "<group>"; };
 		9E9C1E7F22E86B290030DB0E /* Rewriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rewriter.swift; sourceTree = "<group>"; };
 		9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriterTests.swift; sourceTree = "<group>"; };
 		9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsField.swift; sourceTree = "<group>"; };
@@ -259,6 +264,7 @@
 				9E0674DC230ACFC90044C3C4 /* Shaders */,
 				9EB2159C22E1D1B000B1C6FC /* Simulator.swift */,
 				9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */,
+				9E8F711E230D87C200583AAE /* MetalSimulator.swift */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -345,6 +351,7 @@
 				9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */,
 				9E27B86022FA39920030664E /* RigidBodyTests.swift */,
 				9EE801A122FC44AC00198166 /* TestHelper.swift */,
+				9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -529,6 +536,7 @@
 				9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */,
 				9E0674E3230AD2490044C3C4 /* Math.metal in Sources */,
 				9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */,
+				9E8F7120230D87C200583AAE /* MetalSimulator.swift in Sources */,
 				9E9D4B7F22F37244007DCF49 /* RigidBody.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -571,6 +579,7 @@
 				9E036B1F22E4F58600229235 /* Turtle.swift in Sources */,
 				9E0674EA230AD8290044C3C4 /* ApplyPhysicsFieldsKernel.swift in Sources */,
 				9E56C94722E78FEC0095C8AC /* RigidBody.swift in Sources */,
+				9E8F711F230D87C200583AAE /* MetalSimulator.swift in Sources */,
 				9E0674E8230AD4590044C3C4 /* ApplyPhysicsFields.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -580,6 +589,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E3351C122F83DDF00FDC3D6 /* MetalTests.swift in Sources */,
+				9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */,
 				9EE7EBBC22DE1AD100535997 /* SimulatorTests.swift in Sources */,
 				9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */,
 				9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */,

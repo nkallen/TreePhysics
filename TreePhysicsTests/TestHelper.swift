@@ -81,26 +81,26 @@ func XCTAssertEqual(_ a: DifferentialSolution, _ b: DifferentialSolution, accura
 }
 
 func XCTAssertEqual(_ a: CompositeBody, _ b: CompositeBodyStruct, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a.mass, float(b.mass), accuracy: accuracy, "mass", file: file, line: line)
-    XCTAssertEqual(a.force, float3(b.force), accuracy: accuracy, "force", file: file, line: line)
-    XCTAssertEqual(a.torque, float3(b.torque), accuracy: accuracy, "torque", file: file, line: line)
-    XCTAssertEqual(a.centerOfMass, float3(b.centerOfMass), accuracy: accuracy, "center of mass", file: file, line: line)
+    XCTAssertEqual(a.mass, b.mass, accuracy: accuracy, "mass", file: file, line: line)
+    XCTAssertEqual(a.force, b.force, accuracy: accuracy, "force", file: file, line: line)
+    XCTAssertEqual(a.torque, b.torque, accuracy: accuracy, "torque", file: file, line: line)
+    XCTAssertEqual(a.centerOfMass, b.centerOfMass, accuracy: accuracy, "center of mass", file: file, line: line)
     XCTAssertEqual(a.inertiaTensor, b.inertiaTensor, accuracy: accuracy, "inertia tensor", file: file, line: line)
 }
 
 func XCTAssertEqual(_ a: Joint, _ b: JointStruct, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a.θ, float3x3(b.θ), accuracy: accuracy, message(), file: file, line: line)
+    XCTAssertEqual(a.θ, b.θ, accuracy: accuracy, message(), file: file, line: line)
 }
 
 func XCTAssertEqual(_ a: RigidBody, _ b: RigidBodyStruct, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqual(a.mass, float(b.mass), accuracy: accuracy, "mass", file: file, line: line)
-    XCTAssertEqual(a.force, float3(b.force), accuracy: accuracy, "force", file: file, line: line)
-    XCTAssertEqual(a.torque, float3(b.torque), accuracy: accuracy, "torque", file: file, line: line)
-    XCTAssertEqual(a.centerOfMass, float3(b.centerOfMass), accuracy: accuracy, "center of mass", file: file, line: line)
+    XCTAssertEqual(a.mass, b.mass, accuracy: accuracy, "mass", file: file, line: line)
+    XCTAssertEqual(a.force, b.force, accuracy: accuracy, "force", file: file, line: line)
+    XCTAssertEqual(a.torque, b.torque, accuracy: accuracy, "torque", file: file, line: line)
+    XCTAssertEqual(a.centerOfMass, b.centerOfMass, accuracy: accuracy, "center of mass", file: file, line: line)
     XCTAssertEqual(a.inertiaTensor, b.inertiaTensor, accuracy: accuracy, "inertia tensor", file: file, line: line)
 
-    XCTAssertEqual(a.position, float3(b.position), accuracy: accuracy, "position", file: file, line: line)
-    XCTAssertEqual(a.rotation, float3x3(b.rotation), accuracy: accuracy, "rotation", file: file, line: line)
+    XCTAssertEqual(a.position, b.position, accuracy: accuracy, "position", file: file, line: line)
+    XCTAssertEqual(a.rotation, b.rotation, accuracy: accuracy, "rotation", file: file, line: line)
 }
 
 // MARK: Half Arithmetic (should only be used in tests, NOT PRODUCTION CODE!!)

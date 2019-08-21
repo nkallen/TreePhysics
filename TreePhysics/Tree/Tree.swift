@@ -2,6 +2,7 @@ import Foundation
 import SceneKit
 import Darwin
 
+// FIXME kill this class, not necessary
 extension Tree {
     static let K: Float = 200
     static let E: Float = 0.6e9
