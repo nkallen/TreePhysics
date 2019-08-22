@@ -34,9 +34,6 @@ final class Joint: HasTransform {
     }
 
     func rotate(vector: float3) -> float3 {
-        print("parentRigidBody.transform", parentRigidBody.transform)
-        print("rotation_local", matrix4x4_rotation(rotation: θ[0]))
-//        print("vector", vector)
         return rotation_world2local * vector
     }
 

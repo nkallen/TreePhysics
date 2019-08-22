@@ -33,6 +33,8 @@
 		9E461B3322E5E025008AB788 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
 		9E461B3522E7017F008AB788 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
+		9E4C09FD230ED50F00F1DD6B /* hanan.dis1992.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */; };
+		9E4C09FF230F11D900F1DD6B /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FE230F11D900F1DD6B /* TODO */; };
 		9E51B02422FF23660081CA4C /* UpdateRigidBodiesKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodiesKernel.swift */; };
 		9E51B02522FF238A0081CA4C /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
@@ -130,6 +132,10 @@
 		9E461B3222E5E025008AB788 /* Pen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pen.swift; sourceTree = "<group>"; };
 		9E461B3422E7017F008AB788 /* CylinderPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderPen.swift; sourceTree = "<group>"; };
 		9E461B3622E704BD008AB788 /* CylinderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderTest.swift; sourceTree = "<group>"; };
+		9E4C09F9230ED46D00F1DD6B /* 606_delivering_optimized_metal_apps_and_games.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = 606_delivering_optimized_metal_apps_and_games.pdf; sourceTree = "<group>"; };
+		9E4C09FB230ED4B300F1DD6B /* stanford2017-01.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "stanford2017-01.pdf"; sourceTree = "<group>"; };
+		9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = hanan.dis1992.pdf; sourceTree = "<group>"; };
+		9E4C09FE230F11D900F1DD6B /* TODO */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		9E56C94122E76C340095C8AC /* SkinnerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinnerTest.swift; sourceTree = "<group>"; };
 		9E56C94422E78FCF0095C8AC /* Joint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joint.swift; sourceTree = "<group>"; };
 		9E56C94622E78FEC0095C8AC /* RigidBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBody.swift; sourceTree = "<group>"; };
@@ -245,6 +251,16 @@
 			path = Encoders;
 			sourceTree = "<group>";
 		};
+		9E4C09F8230ED45700F1DD6B /* References */ = {
+			isa = PBXGroup;
+			children = (
+				9E4C09F9230ED46D00F1DD6B /* 606_delivering_optimized_metal_apps_and_games.pdf */,
+				9E4C09FB230ED4B300F1DD6B /* stanford2017-01.pdf */,
+				9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */,
+			);
+			path = References;
+			sourceTree = "<group>";
+		};
 		9E56C94322E78FA90095C8AC /* Tree */ = {
 			isa = PBXGroup;
 			children = (
@@ -322,6 +338,7 @@
 		9EE7EBA022DDDC6C00535997 /* TreePhysics */ = {
 			isa = PBXGroup;
 			children = (
+				9E4C09F8230ED45700F1DD6B /* References */,
 				9EE7EBCB22E1078200535997 /* NOTES */,
 				9E1C70F8230C6FB200DA9929 /* SCRATCH */,
 				9E9D4B6922F36FFC007DCF49 /* Application */,
@@ -332,6 +349,7 @@
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
 				9EE7EBA722DDDC6E00535997 /* Assets.xcassets */,
+				9E4C09FE230F11D900F1DD6B /* TODO */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -477,7 +495,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E4C09FD230ED50F00F1DD6B /* hanan.dis1992.pdf in Resources */,
 				9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */,
+				9E4C09FF230F11D900F1DD6B /* TODO in Resources */,
 				9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */,
 				9EE7EBCC22E1078200535997 /* NOTES in Resources */,
 				9E1C70F9230C6FB200DA9929 /* SCRATCH in Resources */,

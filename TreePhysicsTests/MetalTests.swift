@@ -343,8 +343,6 @@ class AdvancedMetalTests: XCTestCase {
         simulator.update(at: 1.0 / 60)
 
         commandBuffer.addCompletedHandler { _ in
-            print(debug.strings[0])
-
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.expecteds.count)
             let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.expecteds.count)
             let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.expecteds.count)
@@ -429,8 +427,6 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         simulator.update(at: 1.0 / 60)
 
         commandBuffer.addCompletedHandler { _ in
-            print(debug.strings[0])
-
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.expecteds.count)
             let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.expecteds.count)
             let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.expecteds.count)

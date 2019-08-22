@@ -50,20 +50,12 @@ updateRigidBody(
                 const JointStruct parentJoint,
                 RigidBodyStruct rigidBody)
 {
-//    debug << "updating rigid body\n";
     float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
     float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
     float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
 
-//    debug << "joint.θ[0]=" << parentJoint.θ[0] << "\n";
-//    debug << "parentJointLocalRotation=" << parentJointLocalRotation << "\n";
-//    debug << "parentJointRotation=" << parentRigidBody.rotation << " * " << parentJointLocalRotation << " = " << parentJointRotation << "\n";
-
     rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
     rigidBody.position = parentJointPosition;
-
-//    debug << "rotation=" << rigidBody.rotation << "\n";
-//    debug << "position=" << rigidBody.position << "\n";
 
     rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * (float3x3)transpose(rigidBody.rotation);
     rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
@@ -80,7 +72,6 @@ rigidBody_climbDown(
     RigidBodyStruct parentRigidBody, currentRigidBody;
     for (short i = rigidBody.climberCount - 1; i >= 0; i--) {
         int id = rigidBody.climberOffset + i;
-//        debug << "climbing down id: " << id << "\n";
 
         RigidBodyStruct next = rigidBodies[id];
         JointStruct parentJoint = joints[id];
@@ -102,11 +93,8 @@ updateRigidBodies(
                   device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
                   device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
                   constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
-                  uint gid [[ thread_position_in_grid ]]
-                  )
+                  uint gid [[ thread_position_in_grid ]])
 {
-    // Debug debug = Debug(buf + gid*8192, 8192);
-
     for (int i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
         int lowerBound = range.x;
@@ -114,15 +102,12 @@ updateRigidBodies(
         if ((int)gid < upperBound - lowerBound) {
             int id = lowerBound + gid;
 
-//            debug << "id: " << id << "\n";
             RigidBodyStruct rigidBody = rigidBodies[id];
             if (rigidBody.parentId != -1) { // FIXME shouldn't be necessary anymore?
                 RigidBodyStruct parentRigidBody;
                 if (rigidBody.climberCount > 0) {
-//                    debug << "has climbers: " << rigidBody.climberCount << "\n";
                     parentRigidBody = rigidBody_climbDown(rigidBody, rigidBodies, joints);
                 } else {
-//                    debug << "no climbers: " << "\n";
                     parentRigidBody = rigidBodies[rigidBody.parentId];
                 }
                 // potentially can optimize away:

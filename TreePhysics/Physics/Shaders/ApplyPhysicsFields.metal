@@ -18,13 +18,6 @@ physicsField_applies(
     
     if (halfExtent.x < 0 || halfExtent.y < 0 || halfExtent.z < 0) return false;
 
-//    debug << "have half extent\n";
-//    debug << "position: " << rigidBody.position << "\n";
-//    debug << "self.position - halfExtent: " << physicsField.position - halfExtent << "\n";
-//    debug << "self.position + halfExtent: " << physicsField.position + halfExtent << "\n";
-//    debug << "position >= self.position - halfExtent: " << (rigidBody.position >= physicsField.position - halfExtent) << "\n";
-//    debug << "position <= self.position + halfExtent: " << (rigidBody.position <= physicsField.position + halfExtent) << "\n";
-
     bool3 all = (rigidBody.position >= physicsField.position - halfExtent && rigidBody.position <= physicsField.position + halfExtent);
     return all.x == true && all.y == true && all.z == true;
 }
@@ -62,20 +55,13 @@ applyPhysicsFields(
     RigidBodyStruct rigidBody = rigidBodies[gid];
     
     if (physicsField_applies(physicsField, rigidBody)) {
-//        debug << "does apply\n";
         float3 delta = physicsField.position - rigidBody.position;
         float distance = length(delta);
-//        debug << "delta: " << delta << "\n";
-//        debug << "distance: " << distance << "\n";
         if (distance > 0) {
             float3 direction = normalize(delta);
 
-//            debug << "direction: " << direction << "\n";
-
             // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
             float3 force = direction * a * pow(M_E_F, -sqr(distance - b)/(2*c));
-
-//            debug << "force: " << force << "\n";
 
             rigidBody = rigidBody_applyForce(rigidBody, force, 0.5);
 

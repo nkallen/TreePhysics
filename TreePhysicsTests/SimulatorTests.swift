@@ -33,7 +33,7 @@ class SimulatorTests: XCTestCase {
 
         XCTAssertEqual(b2.torque, cross(b2.convert(position: float3(0, 1, 0)) - b2.position, force))
 
-        let rotation_world2local = matrix3x3_rotation(from: matrix_float4x4(diagonal: float4(1,1,1,0)), to: b2.transform)
+        let rotation_world2local = matrix3x3_rotation(from: b2.transform)
         XCTAssertEqual(rotation_world2local * b2.inertiaTensor * rotation_world2local.transpose, matrix_float3x3.init(diagonal: float3(
             1.0/4 + 1.0/12,
             1.0/2,

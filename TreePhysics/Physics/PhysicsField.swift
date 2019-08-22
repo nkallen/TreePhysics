@@ -45,17 +45,12 @@ final class AttractorField: PhysicsField {
     let c: Float = 0.1
 
     func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
-//        print("does apply")
         let delta = self.position - position
         let distance = length(delta)
-//        print("delta:", delta)
-//        print("distance:", distance)
         if (distance > 0) {
             let direction = normalize(delta)
-//            print("direction:", direction)
             // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
             let force = direction * a * powf(.e, -sqr(distance - b)/(2*c))
-//            print("force:", force)
             return force
         } else {
             return float3(repeating: 0)

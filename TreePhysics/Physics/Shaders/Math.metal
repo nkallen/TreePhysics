@@ -167,6 +167,26 @@ inverse(matrix<T, 3, 3> m)
 }
 
 template <class T>
+inline matrix<T, 3, 3>
+inverse_lowerTriangular(matrix<T, 3, 3> m)
+{
+    T a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];
+    T                a11 = m[1][1], a12 = m[1][2];
+    T                               a22 = m[2][2];
+
+
+    T b10 = a22 * a11;
+    T b11 = -a22 * a01;
+    T b12 = a12 * a01 - a11 * a02;
+
+    T det = a00 * b10;
+
+    return 1/det * matrix<T, 3, 3>(vec<T, 3>(b10, b11, b12),
+                                   vec<T, 3>(0, (a22 * a00), (-a12 * a00)),
+                                   vec<T, 3>(0, 0, (a11 * a00)));
+}
+
+template <class T>
 inline matrix<T, 2, 2>
 inverse(matrix<T, 2, 2> m) {
     return (1.0 / determinant(m)) *
@@ -224,7 +244,7 @@ struct DifferentialSolution {
 
 template <class T>
 inline QuadraticSolution<T>
-solveQuadratic(T a, T b, T c, thread Debug & debug) {
+solveQuadratic(T a, T b, T c) {
     //    (-b +/- sqrt(b^2 - 4ac)) / 2a
     //    where r2 = c/ar1, cf: https://math.stackexchange.com/questions/311382/solving-a-quadratic-equation-with-precision-when-using-floating-point-variables
     T b2_4ac = b*b - 4.0*a*c;
@@ -238,7 +258,6 @@ solveQuadratic(T a, T b, T c, thread Debug & debug) {
     } else if (b2_4ac > 0) {
         T r2 = (-b - sqrt(b2_4ac)) / (2.0*a);
         T r1 = c / (a * r2);
-//        debug << "b=" << b << " c=" << c << "\n";
         return {
             QuadraticSolutionTypeRealDistinct,
             r1,
@@ -257,9 +276,9 @@ solveQuadratic(T a, T b, T c, thread Debug & debug) {
 
 template <class T>
 inline DifferentialSolution<T>
-solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, thread Debug & debug)
+solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0)
 {
-    QuadraticSolution<T> quadraticSolution = solveQuadratic(a, b, c, debug);
+    QuadraticSolution<T> quadraticSolution = solveQuadratic(a, b, c);
     switch (quadraticSolution.type) {
         case QuadraticSolutionTypeReal: {
             matrix<T, 2, 2> system = matrix<T, 2, 2>(vec<T, 2>(1, quadraticSolution.a), vec<T, 2>(0, 1));
@@ -302,7 +321,7 @@ solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, thread Debug & debug)
 // Evaluate 2nd-order differential equation given its analytic solution
 template <class T>
 inline vec<T, 3>
-evaluateDifferential(DifferentialSolution<T> differentialSolution, T t, thread Debug & debug)
+evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
 {
     T e = M_E_F;
     switch (differentialSolution.type) {
@@ -343,8 +362,6 @@ evaluateDifferential(DifferentialSolution<T> differentialSolution, T t, thread D
             T r2 = differentialSolution.y;
             T k = differentialSolution.z;
 
-//            debug << ".realDistinct(c1: " << c1 << ", c2: " << c2 << ", r1: " << r1 << ", r2: " << r2 << ", k: " << k << ")\n";
-
             T y = c1*pow(e,r1*t) + c2*pow(e,r2*t) + k;
             T y_ddt = r1*c1*pow(e,r1*t) + r2*c2*pow(e,r2*t);
             T y_d2dt = r1*r1*c1 * pow(e,r1*t) + r2*r2*c2 * pow(e,r2*t);
@@ -355,8 +372,8 @@ evaluateDifferential(DifferentialSolution<T> differentialSolution, T t, thread D
 
 template <class T>
 inline vec<T, 3>
-evaluateDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, T t, thread Debug & debug)
+evaluateDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, T t)
 {
-    DifferentialSolution<T> differentialSolution = solveDifferential(a, b, c, g, y_0, y_ddt_0, debug);
-    return evaluateDifferential(differentialSolution, t, debug);
+    DifferentialSolution<T> differentialSolution = solveDifferential(a, b, c, g, y_0, y_ddt_0);
+    return evaluateDifferential(differentialSolution, t);
 }

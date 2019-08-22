@@ -27,7 +27,6 @@ func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     } else if b2_4ac > 0 {
         let r2 = (-b - sqrt(b2_4ac)) / (2.0*a)
         let r1 = c / (a * r2)
-//        print("b=\(b), c=\(c)")
         return .realDistinct(r1, r2)
     } else {
         let imaginaryPart = sqrt(-b2_4ac) / _2a
@@ -74,7 +73,6 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
             r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
         return float3(y, y_ddt, y_d2dt)
     case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
-//        print(".realDistinct(c1: \(c1), c2: \(c2), r1: \(r1), r2: \(r2), k: \(k))")
         let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
         let y_ddt = r1*c1*powf(.e,r1*t) + r2*c2*powf(.e,r2*t)
         let y_d2dt = r1*r1*c1 * powf(.e,r1*t) + r2*r2*c2 * powf(.e,r2*t)
