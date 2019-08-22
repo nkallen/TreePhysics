@@ -81,6 +81,15 @@ final class Simulator {
             if let parentJoint = rigidBody.parentJoint {
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
 
+                print("rigidBody.composite.centerOfMass:", rigidBody.composite.centerOfMass)
+                print("parentJoint.position", parentJoint.position)
+                print("rigidBody.composite.centerOfMass - parentJoint.position", rigidBody.composite.centerOfMass - parentJoint.position)
+                print("pr:", pr)
+//                print("rigidBody.composite.inertiaTensor:", rigidBody.composite.inertiaTensor)
+//                print("parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor):", parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor))
+//                print("pr.crossMatrix: ", pr.crossMatrix)
+//                print("rigidBody.composite.mass * sqr(pr.crossMatrix):", rigidBody.composite.mass * sqr(pr.crossMatrix))
+
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
                     rigidBody.composite.mass * sqr(pr.crossMatrix)
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
@@ -99,6 +108,11 @@ final class Simulator {
                 // 1.b. the generalized eigenvalue problem A * X = X * Λ
                 // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
                 let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
+
+                print("inertiaTensor_jointSpace:", inertiaTensor_jointSpace)
+//                print("L:", L)
+//                print("A[0]:", A[0])
+//                print("A[2]:", A[2])
 
                 let (Λ, X) = A.eigen_ql!
 
@@ -119,6 +133,7 @@ final class Simulator {
                 // FIXME cleanup and make similar to metal impl
                 let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: θ_diagonal_0.x, y_ddt_0: θ_ddt_diagonal_0.x)
                 let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y)
+                print("question:", Λ.y, Λ.z)
                 let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z)
 
                 let θ_diagonal = matrix_float3x3(rows: [

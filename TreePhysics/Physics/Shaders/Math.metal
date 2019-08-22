@@ -1,4 +1,5 @@
 #include <metal_stdlib>
+#include "Print.metal"
 using namespace metal;
 
 // MARK: Quaternion
@@ -223,7 +224,7 @@ struct DifferentialSolution {
 
 template <class T>
 inline QuadraticSolution<T>
-solveQuadratic(T a, T b, T c) {
+solveQuadratic(T a, T b, T c, thread Debug & debug) {
     //    (-b +/- sqrt(b^2 - 4ac)) / 2a
     //    where r2 = c/ar1, cf: https://math.stackexchange.com/questions/311382/solving-a-quadratic-equation-with-precision-when-using-floating-point-variables
     T b2_4ac = b*b - 4.0*a*c;
@@ -237,6 +238,7 @@ solveQuadratic(T a, T b, T c) {
     } else if (b2_4ac > 0) {
         T r2 = (-b - sqrt(b2_4ac)) / (2.0*a);
         T r1 = c / (a * r2);
+//        debug << "b=" << b << " c=" << c << "\n";
         return {
             QuadraticSolutionTypeRealDistinct,
             r1,
@@ -255,9 +257,9 @@ solveQuadratic(T a, T b, T c) {
 
 template <class T>
 inline DifferentialSolution<T>
-solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0)
+solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, thread Debug & debug)
 {
-    QuadraticSolution<T> quadraticSolution = solveQuadratic(a, b, c);
+    QuadraticSolution<T> quadraticSolution = solveQuadratic(a, b, c, debug);
     switch (quadraticSolution.type) {
         case QuadraticSolutionTypeReal: {
             matrix<T, 2, 2> system = matrix<T, 2, 2>(vec<T, 2>(1, quadraticSolution.a), vec<T, 2>(0, 1));
@@ -300,7 +302,7 @@ solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0)
 // Evaluate 2nd-order differential equation given its analytic solution
 template <class T>
 inline vec<T, 3>
-evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
+evaluateDifferential(DifferentialSolution<T> differentialSolution, T t, thread Debug & debug)
 {
     T e = M_E_F;
     switch (differentialSolution.type) {
@@ -341,6 +343,8 @@ evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
             T r2 = differentialSolution.y;
             T k = differentialSolution.z;
 
+//            debug << ".realDistinct(c1: " << c1 << ", c2: " << c2 << ", r1: " << r1 << ", r2: " << r2 << ", k: " << k << ")\n";
+
             T y = c1*pow(e,r1*t) + c2*pow(e,r2*t) + k;
             T y_ddt = r1*c1*pow(e,r1*t) + r2*c2*pow(e,r2*t);
             T y_d2dt = r1*r1*c1 * pow(e,r1*t) + r2*r2*c2 * pow(e,r2*t);
@@ -351,8 +355,8 @@ evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
 
 template <class T>
 inline vec<T, 3>
-evaluateDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, T t)
+evaluateDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, T t, thread Debug & debug)
 {
-    DifferentialSolution<T> differentialSolution = solveDifferential(a, b, c, g, y_0, y_ddt_0);
-    return evaluateDifferential(differentialSolution, t);
+    DifferentialSolution<T> differentialSolution = solveDifferential(a, b, c, g, y_0, y_ddt_0, debug);
+    return evaluateDifferential(differentialSolution, t, debug);
 }

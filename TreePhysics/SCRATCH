@@ -1,189 +1,371 @@
-have half extent
-position: SIMD3<Float>(-1.2518101e-08, 0.16159295, -0.05250473)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.10000002, -0.061592944, 0.15250473)
-distance: 0.19248737
-direction: SIMD3<Float>(0.5195147, -0.31998435, 0.7922843)
-force: SIMD3<Float>(0.021991469, -0.013545193, 0.033538025)
-have half extent
-position: SIMD3<Float>(-0.052174494, 0.16057658, 6.2196834e-09)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.1521745, -0.06057658, 0.099999994)
-distance: 0.19190258
-direction: SIMD3<Float>(0.79297787, -0.31566316, 0.52109766)
-force: SIMD3<Float>(0.033603165, -0.013376517, 0.022081994)
-have half extent
-position: SIMD3<Float>(0.0, 0.11467618, 0.03726054)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.1, -0.014676176, 0.06273946)
-distance: 0.11896063
-direction: SIMD3<Float>(0.8406143, -0.12337004, 0.5273969)
-force: SIMD3<Float>(0.039608296, -0.005812983, 0.024850031)
-have half extent
-position: SIMD3<Float>(-6.815522e-09, 0.08797982, -0.028586375)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.10000001, 0.012020178, 0.12858638)
-distance: 0.1633369
-direction: SIMD3<Float>(0.6122316, 0.07359132, 0.7872464)
-force: SIMD3<Float>(0.027216336, 0.0032714517, 0.0349965)
-have half extent
-position: SIMD3<Float>(-0.024467783, 0.0753041, 2.9167868e-09)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.12446778, 0.024695903, 0.1)
-distance: 0.1615615
-direction: SIMD3<Float>(0.77040493, 0.1528576, 0.61895937)
-force: SIMD3<Float>(0.034340642, 0.006813596, 0.027589986)
-have half extent
-position: SIMD3<Float>(0.0, 0.058674224, 0.019064406)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.1, 0.041325778, 0.0809356)
-distance: 0.13512363
-direction: SIMD3<Float>(0.7400631, 0.3058368, 0.59897447)
-force: SIMD3<Float>(0.034217034, 0.014140454, 0.027693762)
-have half extent
-position: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.1, 0.1, 0.1)
-distance: 0.17320508
-direction: SIMD3<Float>(0.5773503, 0.5773503, 0.5773503)
-force: SIMD3<Float>(0.025267968, 0.025267968, 0.025267968)
-have half extent
-position: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.1, 0.1, 0.1)
-distance: 0.17320508
-direction: SIMD3<Float>(0.5773503, 0.5773503, 0.5773503)
-force: SIMD3<Float>(0.025267968, 0.025267968, 0.025267968)
-have half extent
-position: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position - halfExtent: SIMD3<Float>(0.0, 0.0, 0.0)
-self.position + halfExtent: SIMD3<Float>(0.2, 0.2, 0.2)
-position >= self.position - halfExtent true
-position <= self.position + halfExtent true
-does apply
-delta: SIMD3<Float>(0.1, 0.1, 0.1)
-distance: 0.17320508
-direction: SIMD3<Float>(0.5773503, 0.5773503, 0.5773503)
-force: SIMD3<Float>(0.025267968, 0.025267968, 0.025267968)
-metal[0]:  have half extent
-metal[0]:  position: (-0.000000,0.161593,-0.052505)
-metal[0]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[0]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[0]:  position >= self.position - halfExtent: (0,1,0)
-metal[0]:  position <= self.position + halfExtent: (1,1,1)
-metal[1]:  have half extent
-metal[1]:  position: (-0.052174,0.160577,0.000000)
-metal[1]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[1]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[1]:  position >= self.position - halfExtent: (0,1,1)
-metal[1]:  position <= self.position + halfExtent: (1,1,1)
-metal[2]:  have half extent
-metal[2]:  position: (0.000000,0.114676,0.037261)
-metal[2]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[2]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[2]:  position >= self.position - halfExtent: (1,1,1)
-metal[2]:  position <= self.position + halfExtent: (1,1,1)
-metal[2]:  does apply
-metal[2]:  delta: (0.100000,-0.014676,0.062739)
-metal[2]:  distance: 0.118961
-metal[2]:  direction: (0.840614,-0.123370,0.527397)
-metal[2]:  force: (0.039608,-0.005813,0.024850)
-metal[3]:  have half extent
-metal[3]:  position: (-0.000000,0.087980,-0.028586)
-metal[3]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[3]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[3]:  position >= self.position - halfExtent: (0,1,0)
-metal[3]:  position <= self.position + halfExtent: (1,1,1)
-metal[4]:  have half extent
-metal[4]:  position: (0.000000,0.000000,0.000000)
-metal[4]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[4]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[4]:  position >= self.position - halfExtent: (1,1,1)
-metal[4]:  position <= self.position + halfExtent: (1,1,1)
-metal[4]:  does apply
-metal[4]:  delta: (0.100000,0.100000,0.100000)
-metal[4]:  distance: 0.173205
-metal[4]:  direction: (0.577350,0.577350,0.577350)
-metal[4]:  force: (0.025268,0.025268,0.025268)
-metal[5]:  have half extent
-metal[5]:  position: (-0.024468,0.075304,0.000000)
-metal[5]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[5]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[5]:  position >= self.position - halfExtent: (0,1,1)
-metal[5]:  position <= self.position + halfExtent: (1,1,1)
-metal[6]:  have half extent
-metal[6]:  position: (0.000000,0.000000,0.000000)
-metal[6]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[6]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[6]:  position >= self.position - halfExtent: (1,1,1)
-metal[6]:  position <= self.position + halfExtent: (1,1,1)
-metal[6]:  does apply
-metal[6]:  delta: (0.100000,0.100000,0.100000)
-metal[6]:  distance: 0.173205
-metal[6]:  direction: (0.577350,0.577350,0.577350)
-metal[6]:  force: (0.025268,0.025268,0.025268)
-metal[7]:  have half extent
-metal[7]:  position: (0.000000,0.058674,0.019064)
-metal[7]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[7]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[7]:  position >= self.position - halfExtent: (1,1,1)
-metal[7]:  position <= self.position + halfExtent: (1,1,1)
-metal[7]:  does apply
-metal[7]:  delta: (0.100000,0.041326,0.080936)
-metal[7]:  distance: 0.135124
-metal[7]:  direction: (0.740063,0.305837,0.598974)
-metal[7]:  force: (0.034217,0.014140,0.027694)
-metal[8]:  have half extent
-metal[8]:  position: (0.000000,0.000000,0.000000)
-metal[8]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[8]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[8]:  position >= self.position - halfExtent: (1,1,1)
-metal[8]:  position <= self.position + halfExtent: (1,1,1)
-metal[8]:  does apply
-metal[8]:  delta: (0.100000,0.100000,0.100000)
-metal[8]:  distance: 0.173205
-metal[8]:  direction: (0.577350,0.577350,0.577350)
-metal[8]:  force: (0.025268,0.025268,0.025268)
-metal[9]:  have half extent
-metal[9]:  position: (0.000000,0.000000,0.000000)
-metal[9]:  self.position - halfExtent: (0.000000,0.000000,0.000000)
-metal[9]:  self.position + halfExtent: (0.200000,0.200000,0.200000)
-metal[9]:  position >= self.position - halfExtent: (1,1,1)
-metal[9]:  position <= self.position + halfExtent: (1,1,1)
-metal[9]:  does apply
-metal[9]:  delta: (0.100000,0.100000,0.100000)
-metal[9]:  distance: 0.173205
-metal[9]:  direction: (0.577350,0.577350,0.577350)
-metal[9]:  force: (0.025268,0.025268,0.025268)
+parentRigidBody.transform simd_float4x4([[1.0, 7.367538e-08, -1.1669055e-08, 0.0], [-7.367538e-08, 0.9510564, -0.309017, 0.0], [-1.1669061e-08, 0.309017, 0.9510564, 0.0], [-7.770014e-09, 0.10030111, -0.032589804, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-1.6347059e-08, 0.21101996, -0.06856455)
+parentJoint.position SIMD3<Float>(-1.2210087e-08, 0.15761687, -0.051212825)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-4.1369717e-09, 0.053403094, -0.017351724)
+pr: SIMD3<Float>(-7.868987e-09, 0.04542739, -0.03300494)
+parentRigidBody.transform simd_float4x4([[1.0, 7.367538e-08, -1.1669055e-08, 0.0], [-7.367538e-08, 0.9510564, -0.309017, 0.0], [-1.1669061e-08, 0.309017, 0.9510564, 0.0], [-7.770014e-09, 0.10030111, -0.032589804, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[3.9217853e-06, 4.4444505e-13, -3.2290829e-13], [4.4444505e-13, 1.3560198e-06, 1.8641384e-06], [-3.229083e-13, 1.8641384e-06, 2.5674094e-06]])
+question: 1.2167325e+11 5.0997184e+07
+parentRigidBody.transform simd_float4x4([[0.95105636, 0.30901694, 5.834536e-09, 0.0], [-0.30901694, 0.95105636, 3.6837687e-08, 0.0], [5.8345364e-09, -3.6837687e-08, 1.0, 0.0], [-0.019219272, 0.05915084, 2.2911155e-09, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-0.06887911, 0.21198812, 8.211028e-09)
+parentJoint.position SIMD3<Float>(-0.054111637, 0.1665385, 6.450609e-09)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-0.014767475, 0.045449615, 1.7604194e-09)
+pr: SIMD3<Float>(-0.028089413, 0.03866176, 3.348518e-09)
+parentRigidBody.transform simd_float4x4([[0.95105636, 0.30901694, 5.834536e-09, 0.0], [-0.30901694, 0.95105636, 3.6837687e-08, 0.0], [5.8345364e-09, -3.6837687e-08, 1.0, 0.0], [-0.019219272, 0.05915084, 2.2911155e-09, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[1.4884749e-06, 1.0805416e-06, 9.358635e-14], [1.0805416e-06, 7.862965e-07, -1.2881055e-13], [9.358635e-14, -1.2881055e-13, 2.2735342e-06]])
+question: 1.616723e+11 8.796876e+07
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 0.95105636, 0.3090169, 0.0], [0.0, -0.3090169, 0.95105636, 0.0], [0.0, 0.07301084, 0.023722652, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(0.0, 0.21936022, 0.071274444)
+parentJoint.position SIMD3<Float>(0.0, 0.16500676, 0.05361393)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(0.0, 0.05435346, 0.017660514)
+pr: SIMD3<Float>(0.0, 0.046235822, 0.033592295)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 0.95105636, 0.3090169, 0.0], [0.0, -0.3090169, 0.95105636, 0.0], [0.0, 0.07301084, 0.023722652, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[4.917186e-06, 0.0, 0.0], [0.0, 1.7003945e-06, -2.3371358e-06], [0.0, -2.3371358e-06, 3.2191574e-06]])
+question: 4.067368e+07 8.453183e+10
+parentRigidBody.transform simd_float4x4([[1.0, 7.367537e-08, -1.1669055e-08, 0.0], [-7.367537e-08, 0.9510564, -0.30901694, 0.0], [-1.1669055e-08, 0.30901694, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-1.4435322e-08, 0.18634185, -0.060546145)
+parentJoint.position SIMD3<Float>(-7.770014e-09, 0.10030111, -0.032589804)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-6.6653083e-09, 0.08604074, -0.02795634)
+pr: SIMD3<Float>(-1.2678171e-08, 0.07319064, -0.053176116)
+parentRigidBody.transform simd_float4x4([[1.0, 7.367537e-08, -1.1669055e-08, 0.0], [-7.367537e-08, 0.9510564, -0.30901694, 0.0], [-1.1669055e-08, 0.30901694, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[1.4107452e-05, 1.5991783e-12, -1.1618711e-12], [1.5991783e-12, 4.875452e-06, 6.707441e-06], [-1.1618711e-12, 6.707441e-06, 9.23421e-06]])
+question: 14176908.0 9.051245e+10
+parentRigidBody.transform simd_float4x4([[0.9510564, 0.30901694, 5.8345284e-09, 0.0], [-0.30901694, 0.9510564, 3.6837687e-08, 0.0], [5.8345284e-09, -3.6837687e-08, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-0.051914837, 0.15977746, 6.18873e-09)
+parentJoint.position SIMD3<Float>(-0.019219272, 0.05915084, 2.2911155e-09)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-0.032695565, 0.10062662, 3.8976147e-09)
+pr: SIMD3<Float>(-0.06219067, 0.085598126, 7.4137048e-09)
+parentRigidBody.transform simd_float4x4([[0.9510564, 0.30901694, 5.8345284e-09, 0.0], [-0.30901694, 0.9510564, 3.6837687e-08, 0.0], [5.8345284e-09, -3.6837687e-08, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[1.5300448e-05, 1.1114584e-05, 9.626407e-13], [1.1114584e-05, 8.07775e-06, -1.3249615e-12], [9.626407e-13, -1.3249615e-12, 2.3375664e-05]])
+question: 7.893834e+10 8555906.0
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 0.9510564, 0.30901688, 0.0], [0.0, -0.30901688, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(0.0, 0.17923106, 0.058235694)
+parentJoint.position SIMD3<Float>(0.0, 0.07301084, 0.023722652)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(0.0, 0.10622022, 0.03451304)
+pr: SIMD3<Float>(0.0, 0.09035634, 0.065647714)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 0.9510564, 0.30901688, 0.0], [0.0, -0.30901688, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[3.0306961e-05, 0.0, 0.0], [0.0, 1.0473157e-05, -1.4410103e-05], [0.0, -1.4410103e-05, 1.9837416e-05]])
+question: 6599145.5 5.5450325e+10
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-9.7924815e-09, 0.12640862, -0.041072655)
+parentJoint.position SIMD3<Float>(0.0, 0.0, 0.0)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-9.7924815e-09, 0.12640862, -0.041072655)
+pr: SIMD3<Float>(-9.792481e-09, 0.1264086, -0.04107265)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[5.8281545e-05, 4.0834463e-12, -1.3267924e-12], [4.0834463e-12, 5.5693936e-06, 1.7127219e-05], [-1.3267924e-12, 1.7127219e-05, 5.2716576e-05]])
+question: 3431613.2 4.522429e+10
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-0.043970466, 0.13532719, 5.241687e-09)
+parentJoint.position SIMD3<Float>(0.0, 0.0, 0.0)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-0.043970466, 0.13532719, 5.241687e-09)
+pr: SIMD3<Float>(-0.043970462, 0.13532718, 5.2416866e-09)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[4.5857232e-05, 1.4898945e-05, 5.770874e-13], [1.4898945e-05, 4.843947e-06, -1.7760923e-12], [5.770874e-13, -1.7760923e-12, 5.069819e-05]])
+question: 6.6946585e+10 3944913.5
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(0.0, 0.14669436, 0.047663882)
+parentJoint.position SIMD3<Float>(0.0, 0.0, 0.0)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(0.0, 0.14669436, 0.047663882)
+pr: SIMD3<Float>(0.0, 0.14669435, 0.04766388)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, 0.0, -0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, -0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[7.474004e-05, 0.0, 0.0], [0.0, 7.141072e-06, -2.1964235e-05], [0.0, -2.1964235e-05, 6.7603425e-05]])
+question: 2675941.2 4.4846965e+10
+metal[0]:  parentRigidBody.rotation: ((1.000000,0.000000,-0.000000)(-0.000000,0.951056,-0.309017)(-0.000000,0.309017,0.951056))
+metal[0]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[0]:  childCompositeBody.centerOfMass: (-0.000000,0.211020,-0.068565)
+metal[0]:  joint_position(joint, parentRigidBody)(-0.000000,0.157617,-0.051213)
+metal[0]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.000000,0.053403,-0.017352)
+metal[0]:  pr: (-0.000000,0.056151,-0.000000)
+metal[0]:  parentRigidBody.rotation: ((1.000000,0.000000,-0.000000)(-0.000000,0.951056,-0.309017)(-0.000000,0.309017,0.951056))
+metal[0]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[0]:  inertiaTensor_jointSpace: ((0.000004,0.000000,-0.000000)(0.000000,0.000000,0.000000)(-0.000000,0.000000,0.000004))
+metal[0]:  question: 50997180.000000 50997172.000000
+metal[1]:  parentRigidBody.rotation: ((0.951056,0.309017,0.000000)(-0.309017,0.951056,0.000000)(0.000000,-0.000000,1.000000))
+metal[1]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[1]:  childCompositeBody.centerOfMass: (-0.068879,0.211988,0.000000)
+metal[1]:  joint_position(joint, parentRigidBody)(-0.054112,0.166538,0.000000)
+metal[1]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.014767,0.045450,0.000000)
+metal[1]:  pr: (0.000000,0.047789,-0.000000)
+metal[1]:  parentRigidBody.rotation: ((0.951056,0.309017,0.000000)(-0.309017,0.951056,0.000000)(0.000000,-0.000000,1.000000))
+metal[1]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[1]:  inertiaTensor_jointSpace: ((0.000002,-0.000000,0.000000)(0.000000,0.000000,0.000000)(0.000000,0.000000,0.000002))
+metal[1]:  question: 87968808.000000 87968808.000000
+metal[2]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,0.951056,0.309017)(0.000000,-0.309017,0.951056))
+metal[2]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[2]:  childCompositeBody.centerOfMass: (0.000000,0.219360,0.071274)
+metal[2]:  joint_position(joint, parentRigidBody)(0.000000,0.165007,0.053614)
+metal[2]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000000,0.054353,0.017661)
+metal[2]:  pr: (0.000000,0.057151,0.000000)
+metal[2]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,0.951056,0.309017)(0.000000,-0.309017,0.951056))
+metal[2]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[2]:  inertiaTensor_jointSpace: ((0.000005,0.000000,0.000000)(0.000000,0.000000,-0.000000)(0.000000,-0.000000,0.000005))
+metal[2]:  question: 40673688.000000 40673680.000000
+metal[3]:  parentRigidBody.rotation: ((1.000000,0.000000,-0.000000)(-0.000000,0.951056,-0.309017)(-0.000000,0.309017,0.951056))
+metal[3]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[3]:  childCompositeBody.centerOfMass: (-0.000000,0.186342,-0.060546)
+metal[3]:  joint_position(joint, parentRigidBody)(-0.000000,0.100301,-0.032590)
+metal[3]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.000000,0.086041,-0.027956)
+metal[3]:  pr: (0.000000,0.090469,-0.000000)
+metal[3]:  parentRigidBody.rotation: ((1.000000,0.000000,-0.000000)(-0.000000,0.951056,-0.309017)(-0.000000,0.309017,0.951056))
+metal[3]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[3]:  inertiaTensor_jointSpace: ((0.000014,-0.000000,-0.000000)(-0.000000,0.000000,0.000000)(-0.000000,0.000000,0.000014))
+metal[3]:  question: 14176914.000000 14176905.000000
+metal[4]:   3431613.000000
+metal[4]:  rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[4]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[4]:  childCompositeBody.centerOfMass: (-0.000000,0.126409,-0.041073)
+metal[4]:  joint_position(joint, parentRigidBody)(0.000000,0.000000,0.000000)
+metal[4]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.000000,0.126409,-0.041073)
+metal[4]:  pr: (-0.000000,0.126409,-0.041073)
+metal[4]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[4]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[4]:  inertiaTensor_jointSpace: ((0.000058,0.000000,-0.000000)(0.000000,0.000006,0.000017)(-0.000000,0.000017,0.000053))
+metal[4]:  question:
+metal[5]:  parentRigidBody.rotation: ((0.951056,0.309017,0.000000)(-0.309017,0.951056,0.000000)(0.000000,-0.000000,1.000000))
+metal[5]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[5]:  childCompositeBody.centerOfMass: (-0.051915,0.159777,0.000000)
+metal[5]:  joint_position(joint, parentRigidBody)(-0.019219,0.059151,0.000000)
+metal[5]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.032696,0.100627,0.000000)
+metal[5]:  pr: (0.000000,0.105805,-0.000000)
+metal[5]:  parentRigidBody.rotation: ((0.951056,0.309017,0.000000)(-0.309017,0.951056,0.000000)(0.000000,-0.000000,1.000000))
+metal[5]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[5]:  inertiaTensor_jointSpace: ((0.000023,-0.000000,0.000000)(-0.000000,0.000000,0.000000)(0.000000,0.000000,0.000023))
+metal[5]:  question: 8555907.000000 8555907.000000
+metal[6]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[6]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[6]:  childCompositeBody.centerOfMass: (-0.043970,0.135327,0.000000)
+metal[6]:  joint_position(joint, parentRigidBody)(0.000000,0.000000,0.000000)
+metal[6]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.043970,0.135327,0.000000)
+metal[6]:  pr: (-0.043970,0.135327,0.000000)
+metal[6]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[6]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[6]:  inertiaTensor_jointSpace: ((0.000046,0.000015,0.000000)(0.000015,0.000005,-0.000000)(0.000000,-0.000000,0.000051))
+metal[6]:  question: 3944915.000000 3944914.750000
+metal[7]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,0.951056,0.309017)(0.000000,-0.309017,0.951056))
+metal[7]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[7]:  childCompositeBody.centerOfMass: (0.000000,0.179231,0.058236)
+metal[7]:  joint_position(joint, parentRigidBody)(0.000000,0.073011,0.023723)
+metal[7]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000000,0.106220,0.034513)
+metal[7]:  pr: (0.000000,0.111687,0.000000)
+metal[7]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,0.951056,0.309017)(0.000000,-0.309017,0.951056))
+metal[7]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[7]:  inertiaTensor_jointSpace: ((0.000030,0.000000,0.000000)(0.000000,0.000000,-0.000000)(0.000000,-0.000000,0.000030))
+metal[7]:  question: 6599149.000000 6599145.500000
+metal[8]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[8]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[8]:  childCompositeBody.centerOfMass: (0.000000,0.146694,0.047664)
+metal[8]:  joint_position(joint, parentRigidBody)(0.000000,0.000000,0.000000)
+metal[8]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000000,0.146694,0.047664)
+metal[8]:  pr: (0.000000,0.146694,0.047664)
+metal[8]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[8]:  joint_localRotation(joint)((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[8]:  inertiaTensor_jointSpace: ((0.000075,0.000000,0.000000)(0.000000,0.000007,-0.000022)(0.000000,-0.000022,0.000068))
+metal[8]:  question: 2675941.750000 2675943.000000
+parentRigidBody.transform simd_float4x4([[1.0, -9.93185e-06, 1.375975e-05, 0.0], [1.3697535e-05, 0.95106304, -0.3089966, 0.0], [-1.0017483e-05, 0.30899662, 0.95106304, 0.0], [-7.770014e-09, 0.10030111, -0.032589804, 1.0]])
+rotation_local simd_float4x4([[1.0, -5.0753124e-06, 3.6874292e-06, 0.0], [5.0752833e-06, 1.0, 7.9050005e-06, 0.0], [-3.6874692e-06, -7.904981e-06, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(1.8718313e-06, 0.21102087, -0.068561755)
+parentJoint.position SIMD3<Float>(8.1771685e-07, 0.15761727, -0.051211596)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(1.0541144e-06, 0.0534036, -0.01735016)
+pr: SIMD3<Float>(2.2944314e-06, 0.045429327, -0.033002276)
+parentRigidBody.transform simd_float4x4([[1.0, -9.93185e-06, 1.375975e-05, 0.0], [1.3697535e-05, 0.95106304, -0.3089966, 0.0], [-1.0017483e-05, 0.30899662, 0.95106304, 0.0], [-7.770014e-09, 0.10030111, -0.032589804, 1.0]])
+rotation_local simd_float4x4([[1.0, -5.0753124e-06, 3.6874292e-06, 0.0], [5.0752833e-06, 1.0, 7.9050005e-06, 0.0], [-3.6874692e-06, -7.904981e-06, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[3.9217857e-06, -1.2959636e-10, 9.414568e-11], [-1.2959636e-10, 1.3558013e-06, 1.8640674e-06], [9.414568e-11, 1.8640674e-06, 2.5676284e-06]])
+question: 5.099717e+07 1.2166378e+11
+parentRigidBody.transform simd_float4x4([[0.95106614, 0.3089868, -1.47737155e-05, 0.0], [-0.3089868, 0.95106614, 2.0378675e-05, 0.0], [2.0347525e-05, -1.48165855e-05, 1.0, 0.0], [-0.019219272, 0.05915084, 2.2911155e-09, 1.0]])
+rotation_local simd_float4x4([[1.0, -6.4881533e-06, -3.0265242e-06, 0.0], [6.488166e-06, 1.0, 4.165632e-06, 0.0], [3.026497e-06, -4.1656517e-06, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-0.06887397, 0.21198978, 3.4762625e-06)
+parentJoint.position SIMD3<Float>(-0.054108236, 0.16653961, 2.3033303e-06)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-0.014765736, 0.045450166, 1.1729321e-06)
+pr: SIMD3<Float>(-0.028086454, 0.038663894, 2.5513064e-06)
+parentRigidBody.transform simd_float4x4([[0.95106614, 0.3089868, -1.47737155e-05, 0.0], [-0.3089868, 0.95106614, 2.0378675e-05, 0.0], [2.0347525e-05, -1.48165855e-05, 1.0, 0.0], [-0.019219272, 0.05915084, 2.2911155e-09, 1.0]])
+rotation_local simd_float4x4([[1.0, -6.4881533e-06, -3.0265242e-06, 0.0], [6.488166e-06, 1.0, 4.165632e-06, 0.0], [3.026497e-06, -4.1656517e-06, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[1.4886393e-06, 1.0804874e-06, 7.1297905e-11], [1.0804874e-06, 7.861312e-07, -9.8148906e-11], [7.129791e-11, -9.8148906e-11, 2.2735333e-06]])
+question: 8.796882e+07 1.6165524e+11
+parentRigidBody.transform simd_float4x4([[1.0, -2.1631087e-05, -2.977264e-05, 0.0], [2.9773151e-05, 0.9510491, 0.30903938, 0.0], [2.1630387e-05, -0.30903938, 0.9510491, 0.0], [0.0, 0.07301084, 0.023722652, 1.0]])
+rotation_local simd_float4x4([[1.0, -8.425031e-06, -6.121145e-06, 0.0], [8.425072e-06, 1.0, 6.686093e-06, 0.0], [6.1210885e-06, -6.6861444e-06, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(5.063025e-06, 0.21935898, 0.07127826)
+parentJoint.position SIMD3<Float>(2.879964e-06, 0.16500604, 0.053616107)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(2.183061e-06, 0.05435294, 0.017662153)
+pr: SIMD3<Float>(4.749402e-06, 0.046233803, 0.033595093)
+parentRigidBody.transform simd_float4x4([[1.0, -2.1631087e-05, -2.977264e-05, 0.0], [2.9773151e-05, 0.9510491, 0.30903938, 0.0], [2.1630387e-05, -0.30903938, 0.9510491, 0.0], [0.0, 0.07301084, 0.023722652, 1.0]])
+rotation_local simd_float4x4([[1.0, -8.425031e-06, -6.121145e-06, 0.0], [8.425072e-06, 1.0, 6.686093e-06, 0.0], [6.1210885e-06, -6.6861444e-06, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[4.917187e-06, -3.304184e-10, -2.4009356e-10], [-3.304184e-10, 1.7006773e-06, -2.3372286e-06], [-2.4009356e-10, -2.3372286e-06, 3.218876e-06]])
+question: 4.067365e+07 8.454868e+10
+parentRigidBody.transform simd_float4x4([[1.0, 7.367537e-08, -1.1669055e-08, 0.0], [-7.367537e-08, 0.9510564, -0.30901694, 0.0], [-1.1669055e-08, 0.30901694, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -1.3771424e-05, 1.0005521e-05, 0.0], [1.37712095e-05, 1.0, 2.144963e-05, 0.0], [-1.0005817e-05, -2.1449492e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(1.4307045e-06, 0.18634255, -0.060544003)
+parentJoint.position SIMD3<Float>(-7.770014e-09, 0.10030111, -0.032589804)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(1.4384746e-06, 0.08604144, -0.027954198)
+pr: SIMD3<Float>(2.8970608e-06, 0.0731931, -0.053172726)
+parentRigidBody.transform simd_float4x4([[1.0, 7.367537e-08, -1.1669055e-08, 0.0], [-7.367537e-08, 0.9510564, -0.30901694, 0.0], [-1.1669055e-08, 0.30901694, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -1.3771424e-05, 1.0005521e-05, 0.0], [1.37712095e-05, 1.0, 2.144963e-05, 0.0], [-1.0005817e-05, -2.1449492e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[1.41074515e-05, -3.6935588e-10, 2.6832633e-10], [-3.6935588e-10, 4.8748234e-06, 6.707237e-06], [2.6832633e-10, 6.707237e-06, 9.234839e-06]])
+question: 14176904.0 9.048548e+10
+parentRigidBody.transform simd_float4x4([[0.9510564, 0.30901694, 5.8345284e-09, 0.0], [-0.30901694, 0.9510564, 3.6837687e-08, 0.0], [5.8345284e-09, -3.6837687e-08, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -3.1683874e-05, -1.4779551e-05, 0.0], [3.1684176e-05, 1.0, 2.0341839e-05, 0.0], [1.4778906e-05, -2.0342306e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-0.05191151, 0.15977854, 2.2526924e-06)
+parentJoint.position SIMD3<Float>(-0.019219272, 0.05915084, 2.2911155e-09)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-0.03269224, 0.10062769, 2.2504014e-06)
+pr: SIMD3<Float>(-0.062185127, 0.08560214, 4.7840463e-06)
+parentRigidBody.transform simd_float4x4([[0.9510564, 0.30901694, 5.8345284e-09, 0.0], [-0.30901694, 0.9510564, 3.6837687e-08, 0.0], [5.8345284e-09, -3.6837687e-08, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -3.1683874e-05, -1.4779551e-05, 0.0], [3.1684176e-05, 1.0, 2.0341839e-05, 0.0], [1.4778906e-05, -2.0342306e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[1.530189e-05, 1.1114112e-05, 6.2432326e-10], [1.1114112e-05, 8.076302e-06, -8.5942503e-10], [6.2432326e-10, -8.594251e-10, 2.337566e-05]])
+question: 8555908.0 7.89695e+10
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 0.9510564, 0.30901688, 0.0], [0.0, -0.30901688, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -2.977264e-05, -2.1631095e-05, 0.0], [2.9773151e-05, 1.0, 2.3627068e-05, 0.0], [2.163039e-05, -2.3627712e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(3.61422e-06, 0.17923018, 0.058238417)
+parentJoint.position SIMD3<Float>(0.0, 0.07301084, 0.023722652)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(3.61422e-06, 0.106219344, 0.034515765)
+pr: SIMD3<Float>(7.5232942e-06, 0.09035312, 0.06565216)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 0.9510564, 0.30901688, 0.0], [0.0, -0.30901688, 0.9510564, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -2.977264e-05, -2.1631095e-05, 0.0], [2.9773151e-05, 1.0, 2.3627068e-05, 0.0], [2.163039e-05, -2.3627712e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[3.0306965e-05, -1.66396e-09, -1.2090636e-09], [-1.66396e-09, 1.0474588e-05, -1.4410568e-05], [-1.2090636e-09, -1.4410568e-05, 1.9835987e-05]])
+question: 6599141.0 5.5462093e+10
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -4.709896e-05, 1.5303367e-05, 0.0], [4.709801e-05, 1.0, 6.240295e-05, 0.0], [-1.5306307e-05, -6.240223e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(7.993897e-07, 0.12640901, -0.041071452)
+parentJoint.position SIMD3<Float>(0.0, 0.0, 0.0)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(7.993897e-07, 0.12640901, -0.041071452)
+pr: SIMD3<Float>(7.993896e-07, 0.126409, -0.04107145)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -4.709896e-05, 1.5303367e-05, 0.0], [4.709801e-05, 1.0, 6.240295e-05, 0.0], [-1.5306307e-05, -6.240223e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[5.8281545e-05, -4.0814543e-10, 1.326084e-10], [-4.0814543e-10, 5.568995e-06, 1.7126673e-05], [1.326084e-10, 1.7126673e-05, 5.2716972e-05]])
+question: 3431617.5 4.5248864e+10
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -5.5946843e-05, -1.3720249e-05, 0.0], [5.594742e-05, 1.0, 4.2225813e-05, 0.0], [1.3717886e-05, -4.222658e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(-0.04396776, 0.13532807, 1.8298808e-06)
+parentJoint.position SIMD3<Float>(0.0, 0.0, 0.0)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(-0.04396776, 0.13532807, 1.8298808e-06)
+pr: SIMD3<Float>(-0.043967757, 0.13532805, 1.8298807e-06)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -5.5946843e-05, -1.3720249e-05, 0.0], [5.594742e-05, 1.0, 4.2225813e-05, 0.0], [1.3717886e-05, -4.222658e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[4.5857887e-05, 1.4898034e-05, 2.2367488e-10], [1.4898034e-05, 4.8432858e-06, -6.8845507e-10], [2.2367488e-10, -6.8845507e-10, 5.069818e-05]])
+question: 3944914.5 6.6955067e+10
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -6.614135e-05, -2.149062e-05, 0.0], [6.614231e-05, 1.0, 4.4649303e-05, 0.0], [2.1487665e-05, -4.4650726e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rigidBody.composite.centerOfMass: SIMD3<Float>(2.7902984e-06, 0.14669369, 0.047665987)
+parentJoint.position SIMD3<Float>(0.0, 0.0, 0.0)
+rigidBody.composite.centerOfMass - parentJoint.position SIMD3<Float>(2.7902984e-06, 0.14669369, 0.047665987)
+pr: SIMD3<Float>(2.7902981e-06, 0.14669368, 0.047665983)
+parentRigidBody.transform simd_float4x4([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+rotation_local simd_float4x4([[1.0, -6.614135e-05, -2.149062e-05, 0.0], [6.614231e-05, 1.0, 4.4649303e-05, 0.0], [2.1487665e-05, -4.4650726e-05, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+inertiaTensor_jointSpace: simd_float3x3([[7.474005e-05, -1.4438089e-09, -4.691492e-10], [-1.4438089e-09, 7.141779e-06, -2.196521e-05], [-4.691492e-10, -2.196521e-05, 6.7602734e-05]])
+question: 2675940.5 4.484952e+10
+metal[0]:  parentRigidBody.rotation: ((1.000000,-0.000063,0.000021)(0.000066,0.951082,-0.308937)(-0.000000,0.308937,0.951082))
+metal[0]:  joint_localRotation(joint)((1.000000,-0.000006,-0.000000)(0.000006,1.000000,0.000008)(0.000000,-0.000008,1.000000))
+metal[0]:  childCompositeBody.centerOfMass: (0.000013,0.211025,-0.068549)
+metal[0]:  joint_position(joint, parentRigidBody)(0.000009,0.157620,-0.051202)
+metal[0]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000004,0.053405,-0.017347)
+metal[0]:  pr: (-0.000000,0.056151,0.000000)
+metal[0]:  parentRigidBody.rotation: ((1.000000,-0.000063,0.000021)(0.000066,0.951082,-0.308937)(-0.000000,0.308937,0.951082))
+metal[0]:  joint_localRotation(joint)((1.000000,-0.000006,-0.000000)(0.000006,1.000000,0.000008)(0.000000,-0.000008,1.000000))
+metal[0]:  inertiaTensor_jointSpace: ((0.000004,0.000000,0.000000)(0.000000,0.000000,0.000000)(0.000000,-0.000000,0.000004))
+metal[0]:  question: 50997180.000000 50997180.000000
+metal[1]:  parentRigidBody.rotation: ((0.951083,0.308934,0.000000)(-0.308934,0.951083,0.000070)(0.000021,-0.000066,1.000000))
+metal[1]:  joint_localRotation(joint)((1.000000,-0.000006,-0.000000)(0.000006,1.000000,0.000005)(-0.000000,-0.000005,1.000000))
+metal[1]:  childCompositeBody.centerOfMass: (-0.068862,0.211994,0.000014)
+metal[1]:  joint_position(joint, parentRigidBody)(-0.054099,0.166543,0.000011)
+metal[1]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.014763,0.045451,0.000004)
+metal[1]:  pr: (-0.000000,0.047789,-0.000000)
+metal[1]:  parentRigidBody.rotation: ((0.951083,0.308934,0.000000)(-0.308934,0.951083,0.000070)(0.000021,-0.000066,1.000000))
+metal[1]:  joint_localRotation(joint)((1.000000,-0.000006,-0.000000)(0.000006,1.000000,0.000005)(-0.000000,-0.000005,1.000000))
+metal[1]:  inertiaTensor_jointSpace: ((0.000002,0.000000,-0.000000)(0.000000,0.000000,0.000000)(0.000000,0.000000,0.000002))
+metal[1]:  question: 87968808.000000 87968800.000000
+metal[2]:  parentRigidBody.rotation: ((1.000000,-0.000101,-0.000033)(0.000106,0.951035,0.309082)(-0.000000,-0.309082,0.951035))
+metal[2]:  joint_localRotation(joint)((1.000000,-0.000010,0.000000)(0.000010,1.000000,0.000007)(-0.000000,-0.000007,1.000000))
+metal[2]:  childCompositeBody.centerOfMass: (0.000022,0.219356,0.071288)
+metal[2]:  joint_position(joint, parentRigidBody)(0.000016,0.165004,0.053623)
+metal[2]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000007,0.054352,0.017665)
+metal[2]:  pr: (0.000000,0.057151,0.000000)
+metal[2]:  parentRigidBody.rotation: ((1.000000,-0.000101,-0.000033)(0.000106,0.951035,0.309082)(-0.000000,-0.309082,0.951035))
+metal[2]:  joint_localRotation(joint)((1.000000,-0.000010,0.000000)(0.000010,1.000000,0.000007)(-0.000000,-0.000007,1.000000))
+metal[2]:  inertiaTensor_jointSpace: ((0.000005,-0.000000,-0.000000)(-0.000000,0.000000,0.000000)(-0.000000,0.000000,0.000005))
+metal[2]:  question: 40673708.000000 40673696.000000
+metal[3]:  parentRigidBody.rotation: ((1.000000,-0.000047,0.000015)(0.000049,0.951076,-0.308958)(-0.000000,0.308958,0.951076))
+metal[3]:  joint_localRotation(joint)((1.000000,-0.000017,-0.000000)(0.000017,1.000000,0.000021)(0.000000,-0.000021,1.000000))
+metal[3]:  childCompositeBody.centerOfMass: (0.000011,0.186346,-0.060532)
+metal[3]:  joint_position(joint, parentRigidBody)(0.000005,0.100303,-0.032584)
+metal[3]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000006,0.086043,-0.027949)
+metal[3]:  pr: (0.000000,0.090469,0.000000)
+metal[3]:  parentRigidBody.rotation: ((1.000000,-0.000047,0.000015)(0.000049,0.951076,-0.308958)(-0.000000,0.308958,0.951076))
+metal[3]:  joint_localRotation(joint)((1.000000,-0.000017,-0.000000)(0.000017,1.000000,0.000021)(0.000000,-0.000021,1.000000))
+metal[3]:  inertiaTensor_jointSpace: ((0.000014,-0.000000,-0.000000)(-0.000000,0.000000,-0.000000)(-0.000000,-0.000000,0.000014))
+metal[3]:  question: 14186008.000000 14176902.000000
+metal[4]:   3431618.250000
+metal[4]:  rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[4]:  joint_localRotation(joint)((1.000000,-0.000047,0.000015)(0.000047,1.000000,0.000062)(-0.000015,-0.000062,1.000000))
+metal[4]:  childCompositeBody.centerOfMass: (0.000008,0.126412,-0.041064)
+metal[4]:  joint_position(joint, parentRigidBody)(0.000000,0.000000,0.000000)
+metal[4]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000008,0.126412,-0.041064)
+metal[4]:  pr: (0.000001,0.126409,-0.041071)
+metal[4]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[4]:  joint_localRotation(joint)((1.000000,-0.000047,0.000015)(0.000047,1.000000,0.000062)(-0.000015,-0.000062,1.000000))
+metal[4]:  inertiaTensor_jointSpace: ((0.000058,-0.000000,0.000000)(-0.000000,0.000006,0.000017)(0.000000,0.000017,0.000053))
+metal[4]:  question:
+metal[5]:  parentRigidBody.rotation: ((0.951074,0.308964,0.000000)(-0.308964,0.951074,0.000044)(0.000014,-0.000042,1.000000))
+metal[5]:  joint_localRotation(joint)((1.000000,-0.000032,0.000000)(0.000032,1.000000,0.000025)(-0.000000,-0.000025,1.000000))
+metal[5]:  childCompositeBody.centerOfMass: (-0.051903,0.159781,0.000010)
+metal[5]:  joint_position(joint, parentRigidBody)(-0.019216,0.059152,0.000003)
+metal[5]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.032687,0.100630,0.000007)
+metal[5]:  pr: (0.000000,0.105805,0.000000)
+metal[5]:  parentRigidBody.rotation: ((0.951074,0.308964,0.000000)(-0.308964,0.951074,0.000044)(0.000014,-0.000042,1.000000))
+metal[5]:  joint_localRotation(joint)((1.000000,-0.000032,0.000000)(0.000032,1.000000,0.000025)(-0.000000,-0.000025,1.000000))
+metal[5]:  inertiaTensor_jointSpace: ((0.000023,-0.000000,-0.000000)(-0.000000,0.000000,-0.000000)(-0.000000,-0.000000,0.000023))
+metal[5]:  question: 8557309.000000 8555909.000000
+metal[6]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[6]:  joint_localRotation(joint)((1.000000,-0.000056,-0.000014)(0.000056,1.000000,0.000042)(0.000014,-0.000042,1.000000))
+metal[6]:  childCompositeBody.centerOfMass: (-0.043960,0.135331,0.000009)
+metal[6]:  joint_position(joint, parentRigidBody)(0.000000,0.000000,0.000000)
+metal[6]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(-0.043960,0.135331,0.000009)
+metal[6]:  pr: (-0.043968,0.135328,0.000002)
+metal[6]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[6]:  joint_localRotation(joint)((1.000000,-0.000056,-0.000014)(0.000056,1.000000,0.000042)(0.000014,-0.000042,1.000000))
+metal[6]:  inertiaTensor_jointSpace: ((0.000046,0.000015,0.000000)(0.000015,0.000005,-0.000000)(0.000000,-0.000000,0.000051))
+metal[6]:  question: 3944917.750000 3944914.250000
+metal[7]:  parentRigidBody.rotation: ((1.000000,-0.000066,-0.000021)(0.000070,0.951043,0.309059)(-0.000000,-0.309059,0.951043))
+metal[7]:  joint_localRotation(joint)((1.000000,-0.000037,0.000000)(0.000037,1.000000,0.000024)(-0.000000,-0.000024,1.000000))
+metal[7]:  childCompositeBody.centerOfMass: (0.000018,0.179228,0.058246)
+metal[7]:  joint_position(joint, parentRigidBody)(0.000005,0.073010,0.023726)
+metal[7]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000012,0.106218,0.034521)
+metal[7]:  pr: (0.000000,0.111687,0.000000)
+metal[7]:  parentRigidBody.rotation: ((1.000000,-0.000066,-0.000021)(0.000070,0.951043,0.309059)(-0.000000,-0.309059,0.951043))
+metal[7]:  joint_localRotation(joint)((1.000000,-0.000037,0.000000)(0.000037,1.000000,0.000024)(-0.000000,-0.000024,1.000000))
+metal[7]:  inertiaTensor_jointSpace: ((0.000030,-0.000000,-0.000000)(-0.000000,0.000000,-0.000000)(-0.000000,-0.000000,0.000030))
+metal[7]:  question: 6602009.500000 6599145.500000
+metal[8]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[8]:  joint_localRotation(joint)((1.000000,-0.000066,-0.000021)(0.000066,1.000000,0.000045)(0.000021,-0.000045,1.000000))
+metal[8]:  childCompositeBody.centerOfMass: (0.000014,0.146692,0.047673)
+metal[8]:  joint_position(joint, parentRigidBody)(0.000000,0.000000,0.000000)
+metal[8]:  childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)(0.000014,0.146692,0.047673)
+metal[8]:  pr: (0.000003,0.146694,0.047666)
+metal[8]:  parentRigidBody.rotation: ((1.000000,0.000000,0.000000)(0.000000,1.000000,0.000000)(0.000000,0.000000,1.000000))
+metal[8]:  joint_localRotation(joint)((1.000000,-0.000066,-0.000021)(0.000066,1.000000,0.000045)(0.000021,-0.000045,1.000000))
+metal[8]:  inertiaTensor_jointSpace: ((0.000075,-0.000000,-0.000000)(-0.000000,0.000007,-0.000022)(-0.000000,-0.000022,0.000068))
+metal[8]:  question: 2675940.500000 2675939.750000
+/Users/nickkallen/Documents/TreePhysics/TreePhysicsTests/SimulatorComparisonTests.swift:79: error: -[TreePhysicsTests.SimulatorComparisonTests testUpdate] : XCTAssertEqualWithAccuracy failed: ("3.7201634e-08") is not equal to ("-0.00013302147") +/- ("0.0001") - iteration[1].rigidBody[2].y
+/Users/nickkallen/Documents/TreePhysics/TreePhysicsTests/SimulatorComparisonTests.swift:79: error: -[TreePhysicsTests.SimulatorComparisonTests testUpdate] : XCTAssertEqualWithAccuracy failed: ("-2.3368648e-07") is not equal to ("0.00021746384") +/- ("0.0001") - iteration[1].rigidBody[3].y
+Test Case '-[TreePhysicsTests.SimulatorComparisonTests testUpdate]' failed (0.141 seconds).
+Test Suite 'SimulatorComparisonTests' failed at 2019-08-22 14:17:45.817.
+Executed 1 test, with 2 failures (0 unexpected) in 0.141 (0.142) seconds
+Test Suite 'TreePhysicsTests.xctest' failed at 2019-08-22 14:17:45.818.
+Executed 1 test, with 2 failures (0 unexpected) in 0.141 (0.143) seconds
+Test Suite 'Selected tests' failed at 2019-08-22 14:17:45.818.
+Executed 1 test, with 2 failures (0 unexpected) in 0.141 (0.144) seconds

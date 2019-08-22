@@ -25,13 +25,10 @@ func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
     if b2_4ac == 0 {
         return .real(-b / _2a)
     } else if b2_4ac > 0 {
-        if b < 0 {
-            fatalError("The spring coefficient should never be 0") // FIXME remove
-        } else {
-            let r2 = (-b - sqrt(b2_4ac)) / (2.0*a)
-            let r1 = c / (a * r2)
-            return .realDistinct(r1, r2)
-        }
+        let r2 = (-b - sqrt(b2_4ac)) / (2.0*a)
+        let r1 = c / (a * r2)
+//        print("b=\(b), c=\(c)")
+        return .realDistinct(r1, r2)
     } else {
         let imaginaryPart = sqrt(-b2_4ac) / _2a
         let realPart = -b / _2a
@@ -77,6 +74,7 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
             r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
         return float3(y, y_ddt, y_d2dt)
     case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
+//        print(".realDistinct(c1: \(c1), c2: \(c2), r1: \(r1), r2: \(r2), k: \(k))")
         let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
         let y_ddt = r1*c1*powf(.e,r1*t) + r2*c2*powf(.e,r2*t)
         let y_d2dt = r1*r1*c1 * powf(.e,r1*t) + r2*r2*c2 * powf(.e,r2*t)
@@ -200,13 +198,6 @@ func matrix4x4_scale(_ sx: Float, _ sy: Float, _ sz: Float) -> matrix_float4x4 {
 
 func rotate(_ x: float3, by radians: Float, axis: float3) -> float3 {
     return (matrix4x4_rotation(radians: radians, axis: axis) * float4(x, 0)).xyz
-}
-
-func matrix3x3_rotation(from: matrix_float4x4, to: matrix_float4x4) -> matrix_float3x3 {
-    return matrix_float3x3.init(columns:
-        (float3(dot(to.columns.0, from.columns.0), dot(to.columns.1, from.columns.0), dot(to.columns.2, from.columns.0)),
-         float3(dot(to.columns.0, from.columns.1), dot(to.columns.1, from.columns.1), dot(to.columns.2, from.columns.1)),
-         float3(dot(to.columns.0, from.columns.2), dot(to.columns.1, from.columns.2), dot(to.columns.2, from.columns.2))))
 }
 
 func matrix3x3_rotation(from transform: matrix_float4x4) -> matrix_float3x3 {

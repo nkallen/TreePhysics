@@ -22,8 +22,10 @@ template <class T>
 inline vec<T, 3> joint_rotateVector(
                                     JointStruct joint,
                                     RigidBodyStruct parentRigidBody,
-                                    vec<T, 3> vector)
+                                    vec<T, 3> vector, thread Debug & debug)
 {
+    debug << "parentRigidBody.rotation: " << parentRigidBody.rotation << "\n";
+    debug << "joint_localRotation(joint)" << joint_localRotation(joint) << "\n";
     return (matrix<T, 3, 3>)joint_worldToLocalRotation(joint, parentRigidBody) * vector;
 }
 
@@ -49,12 +51,21 @@ updateJoint(
             JointStruct joint,
             RigidBodyStruct parentRigidBody,
             CompositeBodyStruct childCompositeBody,
-            float time)
+            float time, thread Debug & debug)
 {
-    float3 pr = joint_rotateVector(joint, parentRigidBody, float3(childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)));
+    float3 pr = joint_rotateVector(joint, parentRigidBody, childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody), debug);
 
-    float3x3 inertiaTensor_jointSpace = joint_rotateTensor(joint, parentRigidBody, childCompositeBody.inertiaTensor) - (float)childCompositeBody.mass * sqr(crossMatrix(pr));
-    float3 torque_jointSpace = joint_rotateVector(joint, parentRigidBody, (float3)childCompositeBody.torque);
+    debug << "childCompositeBody.centerOfMass: " << childCompositeBody.centerOfMass << "\n";
+    debug << "joint_position(joint, parentRigidBody)" << joint_position(joint, parentRigidBody) << "\n";
+    debug << "childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody)" << childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody) << "\n";
+    debug << "pr: " << pr << "\n";
+//    debug << "childCompositeBody.inertiaTensor: " << childCompositeBody.inertiaTensor << "\n";
+//    debug << "joint_rotateTensor(joint, parentRigidBody, childCompositeBody.inertiaTensor): " << joint_rotateTensor(joint, parentRigidBody, childCompositeBody.inertiaTensor) << "\n";
+//    debug << "pr.crossMatrix: " << crossMatrix(pr) << "\n";
+//    debug << "rigidBody.composite.mass * sqr(pr.crossMatrix): " << childCompositeBody.mass * sqr(crossMatrix(pr)) << "\n";
+
+    float3x3 inertiaTensor_jointSpace = joint_rotateTensor(joint, parentRigidBody, childCompositeBody.inertiaTensor) - childCompositeBody.mass * sqr(crossMatrix(pr));
+    float3 torque_jointSpace = joint_rotateVector(joint, parentRigidBody, childCompositeBody.torque, debug);
 
     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
     // K is a spring stiffness matrix, θ = euler angles of the joint,
@@ -73,6 +84,10 @@ updateJoint(
     float3x3 A = L_inverse * ((float)joint.k * float3x3(1)) * L_transpose_inverse;
 
     float4 q = diagonalize(A);
+    debug << "inertiaTensor_jointSpace: " << inertiaTensor_jointSpace << "\n";
+//    debug << "L: " << L << "\n";
+//    debug << "A[0]: " << A[0] << "\n";
+//    debug << "A[2]: " << A[2] << "\n";
     float3x3 X = qmat(q);
     float3x3 Λ_M = transpose(X) * A * X;
     float3 Λ = float3(Λ_M[0][0], Λ_M[1][1], Λ_M[2][2]);
@@ -89,16 +104,19 @@ updateJoint(
     float3x3 U_inverse = inverse(U);
 
     float3 torque_diagonal = U_transpose * torque_jointSpace;
-    float3 θ_diagonal_0 = U_inverse * (float3)joint.θ[0];
-    float3 θ_ddt_diagonal_0 = U_inverse * (float3)joint.θ[1];
+    float3 θ_diagonal_0 = U_inverse * joint.θ[0];
+    float3 θ_ddt_diagonal_0 = U_inverse * joint.θ[1];
     float3 βΛ = 0.02 * Λ; // FIXME Tree.B
 
     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
     // differential equations, θ'' + bθ' + kθ = f
 
-    float3 solution_i = evaluateDifferential(1.0, βΛ.x, Λ.x, torque_diagonal.x, θ_diagonal_0.x, θ_ddt_diagonal_0.x, (float)time);
-    float3 solution_ii = evaluateDifferential(1.0, βΛ.y, Λ.y, torque_diagonal.y, θ_diagonal_0.y, θ_ddt_diagonal_0.y, (float)time);
-    float3 solution_iii = evaluateDifferential(1.0, βΛ.z, Λ.z, torque_diagonal.z, θ_diagonal_0.z, θ_ddt_diagonal_0.z, (float)time);
+    float3 solution_i = evaluateDifferential(1.0, βΛ.x, Λ.x, torque_diagonal.x, θ_diagonal_0.x, θ_ddt_diagonal_0.x, time, debug);
+//    debug << "evaluating y:\n";
+    float3 solution_ii = evaluateDifferential(1.0, βΛ.y, Λ.y, torque_diagonal.y, θ_diagonal_0.y, θ_ddt_diagonal_0.y, time, debug);
+//    debug << "=======\n";
+    debug << "question: " << Λ.y << " " << Λ.z << "\n";
+    float3 solution_iii = evaluateDifferential(1.0, βΛ.z, Λ.z, torque_diagonal.z, θ_diagonal_0.z, θ_ddt_diagonal_0.z, time, debug);
 
     float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
@@ -112,10 +130,10 @@ updateJoints(
              device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
              device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
              constant float * time [[ buffer(BufferIndexTime) ]],
-             uint gid [[ thread_position_in_grid ]])
-//             device char * buf [[ buffer(BufferIndexDebugString) ]])
+             uint gid [[ thread_position_in_grid ]],
+             device char * buf [[ buffer(BufferIndexDebugString) ]])
 {
-//    Debug debug = Debug(buf + gid*8192, 8192);
+    Debug debug = Debug(buf + gid*8192, 8192);
 
     JointStruct joint = joints[gid];
     RigidBodyStruct rigidBody = rigidBodies[gid];
@@ -123,7 +141,7 @@ updateJoints(
     if (rigidBody.parentId != -1) {
         RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
         CompositeBodyStruct compositeBody = compositeBodies[gid];
-        joint = updateJoint(joint, parentRigidBody, compositeBody, *time);
+        joint = updateJoint(joint, parentRigidBody, compositeBody, *time, debug);
         joints[gid] = joint;
     }
 }

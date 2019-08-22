@@ -14,3 +14,55 @@ This is my favorite error:
 
 Fatal error: 'try!' expression unexpectedly raised an error: Error Domain=AGXMetalA11 Code=3 "Failed to materializeAll." UserInfo={NSLocalizedDescription=Failed to materializeAll.}: file /Users/nickkallen/Documents/TreePhysics/TreePhysics/Physics/Encoders/MetalKernal.swift, line 14
 
+
+===
+
+let captureManager = MTLCaptureManager.shared()
+captureManager.startCapture(device: device)
+print(captureManager.isCapturing)
+
+...
+
+captureManager.stopCapture()
+
+
+===
+
+let captureManager = MTLCaptureManager.shared()
+
+guard captureManager.supportsDestination(.gpuTraceDocument) else
+{
+print("Capture to a GPU tracefile is not supported")
+return
+}
+
+let captureDescriptor = MTLCaptureDescriptor()
+captureDescriptor.captureObject = self.device
+captureDescriptor.destination = .gpuTraceDocument
+captureDescriptor.outputURL = self.traceURL
+
+==
+
+TODO -- make composite bodies and joints memoryless.
+
+==
+
+// Create myCaptureScope outside of your rendering loop.
+myCaptureScope?.begin()
+let commandBuffer = commandQueue.makeCommandBuffer()!
+// Do Metal work
+commandBuffer.commit()
+myCaptureScope?.end()
+
+
+====
+
+enum kind_en { knothing, kint, kfloat, kstring };
+struct value_st {
+enum kind_en kind;
+union {
+int n;     // when kint
+float f;   // when kfloat
+char* s;   // when kstring
+};
+};

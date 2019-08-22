@@ -48,16 +48,12 @@ class SimulatorComparisonTests: XCTestCase {
 
     func testUpdate() {
         let expect = expectation(description: "wait")
-        tick(2, expect)
+        tick(10, expect)
         waitForExpectations(timeout: 10, handler: {error in})
     }
 
     func tick(_ n: Int, _ expect: XCTestExpectation) {
         guard n > 0 else { expect.fulfill(); return }
-
-        let captureManager = MTLCaptureManager.shared()
-        captureManager.startCapture(device: device)
-        print(captureManager.isCapturing)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
@@ -72,14 +68,16 @@ class SimulatorComparisonTests: XCTestCase {
             let joints = UnsafeMutableRawPointer(metalSimulator.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: metalSimulator.rigidBodies.count)
 
             for i in 0..<(metalSimulator.rigidBodies.count-1) {
-                let message = "iteration[\(i)]"
+                let message = "iteration[\(n)].rigidBody[\(i)]"
                 XCTAssertEqual(rigidBodies[i].force, metalSimulator.rigidBodies[i].force, accuracy: 0.00001, message)
                 XCTAssertEqual(rigidBodies[i].torque, metalSimulator.rigidBodies[i].torque, accuracy: 0.00001, message)
 
                 XCTAssertEqual(compositeBodies[i].force,  metalSimulator.rigidBodies[i].composite.force, accuracy: 0.00001, message)
                 XCTAssertEqual(compositeBodies[i].torque, metalSimulator.rigidBodies[i].composite.torque, accuracy: 0.00001, message)
 
-                XCTAssertEqual(joints[i].θ,  metalSimulator.rigidBodies[i].parentJoint!.θ, accuracy: 0.0001, message)
+                XCTAssertEqual(joints[i].θ[0],  metalSimulator.rigidBodies[i].parentJoint!.θ[0], accuracy: 0.00001, message)
+                XCTAssertEqual(joints[i].θ[1],  metalSimulator.rigidBodies[i].parentJoint!.θ[1], accuracy: 0.0001, message)
+                XCTAssertEqual(joints[i].θ[2],  metalSimulator.rigidBodies[i].parentJoint!.θ[2], accuracy: 0.001, message)
 
                 XCTAssertEqual(rigidBodies[i].position, metalSimulator.rigidBodies[i].position, accuracy: 0.0001, message)
                 XCTAssertEqual(rigidBodies[i].centerOfMass, metalSimulator.rigidBodies[i].centerOfMass, accuracy: 0.0001, message)
@@ -90,6 +88,5 @@ class SimulatorComparisonTests: XCTestCase {
         }
 
         commandBuffer.commit()
-        captureManager.stopCapture()
     }
 }

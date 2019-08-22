@@ -2,8 +2,6 @@ import Foundation
 import simd
 import SceneKit
 
-fileprivate let local_ijk = matrix_float4x4(diagonal: float4(1,1,1,0))
-
 final class Joint: HasTransform {
     unowned let parentRigidBody: RigidBody
     let childRigidBody: RigidBody
@@ -28,16 +26,17 @@ final class Joint: HasTransform {
         let eulerAngles = θ[0]
         let rotation_local = matrix4x4_rotation(rotation: eulerAngles)
         self.transform = parentRigidBody.transform * translation_local * rotation_local
-        self.rotation_world2local = matrix3x3_rotation(from: local_ijk, to: transform.inverse)
+        self.rotation_world2local = matrix3x3_rotation(from: transform.inverse)
     }
 
-    @inline(__always)
     func rotate(tensor: float3x3) -> float3x3 {
         return rotation_world2local * tensor * rotation_world2local.transpose
     }
 
-    @inline(__always)
     func rotate(vector: float3) -> float3 {
+        print("parentRigidBody.transform", parentRigidBody.transform)
+        print("rotation_local", matrix4x4_rotation(rotation: θ[0]))
+//        print("vector", vector)
         return rotation_world2local * vector
     }
 

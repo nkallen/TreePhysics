@@ -2,7 +2,6 @@ import Foundation
 import SceneKit
 
 fileprivate var i = 0
-fileprivate let local_ijk = matrix_float4x4(diagonal: float4(1,1,1,0))
 
 final class RigidBody: HasTransform {
     enum Kind {
