@@ -51,16 +51,16 @@ class Game: NSObject {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 9)
         
-        let configuration = Interpreter<SkinningPen>.Configuration(
+        let configuration = Interpreter<RigidBodyPen>.Configuration(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,
             thicknessScale: 0.9,
             stepSize: 0.1,
             stepSizeScale: 0.9)
-        let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
+        let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
         interpreter.interpret(lSystem)
         let tree = Tree(root)
         self.simulator = Simulator(tree: tree)
@@ -97,13 +97,13 @@ class Game: NSObject {
         
         let node = SCNNode(geometry: geometry)
         node.skinner = skinner
-        
+
         scene.rootNode.addChildNode(node)
         scene.rootNode.addChildNode(parent)
-        //        for bone in boneNodes {
-        //            scene.rootNode.addChildNode(bone)
-        //        }
-        
+        for bone in boneNodes {
+            scene.rootNode.addChildNode(bone)
+        }
+
         // Forces:
         let gravityField = GravityField(float3.zero)
         let attractorField = AttractorField()
@@ -116,7 +116,8 @@ class Game: NSObject {
         self.gravityField = gravityField
         self.attractorField = attractorField
         self.attractor = attractor
-        
+
+        // FIXME move to metalSim
         self.commandQueue = device.makeCommandQueue()!
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.rigidBodies = rigidBodies
@@ -147,18 +148,19 @@ extension Game: SCNSceneRendererDelegate {
             1,
             radius * cosf(Float(start.timeIntervalSinceNow)))
         pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
-//        simulator.update(at: 1.0 / 60)
+        //        simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
         
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        let debug = KernelDebugger(device: device, count: rigidBodies.count, maxChars: 8192)
         resetForces.encode(commandBuffer: commandBuffer)
         applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
-        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
+        updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
-        updateRigidBodies.encode(commandBuffer: debug.wrap(commandBuffer))
+        updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
             self.queue.async {
+                return ()
+
                 let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodies.count)
                 let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.rigidBodies.count)
                 let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodies.count)
@@ -173,7 +175,7 @@ extension Game: SCNSceneRendererDelegate {
                     self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
                 }
                 if quit {
-                    debug.print()
+                    //                    debug.print()
                     for i in 0..<self.rigidBodies.count {
                         print(i, compositeBodies[i])
                         print(i, joints[i])

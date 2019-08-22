@@ -145,7 +145,6 @@
 		9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriterTests.swift; sourceTree = "<group>"; };
 		9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsField.swift; sourceTree = "<group>"; };
 		9E9D4B8922F37244007DCF49 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9E9D4B8A22F37244007DCF49 /* TreePhysics-macOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TreePhysics-macOS copy-Info.plist"; path = "/Users/nickkallen/Documents/TreePhysics/TreePhysics-macOS copy-Info.plist"; sourceTree = "<absolute>"; };
 		9E9D4B8D22F372E4007DCF49 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		9E9D4B8F22F373DA007DCF49 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9E9D4B9322F438FA007DCF49 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
@@ -307,7 +306,6 @@
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
 				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
 				9EE7EB9F22DDDC6C00535997 /* Products */,
-				9E9D4B8A22F37244007DCF49 /* TreePhysics-macOS copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -324,16 +322,16 @@
 		9EE7EBA022DDDC6C00535997 /* TreePhysics */ = {
 			isa = PBXGroup;
 			children = (
+				9EE7EBCB22E1078200535997 /* NOTES */,
+				9E1C70F8230C6FB200DA9929 /* SCRATCH */,
 				9E9D4B6922F36FFC007DCF49 /* Application */,
 				9E9D4B6422F313BD007DCF49 /* Physics */,
 				9EEC11E322F0E3D20078BBFD /* Util */,
 				9E56C94322E78FA90095C8AC /* Tree */,
-				9EE7EBCB22E1078200535997 /* NOTES */,
 				9E036B1D22E4F57900229235 /* L-Systems */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
 				9EE7EBA722DDDC6E00535997 /* Assets.xcassets */,
-				9E1C70F8230C6FB200DA9929 /* SCRATCH */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";
@@ -341,8 +339,8 @@
 		9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */ = {
 			isa = PBXGroup;
 			children = (
-				9EE7EBBB22DE1AD100535997 /* SimulatorTests.swift */,
 				9EE7EBBD22DE1AD100535997 /* Info.plist */,
+				9EE7EBBB22DE1AD100535997 /* SimulatorTests.swift */,
 				9E036B1B22E4F4A700229235 /* TurtleTests.swift */,
 				9E461B3622E704BD008AB788 /* CylinderTest.swift */,
 				9E56C94122E76C340095C8AC /* SkinnerTest.swift */,

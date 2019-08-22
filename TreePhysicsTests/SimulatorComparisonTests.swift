@@ -48,12 +48,16 @@ class SimulatorComparisonTests: XCTestCase {
 
     func testUpdate() {
         let expect = expectation(description: "wait")
-        tick(1, expect)
+        tick(2, expect)
         waitForExpectations(timeout: 10, handler: {error in})
     }
 
     func tick(_ n: Int, _ expect: XCTestExpectation) {
         guard n > 0 else { expect.fulfill(); return }
+
+        let captureManager = MTLCaptureManager.shared()
+        captureManager.startCapture(device: device)
+        print(captureManager.isCapturing)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
@@ -75,16 +79,17 @@ class SimulatorComparisonTests: XCTestCase {
                 XCTAssertEqual(compositeBodies[i].force,  metalSimulator.rigidBodies[i].composite.force, accuracy: 0.00001, message)
                 XCTAssertEqual(compositeBodies[i].torque, metalSimulator.rigidBodies[i].composite.torque, accuracy: 0.00001, message)
 
-//                XCTAssertEqual(joints[i].θ,  metalSimulator.rigidBodies[i].parentJoint!.θ, accuracy: 0.00001, message)
-//
-//                XCTAssertEqual(rigidBodies[i].position, metalSimulator.rigidBodies[i].position, message)
-//                XCTAssertEqual(rigidBodies[i].centerOfMass, metalSimulator.rigidBodies[i].centerOfMass, accuracy: 0.00001, message)
-//                XCTAssertEqual(rigidBodies[i].inertiaTensor, metalSimulator.rigidBodies[i].inertiaTensor, accuracy: 0.00001, message)
+                XCTAssertEqual(joints[i].θ,  metalSimulator.rigidBodies[i].parentJoint!.θ, accuracy: 0.0001, message)
+
+                XCTAssertEqual(rigidBodies[i].position, metalSimulator.rigidBodies[i].position, accuracy: 0.0001, message)
+                XCTAssertEqual(rigidBodies[i].centerOfMass, metalSimulator.rigidBodies[i].centerOfMass, accuracy: 0.0001, message)
+                XCTAssertEqual(rigidBodies[i].inertiaTensor, metalSimulator.rigidBodies[i].inertiaTensor, accuracy: 0.00001, message)
             }
 
             self.tick(n - 1, expect)
         }
 
         commandBuffer.commit()
+        captureManager.stopCapture()
     }
 }

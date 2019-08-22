@@ -34,6 +34,7 @@ final class RigidBody: HasTransform {
     
     init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
         self.name = "Branch[\(i)]"
+        print(name)
         i += 1
         
         self.kind = kind
