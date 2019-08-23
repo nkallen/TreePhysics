@@ -3,26 +3,20 @@ import SceneKit
 
 class Scene: NSObject {
     let scene: SCNScene
-    private let simulator: Simulator
+    // FIXME rename CPUSimulator
     let gravityField: GravityField
     let attractorField: AttractorField
     let attractor: SCNNode
 
+    private let metalSimulator: MetalSimulator
+    private let cpuSimulator: Simulator
+
     let device: MTLDevice, commandQueue: MTLCommandQueue
-    let updateCompositeBodies: UpdateCompositeBodiesKernel
-    let updateJoints: UpdateJointsKernel
-    let updateRigidBodies: UpdateRigidBodiesKernel
-    let resetForces: ResetForcesKernel
-    let applyPhysicsFields: ApplyPhysicsFieldsKernel
-    
-    let rigidBodies: [RigidBody]
-    let rigidBodiesBuffer: MTLBuffer
-    let compositeBodiesBuffer: MTLBuffer
-    let jointsBuffer: MTLBuffer
     
     override init() {
         self.device = MTLCreateSystemDefaultDevice()!
-        
+        self.commandQueue = device.makeCommandQueue()!
+
         self.scene = SCNScene()
         
         let cameraNode = SCNNode()
@@ -60,7 +54,7 @@ class Scene: NSObject {
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
         let tree = Tree(root)
-        self.simulator = Simulator(tree: tree)
+        self.cpuSimulator = Simulator(tree: tree)
         
         scene.rootNode.addChildNode(skinningPen.node)
         scene.rootNode.addChildNode(skinningPen.skeleton)
@@ -68,9 +62,7 @@ class Scene: NSObject {
         // Forces:
         let gravityField = GravityField(float3.zero)
         let attractorField = AttractorField()
-        simulator.add(field: gravityField)
-        simulator.add(field: attractorField)
-        
+
         let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
         scene.rootNode.addChildNode(attractor)
         
@@ -78,23 +70,11 @@ class Scene: NSObject {
         self.attractorField = attractorField
         self.attractor = attractor
 
-        // FIXME move to metalSim
-        self.commandQueue = device.makeCommandQueue()!
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
-        self.rigidBodies = rigidBodies
-        self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModeShared])!
-        self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
-        
-        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodies.count, device: device)
-        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
-        
-        self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
+        self.metalSimulator = MetalSimulator(device: device, root: root)
 
-        self.resetForces = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
-        self.applyPhysicsFields = ApplyPhysicsFieldsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
+        cpuSimulator.add(field: gravityField)
+        cpuSimulator.add(field: attractorField)
+        metalSimulator.add(field: attractorField)
     }
 }
 
@@ -113,23 +93,18 @@ extension Scene: SCNSceneRendererDelegate {
 //            radius * cosf(Float(start.timeIntervalSinceNow)))
 //        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
 
-//        simulator.update(at: 1.0 / 60)
+//        cpuSimulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        resetForces.encode(commandBuffer: commandBuffer)
-        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
-        updateCompositeBodies.encode(commandBuffer: commandBuffer)
-        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
-        updateRigidBodies.encode(commandBuffer: commandBuffer)
+        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         commandBuffer.addCompletedHandler { [unowned self] _ in
+            let metalSimulator = self.metalSimulator
             DispatchQueue.main.async {
+                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
 
-
-                let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodies.count)
-
-                for i in 0..<(self.rigidBodies.count-1) {
-                    self.rigidBodies[i].node.simdPosition = rigidBodies[i].position
+                for i in 0..<(metalSimulator.rigidBodies.count-1) {
+                    metalSimulator.rigidBodies[i].node.simdPosition = rigidBodies[i].position
                 }
             }
         }

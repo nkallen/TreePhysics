@@ -1,8 +1,9 @@
 import Foundation
 import MetalKit
+import MetalPerformanceShaders
 
 class MetalSimulator {
-    private let device: MTLDevice, commandQueue: MTLCommandQueue
+    private let device: MTLDevice
 
     private let updateCompositeBodies: UpdateCompositeBodiesKernel
     private let updateJoints: UpdateJointsKernel
@@ -22,7 +23,6 @@ class MetalSimulator {
 
     init(device: MTLDevice, root: RigidBody) {
         self.device = device
-        self.commandQueue = device.makeCommandQueue()!
 
         // Initialize buffers:
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
