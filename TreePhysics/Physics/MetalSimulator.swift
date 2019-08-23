@@ -25,12 +25,10 @@ class MetalSimulator {
         self.device = device
 
         // Initialize buffers:
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.rigidBodies = rigidBodies
         self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModePrivate])!
+        self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
         self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
 
         // Initialize encoders:

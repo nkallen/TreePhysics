@@ -47,7 +47,12 @@ final class UpdateJoints: MetalKernelEncoder {
     }
 
     static func buffer(count: Int, device: MTLDevice) -> MTLBuffer {
-        let buffer = device.makeBuffer(length: count * MemoryLayout<JointStruct>.stride, options: [.storageModePrivate])!
+        #if os(macOS)
+        let options: MTLResourceOptions = [.storageModePrivate]
+        #elseif os(iOS)
+        let options: MTLResourceOptions = [.storageModeMemoryless]
+        #endif
+        let buffer = device.makeBuffer(length: count * MemoryLayout<JointStruct>.stride, options: options)!
         return buffer
     }
 }

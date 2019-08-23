@@ -46,7 +46,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         commandEncoder.endEncoding()
     }
 
-    static func buffer(root: RigidBody, device: MTLDevice) -> ([RigidBody], MTLBuffer, [Range<Int>]) {
+    static func rigidBodiesBuffer(root: RigidBody, device: MTLDevice) -> ([RigidBody], MTLBuffer, [Range<Int>]) {
         var rangesOfWork: [Range<Int>] = []
         let levels = root.levels()
         var offset = 0
@@ -94,6 +94,16 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         rigidBodyStructs[index[root]!] = `struct`(rigidBody: root, index: index)
         rigidBodies.append(root)
         return (rigidBodies, buffer, rangesOfWork)
+    }
+
+    static func compositeBodiesBuffer(count: Int, device: MTLDevice) -> MTLBuffer {
+        #if os(macOS)
+        let options: MTLResourceOptions = [.storageModePrivate]
+        #elseif os(iOS)
+        let options: MTLResourceOptions = [.storageModeMemoryless]
+        #endif
+        let buffer = device.makeBuffer(length: count * MemoryLayout<CompositeBodyStruct>.stride, options: options)!
+        return buffer
     }
 
     typealias ChildIdsType = (Int32, Int32, Int32)

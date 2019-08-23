@@ -24,7 +24,7 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         root.add(b1, at: float3(0,0,-Float.pi/4))
         b1.add(b2, at: float3(0,0,-Float.pi/4))
 
-        let (rigidBodies, rigidBodiesBuffer, _) = UpdateCompositeBodies.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, _) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
 
         self.applyPhysicsFields = ApplyPhysicsFields(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
     }
@@ -58,7 +58,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        self.device = MTLCreateSystemDefaultDevice()!
+        self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
         self.root = RigidBody()
@@ -68,10 +68,8 @@ class UpdateCompositeBodiesTests: XCTestCase {
         b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModeShared])!
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
+        self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
 
         self.updateCompositeBodies = UpdateCompositeBodies(rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
     }
@@ -80,7 +78,6 @@ class UpdateCompositeBodiesTests: XCTestCase {
         let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         let expect = expectation(description: "wait")
-        let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
@@ -144,10 +141,8 @@ class UpdateJointsTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModeShared])!
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
+        self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
         self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
 
         self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
@@ -215,11 +210,9 @@ class UpdateRigidBodiesTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModeShared])!
+        self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
         self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
 
         self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
