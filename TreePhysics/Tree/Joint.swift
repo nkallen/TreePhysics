@@ -10,7 +10,8 @@ final class Joint: HasTransform {
     // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3 = float3x3(0)
     private(set) var rotation_world2local: float3x3 = matrix_identity_float3x3
-    private let translation_local: float4x4
+    let translation_local: float4x4
+    let position_local: float3
 
     let k: Float
 
@@ -19,6 +20,7 @@ final class Joint: HasTransform {
         self.childRigidBody = child
         self.k = Joint.computeK(radius: parent.radius, length: parent.length)
         self.translation_local = matrix4x4_translation(0, parentRigidBody.length, 0)
+        self.position_local = float3(0, parentRigidBody.length, 0)
         updateTransform()
     }
 

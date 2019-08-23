@@ -84,6 +84,7 @@ final class CPUSimulator {
 
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
                     rigidBody.composite.mass * sqr(pr.crossMatrix)
+
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
 
                 // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,

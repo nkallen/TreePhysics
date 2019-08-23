@@ -27,15 +27,20 @@ final class RigidBody: HasTransform {
     let length: Float
     let radius: Float
     private let inertiaTensor_local: float3x3
-    var inertiaTensor: float3x3
-    
-    private(set) var transform: matrix_float4x4 = matrix_identity_float4x4
-    var centerOfMass: float3 = float3.zero
-    var force: float3 = float3.zero
-    var torque: float3 = float3.zero
     let centerOfMass_local: float3
     var rotation_local: float4x4 = matrix_identity_float4x4
-    
+
+    var force: float3 = float3.zero
+    var torque: float3 = float3.zero
+
+    var inertiaTensor: float3x3
+    private(set) var transform: matrix_float4x4 = matrix_identity_float4x4
+    var centerOfMass: float3 = float3.zero
+    var angularVelocity: float3 = float3.zero
+    var angularAcceleration: float3 = float3.zero
+    var velocity: float3 = float3.zero
+    var acceleration: float3 = float3.zero
+
     let node: SCNNode
     
     init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
@@ -99,15 +104,24 @@ final class RigidBody: HasTransform {
     }
     
     func updateTransform() {
-        if let parentJoint = parentJoint {
-            self.transform = parentJoint.transform * rotation_local
-        } else {
-            self.transform = matrix_identity_float4x4
-        }
+        guard let parentJoint = parentJoint else { return }
+        let parentRigidBody = parentJoint.parentRigidBody
+
+        self.transform = parentJoint.transform * rotation_local
         node.simdTransform = self.transform
         
         let rotation = matrix3x3_rotation(from: transform)
+        let parentJointRotation = matrix3x3_rotation(from: parentJoint.transform)
         self.inertiaTensor = rotation * inertiaTensor_local * rotation.transpose
+
+        self.angularVelocity = parentRigidBody.angularVelocity + parentJointRotation * parentJoint.θ[1]
+        self.angularAcceleration = parentRigidBody.angularAcceleration + parentJointRotation * parentJoint.θ[2] + parentRigidBody.angularVelocity.crossMatrix * self.angularVelocity
+
+        let parentRigidBodyRotation = matrix3x3_rotation(from: parentRigidBody.transform)
+
+        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBodyRotation * parentJoint.position_local - self.angularVelocity.crossMatrix * rotation * (-centerOfMass_local)
+        self.acceleration = parentRigidBody.acceleration + (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBodyRotation * parentJoint.position_local - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation * (-centerOfMass_local)
+
         
         self.centerOfMass = convert(position: centerOfMass_local)
     }
