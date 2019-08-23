@@ -42,4 +42,46 @@ final class SkinningPen: Pen {
     var branch: SkinningPen {
         return SkinningPen(cylinderPen: cylinderPen.branch, rigidBodyPen: rigidBodyPen.branch, parent: self)
     }
+
+    var node: SCNNode {
+        var boneNodes: [SCNNode] = []
+        var boneInverseBindTransforms: [NSValue] = []
+        var boneWeights: [Float] = Array(repeating: 1.0, count: cylinderPen.vertices.count)
+        var boneIndices: Indices = Array(repeating: 0, count: cylinderPen.vertices.count)
+
+        for (boneIndex, bone) in bones.enumerated() {
+            let (vertexIndices, rigidBody) = bone
+            let node = rigidBody.node
+            boneNodes.append(node)
+            boneInverseBindTransforms.append(NSValue(scnMatrix4: SCNMatrix4Invert(node.worldTransform)))
+            for vertexIndex in vertexIndices {
+                boneIndices[Int(vertexIndex)] = UInt16(boneIndex)
+            }
+        }
+
+        let boneWeightsData = Data(bytesNoCopy: &boneWeights, count: boneWeights.count * MemoryLayout<Float>.size, deallocator: .none)
+        let boneIndicesData = Data(bytesNoCopy: &boneIndices, count: boneWeights.count * MemoryLayout<UInt16>.size, deallocator: .none)
+
+        let boneWeightsGeometrySource = SCNGeometrySource(data: boneWeightsData, semantic: .boneWeights, vectorCount: boneWeights.count, usesFloatComponents: true, componentsPerVector: 1, bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0, dataStride: MemoryLayout<Float>.size)
+        let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<UInt16>.size, dataOffset: 0, dataStride: MemoryLayout<UInt16>.size)
+
+        let skinner = SCNSkinner(baseGeometry: cylinderPen.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
+
+        let node = SCNNode(geometry: cylinderPen.geometry)
+        node.skinner = skinner
+
+        return node
+    }
+
+    var skeleton: SCNNode {
+        let skeleton = SCNNode()
+
+        for bone in bones {
+            let (_, rigidBody) = bone
+            let node = rigidBody.node
+            skeleton.addChildNode(node)
+        }
+
+        return skeleton
+    }
 }
