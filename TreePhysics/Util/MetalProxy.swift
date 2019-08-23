@@ -262,3 +262,221 @@ class MTLComputeCommandEncoderProxy: NSObject, MTLComputeCommandEncoder {
     }
     #endif
 }
+
+class MTLDeviceProxy: NSObject, MTLDevice {
+    let underlying: MTLDevice
+
+    init(_ underlying: MTLDevice) {
+        self.underlying = underlying
+    }
+
+    var name: String { return underlying.name }
+
+    var registryID: UInt64 { return underlying.registryID }
+
+    var maxThreadsPerThreadgroup: MTLSize { return underlying.maxThreadsPerThreadgroup }
+
+    var readWriteTextureSupport: MTLReadWriteTextureTier { return underlying.readWriteTextureSupport }
+
+    var argumentBuffersSupport: MTLArgumentBuffersTier { return underlying.argumentBuffersSupport }
+
+    var areRasterOrderGroupsSupported: Bool { return underlying.areRasterOrderGroupsSupported }
+
+    var currentAllocatedSize: Int { return underlying.currentAllocatedSize }
+
+    func makeCommandQueue() -> MTLCommandQueue? {
+        return underlying.makeCommandQueue()
+    }
+
+    func makeCommandQueue(maxCommandBufferCount: Int) -> MTLCommandQueue? {
+        return underlying.makeCommandQueue(maxCommandBufferCount: maxCommandBufferCount)
+    }
+
+    func heapTextureSizeAndAlign(descriptor desc: MTLTextureDescriptor) -> MTLSizeAndAlign {
+        return underlying.heapTextureSizeAndAlign(descriptor: desc)
+    }
+
+    func heapBufferSizeAndAlign(length: Int, options: MTLResourceOptions = []) -> MTLSizeAndAlign {
+        return underlying.heapBufferSizeAndAlign(length: length, options: options)
+    }
+
+    func makeHeap(descriptor: MTLHeapDescriptor) -> MTLHeap? {
+        return underlying.makeHeap(descriptor: descriptor)
+    }
+
+    func makeBuffer(length: Int, options: MTLResourceOptions = []) -> MTLBuffer? {
+        return underlying.makeBuffer(length: length, options: options)
+    }
+
+    func makeBuffer(bytes pointer: UnsafeRawPointer, length: Int, options: MTLResourceOptions = []) -> MTLBuffer? {
+        return underlying.makeBuffer(bytes: pointer, length: length, options: options)
+    }
+
+    func makeBuffer(bytesNoCopy pointer: UnsafeMutableRawPointer, length: Int, options: MTLResourceOptions = [], deallocator: ((UnsafeMutableRawPointer, Int) -> Void)? = nil) -> MTLBuffer? {
+        return underlying.makeBuffer(bytesNoCopy: pointer, length: length, options: options, deallocator: deallocator)
+    }
+
+    func makeDepthStencilState(descriptor: MTLDepthStencilDescriptor) -> MTLDepthStencilState? {
+        return underlying.makeDepthStencilState(descriptor: descriptor)
+    }
+
+    func makeTexture(descriptor: MTLTextureDescriptor) -> MTLTexture? {
+        return underlying.makeTexture(descriptor: descriptor)
+    }
+
+    func makeSamplerState(descriptor: MTLSamplerDescriptor) -> MTLSamplerState? {
+        return underlying.makeSamplerState(descriptor: descriptor)
+    }
+
+    func makeDefaultLibrary() -> MTLLibrary? {
+        return underlying.makeDefaultLibrary()
+    }
+
+    func makeDefaultLibrary(bundle: Bundle) throws -> MTLLibrary {
+        return try underlying.makeDefaultLibrary(bundle: bundle)
+    }
+
+    func makeLibrary(filepath: String) throws -> MTLLibrary {
+        return try underlying.makeLibrary(filepath: filepath)
+    }
+
+    func makeLibrary(URL url: URL) throws -> MTLLibrary {
+        return try underlying.makeLibrary(URL: url)
+    }
+
+    func makeLibrary(data: __DispatchData) throws -> MTLLibrary {
+        return try underlying.makeLibrary(data: data)
+    }
+
+    func makeLibrary(source: String, options: MTLCompileOptions?) throws -> MTLLibrary {
+        return try underlying.makeLibrary(source: source, options: options)
+    }
+
+    func makeLibrary(source: String, options: MTLCompileOptions?, completionHandler: @escaping MTLNewLibraryCompletionHandler) {
+        return underlying.makeLibrary(source: source, options: options, completionHandler: completionHandler)
+    }
+
+    func makeRenderPipelineState(descriptor: MTLRenderPipelineDescriptor) throws -> MTLRenderPipelineState {
+        return try underlying.makeRenderPipelineState(descriptor: descriptor)
+    }
+
+    func makeRenderPipelineState(descriptor: MTLRenderPipelineDescriptor, options: MTLPipelineOption, reflection: AutoreleasingUnsafeMutablePointer<MTLAutoreleasedRenderPipelineReflection?>?) throws -> MTLRenderPipelineState {
+        return try underlying.makeRenderPipelineState(descriptor: descriptor, options: options, reflection: reflection)
+    }
+
+    func makeRenderPipelineState(descriptor: MTLRenderPipelineDescriptor, completionHandler: @escaping MTLNewRenderPipelineStateCompletionHandler) {
+        return underlying.makeRenderPipelineState(descriptor: descriptor, completionHandler: completionHandler)
+    }
+
+    func makeRenderPipelineState(descriptor: MTLRenderPipelineDescriptor, options: MTLPipelineOption, completionHandler: @escaping MTLNewRenderPipelineStateWithReflectionCompletionHandler) {
+        return underlying.makeRenderPipelineState(descriptor: descriptor, options: options, completionHandler: completionHandler)
+    }
+
+    func makeComputePipelineState(function computeFunction: MTLFunction) throws -> MTLComputePipelineState {
+        return try underlying.makeComputePipelineState(function: computeFunction)
+    }
+
+    func makeComputePipelineState(function computeFunction: MTLFunction, options: MTLPipelineOption, reflection: AutoreleasingUnsafeMutablePointer<MTLAutoreleasedComputePipelineReflection?>?) throws -> MTLComputePipelineState {
+        return try underlying.makeComputePipelineState(function: computeFunction, options: options, reflection: reflection)
+    }
+
+    func makeComputePipelineState(function computeFunction: MTLFunction, completionHandler: @escaping MTLNewComputePipelineStateCompletionHandler) {
+        return underlying.makeComputePipelineState(function: computeFunction, completionHandler: completionHandler)
+    }
+
+    func makeComputePipelineState(function computeFunction: MTLFunction, options: MTLPipelineOption, completionHandler: @escaping MTLNewComputePipelineStateWithReflectionCompletionHandler) {
+        return underlying.makeComputePipelineState(function: computeFunction, options: options, completionHandler: completionHandler)
+    }
+
+    func makeComputePipelineState(descriptor: MTLComputePipelineDescriptor, options: MTLPipelineOption, reflection: AutoreleasingUnsafeMutablePointer<MTLAutoreleasedComputePipelineReflection?>?) throws -> MTLComputePipelineState {
+        return try underlying.makeComputePipelineState(descriptor: descriptor, options: options, reflection: reflection)
+    }
+
+    func makeComputePipelineState(descriptor: MTLComputePipelineDescriptor, options: MTLPipelineOption, completionHandler: @escaping MTLNewComputePipelineStateWithReflectionCompletionHandler) {
+        return underlying.makeComputePipelineState(descriptor: descriptor, options: options, completionHandler: completionHandler)
+    }
+
+    func makeFence() -> MTLFence? {
+        return underlying.makeFence()
+    }
+
+    func supportsFeatureSet(_ featureSet: MTLFeatureSet) -> Bool {
+        return underlying.supportsFeatureSet(featureSet)
+    }
+
+    func supportsTextureSampleCount(_ sampleCount: Int) -> Bool {
+        return underlying.supportsTextureSampleCount(sampleCount)
+    }
+
+    func minimumLinearTextureAlignment(for format: MTLPixelFormat) -> Int {
+        return underlying.minimumLinearTextureAlignment(for: format)
+    }
+
+    func minimumTextureBufferAlignment(for format: MTLPixelFormat) -> Int {
+        return underlying.minimumTextureBufferAlignment(for: format)
+    }
+
+    var maxThreadgroupMemoryLength: Int { return underlying.maxThreadgroupMemoryLength }
+
+    var maxArgumentBufferSamplerCount: Int { return underlying.maxArgumentBufferSamplerCount }
+
+    var areProgrammableSamplePositionsSupported: Bool { return underlying.areRasterOrderGroupsSupported }
+
+    func __getDefaultSamplePositions(_ positions: UnsafeMutablePointer<MTLSamplePosition>, count: Int) {
+        return underlying.__getDefaultSamplePositions(positions, count: count)
+    }
+
+    func makeArgumentEncoder(arguments: [MTLArgumentDescriptor]) -> MTLArgumentEncoder? {
+        return underlying.makeArgumentEncoder(arguments: arguments)
+    }
+
+    func makeIndirectCommandBuffer(descriptor: MTLIndirectCommandBufferDescriptor, maxCommandCount maxCount: Int, options: MTLResourceOptions = []) -> MTLIndirectCommandBuffer? {
+        return underlying.makeIndirectCommandBuffer(descriptor: descriptor, maxCommandCount: maxCount, options: options)
+    }
+
+    func makeEvent() -> MTLEvent? {
+        return underlying.makeEvent()
+    }
+
+    func makeSharedEvent() -> MTLSharedEvent? {
+        return underlying.makeSharedEvent()
+    }
+
+    func makeSharedEvent(handle sharedEventHandle: MTLSharedEventHandle) -> MTLSharedEvent? {
+        return underlying.makeSharedEvent(handle: sharedEventHandle)
+    }
+
+    var maxBufferLength: Int { return underlying.maxBufferLength }
+
+    #if os(iOS)
+    func makeRenderPipelineState(tileDescriptor descriptor: MTLTileRenderPipelineDescriptor, options: MTLPipelineOption, reflection: AutoreleasingUnsafeMutablePointer<MTLAutoreleasedRenderPipelineReflection?>?) throws -> MTLRenderPipelineState {
+        return try underlying.makeRenderPipelineState(tileDescriptor: descriptor, options: options, reflection: reflection)
+    }
+
+    func makeRenderPipelineState(tileDescriptor descriptor: MTLTileRenderPipelineDescriptor, options: MTLPipelineOption, completionHandler: @escaping MTLNewRenderPipelineStateWithReflectionCompletionHandler) {
+        return underlying.makeRenderPipelineState(tileDescriptor: descriptor, options: options, completionHandler: completionHandler)
+    }
+    #else
+    var isLowPower: Bool { return underlying.isLowPower }
+
+    var isHeadless: Bool { return underlying.isHeadless }
+
+    var isRemovable: Bool { return underlying.isRemovable }
+
+    var recommendedMaxWorkingSetSize: UInt64 { return underlying.recommendedMaxWorkingSetSize }
+
+    var isDepth24Stencil8PixelFormatSupported: Bool { return underlying.isDepth24Stencil8PixelFormatSupported }
+
+    func makeTexture(descriptor: MTLTextureDescriptor, iosurface: IOSurfaceRef, plane: Int) -> MTLTexture? {
+        return underlying.makeTexture(descriptor: descriptor, iosurface: iosurface, plane: plane)
+    }
+
+    func makeSharedTexture(descriptor: MTLTextureDescriptor) -> MTLTexture? {
+        return underlying.makeSharedTexture(descriptor: descriptor)
+    }
+
+    func makeSharedTexture(handle sharedHandle: MTLSharedTextureHandle) -> MTLTexture? {
+        return underlying.makeSharedTexture(handle: sharedHandle)
+    }
+    #endif
+}
