@@ -268,21 +268,14 @@ class UpdateRigidBodiesTests: XCTestCase {
     }
 }
 
-// FIXME: make both of these use the metal simulator.
 class AdvancedMetalTests: XCTestCase {
-    var updateCompositeBodies: UpdateCompositeBodies!
-    var updateJoints: UpdateJoints!
-    var updateRigidBodies: UpdateRigidBodies!
-    var resetForces: ResetForces!
-
     var device: MTLDevice!
     var commandQueue: MTLCommandQueue!
-    var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
-    var root, b1, b2, b3, b4, b5, b6, b7, b8, b9: RigidBody!
     let force: float3 = float3(0, 1, 0) // world coordinates
 
     var cpuSimulator: CPUSimulator!
+    var metalSimulator: MetalSimulator!
 
     var expecteds: [RigidBody]!
 
@@ -292,16 +285,16 @@ class AdvancedMetalTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = RigidBody()
-        self.b1 = RigidBody()
-        self.b2 = RigidBody()
-        self.b3 = RigidBody()
-        self.b4 = RigidBody()
-        self.b5 = RigidBody()
-        self.b6 = RigidBody()
-        self.b7 = RigidBody()
-        self.b8 = RigidBody()
-        self.b9 = RigidBody()
+        let root = RigidBody()
+        let b1 = RigidBody()
+        let b2 = RigidBody()
+        let b3 = RigidBody()
+        let b4 = RigidBody()
+        let b5 = RigidBody()
+        let b6 = RigidBody()
+        let b7 = RigidBody()
+        let b8 = RigidBody()
+        let b9 = RigidBody()
 
         root.add(b1)
         b1.add(b2)
@@ -313,44 +306,31 @@ class AdvancedMetalTests: XCTestCase {
         b7.add(b8)
         b7.add(b9)
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
-        self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModeShared])!
-        self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
+        b9.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
-        self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
-        self.updateJoints = UpdateJoints(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
-        self.updateRigidBodies = UpdateRigidBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
-        self.resetForces = ResetForces(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
-
-        cpuSimulator = CPUSimulator(root: root)
-        self.expecteds = rigidBodies
+        self.cpuSimulator = CPUSimulator(root: root)
+        self.metalSimulator = MetalSimulator(device: device, root: root)
     }
 
     func testUpdate() {
         let expect = expectation(description: "wait")
-        let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
-        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0/60)
-        updateRigidBodies.encode(commandBuffer: commandBuffer)
-        resetForces.encode(commandBuffer: commandBuffer)
 
+        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0/60)
         cpuSimulator.update(at: 1.0 / 60)
 
         commandBuffer.addCompletedHandler { _ in
-            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.expecteds.count)
-            let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.expecteds.count)
-            let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.expecteds.count)
+            let metalSimulator = self.metalSimulator!
+            let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let compositeBodies = UnsafeMutableRawPointer(metalSimulator.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let joints = UnsafeMutableRawPointer(metalSimulator.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: metalSimulator.rigidBodies.count)
 
-            for i in 0..<(self.expecteds.count-1) {
+            for i in 0..<(metalSimulator.rigidBodies.count-1) {
                 let compositeBody = compositeBodies[i]
                 let joint = joints[i]
                 let rigidBody = rigidBodies[i]
-                let expected = self.expecteds[i]
+                let expected = metalSimulator.rigidBodies[i]
 
                 XCTAssertEqual(expected.composite, compositeBody, accuracy: 0.01)
                 if let parentJoint = expected.parentJoint {
@@ -372,10 +352,11 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
     var updateRigidBodies: UpdateRigidBodies!
 
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
-    var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
     var cpuSimulator: CPUSimulator!
-    var expecteds: [RigidBody]!
+    var metalSimulator: MetalSimulator!
+
+    let force: float3 = float3(0, 1, 0) // world coordinates
 
     override func setUp() {
         super.setUp()
@@ -396,44 +377,31 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
         interpreter.interpret(lSystem)
 
+        root.flattened().last!.apply(force: force, at: 1)
+
         self.cpuSimulator = CPUSimulator(root: root)
-
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
-        self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.compositeBodiesBuffer = device.makeBuffer(
-            length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModeShared])!
-        self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
-
-        self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
-        self.updateJoints = UpdateJoints(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
-
-        self.updateRigidBodies = UpdateRigidBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
-
-        self.expecteds = rigidBodies
+        self.metalSimulator = MetalSimulator(device: device, root: root)
     }
 
     func testUpdate() {
         let expect = expectation(description: "wait")
-        let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
-        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0/60)
-        updateRigidBodies.encode(commandBuffer: commandBuffer)
 
         cpuSimulator.update(at: 1.0 / 60)
+        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0/60)
 
         commandBuffer.addCompletedHandler { _ in
-            let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.expecteds.count)
-            let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.expecteds.count)
-            let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.expecteds.count)
+            let metalSimulator = self.metalSimulator!
+            let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let compositeBodies = UnsafeMutableRawPointer(metalSimulator.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let joints = UnsafeMutableRawPointer(metalSimulator.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: metalSimulator.rigidBodies.count)
 
-            for i in 0..<(self.expecteds.count-1) {
+            for i in 0..<(metalSimulator.rigidBodies.count-1) {
                 let compositeBody = compositeBodies[i]
                 let joint = joints[i]
                 let rigidBody = rigidBodies[i]
-                let expected = self.expecteds[i]
+                let expected = metalSimulator.rigidBodies[i]
 
                 XCTAssertEqual(expected, rigidBody, accuracy: 0.001)
                 XCTAssertEqual(expected.composite, compositeBody, accuracy: 0.0001)

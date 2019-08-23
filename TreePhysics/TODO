@@ -1,5 +1,4 @@
-FIXME remove all debug.wrap code
-FIXME use memoryless
-make it so it's easy to switch between updating the joint as its own kernel and have it be embedded in update composite bodies
-debugger using function constant?
-
+- FIXME use memoryless
+- make it so it's easy to switch between updating the joint as its own kernel and have it be embedded in update composite bodies
+- debugger using function constant?
+- generic physics fields

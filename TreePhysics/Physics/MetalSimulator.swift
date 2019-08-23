@@ -42,10 +42,12 @@ class MetalSimulator {
     }
 
     func encode(commandBuffer: MTLCommandBuffer, at time: TimeInterval) {
-        resetForces.encode(commandBuffer: commandBuffer)
-        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.fields.first!)
+        if let field = fields.first {
+            applyPhysicsFields.encode(commandBuffer: commandBuffer, field: field)
+        }
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
+        resetForces.encode(commandBuffer: commandBuffer)
     }
 }
