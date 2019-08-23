@@ -312,8 +312,6 @@ class AdvancedMetalTests: XCTestCase {
         b7.add(b8)
         b7.add(b9)
 
-        b9.apply(force: force, at: 1)
-
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = device.makeBuffer(

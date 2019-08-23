@@ -18,12 +18,13 @@ final class Simulator {
         fields.append(field)
     }
 
+    // FIXME find nice way of resetting forces
     func update(at time: TimeInterval) {
-        resetForces()
         updateFields(at: time)
         updateCompositeBodies()
         updateJoints(at: time)
         updateRigidBodies()
+        resetForces()
     }
 
     func updateFields(at time: TimeInterval) {
@@ -119,7 +120,7 @@ final class Simulator {
                 let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y)
                 let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z)
 
-                let θ_diagonal = matrix_float3x3(rows: [
+                let θ_diagonal = float3x3(rows: [
                     evaluate(differential: solution_i, at: Float(time)),
                     evaluate(differential: solution_ii, at: Float(time)),
                     evaluate(differential: solution_iii, at: Float(time))])

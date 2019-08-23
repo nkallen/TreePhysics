@@ -50,9 +50,9 @@ class Game: NSObject {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFFFA]/////[!"&FFFFFFFFFA]/////[!"&FFFFFFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
-        
+
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
@@ -79,7 +79,7 @@ class Game: NSObject {
             let (vertexIndices, rigidBody) = bone
             let node = rigidBody.node
             boneNodes.append(node)
-            node.isHidden = true
+//            node.isHidden = true
             parent.addChildNode(node)
             boneInverseBindTransforms.append(NSValue(scnMatrix4: SCNMatrix4Invert(node.worldTransform)))
             for vertexIndex in vertexIndices {
@@ -140,48 +140,77 @@ class Game: NSObject {
 var start = Date()
 
 let radius: Float = 3
+var done: Bool = false
+
 extension Game: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        let pov = renderer.pointOfView!
-        pov.simdPosition = float3(
-            radius * sinf(Float(start.timeIntervalSinceNow)),
-            1,
-            radius * cosf(Float(start.timeIntervalSinceNow)))
-        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
-        //        simulator.update(at: 1.0 / 60)
+
+        //        let pov = renderer.pointOfView!
+//        pov.simdPosition = float3(
+//            radius * sinf(Float(start.timeIntervalSinceNow)),
+//            1,
+//            radius * cosf(Float(start.timeIntervalSinceNow)))
+//        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
+
+//        simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
-        
+
+        let debug = KernelDebugger(device: device, count: rigidBodies.count, maxChars: 1024, label: "metal")
+
         let commandBuffer = commandQueue.makeCommandBuffer()!
         resetForces.encode(commandBuffer: commandBuffer)
-        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
+        applyPhysicsFields.encode(commandBuffer: debug.wrap(commandBuffer), field: self.attractorField)
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
-        commandBuffer.addCompletedHandler { _ in
-            self.queue.async {
-                return ()
+        commandBuffer.addCompletedHandler { [unowned self] _ in
+            DispatchQueue.main.async {
+
+                var printed = 0
 
                 let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodies.count)
                 let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.rigidBodies.count)
                 let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodies.count)
-                var quit = false
-                for i in 0..<self.rigidBodies.count {
-                    let forceDiff = self.rigidBodies[i].force - float3(rigidBodies[i].force)
-                    let torqueDiff = self.rigidBodies[i].torque - float3(rigidBodies[i].torque)
 
-                    if float3(compositeBodies[i].centerOfMass).x.isNaN {
-                        quit = true
-                    }
-                    self.rigidBodies[i].node.simdPosition = float3(rigidBodies[i].position)
-                }
-                if quit {
-                    //                    debug.print()
-                    for i in 0..<self.rigidBodies.count {
-                        print(i, compositeBodies[i])
-                        print(i, joints[i])
-                        print(i, rigidBodies[i])
-                    }
-                    fatalError()
+                for i in 0..<(self.rigidBodies.count-1) {
+                    self.rigidBodies[i].node.simdPosition = rigidBodies[i].position
+
+//                    let lc = self.rigidBodies[i].composite
+//                    let rc = compositeBodies[i]
+//
+//                    if (lc.mass - rc.mass > 0.001 || length(lc.force - rc.force) > 0.001 || length(lc.torque - rc.torque) > 0.001 || length(lc.centerOfMass - rc.centerOfMass) > 0.001) && printed < 10{
+//                        printed += 1
+//                        print(i, "======")
+//                        debug.print()
+//                        print(lc.mass - rc.mass, lc.mass, rc.mass)
+//                        print(lc.force - rc.force, lc.force, rc.force)
+//                        print(lc.torque - rc.torque, lc.torque, rc.torque)
+//                        print(lc.centerOfMass - rc.centerOfMass, lc.centerOfMass, rc.centerOfMass)
+//                    }
+//
+//
+//                    let lj = self.rigidBodies[i].parentJoint!
+//                    let rj = joints[i]
+//
+//                    if length(lj.θ[0] - rj.θ[0]) > 0.0001 && printed < 10 {
+//                        printed += 1
+//                        print(i, "======")
+//                        print(length(lj.θ[0] - rj.θ[0]), lj.θ[0], rj.θ[0])
+//                    }
+
+                    //                                        let lr = self.rigidBodies[i]
+                    //                    let ll = rigidBodies[i]
+                    //
+                    //                    if length(lr.position - ll.position) > 0.0001 {
+                    //                        print(i, "======")
+                    //                        print(length(lr.position - ll.position), lr.position - ll.position, lr.position, ll.position)
+                    //                    }
+
+//                    rigidBodies[i].position = self.rigidBodies[i].position
+//                    rigidBodies[i].rotation = self.rigidBodies[i].rotation
+//                    rigidBodies[i].inertiaTensor = self.rigidBodies[i].inertiaTensor
+//                    rigidBodies[i].centerOfMass = self.rigidBodies[i].centerOfMass
+
                 }
             }
         }

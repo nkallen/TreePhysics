@@ -5,58 +5,6 @@ import SceneKit
 
 class RigidBodyTests: XCTestCase {
 
-    func testFoo() {
-        let bytes: [uint16] = [
-            0
-            , 1
-            , 10
-            , 100
-            , 16384
-            , 0
-            , 0
-            , 0
-            , 0
-            , 0
-            ,  0
-            ,  139
-            ,  0
-            ,  0
-            ,  0
-            ,  139
-            ,  0
-            ,  0
-            ,  0
-            ,  139
-            ,  0
-            ,  0
-            ,  0
-            ,  139
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            ,  0
-            , 0]
-        let compositeBodies = UnsafeMutableRawPointer(mutating: bytes).bindMemory(to: CompositeBodyStruct.self, capacity: 1)
-        print(compositeBodies.pointee)
-    }
-
     func testFlattenIsBreadthFirst() {
         let root = RigidBody()
         let b1 = RigidBody()

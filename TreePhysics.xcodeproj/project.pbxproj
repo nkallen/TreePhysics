@@ -144,6 +144,10 @@
 		9E56C94C22E7929B0095C8AC /* SkinningPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinningPen.swift; sourceTree = "<group>"; };
 		9E62078322F8A7E6005E99C8 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		9E6372A122FEC7AA001D4466 /* MetalProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalProxy.swift; sourceTree = "<group>"; };
+		9E8024B3230FD2BD0019B482 /* longay.th2014.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = longay.th2014.pdf; sourceTree = "<group>"; };
+		9E8024B4230FD2BE0019B482 /* colonization.egwnp2007.large.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = colonization.egwnp2007.large.pdf; sourceTree = "<group>"; };
+		9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT16_07F09_Lec26.pdf; sourceTree = "<group>"; };
+		9E8024B6230FD2BF0019B482 /* selforg.sig2009.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = selforg.sig2009.pdf; sourceTree = "<group>"; };
 		9E8E27BE2307335300652DAC /* Print.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Print.metal; sourceTree = "<group>"; };
 		9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorComparisonTests.swift; sourceTree = "<group>"; };
 		9E8F711E230D87C200583AAE /* MetalSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalSimulator.swift; sourceTree = "<group>"; };
@@ -254,6 +258,10 @@
 		9E4C09F8230ED45700F1DD6B /* References */ = {
 			isa = PBXGroup;
 			children = (
+				9E8024B4230FD2BE0019B482 /* colonization.egwnp2007.large.pdf */,
+				9E8024B3230FD2BD0019B482 /* longay.th2014.pdf */,
+				9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */,
+				9E8024B6230FD2BF0019B482 /* selforg.sig2009.pdf */,
 				9E4C09F9230ED46D00F1DD6B /* 606_delivering_optimized_metal_apps_and_games.pdf */,
 				9E4C09FB230ED4B300F1DD6B /* stanford2017-01.pdf */,
 				9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */,

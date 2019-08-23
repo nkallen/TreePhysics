@@ -388,6 +388,12 @@ private:
     size_t maxlen;
 
 public:
+    Debug(device char *buf, uint gid, size_t maxlen)
+    {
+        this->buf = buf + gid*maxlen;
+        this->maxlen = maxlen;
+    }
+
     Debug(device char *buf, size_t maxlen)
     {
         this->buf = buf;
