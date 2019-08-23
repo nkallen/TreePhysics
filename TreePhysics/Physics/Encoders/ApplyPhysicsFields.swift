@@ -2,7 +2,7 @@ import Foundation
 import MetalKit
 import Metal
 
-final class ResetForcesKernel: MetalKernel {
+final class ApplyPhysicsFields: MetalKernelEncoder {
     let rigidBodiesBuffer: MTLBuffer
     let numRigidBodies: Int
 
@@ -10,14 +10,16 @@ final class ResetForcesKernel: MetalKernel {
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.numRigidBodies = numRigidBodies
 
-        super.init(device: device, name: "resetForces")
+        super.init(device: device, name: "applyPhysicsFields")
     }
 
-    func encode(commandBuffer: MTLCommandBuffer) {
+    func encode(commandBuffer: MTLCommandBuffer, field: PhysicsField) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(computePipelineState)
-        commandEncoder.label  = "Reset Forces"
+        commandEncoder.label  = "Apply Physics Fields"
         commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
+        var `struct` = field.struct
+        commandEncoder.setBytes(&`struct`, length: MemoryLayout<PhysicsFieldStruct>.stride, index: BufferIndex.physicsField.rawValue)
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)

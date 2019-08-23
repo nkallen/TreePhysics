@@ -6,7 +6,7 @@ import MetalKit
 fileprivate let sqrt2: Float = sqrt(2)
 
 class ApplyPhysicsFieldsTests: XCTestCase {
-    var applyPhysicsFieldsKernel: ApplyPhysicsFieldsKernel!
+    var applyPhysicsFields: ApplyPhysicsFields!
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer: MTLBuffer!
 
@@ -24,9 +24,9 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         root.add(b1, at: float3(0,0,-Float.pi/4))
         b1.add(b2, at: float3(0,0,-Float.pi/4))
 
-        let (rigidBodies, rigidBodiesBuffer, _) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, _) = UpdateCompositeBodies.buffer(root: root, device: device)
 
-        self.applyPhysicsFieldsKernel = ApplyPhysicsFieldsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
+        self.applyPhysicsFields = ApplyPhysicsFields(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
     }
 
     func testUpdate() {
@@ -34,7 +34,7 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        applyPhysicsFieldsKernel.encode(commandBuffer: commandBuffer, field: AttractorField())
+        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: AttractorField())
         commandBuffer.addCompletedHandler { _ in
             debug.print()
             
@@ -46,8 +46,8 @@ class ApplyPhysicsFieldsTests: XCTestCase {
     }
 }
 
-class UpdateCompositeBodiesKernelTests: XCTestCase {
-    var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
+class UpdateCompositeBodiesTests: XCTestCase {
+    var updateCompositeBodies: UpdateCompositeBodies!
 
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer: MTLBuffer!
@@ -68,12 +68,12 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
             options: [.storageModeShared])!
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateCompositeBodies = UpdateCompositeBodies(rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
     }
 
     func testUpdateCompositeBodies() {
@@ -83,7 +83,7 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer))
+        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
         commandBuffer.addCompletedHandler { _ in
             let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
@@ -119,9 +119,9 @@ class UpdateCompositeBodiesKernelTests: XCTestCase {
     }
 }
 
-class UpdateJointsKernelTests: XCTestCase {
-    var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
-    var updateJointsKernel: UpdateJointsKernel!
+class UpdateJointsTests: XCTestCase {
+    var updateCompositeBodies: UpdateCompositeBodies!
+    var updateJoints: UpdateJoints!
 
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer: MTLBuffer!
@@ -144,22 +144,22 @@ class UpdateJointsKernelTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
             options: [.storageModeShared])!
-        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodies.count, device: device)
+        self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
-        self.updateJointsKernel = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
+        self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateJoints = UpdateJoints(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
     }
 
     func testUpdateJoints() {
         let expect = expectation(description: "wait")
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
-        updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1/60)
+        updateCompositeBodies.encode(commandBuffer: commandBuffer)
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1/60)
         commandBuffer.addCompletedHandler { _ in
             let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: 2)
 
@@ -189,10 +189,10 @@ class UpdateJointsKernelTests: XCTestCase {
     }
 }
 
-class UpdateRigidBodiesKernelTests: XCTestCase {
-    var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
-    var updateJointsKernel: UpdateJointsKernel!
-    var updateRigidBodiesKernel: UpdateRigidBodiesKernel!
+class UpdateRigidBodiesTests: XCTestCase {
+    var updateCompositeBodies: UpdateCompositeBodies!
+    var updateJoints: UpdateJoints!
+    var updateRigidBodies: UpdateRigidBodies!
 
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
@@ -215,16 +215,16 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
             options: [.storageModeShared])!
-        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodies.count, device: device)
+        self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
-        self.updateJointsKernel = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
-        self.updateRigidBodiesKernel = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
+        self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateJoints = UpdateJoints(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
+        self.updateRigidBodies = UpdateRigidBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
     }
 
     func testUpdateRigidBodies() {
@@ -232,9 +232,9 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         let debug = KernelDebugger(device: device)
-        updateCompositeBodiesKernel.encode(commandBuffer: commandBuffer)
-        updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1/60)
-        updateRigidBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer))
+        updateCompositeBodies.encode(commandBuffer: commandBuffer)
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1/60)
+        updateRigidBodies.encode(commandBuffer: debug.wrap(commandBuffer))
         commandBuffer.addCompletedHandler { _ in
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 2)
 
@@ -269,10 +269,10 @@ class UpdateRigidBodiesKernelTests: XCTestCase {
 }
 
 class AdvancedMetalTests: XCTestCase {
-    var updateCompositeBodiesKernel: UpdateCompositeBodiesKernel!
-    var updateJointsKernel: UpdateJointsKernel!
-    var updateRigidBodiesKernel: UpdateRigidBodiesKernel!
-    var resetForcesKernel: ResetForcesKernel!
+    var updateCompositeBodies: UpdateCompositeBodies!
+    var updateJoints: UpdateJoints!
+    var updateRigidBodies: UpdateRigidBodies!
+    var resetForces: ResetForces!
 
     var device: MTLDevice!
     var commandQueue: MTLCommandQueue!
@@ -312,17 +312,17 @@ class AdvancedMetalTests: XCTestCase {
         b7.add(b8)
         b7.add(b9)
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
             options: [.storageModeShared])!
-        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodies.count, device: device)
+        self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
 
-        self.updateCompositeBodiesKernel = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
-        self.updateJointsKernel = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
-        self.updateRigidBodiesKernel = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
-        self.resetForcesKernel = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
+        self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateJoints = UpdateJoints(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
+        self.updateRigidBodies = UpdateRigidBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
+        self.resetForces = ResetForces(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
 
         cpuSimulator = CPUSimulator(tree: Tree(root))
         self.expecteds = rigidBodies
@@ -333,10 +333,10 @@ class AdvancedMetalTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodiesKernel.encode(commandBuffer: debug.wrap(commandBuffer))
-        updateJointsKernel.encode(commandBuffer: commandBuffer, at: 1.0/60)
-        updateRigidBodiesKernel.encode(commandBuffer: commandBuffer)
-        resetForcesKernel.encode(commandBuffer: commandBuffer)
+        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1.0/60)
+        updateRigidBodies.encode(commandBuffer: commandBuffer)
+        resetForces.encode(commandBuffer: commandBuffer)
 
         cpuSimulator.update(at: 1.0 / 60)
 
@@ -366,9 +366,9 @@ class AdvancedMetalTests: XCTestCase {
 }
 
 class EvenMoreAdvancedMetalTests: XCTestCase {
-    var updateCompositeBodies: UpdateCompositeBodiesKernel!
-    var updateJoints: UpdateJointsKernel!
-    var updateRigidBodies: UpdateRigidBodiesKernel!
+    var updateCompositeBodies: UpdateCompositeBodies!
+    var updateJoints: UpdateJoints!
+    var updateRigidBodies: UpdateRigidBodies!
 
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
@@ -398,17 +398,17 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         let tree = Tree(root)
         self.cpuSimulator = CPUSimulator(tree: tree)
 
-        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
+        let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
             options: [.storageModeShared])!
-        self.updateCompositeBodies = UpdateCompositeBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
+        self.updateCompositeBodies = UpdateCompositeBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, ranges: ranges, compositeBodiesBuffer: compositeBodiesBuffer)
 
-        self.jointsBuffer = UpdateJointsKernel.buffer(count: rigidBodies.count, device: device)
-        self.updateJoints = UpdateJointsKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
+        self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
+        self.updateJoints = UpdateJoints(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, numJoints: rigidBodies.count)
 
-        self.updateRigidBodies = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
+        self.updateRigidBodies = UpdateRigidBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
 
         self.expecteds = rigidBodies
     }

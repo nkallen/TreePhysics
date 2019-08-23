@@ -2,7 +2,7 @@ import Foundation
 import MetalKit
 import Metal
 
-final class UpdateJointsKernel: MetalKernel {
+final class UpdateJoints: MetalKernelEncoder {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
     let jointsBuffer: MTLBuffer

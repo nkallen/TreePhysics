@@ -3,7 +3,7 @@ import MetalKit
 
 let maxBuffersInFlight = 3
 
-class MetalKernel {
+class MetalKernelEncoder {
     let device: MTLDevice
     let computePipelineState: MTLComputePipelineState
 

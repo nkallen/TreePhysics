@@ -3,8 +3,7 @@ import MetalKit
 import Metal
 import SceneKit
 
-// FIXME rename encoder
-final class UpdateCompositeBodiesKernel: MetalKernel {
+final class UpdateCompositeBodies: MetalKernelEncoder {
     let rigidBodiesBuffer: MTLBuffer
     let compositeBodiesBuffer: MTLBuffer
     let ranges: [Range<Int>]
