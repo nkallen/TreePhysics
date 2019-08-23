@@ -69,9 +69,6 @@ class SimulatorComparisonTests: XCTestCase {
 
             for i in 0..<(metalSimulator.rigidBodies.count-1) {
                 let message = "iteration[\(n)].rigidBody[\(i)]"
-                XCTAssertEqual(rigidBodies[i].force, metalSimulator.rigidBodies[i].force, accuracy: 0.00001, message)
-                XCTAssertEqual(rigidBodies[i].torque, metalSimulator.rigidBodies[i].torque, accuracy: 0.00001, message)
-
                 XCTAssertEqual(compositeBodies[i].force,  metalSimulator.rigidBodies[i].composite.force, accuracy: 0.00001, message)
                 XCTAssertEqual(compositeBodies[i].torque, metalSimulator.rigidBodies[i].composite.torque, accuracy: 0.00001, message)
 
