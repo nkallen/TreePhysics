@@ -44,6 +44,7 @@
 		9E56C94B22E792820095C8AC /* RigidBodyPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94A22E792820095C8AC /* RigidBodyPen.swift */; };
 		9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
 		9E6372A222FEC7AA001D4466 /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
+		9E8024B8230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */; };
 		9E8E27BF2307335300652DAC /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
 		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
 		9E8F711F230D87C200583AAE /* MetalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711E230D87C200583AAE /* MetalSimulator.swift */; };
@@ -148,6 +149,7 @@
 		9E8024B4230FD2BE0019B482 /* colonization.egwnp2007.large.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = colonization.egwnp2007.large.pdf; sourceTree = "<group>"; };
 		9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT16_07F09_Lec26.pdf; sourceTree = "<group>"; };
 		9E8024B6230FD2BF0019B482 /* selforg.sig2009.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = selforg.sig2009.pdf; sourceTree = "<group>"; };
+		9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Metal-Shading-Language-Specification.pdf"; sourceTree = "<group>"; };
 		9E8E27BE2307335300652DAC /* Print.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Print.metal; sourceTree = "<group>"; };
 		9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorComparisonTests.swift; sourceTree = "<group>"; };
 		9E8F711E230D87C200583AAE /* MetalSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalSimulator.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 		9E4C09F8230ED45700F1DD6B /* References */ = {
 			isa = PBXGroup;
 			children = (
+				9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */,
 				9E8024B4230FD2BE0019B482 /* colonization.egwnp2007.large.pdf */,
 				9E8024B3230FD2BD0019B482 /* longay.th2014.pdf */,
 				9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */,
@@ -504,6 +507,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E4C09FD230ED50F00F1DD6B /* hanan.dis1992.pdf in Resources */,
+				9E8024B8230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf in Resources */,
 				9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */,
 				9E4C09FF230F11D900F1DD6B /* TODO in Resources */,
 				9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */,
