@@ -12,8 +12,6 @@ class SimulatorComparisonTests: XCTestCase {
 
     var attractorField: AttractorField!
 
-    var debug: KernelDebugger!
-
     override func setUp() {
         super.setUp()
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
@@ -41,8 +39,6 @@ class SimulatorComparisonTests: XCTestCase {
         metalSimulator.add(field: attractorField)
 
         attractorField.position = float3(0.1, 0.1, 0.1)
-
-        self.debug = KernelDebugger(device: device, count: metalSimulator.rigidBodies.count, maxChars: 8192, label: "metal")
     }
 
     func testUpdate() {
@@ -57,9 +53,8 @@ class SimulatorComparisonTests: XCTestCase {
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
         cpuSimulator.update(at: 1.0 / 60)
-        metalSimulator.encode(commandBuffer: debug.wrap(commandBuffer), at: 1.0 / 60)
+        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         commandBuffer.addCompletedHandler { _ in
-            self.debug.print()
             let metalSimulator = self.metalSimulator!
 
             let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)

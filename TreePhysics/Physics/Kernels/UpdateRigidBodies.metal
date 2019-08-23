@@ -1,7 +1,6 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
-#import "Print.metal"
 
 using namespace metal;
 
@@ -26,11 +25,11 @@ inline float3x3 rigidBody_localInertiaTensor(
     float mass = rigidBody.mass;
     float length = rigidBody.length;
     float radius = rigidBody.radius;
-    
+
     float momentOfInertiaAboutY = 1.0/12 * mass * length * length; // Moment of Inertia of a rod about its center of mass;
     float momentOfInertiaAboutX = 1.0/4 * mass * radius * radius; // MoI of a disc about its center
     float momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius; // ditto
-    
+
     // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
     // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
     return float3x3(momentOfInertiaAboutY + momentOfInertiaAboutX, 0, 0,
@@ -53,13 +52,13 @@ updateRigidBody(
     float3x3 parentJointLocalRotation = joint_localRotation(parentJoint);
     float3x3 parentJointRotation = parentRigidBody.rotation * parentJointLocalRotation;
     float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
-    
+
     rigidBody.rotation = parentJointRotation * rigidBody.localRotation;
     rigidBody.position = parentJointPosition;
-    
+
     rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * (float3x3)transpose(rigidBody.rotation);
     rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
-    
+
     return rigidBody;
 }
 
@@ -72,7 +71,7 @@ rigidBody_climbDown(
     RigidBodyStruct parentRigidBody, currentRigidBody;
     for (short i = rigidBody.climberCount - 1; i >= 0; i--) {
         int id = rigidBody.climberOffset + i;
-        
+
         RigidBodyStruct next = rigidBodies[id];
         JointStruct parentJoint = joints[id];
         if (i == rigidBody.climberCount - 1) {
@@ -81,7 +80,7 @@ rigidBody_climbDown(
             parentRigidBody = currentRigidBody;
         }
         currentRigidBody = next;
-        
+
         currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody);
         rigidBodies[id] = currentRigidBody;
     }
@@ -101,7 +100,7 @@ updateRigidBodies(
         int upperBound = range.y;
         if ((int)gid < upperBound - lowerBound) {
             int id = lowerBound + gid;
-            
+
             RigidBodyStruct rigidBody = rigidBodies[id];
             RigidBodyStruct parentRigidBody;
             if (rigidBody.climberCount > 0) {
@@ -111,7 +110,7 @@ updateRigidBodies(
             }
             // potentially can optimize away:
             const JointStruct parentJoint = joints[id];
-            
+
             rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
             rigidBodies[id] = rigidBody;
         }

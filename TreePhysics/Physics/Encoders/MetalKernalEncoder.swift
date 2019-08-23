@@ -22,19 +22,18 @@ class MetalKernelEncoder {
 
 class KernelDebugger {
     let stringBuffer: MTLBuffer
-    let count: Int
-    let maxChars: Int
+    var count: Int? = nil
     let label: String
 
-    init(device: MTLDevice, count: Int = 16, maxChars: Int = 2048, label: String = "") {
-        self.maxChars = maxChars
-        self.stringBuffer = device.makeBuffer(length: maxChars * count, options: [.storageModeShared])!
-        self.count = count
+    init(device: MTLDevice, length: Int = 1024 * 1024, label: String = "") {
+        self.stringBuffer = device.makeBuffer(length: length, options: [.storageModeShared])!
         self.label = label
     }
 
     func encode(commandEncoder: MTLComputeCommandEncoder) {
-        commandEncoder.setBuffer(stringBuffer, offset: 0, index: BufferIndex.debugString.rawValue)
+        commandEncoder.setBuffer(stringBuffer, offset: 0, index: BufferIndex.debug.rawValue)
+        var length = stringBuffer.allocatedSize
+        commandEncoder.setBytes(&length, length: MemoryLayout<Int>.stride, index: BufferIndex.debugLength.rawValue)
     }
 
     func wrap(_ commandBuffer: MTLCommandBuffer) -> MTLCommandBuffer {
@@ -42,18 +41,21 @@ class KernelDebugger {
     }
 
     var strings: [String] {
-        var pointer = UnsafeMutableRawPointer(self.stringBuffer.contents()).bindMemory(to: CChar.self, capacity: maxChars * count)
+        guard let count = count else { return [] }
+
+        var pointer = UnsafeMutableRawPointer(stringBuffer.contents()).bindMemory(to: CChar.self, capacity: stringBuffer.allocatedSize)
         var result: [String] = []
         for _ in 0..<count {
             result.append(String(cString: pointer))
-            pointer = pointer.advanced(by: maxChars)
+            pointer = pointer.advanced(by: stringBuffer.allocatedSize / count)
         }
 
         return result
     }
 
-    func print(count: Int? = nil) {
-        let count = count ?? self.count
+    func print() {
+        guard let count = count else { return }
+
         for i in 0..<count {
             let string = strings[i]
             let lines = string.split { $0.isNewline }
@@ -89,5 +91,10 @@ class KernelDebuggerComputeCommandEncoderProxy: MTLComputeCommandEncoderProxy {
     override func setComputePipelineState(_ state: MTLComputePipelineState) {
         super.setComputePipelineState(state)
         debugger.encode(commandEncoder: underlying)
+    }
+
+    override func dispatchThreads(_ threadsPerGrid: MTLSize, threadsPerThreadgroup: MTLSize) {
+        debugger.count = threadsPerGrid.width * threadsPerGrid.height * threadsPerGrid.depth
+        underlying.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
     }
 }

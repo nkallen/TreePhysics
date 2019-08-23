@@ -7,25 +7,6 @@ For each updatCompositeBodies step (which is leaf to root order) replay the turt
 
 Calculate the joint angles immediately -- there's no avoiding this, unfortunately.
 
-
-===
-
-This is my favorite error:
-
-Fatal error: 'try!' expression unexpectedly raised an error: Error Domain=AGXMetalA11 Code=3 "Failed to materializeAll." UserInfo={NSLocalizedDescription=Failed to materializeAll.}: file /Users/nickkallen/Documents/TreePhysics/TreePhysics/Physics/Encoders/MetalKernal.swift, line 14
-
-
-===
-
-let captureManager = MTLCaptureManager.shared()
-captureManager.startCapture(device: device)
-print(captureManager.isCapturing)
-
-...
-
-captureManager.stopCapture()
-
-
 ===
 
 let captureManager = MTLCaptureManager.shared()
@@ -40,10 +21,6 @@ let captureDescriptor = MTLCaptureDescriptor()
 captureDescriptor.captureObject = self.device
 captureDescriptor.destination = .gpuTraceDocument
 captureDescriptor.outputURL = self.traceURL
-
-==
-
-TODO -- make composite bodies and joints memoryless.
 
 ==
 
@@ -69,6 +46,10 @@ char* s;   // when kstring
 
 ===
 
-,
-device char * buf [[ buffer(BufferIndexDebugString) ]]
-Debug debug = Debug(buf, gid, 1024);
+,                      uint gsize [[ grid_size ]],
+                      device char * buf [[ buffer(BufferIndexDebug) ]],
+                      constant uint * buflen [[ buffer(BufferIndexDebugLength) ]])
+{
+
+    Debug debug = Debug(buf, *buflen, gid, gsize);
+    debug << "hi mom!\n";

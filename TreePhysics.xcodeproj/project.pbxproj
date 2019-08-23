@@ -79,6 +79,7 @@
 		9E9D4B9A22F44123007DCF49 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9922F44123007DCF49 /* Info.plist */; };
 		9EA619CC230AE78400BE2213 /* PrettyPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA619CB230AE78400BE2213 /* PrettyPrint.swift */; };
 		9EA619CD230AE86800BE2213 /* PrettyPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA619CB230AE78400BE2213 /* PrettyPrint.swift */; };
+		9EA7010C231064F3009077A0 /* Debug.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA7010B231064F3009077A0 /* Debug.metal */; };
 		9EB2159D22E1D1B000B1C6FC /* CPUSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */; };
 		9EE7250022F84CCE000D0A2F /* UpdateCompositeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */; };
 		9EE7250222F84D57000D0A2F /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
@@ -161,6 +162,7 @@
 		9E9D4B9522F43CAE007DCF49 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		9E9D4B9922F44123007DCF49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9EA619CB230AE78400BE2213 /* PrettyPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrettyPrint.swift; sourceTree = "<group>"; };
+		9EA7010B231064F3009077A0 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodies.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -237,6 +239,7 @@
 				9E0D67C6230962F9008912E7 /* Half.h */,
 				9E0D67C7230962F9008912E7 /* Half.c */,
 				9E62078322F8A7E6005E99C8 /* ShaderTypes.h */,
+				9EA7010B231064F3009077A0 /* Debug.metal */,
 			);
 			path = Kernels;
 			sourceTree = "<group>";
@@ -577,6 +580,7 @@
 				9E0D67C8230962F9008912E7 /* Half.c in Sources */,
 				9E9D4B9422F438FA007DCF49 /* Scene.swift in Sources */,
 				9E56C94922E78FFC0095C8AC /* CompositeBody.swift in Sources */,
+				9EA7010C231064F3009077A0 /* Debug.metal in Sources */,
 				9E461B3322E5E025008AB788 /* Pen.swift in Sources */,
 				9EEC11E222EA50920078BBFD /* Diagonalization.swift in Sources */,
 				9E6372A222FEC7AA001D4466 /* MetalProxy.swift in Sources */,

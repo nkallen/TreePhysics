@@ -1,7 +1,6 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
-#import "Print.metal"
 
 using namespace metal;
 

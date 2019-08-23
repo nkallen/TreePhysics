@@ -22,8 +22,8 @@ typedef NS_ENUM(NSInteger, BufferIndex)
     BufferIndexRanges = 5,
     BufferIndexPhysicsField = 6, 
 
-    BufferIndexDebugString = 10,
-
+    BufferIndexDebug = 20,
+    BufferIndexDebugLength = 21,
 };
 
 typedef NS_ENUM(NSInteger, ThreadGroupIndex)
@@ -36,16 +36,8 @@ typedef NS_ENUM(NSInteger, FunctionConstantIndex)
 {
     FunctionConstantIndexRangeCount = 0,
     FunctionConstantIndexBeta = 1,
+    FunctionConstantIndexPrintMaxLen = 10,
 };
-
-/*
- Some notes on floating-point precision (half vs float). The mass of objects can very small (a fraction of a gram) depending on how the tree is designed. Since we divide by mass to calculate centerOfMass, it's important that mass not get rounded down to zero or we get divide by zero errors.
-
- The inertia tensor also can have very small numbers because of the r^2 terms. Calculating its inverse also involves division, so it's important to be very careful here.
-
- In both cases, we need to work with floats and not halfs.
-
- */
 
 typedef struct {
     vector_float3 position;

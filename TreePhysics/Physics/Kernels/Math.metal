@@ -1,5 +1,4 @@
 #include <metal_stdlib>
-#include "Print.metal"
 using namespace metal;
 
 // MARK: Quaternion

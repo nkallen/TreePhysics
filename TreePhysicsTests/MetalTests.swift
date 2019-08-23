@@ -225,10 +225,12 @@ class UpdateRigidBodiesTests: XCTestCase {
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         let debug = KernelDebugger(device: device)
-        updateCompositeBodies.encode(commandBuffer: commandBuffer)
+        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
         updateJoints.encode(commandBuffer: commandBuffer, at: 1/60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
+            debug.print()
+            
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 2)
 
             let b2 = rigidBodies[0]
