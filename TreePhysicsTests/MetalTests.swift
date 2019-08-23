@@ -83,7 +83,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
         let debug = KernelDebugger(device: device)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
+        updateCompositeBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
             let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: 3)
             let b2_composite = compositeBodies[0]
@@ -234,7 +234,7 @@ class UpdateRigidBodiesTests: XCTestCase {
         let debug = KernelDebugger(device: device)
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1/60)
-        updateRigidBodies.encode(commandBuffer: debug.wrap(commandBuffer))
+        updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: 2)
 
@@ -325,7 +325,7 @@ class AdvancedMetalTests: XCTestCase {
         self.updateRigidBodies = UpdateRigidBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
         self.resetForces = ResetForces(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
 
-        cpuSimulator = CPUSimulator(tree: Tree(root))
+        cpuSimulator = CPUSimulator(root: root)
         self.expecteds = rigidBodies
     }
 
@@ -396,8 +396,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
         interpreter.interpret(lSystem)
 
-        let tree = Tree(root)
-        self.cpuSimulator = CPUSimulator(tree: tree)
+        self.cpuSimulator = CPUSimulator(root: root)
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer

@@ -33,10 +33,9 @@ class SimulatorComparisonTests: XCTestCase {
         let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
         interpreter.interpret(lSystem)
 
-        let tree = Tree(root)
         self.attractorField = AttractorField()
 
-        self.cpuSimulator = CPUSimulator(tree: tree)
+        self.cpuSimulator = CPUSimulator(root: root)
         cpuSimulator.add(field: attractorField)
         self.metalSimulator = MetalSimulator(device: device, root: root)
         metalSimulator.add(field: attractorField)

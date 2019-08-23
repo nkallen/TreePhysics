@@ -20,7 +20,7 @@ class CPUSimulatorTests: XCTestCase {
         root.add(b1, at: float3(0,0,-Float.pi/4))
         b1.add(b2, at: float3(0,0,-Float.pi/4))
 
-        simulator = CPUSimulator(tree: Tree(root))
+        simulator = CPUSimulator(root: root)
 
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
     }
