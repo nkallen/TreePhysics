@@ -5,6 +5,8 @@
 
 using namespace metal;
 
+constant float β [[ function_constant(FunctionConstantIndexBeta) ]];
+
 inline float3x3 joint_localRotation(
                                     JointStruct joint)
 {
@@ -88,7 +90,7 @@ updateJoint(
     float3 torque_diagonal = U_transpose * torque_jointSpace;
     float3 θ_diagonal_0 = U_inverse * joint.θ[0];
     float3 θ_ddt_diagonal_0 = U_inverse * joint.θ[1];
-    float3 βΛ = 0.02 * Λ; // FIXME Tree.B
+    float3 βΛ = β * Λ;
 
     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
     // differential equations, θ'' + bθ' + kθ = f
@@ -113,7 +115,7 @@ updateJoints(
 {
     JointStruct joint = joints[gid];
     RigidBodyStruct rigidBody = rigidBodies[gid];
-    
+
     RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
     CompositeBodyStruct compositeBody = compositeBodies[gid];
     joint = updateJoint(joint, rigidBody.jointStiffness, parentRigidBody, compositeBody, *time);

@@ -35,6 +35,7 @@ typedef NS_ENUM(NSInteger, ThreadGroupIndex)
 typedef NS_ENUM(NSInteger, FunctionConstantIndex)
 {
     FunctionConstantIndexRangeCount = 0,
+    FunctionConstantIndexBeta = 1,
 };
 
 /*

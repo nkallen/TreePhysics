@@ -80,6 +80,11 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
     }
 }
 
+func evaluateDifferential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_ddt_0: Float, at t: Float) -> float3 {
+    let solution = solve_differential(a: a, b: b, c: c, g: g, y_0: y_0, y_ddt_0: y_ddt_0)
+    return evaluate(differential: solution, at: t)
+}
+
 extension Array where Element == Float {
     var sum: Float {
         return reduce(0, +)

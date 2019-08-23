@@ -18,7 +18,6 @@ final class CPUSimulator {
         fields.append(field)
     }
 
-    // FIXME find nice way of resetting forces
     func update(at time: TimeInterval) {
         updateFields(at: time)
         updateCompositeBodies()
@@ -78,6 +77,7 @@ final class CPUSimulator {
     }
 
     func updateJoints(at time: TimeInterval) {
+        let time = Float(time)
         for rigidBody in rigidBodiesReverseLevelOrder { // Order does not matter
             if let parentJoint = rigidBody.parentJoint {
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
@@ -110,20 +110,14 @@ final class CPUSimulator {
                 let torque_diagonal = U_transpose * torque_jointSpace
                 let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
                 let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
-                let βΛ = Tree.B * Λ
+                let βΛ = Tree.β * Λ
 
                 // 2.a. thanks to diagonalization, we now have three independent 2nd-order
                 // differential equations, θ'' + bθ' + kθ = f
-
-                // FIXME cleanup and make similar to metal impl
-                let solution_i = solve_differential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: θ_diagonal_0.x, y_ddt_0: θ_ddt_diagonal_0.x)
-                let solution_ii = solve_differential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y)
-                let solution_iii = solve_differential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z)
-
                 let θ_diagonal = float3x3(rows: [
-                    evaluate(differential: solution_i, at: Float(time)),
-                    evaluate(differential: solution_ii, at: Float(time)),
-                    evaluate(differential: solution_iii, at: Float(time))])
+                    evaluateDifferential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: θ_diagonal_0.x, y_ddt_0: θ_ddt_diagonal_0.x, at: time),
+                    evaluateDifferential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y, at: time),
+                    evaluateDifferential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z, at: time)])
 
                 parentJoint.θ = U * θ_diagonal
             }

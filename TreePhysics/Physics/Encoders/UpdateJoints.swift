@@ -8,12 +8,20 @@ final class UpdateJoints: MetalKernelEncoder {
     let jointsBuffer: MTLBuffer
     let numJoints: Int
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, compositeBodiesBuffer: MTLBuffer, jointsBuffer: MTLBuffer, numJoints: Int) {
+        precondition(numJoints > 0)
+
+        let library = device.makeDefaultLibrary()!
+        let constantValues = MTLFunctionConstantValues()
+        var β = Tree.β
+        constantValues.setConstantValue(&β, type: .float, index: FunctionConstantIndex.beta.rawValue)
+        let function = try! library.makeFunction(name: "updateJoints", constantValues: constantValues)
+
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.jointsBuffer = jointsBuffer
         self.compositeBodiesBuffer = compositeBodiesBuffer
         self.numJoints = numJoints
 
-        super.init(device: device, name: "updateJoints")
+        super.init(device: device, function: function)
     }
 
     func encode(commandBuffer: MTLCommandBuffer, at time: Float) {
