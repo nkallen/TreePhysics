@@ -1,7 +1,7 @@
 import Foundation
 import simd
 
-final class Simulator {
+final class CPUSimulator {
     let tree: Tree
     let rigidBodiesLevelOrder: [RigidBody]
     let rigidBodiesReverseLevelOrder: [RigidBody]

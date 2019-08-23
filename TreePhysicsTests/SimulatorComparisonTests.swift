@@ -6,7 +6,7 @@ class SimulatorComparisonTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
-    var cpuSimulator: Simulator!
+    var cpuSimulator: CPUSimulator!
     var metalSimulator: MetalSimulator!
     var expecteds: [RigidBody]!
 
@@ -36,7 +36,7 @@ class SimulatorComparisonTests: XCTestCase {
         let tree = Tree(root)
         self.attractorField = AttractorField()
 
-        self.cpuSimulator = Simulator(tree: tree)
+        self.cpuSimulator = CPUSimulator(tree: tree)
         cpuSimulator.add(field: attractorField)
         self.metalSimulator = MetalSimulator(device: device, root: root)
         metalSimulator.add(field: attractorField)

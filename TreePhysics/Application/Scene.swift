@@ -3,16 +3,15 @@ import SceneKit
 
 class Scene: NSObject {
     let scene: SCNScene
-    // FIXME rename CPUSimulator
     let gravityField: GravityField
     let attractorField: AttractorField
     let attractor: SCNNode
 
     private let metalSimulator: MetalSimulator
-    private let cpuSimulator: Simulator
+    private let cpuSimulator: CPUSimulator
 
     let device: MTLDevice, commandQueue: MTLCommandQueue
-    
+
     override init() {
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
@@ -54,7 +53,7 @@ class Scene: NSObject {
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
         let tree = Tree(root)
-        self.cpuSimulator = Simulator(tree: tree)
+        self.cpuSimulator = CPUSimulator(tree: tree)
         
         scene.rootNode.addChildNode(skinningPen.node)
         scene.rootNode.addChildNode(skinningPen.skeleton)

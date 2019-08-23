@@ -281,7 +281,7 @@ class AdvancedMetalTests: XCTestCase {
     var root, b1, b2, b3, b4, b5, b6, b7, b8, b9: RigidBody!
     let force: float3 = float3(0, 1, 0) // world coordinates
 
-    var simulator: Simulator!
+    var cpuSimulator: CPUSimulator!
 
     var expecteds: [RigidBody]!
 
@@ -324,7 +324,7 @@ class AdvancedMetalTests: XCTestCase {
         self.updateRigidBodiesKernel = UpdateRigidBodiesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
         self.resetForcesKernel = ResetForcesKernel(device: device, rigidBodiesBuffer: rigidBodiesBuffer, numRigidBodies: rigidBodies.count)
 
-        simulator = Simulator(tree: Tree(root))
+        cpuSimulator = CPUSimulator(tree: Tree(root))
         self.expecteds = rigidBodies
     }
 
@@ -338,7 +338,7 @@ class AdvancedMetalTests: XCTestCase {
         updateRigidBodiesKernel.encode(commandBuffer: commandBuffer)
         resetForcesKernel.encode(commandBuffer: commandBuffer)
 
-        simulator.update(at: 1.0 / 60)
+        cpuSimulator.update(at: 1.0 / 60)
 
         commandBuffer.addCompletedHandler { _ in
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.expecteds.count)
@@ -373,7 +373,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
-    var simulator: Simulator!
+    var cpuSimulator: CPUSimulator!
     var expecteds: [RigidBody]!
 
     override func setUp() {
@@ -396,7 +396,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         interpreter.interpret(lSystem)
 
         let tree = Tree(root)
-        self.simulator = Simulator(tree: tree)
+        self.cpuSimulator = CPUSimulator(tree: tree)
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodiesKernel.buffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
@@ -422,7 +422,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0/60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
 
-        simulator.update(at: 1.0 / 60)
+        cpuSimulator.update(at: 1.0 / 60)
 
         commandBuffer.addCompletedHandler { _ in
             let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.expecteds.count)

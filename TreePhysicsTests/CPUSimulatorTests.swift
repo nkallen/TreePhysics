@@ -4,8 +4,8 @@ import simd
 
 fileprivate let sqrt2: Float = sqrtf(2)
 
-class SimulatorTests: XCTestCase {
-    var simulator: Simulator!
+class CPUSimulatorTests: XCTestCase {
+    var simulator: CPUSimulator!
     var root: RigidBody!
     var b1: RigidBody!
     var b2: RigidBody!
@@ -20,7 +20,7 @@ class SimulatorTests: XCTestCase {
         root.add(b1, at: float3(0,0,-Float.pi/4))
         b1.add(b2, at: float3(0,0,-Float.pi/4))
 
-        simulator = Simulator(tree: Tree(root))
+        simulator = CPUSimulator(tree: Tree(root))
 
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
     }
