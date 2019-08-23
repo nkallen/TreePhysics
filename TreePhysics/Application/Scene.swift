@@ -1,9 +1,7 @@
 import Foundation
 import SceneKit
 
-class Game: NSObject {
-    let queue = DispatchQueue(label: "foo")
-    
+class Scene: NSObject {
     let scene: SCNScene
     private let simulator: Simulator
     let gravityField: GravityField
@@ -105,7 +103,7 @@ var start = Date()
 let radius: Float = 3
 var done: Bool = false
 
-extension Game: SCNSceneRendererDelegate {
+extension Scene: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
 
         //        let pov = renderer.pointOfView!

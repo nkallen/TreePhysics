@@ -4,14 +4,14 @@ import SceneKit
 import UIKit
 
 class GameViewController: UIViewController {
-    var game: Game!
+    var scene: Scene!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.game = Game()
+        self.scene = Scene()
 
-        scnView.scene = game.scene
+        scnView.scene = scene.scene
         scnView.allowsCameraControl = true
         scnView.showsStatistics = true
         scnView.backgroundColor = .black
@@ -26,7 +26,7 @@ class GameViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        scnView.delegate = game
+        scnView.delegate = scene
     }
 
     var scnView: SCNView {
@@ -41,7 +41,7 @@ extension GameViewController {
     func handleTap(_ gestureRecognizer: UIGestureRecognizer) {
         toggle = !toggle
         print(scnView.hitTest(gestureRecognizer.location(in: scnView), options: nil))
-        game.gravityField.g = toggle ? float3.zero : float3(0, -9.81, 0)
+        scene.gravityField.g = toggle ? float3.zero : float3(0, -9.81, 0)
     }
 
     @objc
@@ -52,8 +52,8 @@ extension GameViewController {
         let vpWithZ = SCNVector3(x: Float(point.x), y: Float(point.y), z: projectedOrigin.z)
         let worldPoint = float3(scnView.unprojectPoint(vpWithZ))
 
-        game.attractorField.position = worldPoint
-        game.attractor.simdPosition = worldPoint
+        scene.attractorField.position = worldPoint
+        scene.attractor.simdPosition = worldPoint
     }
 }
 
