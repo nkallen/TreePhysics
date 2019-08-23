@@ -16,7 +16,7 @@ class SimulatorComparisonTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        self.device = MTLCreateSystemDefaultDevice()!
+        self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
         let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)

@@ -47,6 +47,7 @@ inline float3 joint_position(
 inline JointStruct
 updateJoint(
             JointStruct joint,
+            float jointStiffness,
             RigidBodyStruct parentRigidBody,
             CompositeBodyStruct childCompositeBody,
             float time)
@@ -70,7 +71,7 @@ updateJoint(
 
     // 1.b. the generalized eigenvalue problem A * X = X * Λ
     // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
-    float3x3 A = L_inverse * ((float)joint.k * float3x3(1)) * L_transpose_inverse;
+    float3x3 A = L_inverse * ((float)jointStiffness * float3x3(1)) * L_transpose_inverse;
 
     float4 q = diagonalize(A);
     float3x3 X = qmat(q);
@@ -116,7 +117,7 @@ updateJoints(
     if (rigidBody.parentId != -1) {
         RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
         CompositeBodyStruct compositeBody = compositeBodies[gid];
-        joint = updateJoint(joint, parentRigidBody, compositeBody, *time);
+        joint = updateJoint(joint, rigidBody.jointStiffness, parentRigidBody, compositeBody, *time);
         joints[gid] = joint;
     }
 }

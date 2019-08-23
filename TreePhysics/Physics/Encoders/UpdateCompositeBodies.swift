@@ -127,6 +127,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
             mass: rigidBody.mass,
             length: rigidBody.length,
             radius: rigidBody.radius,
+            jointStiffness: 200.0,
             localRotation: matrix3x3_rotation(rotation: rigidBody.rotation_local),
 
             position: rigidBody.position,

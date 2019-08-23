@@ -133,7 +133,7 @@ class UpdateJointsTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        self.device = MTLCreateSystemDefaultDevice()!
+        self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
         self.root = RigidBody()
@@ -268,6 +268,7 @@ class UpdateRigidBodiesTests: XCTestCase {
     }
 }
 
+// FIXME: make both of these use the metal simulator.
 class AdvancedMetalTests: XCTestCase {
     var updateCompositeBodies: UpdateCompositeBodies!
     var updateJoints: UpdateJoints!
@@ -288,7 +289,7 @@ class AdvancedMetalTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        self.device = MTLCreateSystemDefaultDevice()!
+        self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
         self.root = RigidBody()
@@ -378,7 +379,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        self.device = MTLCreateSystemDefaultDevice()!
+        self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
         let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)

@@ -8,7 +8,7 @@ extension Joint: CustomDebugStringConvertible {
 
 extension JointStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "Joint: k=\(k), θ=\(float3x3(θ))"
+        return "Joint: θ=\(float3x3(θ))"
     }
 }
 

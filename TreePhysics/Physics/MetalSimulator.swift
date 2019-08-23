@@ -30,7 +30,7 @@ class MetalSimulator {
         self.rigidBodiesBuffer = rigidBodiesBuffer
         self.compositeBodiesBuffer = device.makeBuffer(
             length: MemoryLayout<CompositeBodyStruct>.stride * rigidBodies.count,
-            options: [.storageModeShared])!
+            options: [.storageModePrivate])!
         self.jointsBuffer = UpdateJoints.buffer(count: rigidBodies.count, device: device)
 
         // Initialize encoders:
