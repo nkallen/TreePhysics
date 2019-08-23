@@ -28,8 +28,9 @@ final class UpdateJoints: MetalKernelEncoder {
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)
+        let numJointsExcludingRoot = numJoints - 1
         let threadsPerGrid = MTLSize(
-            width: numJoints,
+            width: numJointsExcludingRoot,
             height: 1,
             depth: 1)
 

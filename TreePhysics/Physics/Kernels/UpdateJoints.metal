@@ -113,11 +113,9 @@ updateJoints(
 {
     JointStruct joint = joints[gid];
     RigidBodyStruct rigidBody = rigidBodies[gid];
-
-    if (rigidBody.parentId != -1) {
-        RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
-        CompositeBodyStruct compositeBody = compositeBodies[gid];
-        joint = updateJoint(joint, rigidBody.jointStiffness, parentRigidBody, compositeBody, *time);
-        joints[gid] = joint;
-    }
+    
+    RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
+    CompositeBodyStruct compositeBody = compositeBodies[gid];
+    joint = updateJoint(joint, rigidBody.jointStiffness, parentRigidBody, compositeBody, *time);
+    joints[gid] = joint;
 }
