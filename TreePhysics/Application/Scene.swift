@@ -155,62 +155,20 @@ extension Game: SCNSceneRendererDelegate {
 //        simulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
 
-        let debug = KernelDebugger(device: device, count: rigidBodies.count, maxChars: 1024, label: "metal")
-
         let commandBuffer = commandQueue.makeCommandBuffer()!
         resetForces.encode(commandBuffer: commandBuffer)
-        applyPhysicsFields.encode(commandBuffer: debug.wrap(commandBuffer), field: self.attractorField)
+        applyPhysicsFields.encode(commandBuffer: commandBuffer, field: self.attractorField)
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { [unowned self] _ in
             DispatchQueue.main.async {
 
-                var printed = 0
 
                 let rigidBodies = UnsafeMutableRawPointer(self.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: self.rigidBodies.count)
-                let compositeBodies = UnsafeMutableRawPointer(self.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: self.rigidBodies.count)
-                let joints = UnsafeMutableRawPointer(self.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: self.rigidBodies.count)
 
                 for i in 0..<(self.rigidBodies.count-1) {
                     self.rigidBodies[i].node.simdPosition = rigidBodies[i].position
-
-//                    let lc = self.rigidBodies[i].composite
-//                    let rc = compositeBodies[i]
-//
-//                    if (lc.mass - rc.mass > 0.001 || length(lc.force - rc.force) > 0.001 || length(lc.torque - rc.torque) > 0.001 || length(lc.centerOfMass - rc.centerOfMass) > 0.001) && printed < 10{
-//                        printed += 1
-//                        print(i, "======")
-//                        debug.print()
-//                        print(lc.mass - rc.mass, lc.mass, rc.mass)
-//                        print(lc.force - rc.force, lc.force, rc.force)
-//                        print(lc.torque - rc.torque, lc.torque, rc.torque)
-//                        print(lc.centerOfMass - rc.centerOfMass, lc.centerOfMass, rc.centerOfMass)
-//                    }
-//
-//
-//                    let lj = self.rigidBodies[i].parentJoint!
-//                    let rj = joints[i]
-//
-//                    if length(lj.θ[0] - rj.θ[0]) > 0.0001 && printed < 10 {
-//                        printed += 1
-//                        print(i, "======")
-//                        print(length(lj.θ[0] - rj.θ[0]), lj.θ[0], rj.θ[0])
-//                    }
-
-                    //                                        let lr = self.rigidBodies[i]
-                    //                    let ll = rigidBodies[i]
-                    //
-                    //                    if length(lr.position - ll.position) > 0.0001 {
-                    //                        print(i, "======")
-                    //                        print(length(lr.position - ll.position), lr.position - ll.position, lr.position, ll.position)
-                    //                    }
-
-//                    rigidBodies[i].position = self.rigidBodies[i].position
-//                    rigidBodies[i].rotation = self.rigidBodies[i].rotation
-//                    rigidBodies[i].inertiaTensor = self.rigidBodies[i].inertiaTensor
-//                    rigidBodies[i].centerOfMass = self.rigidBodies[i].centerOfMass
-
                 }
             }
         }

@@ -50,30 +50,19 @@ kernel void
 applyPhysicsFields(
                    constant PhysicsFieldStruct & physicsField [[ buffer(BufferIndexPhysicsField) ]],
                    device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
-                   uint gid [[ thread_position_in_grid ]],
-                   device char * buf [[ buffer(BufferIndexDebugString) ]])
+                   uint gid [[ thread_position_in_grid ]])
 {
-    Debug debug = Debug(buf, gid, 1024);
     RigidBodyStruct rigidBody = rigidBodies[gid];
     
     if (physicsField_applies(physicsField, rigidBody)) {
-        debug << "does apply with position=" << physicsField.position << " and rigid.position=" << rigidBody.position << "\n";
         float3 delta = physicsField.position - rigidBody.position;
         float distance = length(delta);
-        debug << "delta: " << delta << "\n";
-        debug << "distance: " << distance << "\n";
         if (distance > 0) {
             float3 direction = normalize(delta);
 
-            debug << "direction: " << direction << "\n";
-
             // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
             float3 force = direction * a * pow(M_E_F, -sqr(distance - b)/(2*c));
-
-            debug << "force: " << force << "\n";
-
             rigidBody = rigidBody_applyForce(rigidBody, force, 0.5);
-
             rigidBodies[gid] = rigidBody;
         }
     }

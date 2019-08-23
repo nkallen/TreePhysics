@@ -66,3 +66,9 @@ float f;   // when kfloat
 char* s;   // when kstring
 };
 };
+
+===
+
+,
+device char * buf [[ buffer(BufferIndexDebugString) ]]
+Debug debug = Debug(buf, gid, 1024);
