@@ -53,7 +53,6 @@
 		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
 		9E9D4B6622F313D0007DCF49 /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
 		9E9D4B6E22F37244007DCF49 /* HasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC522E0972400535997 /* HasTransform.swift */; };
-		9E9D4B6F22F37244007DCF49 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBB322DDDCCB00535997 /* Tree.swift */; };
 		9E9D4B7022F37244007DCF49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94822E78FFC0095C8AC /* CompositeBody.swift */; };
 		9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
@@ -88,7 +87,6 @@
 		9EE7EBA622DDDC6C00535997 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA522DDDC6C00535997 /* art.scnassets */; };
 		9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
 		9EE7EBAB22DDDC6E00535997 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA922DDDC6E00535997 /* Main.storyboard */; };
-		9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBB322DDDCCB00535997 /* Tree.swift */; };
 		9EE7EBBC22DE1AD100535997 /* CPUSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBBB22DE1AD100535997 /* CPUSimulatorTests.swift */; };
 		9EE7EBC422E08E4000535997 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
 		9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC522E0972400535997 /* HasTransform.swift */; };
@@ -172,7 +170,6 @@
 		9EE7EBA722DDDC6E00535997 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9EE7EBAA22DDDC6E00535997 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9EE7EBAC22DDDC6E00535997 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9EE7EBB322DDDCCB00535997 /* Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
 		9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TreePhysicsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBBB22DE1AD100535997 /* CPUSimulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulatorTests.swift; sourceTree = "<group>"; };
 		9EE7EBBD22DE1AD100535997 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -275,7 +272,6 @@
 		9E56C94322E78FA90095C8AC /* Tree */ = {
 			isa = PBXGroup;
 			children = (
-				9EE7EBB322DDDCCB00535997 /* Tree.swift */,
 				9E56C94422E78FCF0095C8AC /* Joint.swift */,
 				9E56C94622E78FEC0095C8AC /* RigidBody.swift */,
 				9E56C94822E78FFC0095C8AC /* CompositeBody.swift */,
@@ -535,7 +531,6 @@
 				9E9D4B6E22F37244007DCF49 /* HasTransform.swift in Sources */,
 				9E0674E2230AD2450044C3C4 /* UpdateJoints.metal in Sources */,
 				9E0674E1230AD2420044C3C4 /* UpdateCompositeBodies.metal in Sources */,
-				9E9D4B6F22F37244007DCF49 /* Tree.swift in Sources */,
 				9E9D4B7022F37244007DCF49 /* main.swift in Sources */,
 				9E9D4B9822F43D98007DCF49 /* Scene.swift in Sources */,
 				9E1797E622FB704F00FA3892 /* UpdateCompositeBodies.swift in Sources */,
@@ -577,7 +572,6 @@
 			files = (
 				9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */,
 				9E8E27BF2307335300652DAC /* Print.metal in Sources */,
-				9EE7EBB422DDDCCB00535997 /* Tree.swift in Sources */,
 				9E31BE9822FDAE4600AF908B /* UpdateRigidBodies.metal in Sources */,
 				9EE7EBCA22E0F27900535997 /* main.swift in Sources */,
 				9E0D67C8230962F9008912E7 /* Half.c in Sources */,

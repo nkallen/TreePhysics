@@ -3,6 +3,13 @@ import SceneKit
 
 fileprivate var i = 0
 
+extension RigidBody {
+    static let K: Float = 200
+    static let β: Float = 0.02
+    static let maxAngle: Float = Float.pi / 3
+    static let minAngle: Float = -Float.pi / 3
+}
+
 final class RigidBody: HasTransform {
     enum Kind {
         case `static`

@@ -11,7 +11,7 @@ extension HasTransform {
     }
 
     var position: float3 {
-        return convert(position: float3.zero) // XXX FIXME
+        return convert(position: float3.zero)
     }
 
     var rotation: float3x3 {

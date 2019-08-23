@@ -52,8 +52,7 @@ class Scene: NSObject {
             stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
-        let tree = Tree(root)
-        self.cpuSimulator = CPUSimulator(tree: tree)
+        self.cpuSimulator = CPUSimulator(root: root)
         
         scene.rootNode.addChildNode(skinningPen.node)
         scene.rootNode.addChildNode(skinningPen.skeleton)

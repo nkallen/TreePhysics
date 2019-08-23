@@ -2,14 +2,14 @@ import Foundation
 import simd
 
 final class CPUSimulator {
-    let tree: Tree
+    let root: RigidBody
     let rigidBodiesLevelOrder: [RigidBody]
     let rigidBodiesReverseLevelOrder: [RigidBody]
     private var fields: [PhysicsField] = []
 
-    init(tree: Tree) {
-        self.tree = tree
-        self.rigidBodiesLevelOrder = tree.root.flattened().filter { $0.kind == .dynamic }
+    init(root: RigidBody) {
+        self.root = root
+        self.rigidBodiesLevelOrder = root.flattened().filter { $0.kind == .dynamic }
         self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
         updateRigidBodies()
     }
@@ -110,7 +110,7 @@ final class CPUSimulator {
                 let torque_diagonal = U_transpose * torque_jointSpace
                 let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
                 let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
-                let βΛ = Tree.β * Λ
+                let βΛ = RigidBody.β * Λ
 
                 // 2.a. thanks to diagonalization, we now have three independent 2nd-order
                 // differential equations, θ'' + bθ' + kθ = f

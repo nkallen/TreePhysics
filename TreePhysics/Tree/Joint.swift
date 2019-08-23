@@ -38,7 +38,6 @@ final class Joint: HasTransform {
     }
 
     private static func computeK(radius: Float, length: Float) -> Float {
-        return Tree.K
-//        return Tree.E * .pi * radius * radius / length
+        return RigidBody.K
     }
 }

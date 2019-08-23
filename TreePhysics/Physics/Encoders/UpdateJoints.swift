@@ -12,7 +12,7 @@ final class UpdateJoints: MetalKernelEncoder {
 
         let library = device.makeDefaultLibrary()!
         let constantValues = MTLFunctionConstantValues()
-        var β = Tree.β
+        var β = RigidBody.β
         constantValues.setConstantValue(&β, type: .float, index: FunctionConstantIndex.beta.rawValue)
         let function = try! library.makeFunction(name: "updateJoints", constantValues: constantValues)
 
