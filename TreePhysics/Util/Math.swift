@@ -36,19 +36,21 @@ func solve_quadratic(a: Float, b: Float, c: Float) -> QuadraticSolution {
 }
 
 func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_ddt_0: Float) -> DifferentialSolution {
+    let k = g/c
+    let y_0_k = y_0 - k
     switch solve_quadratic(a: a, b: b, c: c) {
     case let .complex(real, imaginary):
-        let c1 = y_0
+        let c1 = y_0_k
         let c2 = (y_ddt_0 - real * c1) / imaginary
-        return .complex(c1: c1, c2: c2, λ: real, μ: imaginary, k: g/c)
+        return .complex(c1: c1, c2: c2, λ: real, μ: imaginary, k: k)
     case let .real(r):
         let system = float2x2(columns: (float2(1, r), float2(0, 1)))
-        let solution = system.inverse * float2(y_0, y_ddt_0)
-        return .real(c1: solution.x, c2: solution.y, r: r, k: g/c)
+        let solution = system.inverse * float2(y_0_k, y_ddt_0)
+        return .real(c1: solution.x, c2: solution.y, r: r, k: k)
     case let .realDistinct(r1, r2):
         let system = float2x2(columns: (float2(1, r1), float2(1, r2)))
-        let solution = system.inverse * float2(y_0, y_ddt_0)
-        return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2, k: g/c)
+        let solution = system.inverse * float2(y_0_k, y_ddt_0)
+        return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2, k: k)
     }
 }
 
@@ -127,6 +129,17 @@ func matrix4x4_rotation(from: float3, to: float3) -> float4x4 {
                                          float4(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st, 0),
                                          float4(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci, 0),
                                          float4(                  0,                   0,                   0, 1)))
+}
+
+func matrix3x3_rotation(radians: Float, axis: float3) -> matrix_float3x3 {
+    let unitAxis = normalize(axis)
+    let ct = cosf(radians)
+    let st = sinf(radians)
+    let ci = 1 - ct
+    let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
+    return matrix_float3x3.init(columns:(float3(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st),
+                                         float3(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st),
+                                         float3(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
 }
 
 func matrix4x4_rotation(radians: Float, axis: float3) -> matrix_float4x4 {

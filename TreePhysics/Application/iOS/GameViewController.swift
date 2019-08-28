@@ -15,7 +15,7 @@ class GameViewController: UIViewController {
         scnView.allowsCameraControl = true
         scnView.showsStatistics = true
         scnView.backgroundColor = .black
-        scnView.preferredFramesPerSecond = 10
+        scnView.preferredFramesPerSecond = 60
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
