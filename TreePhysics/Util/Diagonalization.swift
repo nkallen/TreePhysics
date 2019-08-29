@@ -52,12 +52,8 @@ extension matrix_double3x3 {
             d[2] = self[2, 2] - 2.0*q[2]*u[2]
 
             // Store inverse Householder transformation in Q
-            for j in 1..<3 {
-                f = omega * u[j]
-                for i in 1..<3 {
-                    Q[j, i] = Q[j, i] - f*u[i]
-                }
-            }
+            Q[1] = Q[1] - omega * u[1]*u
+            Q[2] = Q[2] - omega * u[2]*u
 
             // Calculate updated A[1][2] and store it in e[1]
             e[1] = self[2, 1] - q[1]*u[2] - u[1]*q[2]
@@ -75,7 +71,7 @@ extension matrix_double3x3 {
     // matrix A using the QL algorithm with implicit shifts, preceded by a
     // Householder reduction to tridiagonal form.
     var eigen_ql: (double3, double3x3)? {
-        var g, r, p, f, b, s, c, t: Double // Intermediate storage
+        var g, r, p, f, b, s, c: Double // Intermediate storage
         var (Q, w, e_) = self.tridiagonal
         var e = double3(e_.x, e_.y, 0)
 
@@ -142,11 +138,10 @@ extension matrix_double3x3 {
                     g = c*r - b
 
                     // Form eigenvectors
-                    for k in 0..<3 {
-                        t = Q[i+1, k]
-                        Q[i+1, k] = s*Q[i, k] + c*t
-                        Q[i, k]   = c*Q[i, k] - s*t
-                    }
+                    let t = Q[i+1]
+                    Q[i+1] = s*Q[i] + c*t
+                    Q[i]   = c*Q[i] - s*t
+
                     i -= 1
                 }
                 w[l] -= p
