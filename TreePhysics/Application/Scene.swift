@@ -6,6 +6,7 @@ class Scene: NSObject {
     let gravityField: GravityField
     let attractorField: AttractorField
     let attractor: SCNNode
+    let root: RigidBody
 
     private let metalSimulator: MetalSimulator
     private let cpuSimulator: CPUSimulator
@@ -35,13 +36,13 @@ class Scene: NSObject {
         
         // Tree:
         
-        let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)
+        self.root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)
         let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
@@ -55,7 +56,9 @@ class Scene: NSObject {
         self.cpuSimulator = CPUSimulator(root: root)
         
         scene.rootNode.addChildNode(skinningPen.node)
-        scene.rootNode.addChildNode(skinningPen.skeleton)
+//        scene.rootNode.addChildNode(skinningPen.skeleton)
+
+        scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.25))
 
         // Forces:
         let gravityField = GravityField(float3.zero)
@@ -83,7 +86,6 @@ var done: Bool = false
 
 extension Scene: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-
         //        let pov = renderer.pointOfView!
 //        pov.simdPosition = float3(
 //            radius * sinf(Float(start.timeIntervalSinceNow)),
@@ -91,11 +93,12 @@ extension Scene: SCNSceneRendererDelegate {
 //            radius * cosf(Float(start.timeIntervalSinceNow)))
 //        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
 
-//        cpuSimulator.update(at: 1.0 / 60)
+        cpuSimulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
 
+        return ()
         let commandBuffer = commandQueue.makeCommandBuffer()!
-        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
+        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 100)
         commandBuffer.addCompletedHandler { [unowned self] _ in
             let metalSimulator = self.metalSimulator
             DispatchQueue.main.async {

@@ -44,6 +44,7 @@
 		9E56C94922E78FFC0095C8AC /* CompositeBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94822E78FFC0095C8AC /* CompositeBody.swift */; };
 		9E56C94B22E792820095C8AC /* RigidBodyPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94A22E792820095C8AC /* RigidBodyPen.swift */; };
 		9E56C94D22E7929B0095C8AC /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
+		9E57566923184C9C0036F68B /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9E6372A222FEC7AA001D4466 /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
 		9E8024B8230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */; };
 		9E8E27BF2307335300652DAC /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
@@ -145,6 +146,7 @@
 		9E56C94822E78FFC0095C8AC /* CompositeBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositeBody.swift; sourceTree = "<group>"; };
 		9E56C94A22E792820095C8AC /* RigidBodyPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBodyPen.swift; sourceTree = "<group>"; };
 		9E56C94C22E7929B0095C8AC /* SkinningPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinningPen.swift; sourceTree = "<group>"; };
+		9E57566823184C9C0036F68B /* Visualization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visualization.swift; sourceTree = "<group>"; };
 		9E62078322F8A7E6005E99C8 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		9E6372A122FEC7AA001D4466 /* MetalProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalProxy.swift; sourceTree = "<group>"; };
 		9E8024B3230FD2BD0019B482 /* longay.th2014.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = longay.th2014.pdf; sourceTree = "<group>"; };
@@ -396,6 +398,7 @@
 				9EE7EBC322E08E4000535997 /* Math.swift */,
 				9E6372A122FEC7AA001D4466 /* MetalProxy.swift */,
 				9EA619CB230AE78400BE2213 /* PrettyPrint.swift */,
+				9E57566823184C9C0036F68B /* Visualization.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -581,6 +584,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E57566923184C9C0036F68B /* Visualization.swift in Sources */,
 				9EE7EBC622E0972400535997 /* HasTransform.swift in Sources */,
 				9E8E27BF2307335300652DAC /* Print.metal in Sources */,
 				9E31BE9822FDAE4600AF908B /* UpdateRigidBodies.metal in Sources */,

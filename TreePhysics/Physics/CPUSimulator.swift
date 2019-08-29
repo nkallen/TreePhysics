@@ -1,6 +1,10 @@
 import Foundation
 import simd
 
+let torqueFictitiousMultiplier_i: Float = 1.0
+let torqueFictitiousMultiplier_ii: Float = 0.0
+let torqueFictitiousMultiplier_iii: Float = 1.0
+
 final class CPUSimulator {
     let root: RigidBody
     let rigidBodiesLevelOrder: [RigidBody]
@@ -87,6 +91,22 @@ final class CPUSimulator {
 
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
 
+                // Calculate any fictitious forces:
+                let parentAngularAcceleration_jointSpace = parentJoint.rotate(vector: parentJoint.parentRigidBody.angularAcceleration)
+                let parentAngularVelocity_jointSpace = parentJoint.rotate(vector: parentJoint.parentRigidBody.angularVelocity)
+                let childAngularVelocity_jointSpace = parentJoint.rotate(vector: rigidBody.angularVelocity)
+
+                let torqueFictitious_jointSpace_i: float3 = torqueFictitiousMultiplier_i *
+                    -rigidBody.composite.mass * pr.crossMatrix * parentJoint.rotate(vector: parentJoint.acceleration)
+                let torqueFictitious_jointSpace_ii: float3 = torqueFictitiousMultiplier_ii *
+                    -inertiaTensor_jointSpace * (parentAngularAcceleration_jointSpace + parentAngularVelocity_jointSpace.crossMatrix * childAngularVelocity_jointSpace)
+                let torqueFictitious_jointSpace_iii: float3 = torqueFictitiousMultiplier_ii *
+                    -childAngularVelocity_jointSpace.crossMatrix * inertiaTensor_jointSpace * childAngularVelocity_jointSpace
+
+                let torqueFictitious_jointSpace = torqueFictitious_jointSpace_i + torqueFictitious_jointSpace_ii + torqueFictitious_jointSpace_iii
+
+                let torqueTotal_jointSpace = torque_jointSpace + torqueFictitious_jointSpace
+
                 // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
                 // K is a spring stiffness matrix, θ = euler angles of the joint,
                 // θ' = angular velocities (i.e., first derivative), etc.
@@ -96,19 +116,19 @@ final class CPUSimulator {
 
                 // 1.a. the cholesky decomposition of I
                 let L = inertiaTensor_jointSpace.cholesky
-                let L_inverse = L.inverse, L_transpose_inverse = L.transpose.inverse
+                let L_inverse = L.inverse, L_transpose_inverse = L_inverse.transpose
 
                 // 1.b. the generalized eigenvalue problem A * X = X * Λ
                 // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
                 let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
-                let (Λ, X) = A.eigen_ql!
+                let (Λ, X) = A.eigen_analytical!
 
                 // 2. Now we can restate the differential equation in terms of other (diagonal)
                 // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
                 let U = L_transpose_inverse * X
                 let U_transpose = U.transpose, U_inverse = U.inverse
 
-                let torque_diagonal = U_transpose * torque_jointSpace
+                let torque_diagonal = U_transpose * torqueTotal_jointSpace
                 let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
                 let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
                 let βΛ = RigidBody.β * Λ
@@ -126,8 +146,12 @@ final class CPUSimulator {
     }
 
     func updateRigidBodies() {
+        for joint in root.childJoints {
+            joint.updateTransform()
+        }
         for rigidBody in rigidBodiesLevelOrder {
             rigidBody.updateTransform()
+
             for joint in rigidBody.childJoints {
                 joint.updateTransform()
             }

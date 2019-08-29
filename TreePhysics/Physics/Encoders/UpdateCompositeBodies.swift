@@ -125,7 +125,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         memcpy(&childIds, &childRigidBodyIndices, childRigidBodyIndices.count * MemoryLayout<Int32>.stride)
 
         // Climbers
-        assert(climbers.count <= 10)
+//        assert(climbers.count <= 10)
         let climberOffset = Int32(climbers.first.map { index[$0]! } ?? 0)
 
         let strct = RigidBodyStruct(

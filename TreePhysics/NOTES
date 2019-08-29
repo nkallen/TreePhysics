@@ -46,10 +46,4 @@ char* s;   // when kstring
 
 ===
 
-,                      uint gsize [[ grid_size ]],
-                      device char * buf [[ buffer(BufferIndexDebug) ]],
-                      constant uint * buflen [[ buffer(BufferIndexDebugLength) ]])
-{
-
-    Debug debug = Debug(buf, *buflen, gid, gsize);
-    debug << "hi mom!\n";
+                let torqueFictitious_jointSpace_ii = -inertiaTensor_jointSpace * (parentAngularAcceleration_jointSpace + parentAngularVelocity_jointSpace.crossMatrix * childAngularVelocity_jointSpace)

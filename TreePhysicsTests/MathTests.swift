@@ -93,7 +93,7 @@ class MathTests: XCTestCase {
             double3(1,0,0),
             double3(0,-0.006502,0.999979),
             double3(0,0.999979,0.006502)
-            )), Q, accuracy: 0.001)
+        )), Q, accuracy: 0.001)
         XCTAssertEqual(double3(1/3,0.349891,0.483442), d, accuracy: 0.0001)
         XCTAssertEqual(double2(0,-0.049855), e, accuracy: 0.0001)
         XCTAssertEqual(
