@@ -76,16 +76,18 @@ final class RigidBody: HasTransform {
         
         updateTransform()
     }
-    
-    func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) {
-        add(child, at: matrix4x4_rotation(rotation: eulerAngles))
+
+    // FIXME test only
+    func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) -> Joint {
+        return add(child, at: matrix4x4_rotation(rotation: eulerAngles))
     }
     
-    func add(_ child: RigidBody, at rotation: matrix_float4x4) {
+    func add(_ child: RigidBody, at rotation: matrix_float4x4) -> Joint {
         let joint = Joint(parent: self, child: child, at: rotation)
         childJoints.append(joint)
         child.parentJoint = joint
         child.updateTransform()
+        return joint
     }
     
     // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end

@@ -146,12 +146,8 @@ final class CPUSimulator {
     }
 
     func updateRigidBodies() {
-        for joint in root.childJoints {
-            joint.updateTransform()
-        }
         for rigidBody in rigidBodiesLevelOrder {
             rigidBody.updateTransform()
-
             for joint in rigidBody.childJoints {
                 joint.updateTransform()
             }

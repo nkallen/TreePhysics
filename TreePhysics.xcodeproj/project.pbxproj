@@ -84,6 +84,7 @@
 		9EA7010C231064F3009077A0 /* Debug.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA7010B231064F3009077A0 /* Debug.metal */; };
 		9EA7010E23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */; };
 		9EB2159D22E1D1B000B1C6FC /* CPUSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */; };
+		9EC88E25231989930049737D /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC88E24231989930049737D /* ModelTests.swift */; };
 		9EE7250022F84CCE000D0A2F /* UpdateCompositeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */; };
 		9EE7250222F84D57000D0A2F /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
@@ -170,6 +171,7 @@
 		9EA7010B231064F3009077A0 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT18_03SCF11_s13_2text.pdf; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
+		9EC88E24231989930049737D /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodies.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -386,6 +388,7 @@
 				9E27B86022FA39920030664E /* RigidBodyTests.swift */,
 				9EE801A122FC44AC00198166 /* TestHelper.swift */,
 				9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */,
+				9EC88E24231989930049737D /* ModelTests.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -636,6 +639,7 @@
 				9EEC11E022EA23000078BBFD /* MathTests.swift in Sources */,
 				9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */,
 				9EE801A222FC44AC00198166 /* TestHelper.swift in Sources */,
+				9EC88E25231989930049737D /* ModelTests.swift in Sources */,
 				9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */,
 				9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */,
 			);

@@ -1,2 +1,8 @@
 - make it so it's easy to switch between updating the joint as its own kernel and have it be embedded in update composite bodies
 - generic physics fields
+
+
+1. Create a simple test: 1 rigid body pointing directly up; torque at 90 degrees
+compare eigen vs direct method, see why they differ;
+
+once that's done, evaluate the differential code with two bodies; confirm torque is greater on the taller one
