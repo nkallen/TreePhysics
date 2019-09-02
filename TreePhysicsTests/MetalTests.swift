@@ -163,19 +163,19 @@ class UpdateJointsTests: XCTestCase {
 
             XCTAssertEqual(
                 float3x3(
-                    float3(0,0,0.005), // i.e., a small rotation about the z axis
-                    float3(0,0,0),
-                    float3(0,0,0)
+                    float3(0,0,0.00022747851), // i.e., a small rotation about the z axis
+                    float3(0,0,0.02657279),
+                    float3(0,0,1.4540789)
                 ),
-                float3x3(b2_parentJoint.θ), accuracy: 0.0001)
+                b2_parentJoint.θ, accuracy: 0.0001)
 
             XCTAssertEqual(
                 float3x3(
-                    float3(0,0,0.008535533), // a slightly larger rotation since the torque on b1 is greater
-                    float3(0,0,0),
-                    float3(0,0,0)
+                    float3(0,0,8.1739134e-05), // a slightly larger torque and larger moment of inertia
+                    float3(0,0,0.009755036),
+                    float3(0,0,0.5747628)
                 ),
-                float3x3(b1_parentJoint.θ), accuracy: 0.0001)
+                b1_parentJoint.θ, accuracy: 0.0001)
 
             expect.fulfill()
         }
@@ -226,7 +226,7 @@ class UpdateRigidBodiesTests: XCTestCase {
         let commandBuffer = commandQueue.makeCommandBuffer()!
         let debug = KernelDebugger(device: device)
         updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
-        updateJoints.encode(commandBuffer: commandBuffer, at: 1/60)
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1/30)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
             debug.print()
@@ -237,24 +237,24 @@ class UpdateRigidBodiesTests: XCTestCase {
             let b1 = rigidBodies[1]
 
             XCTAssertEqual(
-                float3(0.7010456, 1.7131165, 0),
+                float3(0.70687836, 1.7073351, 0),
                 float3(b2.position), accuracy: 0.001)
             XCTAssertEqual(
                 float3x3(
-                    float3(0.013535142,-1,0),
-                    float3(1,0.013535142,0),
+                    float3(0.0011795461,-1,0),
+                    float3(1,0.0011795461,0),
                     float3(0,0,1)),
-                float3x3(b2.rotation), accuracy: 0.001)
+                b2.rotation, accuracy: 0.001)
 
             XCTAssertEqual(
                 float3(0, 1, 0),
                 float3(b1.position))
             XCTAssertEqual(
                 float3x3(
-                    float3(0.7131165,-0.7010456,0),
-                    float3(0.7010456,0.7131165,0),
+                    float3(0.7073351,-0.70687836,0),
+                    float3(0.70687836,0.7073351,0),
                     float3(0,0,1)),
-                float3x3(b1.rotation), accuracy: 0.001)
+                b1.rotation, accuracy: 0.001)
 
             expect.fulfill()
         }
