@@ -9,6 +9,7 @@ class CPUSimulatorTests: XCTestCase {
     var root: RigidBody!
     var b1: RigidBody!
     var b2: RigidBody!
+    var forceAppliedPosition: float3!
     let force = float3(0, 1, 0) // world coordinates
 
     override func setUp() {
@@ -17,12 +18,13 @@ class CPUSimulatorTests: XCTestCase {
         root = RigidBody()
         b1 = RigidBody()
         b2 = RigidBody()
-        root.add(b1, at: float3(0,0,-Float.pi/4))
-        b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
+        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
 
         simulator = CPUSimulator(root: root)
 
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
+        self.forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
     }
 
     func testApplyForce() {
@@ -31,10 +33,9 @@ class CPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b2.length, 1)
         XCTAssertEqual(b2.radius, 1)
 
-        XCTAssertEqual(b2.torque, cross(b2.convert(position: float3(0, 1, 0)) - b2.position, force))
+        XCTAssertEqual(b2.torque, cross(forceAppliedPosition - b2.position, force))
 
-        let rotation_world2local = matrix3x3_rotation(from: b2.transform)
-        XCTAssertEqual(rotation_world2local * b2.inertiaTensor * rotation_world2local.transpose, matrix_float3x3.init(diagonal: float3(
+        XCTAssertEqual(b2.rotation * b2.inertiaTensor * b2.rotation.transpose, matrix_float3x3.init(diagonal: float3(
             1.0/4 + 1.0/12,
             1.0/2,
             1.0/4 + 1.0/12
@@ -53,8 +54,6 @@ class CPUSimulatorTests: XCTestCase {
 
     func testComposite() {
         simulator.updateCompositeBodies()
-
-        let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
 
         // mass
         XCTAssertEqual(b2.composite.mass, 1)
@@ -119,10 +118,6 @@ class CPUSimulatorTests: XCTestCase {
             float3(1,0,0),
             float3(0,0,1)),
             b2.rotation, accuracy: 0.0001)
-        XCTAssertEqual(
-            float4x4(
-                [[1.4901161e-07, -1, 0, 0], [1, 1.4901161e-07, 0, 0], [0, 0, 1, 0], [1/sqrt2, 1+1/sqrt2, 0, 1]]),
-            b2.transform, accuracy: Float(0.0001))
 
         XCTAssertEqual(
             float3(0, 1, 0),
@@ -133,9 +128,6 @@ class CPUSimulatorTests: XCTestCase {
                 float3(1/sqrt(2),1/sqrt(2),0),
                 float3(0,0,1)),
             b1.rotation, accuracy: 0.0001)
-        XCTAssertEqual(
-            float4x4([[1/sqrt2, -1/sqrt2, 0, 0], [1/sqrt2, 1.0/sqrt2, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
-            b1.transform, accuracy: 0.0001)
 
         simulator.update(at: 1.0 / 30)
 
@@ -148,10 +140,6 @@ class CPUSimulatorTests: XCTestCase {
                 float3(1,0.0011795163,0),
                 float3(0,0,1)),
             b2.rotation, accuracy: 0.0001)
-        XCTAssertEqual(
-            float4x4(
-                [[0.0011795163, -0.9999084, 0, 0], [0.9999084, 0.0011795163, 0, 0], [0, 0, 1, 0], [0.70687836, 1.7073351, 0, 1]]),
-            b2.transform, accuracy: Float(0.0001))
 
         XCTAssertEqual(
             float3(0, 1, 0),
@@ -162,9 +150,6 @@ class CPUSimulatorTests: XCTestCase {
                 float3(0.70687836,0.7073351,0),
                 float3(0,0,1)),
             b1.rotation, accuracy: 0.0001)
-        XCTAssertEqual(
-            float4x4([[0.7073351, -0.70687836, 0, 0], [0.70687836, 0.7073351, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
-            b1.transform, accuracy: 0.0001)
     }
 
 }

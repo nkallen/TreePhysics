@@ -20,8 +20,8 @@ final class RigidBodyPen: Pen {
 
         let newBranch = RigidBody(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
-        let parentTangent = parentBranch.convert(position: float3(0,1,0)) - parentBranch.position
-        let rotation = matrix4x4_rotation(from: parentTangent, to: tangent)
+        let parentTangent = parentBranch.translation + parentBranch.rotation * float3(0,1,0) - parentBranch.position
+        let rotation = matrix3x3_rotation(from: parentTangent, to: tangent)
 
         parentBranch.add(newBranch, at: rotation)
 

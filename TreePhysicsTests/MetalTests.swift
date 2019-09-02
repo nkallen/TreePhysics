@@ -64,8 +64,8 @@ class UpdateCompositeBodiesTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        root.add(b1, at: float3(0,0,-Float.pi/4))
-        b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
+        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
@@ -75,7 +75,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     }
 
     func testUpdateCompositeBodies() {
-        let forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
+        let forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
 
         let expect = expectation(description: "wait")
 
@@ -139,7 +139,7 @@ class UpdateJointsTests: XCTestCase {
         root.add(b1, at: float3(0,0,-Float.pi/4))
         b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
-        self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
+        self.forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
@@ -205,10 +205,10 @@ class UpdateRigidBodiesTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        root.add(b1, at: float3(0,0,-Float.pi/4))
-        b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
+        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
-        self.forceAppliedPosition = b2.convert(position: float3(0, 1, 0))
+        self.forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer

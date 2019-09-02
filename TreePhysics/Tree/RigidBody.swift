@@ -10,7 +10,7 @@ extension RigidBody {
     static let minAngle: Float = -Float.pi / 3
 }
 
-final class RigidBody: HasTransform {
+final class RigidBody {
     enum Kind {
         case `static`
         case `dynamic`
@@ -33,7 +33,8 @@ final class RigidBody: HasTransform {
     var torque: float3 = float3.zero
 
     var inertiaTensor: float3x3
-    private(set) var transform: matrix_float4x4 = matrix_identity_float4x4
+    var rotation: float3x3 = matrix_identity_float3x3
+    var translation: float3 = float3.zero
     var centerOfMass: float3 = float3.zero
     var angularVelocity: float3 = float3.zero
     var angularAcceleration: float3 = float3.zero
@@ -58,7 +59,7 @@ final class RigidBody: HasTransform {
         
         // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
         // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-        self.inertiaTensor_local = matrix_float3x3.init(diagonal:
+        self.inertiaTensor_local = matrix_float3x3(diagonal:
             float3(momentOfInertiaAboutY + momentOfInertiaAboutZ,
                    momentOfInertiaAboutZ + momentOfInertiaAboutX,
                    momentOfInertiaAboutX + momentOfInertiaAboutY))
@@ -72,17 +73,20 @@ final class RigidBody: HasTransform {
         self.composite = CompositeBody()
         
         node.name = name
-        node.simdPosition = position
-        
+
         updateTransform()
+    }
+
+    var position: float3 {
+        return translation // FIXME should be center of mass
     }
 
     // FIXME test only
     func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) -> Joint {
-        return add(child, at: matrix4x4_rotation(rotation: eulerAngles))
+        return add(child, at: matrix3x3_rotation(rotation: eulerAngles))
     }
     
-    func add(_ child: RigidBody, at rotation: matrix_float4x4) -> Joint {
+    func add(_ child: RigidBody, at rotation: matrix_float3x3) -> Joint {
         let joint = Joint(parent: self, child: child, at: rotation)
         childJoints.append(joint)
         child.parentJoint = joint
@@ -96,7 +100,7 @@ final class RigidBody: HasTransform {
         guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
         
         self.force += force
-        self.torque += cross(convert(position: float3(0, 1, 0) * distance * length) - self.position, force)
+        self.torque += cross(translation + rotation * float3(0, distance * length, 0) - self.position, force)
     }
     
     func resetForces() {
@@ -104,37 +108,35 @@ final class RigidBody: HasTransform {
         self.torque = float3.zero
     }
 
-    var rotation_local: float4x4 {
-        guard let parentJoint = parentJoint else { return matrix_identity_float4x4 }
+    var rotation_local: float3x3 {
+        guard let parentJoint = parentJoint else { return matrix_identity_float3x3 }
         let sora = parentJoint.θ[0]
         guard simd_length(sora) > 10e-10 else {
-            // otherwise matrix4x4_rotation will return NaNs
-            return matrix_identity_float4x4
+            // otherwise matrix3x3_rotation will return NaNs
+            return matrix_identity_float3x3
         }
-        return matrix4x4_rotation(radians: simd_length(sora), axis: sora)
+        return matrix3x3_rotation(radians: simd_length(sora), axis: sora)
     }
     
     func updateTransform() {
         guard let parentJoint = parentJoint else { return }
         let parentRigidBody = parentJoint.parentRigidBody
 
-        self.transform = parentJoint.transform * rotation_local
-        node.simdTransform = self.transform
-        
-        let parentJointRotation = matrix3x3_rotation(from: parentJoint.transform)
-        let rotation = matrix3x3_rotation(from: transform)
+        self.rotation = parentJoint.rotation * rotation_local
+        self.translation = parentJoint.translation
+
+        node.simdPosition = self.position
+//        node.simdRotation = ... FIXME
 
         self.inertiaTensor = rotation * inertiaTensor_local * rotation.transpose
 
-        self.angularVelocity = parentRigidBody.angularVelocity + parentJointRotation * parentJoint.θ[1]
-        self.angularAcceleration = parentRigidBody.angularAcceleration + parentJointRotation * parentJoint.θ[2] + parentRigidBody.angularVelocity.crossMatrix * self.angularVelocity
+        self.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation * parentJoint.θ[1]
+        self.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation * parentJoint.θ[2] + parentRigidBody.angularVelocity.crossMatrix * self.angularVelocity
 
-        let parentRigidBodyRotation = matrix3x3_rotation(from: parentRigidBody.transform)
-
-        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBodyRotation * parentJoint.position_local - self.angularVelocity.crossMatrix * rotation * (-centerOfMass_local)
+        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation * parentJoint.position_local - self.angularVelocity.crossMatrix * rotation * (-centerOfMass_local)
         self.acceleration = parentJoint.acceleration - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation * (-centerOfMass_local)
 
-        self.centerOfMass = convert(position: centerOfMass_local)
+        self.centerOfMass = translation + rotation * centerOfMass_local
     }
 }
 

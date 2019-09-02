@@ -139,7 +139,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
             radius: rigidBody.radius,
 
             jointStiffness: 200.0,
-            jointLocalRotation: rigidBody.parentJoint.map { matrix3x3_rotation(rotation: $0.rotation_local) } ?? matrix_identity_float3x3,
+            jointLocalRotation: rigidBody.parentJoint.map { $0.rotation_local } ?? matrix_identity_float3x3,
 
             position: rigidBody.position,
             rotation: rigidBody.rotation,

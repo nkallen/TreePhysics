@@ -114,24 +114,24 @@ func matrix3x3_rotation(radians: Float) -> float3x3 {
          float3(0, 0, 1)))
 }
 
-func matrix4x4_rotation(from: float3, to: float3) -> float4x4 {
+func matrix3x3_rotation(from: float3, to: float3) -> float3x3 {
     let from = normalize(from), to = normalize(to)
 
     let axis = cross(from, to)
-    if length(axis) == 0 { return matrix_identity_float4x4 }
+    if length(axis) == 0 { return matrix_identity_float3x3 }
 
     let unitAxis = normalize(axis)
     let ct = dot(from, to)
     let st = length(axis)
     let ci = 1 - ct
     let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
-    return matrix_float4x4.init(columns:(float4(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st, 0),
-                                         float4(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st, 0),
-                                         float4(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci, 0),
-                                         float4(                  0,                   0,                   0, 1)))
+    return float3x3(columns:
+        (float3(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st),
+         float3(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st),
+         float3(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
 }
 
-func matrix3x3_rotation(radians: Float, axis: float3) -> matrix_float3x3 {
+func matrix3x3_rotation(radians: Float, axis: float3) -> matrix_float3x3 { // FIXME check for NaN
     let unitAxis = normalize(axis)
     let ct = cosf(radians)
     let st = sinf(radians)
