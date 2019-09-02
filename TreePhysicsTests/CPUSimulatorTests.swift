@@ -46,7 +46,6 @@ class CPUSimulatorTests: XCTestCase {
 
         XCTAssertEqual(b2.centerOfMass, float3(0.5 + 1/sqrt2, 1 + 1/sqrt2, 0), accuracy: 0.0001)
         XCTAssertEqual(b1.centerOfMass, float3(0.5/sqrt2, 1 + 0.5/sqrt2, 0), accuracy: 0.0001)
-        XCTAssertEqual(root.centerOfMass, float3(0, 0.5, 0), accuracy: 0.0001)
 
         XCTAssertEqual(b2.parentJoint!.position, float3(1/sqrt2, 1 + 1/sqrt2, 0), accuracy: 0.0001)
         XCTAssertEqual(b1.parentJoint!.position, float3(0,1, 0))
@@ -95,17 +94,17 @@ class CPUSimulatorTests: XCTestCase {
 
         XCTAssertEqual(
             float3x3(
-                float3(0,0,0.005), // i.e., a small rotation about the z axis
-                float3(0,0,0),
-                float3(0,0,0)
+                float3(0,0,0.00022747826), // i.e., a small rotation about the z axis
+                float3(0,0,0.0265728),
+                float3(0,0,1.4540794)
             ),
             b2.parentJoint!.θ, accuracy: 0.0001)
 
         XCTAssertEqual(
             float3x3(
-                float3(0,0,0.008535533), // a slightly larger rotation since the torque on b1 is greater
-                float3(0,0,0),
-                float3(0,0,0)
+                float3(0,0,8.173804e-5), // a larger torque but also larger inertia
+                float3(0,0,0.009755039),
+                float3(0,0,0.5747631)
             ),
             b1.parentJoint!.θ, accuracy: 0.0001)
     }
@@ -138,20 +137,20 @@ class CPUSimulatorTests: XCTestCase {
             float4x4([[1/sqrt2, -1/sqrt2, 0, 0], [1/sqrt2, 1.0/sqrt2, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
             b1.transform, accuracy: 0.0001)
 
-        simulator.update(at: 1.0 / 60)
+        simulator.update(at: 1.0 / 30)
 
         XCTAssertEqual(
-            float3(0.7010456, 1.7131165, 0),
+            float3(0.70687836, 1.7073351, 0),
             b2.position, accuracy: 0.0001)
         XCTAssertEqual(
             float3x3(
-                float3(0.013535142,-1,0),
-                float3(1,0.013535142,0),
+                float3(0.0011795163,-1,0),
+                float3(1,0.0011795163,0),
                 float3(0,0,1)),
             b2.rotation, accuracy: 0.0001)
         XCTAssertEqual(
             float4x4(
-                [[0.013535231, -0.9999084, 0, 0], [0.9999084, 0.013535231, 0, 0], [0, 0, 1, 0], [0.7010455, 1.7131165, 0, 1]]),
+                [[0.0011795163, -0.9999084, 0, 0], [0.9999084, 0.0011795163, 0, 0], [0, 0, 1, 0], [0.70687836, 1.7073351, 0, 1]]),
             b2.transform, accuracy: Float(0.0001))
 
         XCTAssertEqual(
@@ -159,12 +158,12 @@ class CPUSimulatorTests: XCTestCase {
             b1.position)
         XCTAssertEqual(
             float3x3(
-                float3(0.7131165,-0.7010456,0),
-                float3(0.7010456,0.7131165,0),
+                float3(0.7073351,-0.70687836,0),
+                float3(0.70687836,0.7073351,0),
                 float3(0,0,1)),
             b1.rotation, accuracy: 0.0001)
         XCTAssertEqual(
-            float4x4([[0.7131165, -0.7010455, 0, 0], [0.7010455, 0.7131165, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
+            float4x4([[0.7073351, -0.70687836, 0, 0], [0.70687836, 0.7073351, 0, 0], [0, 0, 1, 0], [0, 1, 0, 1]]),
             b1.transform, accuracy: 0.0001)
     }
 

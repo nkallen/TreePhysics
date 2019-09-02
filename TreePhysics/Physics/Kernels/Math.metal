@@ -277,33 +277,35 @@ template <class T>
 inline DifferentialSolution<T>
 solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0)
 {
+    T k = g/c;
+    T y_0_k = y_0 - k;
     QuadraticSolution<T> quadraticSolution = solveQuadratic(a, b, c);
     switch (quadraticSolution.type) {
         case QuadraticSolutionTypeReal: {
             matrix<T, 2, 2> system = matrix<T, 2, 2>(vec<T, 2>(1, quadraticSolution.a), vec<T, 2>(0, 1));
-            vec<T, 2> solution = inverse(system) * vec<T, 2>(y_0, y_ddt_0);
+            vec<T, 2> solution = inverse(system) * vec<T, 2>(y_0_k, y_ddt_0);
             return {
                 QuadraticSolutionTypeReal,
                 solution.x,
                 solution.y,
                 quadraticSolution.a,
-                g/c
+                k
             };
         }
         case QuadraticSolutionTypeRealDistinct: {
             matrix<T, 2, 2> system = matrix<T, 2, 2>(vec<T, 2>(1, quadraticSolution.a), vec<T, 2>(1, quadraticSolution.b));
-            vec<T, 2> solution = inverse(system) * vec<T, 2>(y_0, y_ddt_0);
+            vec<T, 2> solution = inverse(system) * vec<T, 2>(y_0_k, y_ddt_0);
             return {
                 QuadraticSolutionTypeRealDistinct,
                 solution.x,
                 solution.y,
                 quadraticSolution.a,
                 quadraticSolution.b,
-                g/c
+                k
             };
         }
         case QuadraticSolutionTypeComplex: {
-            T c1 = y_0;
+            T c1 = y_0_k;
             T c2 = (y_ddt_0 - quadraticSolution.a * c1) / quadraticSolution.b;
             return {
                 QuadraticSolutionTypeComplex,
@@ -311,7 +313,7 @@ solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0)
                 c2,
                 quadraticSolution.a,
                 quadraticSolution.b,
-                g/c
+                k
             };
         }
     }
