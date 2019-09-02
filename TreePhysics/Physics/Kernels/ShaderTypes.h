@@ -58,8 +58,9 @@ typedef struct {
     float mass;
     float length;
     float radius;
+
     float jointStiffness;
-    matrix_float3x3 localRotation;
+    matrix_float3x3 jointLocalRotation;
 
     vector_float3 position;
     matrix_float3x3 rotation;

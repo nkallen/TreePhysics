@@ -6,35 +6,29 @@ using namespace metal;
 
 constant float β [[ function_constant(FunctionConstantIndexBeta) ]];
 
-inline float3x3 joint_localRotation(
-                                    JointStruct joint)
-{
-    return matrix_rotate(joint.θ[0]);
-}
-
 inline float3x3 joint_worldToLocalRotation(
-                                           JointStruct joint,
+                                           float3x3 jointLocalRotation,
                                            RigidBodyStruct parentRigidBody)
 {
-    return transpose(parentRigidBody.rotation * joint_localRotation(joint));
+    return transpose(parentRigidBody.rotation * jointLocalRotation);
 }
 
 template <class T>
 inline vec<T, 3> joint_rotateVector(
-                                    JointStruct joint,
+                                    float3x3 jointLocalRotation,
                                     RigidBodyStruct parentRigidBody,
                                     vec<T, 3> vector)
 {
-    return (matrix<T, 3, 3>)joint_worldToLocalRotation(joint, parentRigidBody) * vector;
+    return (matrix<T, 3, 3>)joint_worldToLocalRotation(jointLocalRotation, parentRigidBody) * vector;
 }
 
 template <class T>
 inline matrix<T, 3, 3> joint_rotateTensor(
-                                          JointStruct joint,
+                                          float3x3 jointLocalRotation,
                                           RigidBodyStruct parentRigidBody,
                                           matrix<T, 3, 3> tensor)
 {
-    matrix<T, 3, 3> R = matrix<T, 3, 3>(joint_worldToLocalRotation(joint, parentRigidBody));
+    matrix<T, 3, 3> R = matrix<T, 3, 3>(joint_worldToLocalRotation(jointLocalRotation, parentRigidBody));
     return R * tensor * transpose(R);
 }
 
@@ -49,14 +43,15 @@ inline JointStruct
 updateJoint(
             JointStruct joint,
             float jointStiffness,
+            float3x3 jointLocalRotation,
             RigidBodyStruct parentRigidBody,
             CompositeBodyStruct childCompositeBody,
             float time)
 {
-    float3 pr = joint_rotateVector(joint, parentRigidBody, childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody));
+    float3 pr = joint_rotateVector(jointLocalRotation, parentRigidBody, childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody));
 
-    float3x3 inertiaTensor_jointSpace = joint_rotateTensor(joint, parentRigidBody, childCompositeBody.inertiaTensor) - childCompositeBody.mass * sqr(crossMatrix(pr));
-    float3 torque_jointSpace = joint_rotateVector(joint, parentRigidBody, childCompositeBody.torque);
+    float3x3 inertiaTensor_jointSpace = joint_rotateTensor(jointLocalRotation, parentRigidBody, childCompositeBody.inertiaTensor) - childCompositeBody.mass * sqr(crossMatrix(pr));
+    float3 torque_jointSpace = joint_rotateVector(jointLocalRotation, parentRigidBody, childCompositeBody.torque);
 
     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
     // K is a spring stiffness matrix, θ = euler angles of the joint,
@@ -117,6 +112,6 @@ updateJoints(
 
     RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
     CompositeBodyStruct compositeBody = compositeBodies[gid];
-    joint = updateJoint(joint, rigidBody.jointStiffness, parentRigidBody, compositeBody, *time);
+    joint = updateJoint(joint, rigidBody.jointStiffness, rigidBody.jointLocalRotation, parentRigidBody, compositeBody, *time);
     joints[gid] = joint;
 }

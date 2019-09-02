@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 let torqueFictitiousMultiplier_i: Float = 1.0
-let torqueFictitiousMultiplier_ii: Float = 0.0
+let torqueFictitiousMultiplier_ii: Float = 0.1
 let torqueFictitiousMultiplier_iii: Float = 1.0
 
 final class CPUSimulator {
