@@ -122,7 +122,7 @@ final class RigidBody {
         self.translation = parentJoint.translation
 
         node.simdPosition = self.translation
-//        node.simdRotation = ... FIXME
+        node.simdOrientation = self.rotation
 
         self.inertiaTensor = float3x3(rotation) * inertiaTensor_local * float3x3(rotation).transpose
 
