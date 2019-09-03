@@ -100,13 +100,6 @@ class MathTests: XCTestCase {
             float3(1/3,1/3,1/2),
             matrix.eigen_ql!.0, accuracy: 0.0001)
     }
-
-    func testRotation() {
-        XCTAssertEqual(
-            matrix4x4_rotation(radians: .pi/4, axis: .z),
-            matrix4x4_rotation(rotation: float3(0, 0, .pi/4)),
-            accuracy: 0.0001)
-    }
 }
 
 class QuadraticTests: XCTestCase {

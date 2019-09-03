@@ -21,8 +21,8 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
-        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1)
+        _ = b1.add(b2)
 
         let (rigidBodies, rigidBodiesBuffer, _) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
 
@@ -64,8 +64,8 @@ class UpdateCompositeBodiesTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
-        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1)
+        _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
@@ -136,8 +136,8 @@ class UpdateJointsTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
-        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1)
+        _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
 
@@ -205,8 +205,8 @@ class UpdateRigidBodiesTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
-        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1)
+        _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
         self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
 

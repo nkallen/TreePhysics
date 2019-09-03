@@ -18,7 +18,7 @@ class ModelTests: XCTestCase {
     func test2DCaseIsSameAsPlanar3DCase() {
         let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)
         let rigidBody = RigidBody(length: 1, radius: 1, density: 1)
-        let parentJoint = root.add(rigidBody, at: float3.zero)
+        let parentJoint = root.add(rigidBody, at: simd_quatf.identity)
 
         // 1. The 2D setup:
         let momentOfInertia_jointSpace = rigidBody.momentOfInertia + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, parentJoint.position))

@@ -105,132 +105,6 @@ extension Array where Element == float3 {
     }
 }
 
-func matrix3x3_rotation(radians: Float) -> float3x3 {
-    let cs = cosf(radians)
-    let sn = sinf(radians)
-    return float3x3(columns:
-        (float3(cs, sn, 0),
-         float3(-sn, cs, 0),
-         float3(0, 0, 1)))
-}
-
-func matrix3x3_rotation(from: float3, to: float3) -> float3x3 {
-    let from = normalize(from), to = normalize(to)
-
-    let axis = cross(from, to)
-    if length(axis) == 0 { return matrix_identity_float3x3 }
-
-    let unitAxis = normalize(axis)
-    let ct = dot(from, to)
-    let st = length(axis)
-    let ci = 1 - ct
-    let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
-    return float3x3(columns:
-        (float3(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st),
-         float3(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st),
-         float3(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
-}
-
-// FIXME rename all matrix_float3x3
-func matrix3x3_rotation(radians: Float, axis: float3) -> matrix_float3x3 { // FIXME check for NaN
-    let unitAxis = normalize(axis)
-    let ct = cosf(radians)
-    let st = sinf(radians)
-    let ci = 1 - ct
-    let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
-    return float3x3(columns:
-        (float3(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st),
-         float3(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st),
-         float3(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
-}
-
-func matrix4x4_rotation(radians: Float, axis: float3) -> matrix_float4x4 {
-    let unitAxis = normalize(axis)
-    let ct = cosf(radians)
-    let st = sinf(radians)
-    let ci = 1 - ct
-    let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
-    return matrix_float4x4.init(columns:(float4(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st, 0),
-                                         float4(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st, 0),
-                                         float4(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci, 0),
-                                         float4(                  0,                   0,                   0, 1)))
-}
-
-func matrix4x4_rotation(rotation: float3) -> matrix_float4x4 {
-    let pitch = rotation.x
-    let yaw = rotation.y
-    let roll = rotation.z
-
-    let cb = cosf(pitch)
-    let sb = sinf(pitch)
-    let ch = cosf(yaw)
-    let sh = sinf(yaw)
-    let ca = cosf(roll)
-    let sa = sinf(roll)
-
-    return float4x4(columns:(
-        float4(ch*ca,          sa,     -sh*ca,            0),
-        float4(sh*sb-ch*sa*cb, ca*cb,  sh*sa*cb+ch*sb,    0),
-        float4(ch*sa*sb+sh*cb, -ca*sb, -sh*sa*sb + ch*cb, 0),
-        float4(0,              0,      0,                 1)))
-}
-
-func matrix3x3_rotation(rotation: float3) -> matrix_float3x3 {
-    let pitch = rotation.x
-    let yaw = rotation.y
-    let roll = rotation.z
-
-    let cb = cosf(pitch)
-    let sb = sinf(pitch)
-    let ch = cosf(yaw)
-    let sh = sinf(yaw)
-    let ca = cosf(roll)
-    let sa = sinf(roll)
-
-    return float3x3(columns:(
-        float3(ch*ca,          sa,     -sh*ca),
-        float3(sh*sb-ch*sa*cb, ca*cb,  sh*sa*cb+ch*sb),
-        float3(ch*sa*sb+sh*cb, -ca*sb, -sh*sa*sb + ch*cb)))
-}
-
-func matrix3x3_rotation(rotation: matrix_float4x4) -> matrix_float3x3 {
-    return float3x3(columns: (
-        rotation[0].xyz,
-        rotation[1].xyz,
-        rotation[2].xyz))
-}
-
-func matrix4x4_translation(_ translationX: Float, _ translationY: Float, _ translationZ: Float) -> matrix_float4x4 {
-    return matrix_float4x4.init(columns:(vector_float4(1, 0, 0, 0),
-                                         vector_float4(0, 1, 0, 0),
-                                         vector_float4(0, 0, 1, 0),
-                                         vector_float4(translationX, translationY, translationZ, 1)))
-}
-
-func matrix4x4_scale(_ sx: Float, _ sy: Float, _ sz: Float) -> matrix_float4x4 {
-    return matrix_float4x4.init(columns:(vector_float4(sx, 0, 0, 0),
-                                         vector_float4(0, sy, 0, 0),
-                                         vector_float4(0, 0, sz, 0),
-                                         vector_float4(0, 0, 0, 1)))
-}
-
-func rotate(_ x: float3, by radians: Float, axis: float3) -> float3 {
-    return (matrix4x4_rotation(radians: radians, axis: axis) * float4(x, 0)).xyz
-}
-
-func matrix3x3_rotation(from transform: matrix_float4x4) -> matrix_float3x3 {
-    return float3x3(columns: (
-        transform[0].xyz, transform[1].xyz, transform[2].xyz
-    ))
-}
-
-func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> float3x3 {
-    return float3x3(columns:
-        (vector_float3(1, 0, 0),
-                                         vector_float3(0, 1, 0),
-                                         vector_float3(translationX, translationY, 1)))
-}
-
 extension float2 {
     init(_ double2: double2) {
         self = float2(Float(double2.x), Float(double2.y))
@@ -310,7 +184,7 @@ func sqr(_ x: Double) -> Double {
 }
 
 @inline(__always)
-func sqr(_ x: matrix_float3x3) -> matrix_float3x3 {
+func sqr(_ x: float3x3) -> float3x3 {
     return matrix_multiply(x, x)
 }
 
@@ -318,9 +192,9 @@ extension Float {
     static let e: Float = Float(Darwin.M_E)
 }
 
-extension matrix_float3x3 {
+extension float3x3 {
     init(_ double3x3: double3x3) {
-        self = matrix_float3x3(columns: (
+        self = float3x3(columns: (
             float3(double3x3[0]),
             float3(double3x3[1]),
             float3(double3x3[2])
@@ -329,7 +203,7 @@ extension matrix_float3x3 {
 
     // unrolled: cf https://hal.archives-ouvertes.fr/hal-01550129/document
     var cholesky: float3x3 {
-        var result = matrix_float3x3(0)
+        var result = float3x3(0)
 
         // Load A into registers
 

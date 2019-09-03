@@ -160,3 +160,9 @@ class SharedBuffersMTLDevice: MTLDeviceProxy {
         return options
     }
 }
+
+extension RigidBody {
+    func add(_ child: RigidBody) -> Joint {
+        return add(child, at: simd_quatf(angle: -.pi/4, axis: float3(0,0,1)))
+    }
+}

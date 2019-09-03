@@ -37,10 +37,10 @@ final class CylinderPen: Pen {
 
         let (vertices, indices) = makeSegment(radius: radius, height: distance)
 
-        let rotation = matrix3x3_rotation(from: float3(0,1,0), to: tangent)
+        let rotation = simd_quatf(from: float3(0,1,0), to: tangent)
         let rotatedVertices: [float3]
         rotatedVertices = vertices.map { vertex in
-            start + rotation * vertex
+            start + rotation.act(vertex)
         }
 
         self.start = start + distance * tangent

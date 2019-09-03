@@ -18,13 +18,8 @@ class CPUSimulatorTests: XCTestCase {
         root = RigidBody()
         b1 = RigidBody()
         b2 = RigidBody()
-        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
-        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
-
-        print(b1.rotation.normalized)
-        print(simd_quatf(matrix3x3_rotation(radians: -Float.pi/4, axis: float3(0,0,1))).normalized)
-        print(b2.rotation.normalized)
-        print(simd_quatf(sqr(matrix3x3_rotation(radians: -Float.pi/4, axis: float3(0,0,1)))).normalized)
+        _ = root.add(b1)
+        _ = b1.add(b2)
 
         simulator = CPUSimulator(root: root)
 
@@ -146,10 +141,4 @@ class CPUSimulatorTests: XCTestCase {
             b1.rotation, accuracy: 0.0001)
     }
 
-}
-
-extension RigidBody {
-    func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) -> Joint {
-        return add(child, at: matrix3x3_rotation(rotation: eulerAngles))
-    }
 }
