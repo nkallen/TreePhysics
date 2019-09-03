@@ -33,7 +33,7 @@ final class RigidBody {
     var torque: float3 = float3.zero
 
     var inertiaTensor: float3x3
-    var rotation: float3x3 = matrix_identity_float3x3
+    var rotation: simd_quatf = simd_quatf.identity
     var translation: float3 = float3.zero
     var centerOfMass: float3 = float3.zero
     var angularVelocity: float3 = float3.zero
@@ -59,7 +59,7 @@ final class RigidBody {
         
         // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
         // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-        self.inertiaTensor_local = matrix_float3x3(diagonal:
+        self.inertiaTensor_local = float3x3(diagonal:
             float3(momentOfInertiaAboutY + momentOfInertiaAboutZ,
                    momentOfInertiaAboutZ + momentOfInertiaAboutX,
                    momentOfInertiaAboutX + momentOfInertiaAboutY))
@@ -80,13 +80,8 @@ final class RigidBody {
     var position: float3 {
         return translation // FIXME should be center of mass
     }
-
-    // FIXME test only
-    func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) -> Joint {
-        return add(child, at: matrix3x3_rotation(rotation: eulerAngles))
-    }
     
-    func add(_ child: RigidBody, at rotation: matrix_float3x3) -> Joint {
+    func add(_ child: RigidBody, at rotation: simd_quatf) -> Joint {
         let joint = Joint(parent: self, child: child, at: rotation)
         childJoints.append(joint)
         child.parentJoint = joint
@@ -100,7 +95,7 @@ final class RigidBody {
         guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
         
         self.force += force
-        self.torque += cross(translation + rotation * float3(0, distance * length, 0) - self.position, force)
+        self.torque += cross(translation + rotation.act(float3(0, distance * length, 0)) - self.position, force)
     }
     
     func resetForces() {
@@ -108,35 +103,37 @@ final class RigidBody {
         self.torque = float3.zero
     }
 
-    var rotation_local: float3x3 {
-        guard let parentJoint = parentJoint else { return matrix_identity_float3x3 }
+    // FIXME
+    var rotation_local: simd_quatf {
+        guard let parentJoint = parentJoint else { return simd_quatf.identity }
         let sora = parentJoint.θ[0]
         guard simd_length(sora) > 10e-10 else {
             // otherwise matrix3x3_rotation will return NaNs
-            return matrix_identity_float3x3
+            return simd_quatf.identity
         }
-        return matrix3x3_rotation(radians: simd_length(sora), axis: sora)
+        return simd_quatf(angle: simd_length(sora), axis: normalize(sora))
     }
     
     func updateTransform() {
         guard let parentJoint = parentJoint else { return }
         let parentRigidBody = parentJoint.parentRigidBody
 
-        self.rotation = parentJoint.rotation * rotation_local
+        self.rotation = (parentJoint.rotation * rotation_local).normalized
         self.translation = parentJoint.translation
 
         node.simdPosition = self.position
 //        node.simdRotation = ... FIXME
 
-        self.inertiaTensor = rotation * inertiaTensor_local * rotation.transpose
+        // FIXME maybe extend simd to rotate tensors
+        self.inertiaTensor = float3x3(rotation) * inertiaTensor_local * float3x3(rotation).transpose
 
-        self.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation * parentJoint.θ[1]
-        self.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation * parentJoint.θ[2] + parentRigidBody.angularVelocity.crossMatrix * self.angularVelocity
+        self.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation.act(parentJoint.θ[1])
+        self.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.crossMatrix * self.angularVelocity
 
-        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation * parentJoint.position_local - self.angularVelocity.crossMatrix * rotation * (-centerOfMass_local)
-        self.acceleration = parentJoint.acceleration - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation * (-centerOfMass_local)
+        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.position_local) - self.angularVelocity.crossMatrix * rotation.act(-centerOfMass_local)
+        self.acceleration = parentJoint.acceleration - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation.act(-centerOfMass_local)
 
-        self.centerOfMass = translation + rotation * centerOfMass_local
+        self.centerOfMass = translation + rotation.act(centerOfMass_local)
     }
 }
 

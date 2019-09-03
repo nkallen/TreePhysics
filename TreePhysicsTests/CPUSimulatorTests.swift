@@ -21,10 +21,15 @@ class CPUSimulatorTests: XCTestCase {
         _ = root.add(b1, at: float3(0,0,-Float.pi/4))
         _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
 
+        print(b1.rotation.normalized)
+        print(simd_quatf(matrix3x3_rotation(radians: -Float.pi/4, axis: float3(0,0,1))).normalized)
+        print(b2.rotation.normalized)
+        print(simd_quatf(sqr(matrix3x3_rotation(radians: -Float.pi/4, axis: float3(0,0,1)))).normalized)
+
         simulator = CPUSimulator(root: root)
 
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
-        self.forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
+        self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
     }
 
     func testApplyForce() {
@@ -35,11 +40,12 @@ class CPUSimulatorTests: XCTestCase {
 
         XCTAssertEqual(b2.torque, cross(forceAppliedPosition - b2.position, force))
 
-        XCTAssertEqual(b2.rotation * b2.inertiaTensor * b2.rotation.transpose, matrix_float3x3.init(diagonal: float3(
-            1.0/4 + 1.0/12,
-            1.0/2,
-            1.0/4 + 1.0/12
-        )), accuracy: 0.0001)
+        XCTAssertEqual(float3x3(b2.rotation.normalized) * b2.inertiaTensor * float3x3(b2.rotation.normalized).transpose,
+                       float3x3(diagonal: float3(
+                        1.0/4 + 1.0/12,
+                        1.0/2,
+                        1.0/4 + 1.0/12
+                       )), accuracy: 0.0001)
 
         XCTAssertEqual(root.position, float3.zero)
         XCTAssertEqual(b1.parentJoint!.position, float3(0,1,0))
@@ -111,22 +117,16 @@ class CPUSimulatorTests: XCTestCase {
     func testUpdateRigidBodies() {
         XCTAssertEqual(
             float3(1/sqrt2, 1+1/sqrt2, 0),
-            b2.position)
+            b2.position, accuracy: 0.0001)
         XCTAssertEqual(
-            float3x3(
-            float3(0,-1,0),
-            float3(1,0,0),
-            float3(0,0,1)),
+            simd_quatf(angle: .pi/2, axis: float3(0,0,-1)),
             b2.rotation, accuracy: 0.0001)
 
         XCTAssertEqual(
             float3(0, 1, 0),
             b1.position)
         XCTAssertEqual(
-            float3x3(
-                float3(1/sqrt(2),-1/sqrt2,0),
-                float3(1/sqrt(2),1/sqrt(2),0),
-                float3(0,0,1)),
+            simd_quatf(angle: .pi/4, axis: float3(0,0,-1)),
             b1.rotation, accuracy: 0.0001)
 
         simulator.update(at: 1.0 / 30)
@@ -135,21 +135,21 @@ class CPUSimulatorTests: XCTestCase {
             float3(0.70687836, 1.7073351, 0),
             b2.position, accuracy: 0.0001)
         XCTAssertEqual(
-            float3x3(
-                float3(0.0011795163,-1,0),
-                float3(1,0.0011795163,0),
-                float3(0,0,1)),
+            simd_quatf(angle: 1.5696167, axis: float3(0,0,-1)),
             b2.rotation, accuracy: 0.0001)
 
         XCTAssertEqual(
             float3(0, 1, 0),
             b1.position)
         XCTAssertEqual(
-            float3x3(
-                float3(0.7073351,-0.70687836,0),
-                float3(0.70687836,0.7073351,0),
-                float3(0,0,1)),
+            simd_quatf(angle: 0.78507507, axis: float3(0,0,-1)),
             b1.rotation, accuracy: 0.0001)
     }
 
+}
+
+extension RigidBody {
+    func add(_ child: RigidBody, at eulerAngles: float3 = float3(0, 0, -.pi / 4)) -> Joint {
+        return add(child, at: matrix3x3_rotation(rotation: eulerAngles))
+    }
 }

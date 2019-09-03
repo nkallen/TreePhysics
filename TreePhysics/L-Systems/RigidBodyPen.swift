@@ -20,10 +20,10 @@ final class RigidBodyPen: Pen {
 
         let newBranch = RigidBody(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
-        let parentTangent = parentBranch.translation + parentBranch.rotation * float3(0,1,0) - parentBranch.position
+        let parentTangent = parentBranch.translation + parentBranch.rotation.act(float3(0,1,0)) - parentBranch.position
         let rotation = matrix3x3_rotation(from: parentTangent, to: tangent)
 
-        parentBranch.add(newBranch, at: rotation)
+        _ = parentBranch.add(newBranch, at: simd_quatf(rotation).normalized)
 
         self.start = start + distance * tangent
         self.parentBranch = newBranch

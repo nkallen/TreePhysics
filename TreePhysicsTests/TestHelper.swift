@@ -33,6 +33,11 @@ func XCTAssertEqual(_ a: float3x3, _ b: float3x3, accuracy: Float, _ message: @a
     XCTAssertEqual(a.columns.2, b.columns.2, accuracy: accuracy, message() + ".columns.2", file: file, line: line)
 }
 
+func XCTAssertEqual(_ a: simd_quatf, _ b: simd_quatf, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+    XCTAssertEqual(a.angle, b.angle, accuracy: accuracy, message() + ".angle", file: file, line: line)
+    XCTAssertEqual(a.axis, b.axis, accuracy: accuracy, message() + ".axis", file: file, line: line)
+}
+
 func XCTAssertEqual(_ a: float4x4, _ b: float4x4, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.columns.0, b.columns.0, accuracy: accuracy, message(), file: file, line: line)
     XCTAssertEqual(a.columns.1, b.columns.1, accuracy: accuracy, message(), file: file, line: line)
@@ -100,7 +105,7 @@ func XCTAssertEqual(_ a: RigidBody, _ b: RigidBodyStruct, accuracy: Float, _ mes
     XCTAssertEqual(a.inertiaTensor, b.inertiaTensor, accuracy: accuracy, "inertia tensor", file: file, line: line)
 
     XCTAssertEqual(a.position, b.position, accuracy: accuracy, "position", file: file, line: line)
-    XCTAssertEqual(a.rotation, b.rotation, accuracy: accuracy, "rotation", file: file, line: line)
+    XCTAssertEqual(float3x3(a.rotation), b.rotation, accuracy: accuracy, "rotation", file: file, line: line)
 }
 
 // MARK: Half Arithmetic (should only be used in tests, NOT PRODUCTION CODE!!)

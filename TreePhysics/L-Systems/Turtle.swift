@@ -19,7 +19,7 @@ enum Command {
     case pop
 }
 
-fileprivate let initialOrientation = matrix_float3x3.init(columns: (.y, -.x, .z))
+fileprivate let initialOrientation = float3x3(columns: (.y, -.x, .z))
 
 class Interpreter<P> where P: Pen {
     struct Configuration {
@@ -174,7 +174,7 @@ class Interpreter<P> where P: Pen {
 fileprivate func matrix3x3_rotation_up(radians: Float) -> float3x3 {
     let cs = cosf(radians)
     let sn = sinf(radians)
-    return matrix_float3x3.init(columns:
+    return float3x3(columns:
         (float3(cs, -sn, 0),
          float3(sn, cs, 0),
          float3(0, 0, 1)))
@@ -183,7 +183,7 @@ fileprivate func matrix3x3_rotation_up(radians: Float) -> float3x3 {
 fileprivate func matrix3x3_rotation_left(radians: Float) -> float3x3 {
     let cs = cosf(radians)
     let sn = sinf(radians)
-    return matrix_float3x3.init(columns:
+    return float3x3(columns:
         (float3(cs, 0, sn),
          float3(0, 1, 0),
          float3(-sn, 0, cs)))
@@ -192,7 +192,7 @@ fileprivate func matrix3x3_rotation_left(radians: Float) -> float3x3 {
 fileprivate func matrix3x3_rotation_heading(radians: Float) -> float3x3 {
     let cs = cosf(radians)
     let sn = sinf(radians)
-    return matrix_float3x3.init(columns:
+    return float3x3(columns:
         (float3(1, 0, 0),
          float3(0, cs, sn),
          float3(0, -sn, cs)))

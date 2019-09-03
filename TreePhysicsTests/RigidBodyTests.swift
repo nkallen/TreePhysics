@@ -14,13 +14,13 @@ class RigidBodyTests: XCTestCase {
         let b5 = RigidBody()
         let b6 = RigidBody()
         let b7 = RigidBody()
-        root.add(b1)
-        root.add(b2)
-        b1.add(b3)
-        b1.add(b4)
-        b4.add(b5)
-        b2.add(b6)
-        b2.add(b7)
+        _ = root.add(b1)
+        _ = root.add(b2)
+        _ = b1.add(b3)
+        _ = b1.add(b4)
+        _ = b4.add(b5)
+        _ = b2.add(b6)
+        _ = b2.add(b7)
 
         XCTAssertEqual(root.flattened(),
                        [root, b1, b2, b3, b4, b6, b7, b5])
@@ -30,8 +30,8 @@ class RigidBodyTests: XCTestCase {
         let root = RigidBody()
         let b1 = RigidBody()
         let b2 = RigidBody()
-        root.add(b1)
-        b1.add(b2)
+        _ = root.add(b1)
+        _ = b1.add(b2)
 
         let expected: [Level] = [
             [UnitOfWork(rigidBody: b2, climbers: [b1])],
@@ -51,19 +51,15 @@ class RigidBodyTests: XCTestCase {
         let b8 = RigidBody()
         let b9 = RigidBody()
 
-        root.add(b1)
-
-        b1.add(b2)
-        b1.add(b3)
-
-        b3.add(b4)
-        b4.add(b5)
-
-        b5.add(b6)
-        b5.add(b7)
-
-        b7.add(b8)
-        b7.add(b9)
+        _ = root.add(b1)
+        _ = b1.add(b2)
+        _ = b1.add(b3)
+        _ = b3.add(b4)
+        _ = b4.add(b5)
+        _ = b5.add(b6)
+        _ = b5.add(b7)
+        _ = b7.add(b8)
+        _ = b7.add(b9)
 
         let empty: [RigidBody] = []
 

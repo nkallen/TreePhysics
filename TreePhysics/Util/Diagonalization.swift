@@ -250,7 +250,7 @@ extension matrix_double3x3 {
 
 }
 
-extension matrix_float3x3 {
+extension float3x3 {
     var eigen_analytical: (float3, float3x3)? {
         guard let (eigenvalues, eigenvectors) = double3x3(self).eigen_analytical else {
             return nil

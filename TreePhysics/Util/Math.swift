@@ -108,7 +108,7 @@ extension Array where Element == float3 {
 func matrix3x3_rotation(radians: Float) -> float3x3 {
     let cs = cosf(radians)
     let sn = sinf(radians)
-    return matrix_float3x3.init(columns:
+    return float3x3(columns:
         (float3(cs, sn, 0),
          float3(-sn, cs, 0),
          float3(0, 0, 1)))
@@ -131,15 +131,17 @@ func matrix3x3_rotation(from: float3, to: float3) -> float3x3 {
          float3(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
 }
 
+// FIXME rename all matrix_float3x3
 func matrix3x3_rotation(radians: Float, axis: float3) -> matrix_float3x3 { // FIXME check for NaN
     let unitAxis = normalize(axis)
     let ct = cosf(radians)
     let st = sinf(radians)
     let ci = 1 - ct
     let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
-    return matrix_float3x3.init(columns:(float3(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st),
-                                         float3(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st),
-                                         float3(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
+    return float3x3(columns:
+        (float3(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st),
+         float3(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st),
+         float3(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
 }
 
 func matrix4x4_rotation(radians: Float, axis: float3) -> matrix_float4x4 {
@@ -223,7 +225,8 @@ func matrix3x3_rotation(from transform: matrix_float4x4) -> matrix_float3x3 {
 }
 
 func matrix3x3_translation(_ translationX: Float, _ translationY: Float) -> float3x3 {
-    return matrix_float3x3.init(columns:(vector_float3(1, 0, 0),
+    return float3x3(columns:
+        (vector_float3(1, 0, 0),
                                          vector_float3(0, 1, 0),
                                          vector_float3(translationX, translationY, 1)))
 }
@@ -253,7 +256,7 @@ extension float3 {
     }
 
     var crossMatrix: float3x3 {
-        return matrix_float3x3.init(columns:
+        return float3x3(columns:
             (float3(0, self.z, -self.y),
              float3(-self.z, 0, self.x),
              float3(self.y, -self.x, 0)))
@@ -459,4 +462,8 @@ extension float3x3 {
     init(_ h: half3x3) {
         self = float3x3(float3(h[0]), float3(h[1]), float3(h[2]))
     }
+}
+
+extension simd_quatf {
+    static let identity = simd_quatf(angle: 1, axis: float3.zero)
 }

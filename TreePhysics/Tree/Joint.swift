@@ -6,19 +6,19 @@ final class Joint {
     unowned let parentRigidBody: RigidBody
     let childRigidBody: RigidBody
 
-    var rotation_local: float3x3 = matrix_identity_float3x3
-    var rotation: float3x3 = matrix_identity_float3x3
+    var rotation_local: simd_quatf = simd_quatf.identity
+    var rotation: simd_quatf = simd_quatf.identity
     var translation: float3 = float3.zero
     var acceleration: float3 = float3.zero
     // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3 = float3x3(0)
-    private(set) var rotation_world2local: float3x3 = matrix_identity_float3x3
+    private(set) var rotation_world2local: simd_quatf = simd_quatf.identity
     let translation_local: float3
     let position_local: float3
 
     let k: Float
 
-    init(parent: RigidBody, child: RigidBody, at rotation: float3x3) {
+    init(parent: RigidBody, child: RigidBody, at rotation: simd_quatf) {
         self.parentRigidBody = parent
         self.childRigidBody = child
         self.rotation_local = rotation
@@ -33,20 +33,20 @@ final class Joint {
     }
 
     func updateTransform() {
-        self.rotation = parentRigidBody.rotation * rotation_local
-        self.translation = parentRigidBody.translation + parentRigidBody.rotation * translation_local
-        self.rotation_world2local = rotation.transpose
+        self.rotation = (parentRigidBody.rotation * rotation_local).normalized
+        self.translation = parentRigidBody.translation + parentRigidBody.rotation.act(translation_local)
+        self.rotation_world2local = rotation.inverse.normalized
 
         self.acceleration = parentRigidBody.acceleration +
-            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation * position_local
+            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(position_local)
     }
 
     func rotate(tensor: float3x3) -> float3x3 {
-        return rotation_world2local * tensor * rotation_world2local.transpose
+        return float3x3(rotation_world2local) * tensor * float3x3(rotation_world2local).transpose
     }
 
     func rotate(vector: float3) -> float3 {
-        return rotation_world2local * vector
+        return rotation_world2local.act(vector)
     }
 
     private static func computeK(radius: Float, length: Float) -> Float {

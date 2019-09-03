@@ -21,8 +21,8 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        root.add(b1, at: float3(0,0,-Float.pi/4))
-        b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
+        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
 
         let (rigidBodies, rigidBodiesBuffer, _) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
 
@@ -75,7 +75,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     }
 
     func testUpdateCompositeBodies() {
-        let forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
+        let forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
 
         let expect = expectation(description: "wait")
 
@@ -106,7 +106,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
             // inertia tensor
             XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor, accuracy: 0.0001)
             var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - float3(b1_composite.centerOfMass)).crossMatrix)
-            b1_inertiaTensor += b2_composite.inertiaTensor - float3x3(b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).crossMatrix))
+            b1_inertiaTensor += b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).crossMatrix)
             XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
 
             expect.fulfill()
@@ -136,10 +136,10 @@ class UpdateJointsTests: XCTestCase {
         self.root = RigidBody()
         self.b1 = RigidBody()
         self.b2 = RigidBody()
-        root.add(b1, at: float3(0,0,-Float.pi/4))
-        b1.add(b2, at: float3(0,0,-Float.pi/4))
+        _ = root.add(b1, at: float3(0,0,-Float.pi/4))
+        _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
-        self.forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
+        self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
@@ -208,7 +208,7 @@ class UpdateRigidBodiesTests: XCTestCase {
         _ = root.add(b1, at: float3(0,0,-Float.pi/4))
         _ = b1.add(b2, at: float3(0,0,-Float.pi/4))
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
-        self.forceAppliedPosition = b2.translation + b2.rotation * float3(0, 1, 0)
+        self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
@@ -291,15 +291,15 @@ class AdvancedMetalTests: XCTestCase {
         let b8 = RigidBody()
         let b9 = RigidBody()
 
-        root.add(b1)
-        b1.add(b2)
-        b1.add(b3)
-        b3.add(b4)
-        b4.add(b5)
-        b5.add(b6)
-        b5.add(b7)
-        b7.add(b8)
-        b7.add(b9)
+        _ = root.add(b1)
+        _ = b1.add(b2)
+        _ = b1.add(b3)
+        _ = b3.add(b4)
+        _ = b4.add(b5)
+        _ = b5.add(b6)
+        _ = b5.add(b7)
+        _ = b7.add(b8)
+        _ = b7.add(b9)
 
         b9.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
