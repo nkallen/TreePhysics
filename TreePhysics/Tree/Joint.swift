@@ -14,7 +14,6 @@ final class Joint {
     var θ: float3x3 = float3x3(0)
     private(set) var rotation_world2local: simd_quatf = simd_quatf.identity
     let translation_local: float3
-    let position_local: float3
 
     let k: Float
 
@@ -24,7 +23,6 @@ final class Joint {
         self.rotation_local = rotation
         self.k = Joint.computeK(radius: parent.radius, length: parent.length)
         self.translation_local = float3(0, parentRigidBody.length, 0)
-        self.position_local = float3(0, parentRigidBody.length, 0) // FIXME weird duplicate
         updateTransform()
     }
 
@@ -38,7 +36,7 @@ final class Joint {
         self.rotation_world2local = rotation.inverse.normalized
 
         self.acceleration = parentRigidBody.acceleration +
-            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(position_local)
+            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(translation_local)
     }
 
     func rotate(tensor: float3x3) -> float3x3 {

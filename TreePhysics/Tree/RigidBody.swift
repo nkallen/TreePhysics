@@ -95,7 +95,7 @@ final class RigidBody {
         guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
         
         self.force += force
-        self.torque += cross(translation + rotation.act(float3(0, distance * length, 0)) - self.position, force)
+        self.torque += cross(translation + rotation.act(float3(0, distance * length, 0)) - self.translation, force)
     }
     
     func resetForces() {
@@ -121,16 +121,15 @@ final class RigidBody {
         self.rotation = (parentJoint.rotation * rotation_local).normalized
         self.translation = parentJoint.translation
 
-        node.simdPosition = self.position
+        node.simdPosition = self.translation
 //        node.simdRotation = ... FIXME
 
-        // FIXME maybe extend simd to rotate tensors
         self.inertiaTensor = float3x3(rotation) * inertiaTensor_local * float3x3(rotation).transpose
 
         self.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation.act(parentJoint.θ[1])
         self.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.crossMatrix * self.angularVelocity
 
-        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.position_local) - self.angularVelocity.crossMatrix * rotation.act(-centerOfMass_local)
+        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.translation_local) - self.angularVelocity.crossMatrix * rotation.act(-centerOfMass_local)
         self.acceleration = parentJoint.acceleration - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation.act(-centerOfMass_local)
 
         self.centerOfMass = translation + rotation.act(centerOfMass_local)
