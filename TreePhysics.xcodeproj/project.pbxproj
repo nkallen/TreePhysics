@@ -47,6 +47,7 @@
 		9E57566923184C9C0036F68B /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9E6372A222FEC7AA001D4466 /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
 		9E8024B8230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */; };
+		9E80B3E6231FF74F00A700CF /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9E8E27BF2307335300652DAC /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
 		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
 		9E8F711F230D87C200583AAE /* MetalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711E230D87C200583AAE /* MetalSimulator.swift */; };
@@ -545,6 +546,7 @@
 				9E0674E1230AD2420044C3C4 /* UpdateCompositeBodies.metal in Sources */,
 				9E9D4B7022F37244007DCF49 /* main.swift in Sources */,
 				9E9D4B9822F43D98007DCF49 /* Scene.swift in Sources */,
+				9E80B3E6231FF74F00A700CF /* Visualization.swift in Sources */,
 				9E1797E622FB704F00FA3892 /* UpdateCompositeBodies.swift in Sources */,
 				9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */,
 				9E1C70FA230C802700DA9929 /* ApplyPhysicsFields.metal in Sources */,

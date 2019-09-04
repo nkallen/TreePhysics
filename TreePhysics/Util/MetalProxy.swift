@@ -448,6 +448,10 @@ class MTLDeviceProxy: NSObject, MTLDevice {
 
     var maxBufferLength: Int { return underlying.maxBufferLength }
 
+    func makeTexture(descriptor: MTLTextureDescriptor, iosurface: IOSurfaceRef, plane: Int) -> MTLTexture? {
+        return underlying.makeTexture(descriptor: descriptor, iosurface: iosurface, plane: plane)
+    }
+
     #if os(iOS)
     func makeRenderPipelineState(tileDescriptor descriptor: MTLTileRenderPipelineDescriptor, options: MTLPipelineOption, reflection: AutoreleasingUnsafeMutablePointer<MTLAutoreleasedRenderPipelineReflection?>?) throws -> MTLRenderPipelineState {
         return try underlying.makeRenderPipelineState(tileDescriptor: descriptor, options: options, reflection: reflection)
@@ -466,10 +470,6 @@ class MTLDeviceProxy: NSObject, MTLDevice {
     var recommendedMaxWorkingSetSize: UInt64 { return underlying.recommendedMaxWorkingSetSize }
 
     var isDepth24Stencil8PixelFormatSupported: Bool { return underlying.isDepth24Stencil8PixelFormatSupported }
-
-    func makeTexture(descriptor: MTLTextureDescriptor, iosurface: IOSurfaceRef, plane: Int) -> MTLTexture? {
-        return underlying.makeTexture(descriptor: descriptor, iosurface: iosurface, plane: plane)
-    }
 
     func makeSharedTexture(descriptor: MTLTextureDescriptor) -> MTLTexture? {
         return underlying.makeSharedTexture(descriptor: descriptor)

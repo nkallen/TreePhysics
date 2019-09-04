@@ -129,6 +129,10 @@ extension float3 {
         return float2(x, y)
     }
 
+    var xz: float2 {
+        return float2(x, z)
+    }
+
     var crossMatrix: float3x3 {
         return float3x3(columns:
             (float3(0, self.z, -self.y),

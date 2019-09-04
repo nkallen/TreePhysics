@@ -78,7 +78,7 @@ final class WindField: PhysicsField {
     func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
         let t: Float = 0.1*(-Float(time))
 
-        let magnitude = fbm(floor(position.xy*100) + t) * 0.01
+        let magnitude = fbm(position.xz + t) * 0.005
         let direction = float3(-1,0,0)
         return magnitude * direction
     }
