@@ -42,13 +42,13 @@ class Scene: NSObject {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFA]/////[!"&FFFFFFA]/////[!"&FFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 6)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,
-            thicknessScale: 0.9,
+            thicknessScale: 0.7,
             stepSize: 0.1,
             stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
@@ -74,8 +74,11 @@ class Scene: NSObject {
         self.metalSimulator = MetalSimulator(device: device, root: root)
 
         cpuSimulator.add(field: gravityField)
-        cpuSimulator.add(field: attractorField)
+//        cpuSimulator.add(field: attractorField)
         metalSimulator.add(field: attractorField)
+
+        let windField = WindField()
+        cpuSimulator.add(field: windField)
     }
 }
 

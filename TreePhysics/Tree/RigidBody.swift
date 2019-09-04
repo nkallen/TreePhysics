@@ -67,7 +67,7 @@ final class RigidBody {
         self.inertiaTensor = inertiaTensor_local
         
         self.centerOfMass_local = float3(0, 1, 0) * length / 2
-        
+
         let node = SCNNode(geometry: SCNSphere(radius: 0.01))
         self.node = node
         self.composite = CompositeBody()
@@ -103,20 +103,12 @@ final class RigidBody {
         self.torque = float3.zero
     }
 
-    // FIXME
-    var rotation_local: simd_quatf {
-        guard let parentJoint = parentJoint else { return simd_quatf.identity }
-        let sora = parentJoint.θ[0]
-        guard simd_length(sora) > 10e-10 else {
-            // otherwise matrix3x3_rotation will return NaNs
-            return simd_quatf.identity
-        }
-        return simd_quatf(angle: simd_length(sora), axis: normalize(sora))
-    }
-    
     func updateTransform() {
         guard let parentJoint = parentJoint else { return }
         let parentRigidBody = parentJoint.parentRigidBody
+
+        let sora = parentJoint.θ[0]
+        let rotation_local = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
 
         self.rotation = (parentJoint.rotation * rotation_local).normalized
         self.translation = parentJoint.translation

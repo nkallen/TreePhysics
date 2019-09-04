@@ -206,10 +206,10 @@ extension float3x3 {
         var result = float3x3(0)
 
         // Load A into registers
-
-        let a00 = self[0, 0]
-        let a01 = self[0, 1], a11 = self[1, 1]
-        let a02 = self[0, 2], a12 = self[1, 2], a22 = self[2, 2]
+        let  a0 = self[0],     a1 = self[1]
+        let a00 = a0[0]
+        let a01 = a0[1], a11 = a1[1]
+        let a02 = a0[2], a12 = a1[2], a22 = self[2, 2]
 
         // Factorize A
         let sqrt_a00 = sqrt(a00)

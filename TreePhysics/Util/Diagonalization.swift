@@ -16,6 +16,11 @@ extension matrix_double3x3 {
     // A. The access is read-only.
     // ---------------------------------------------------------------------------
     var tridiagonal: (double3x3, double3, double2) {
+        let  a0 = self[0],     a1 = self[1]
+        let a00 = a0[0]
+        let a01 = a0[1], a11 = a1[1]
+        let a02 = a0[2], a12 = a1[2], a22 = self[2, 2]
+
         var d = double3.zero
         var e = double2.zero
         var u = double3.zero
@@ -24,44 +29,46 @@ extension matrix_double3x3 {
         var Q = matrix_identity_double3x3
 
         // Bring first row and column to the desired form
-        let h = sqr(self[1, 0]) + sqr(self[2, 0])
-        let g = self[1, 0] > 0 ? -sqrt(h) : sqrt(h)
+        let h = sqr(a01) + sqr(a02)
+        let g = a01 > 0 ? -sqrt(h) : sqrt(h)
 
         e[0] = g
-        var f = g * self[1, 0]
-        u[1] = self[1,0] - g
-        u[2] = self[2,0]
+        var f = g * a01
+        u[1] = a01 - g
+        u[2] = a02
 
         var omega = h - f
         if omega > 0.0 {
             omega = 1.0 / omega
             var K = 0.0
-            for i in 1..<3 {
-                f = self[i, 1] * u[1] + self[2, i] * u[2]
-                q[i] = omega * f                  // p
-                K   += u[i] * f                   // u* A u
-            }
+
+            f = a11 * u[1] + a12 * u[2]
+            q[1] = omega * f                  // p
+            K   += u[1] * f                   // u* A u
+
+            f = a12 * u[1] + a22 * u[2]
+            q[2] = omega * f                  // p
+            K   += u[2] * f                   // u* A u
+
             K *= 0.5 * sqr(omega)
 
             for i in 1..<3 {
                 q[i] = q[i] - K * u[i]
             }
 
-            d[0] = self[0, 0]
-            d[1] = self[1, 1] - 2.0*q[1]*u[1]
-            d[2] = self[2, 2] - 2.0*q[2]*u[2]
+            d[0] = a00
+            d[1] = a11 - 2.0*q[1]*u[1]
+            d[2] = a22 - 2.0*q[2]*u[2]
 
             // Store inverse Householder transformation in Q
             Q[1] = Q[1] - omega * u[1]*u
             Q[2] = Q[2] - omega * u[2]*u
 
             // Calculate updated A[1][2] and store it in e[1]
-            e[1] = self[2, 1] - q[1]*u[2] - u[1]*q[2]
+            e[1] = a12 - q[1]*u[2] - u[1]*q[2]
         } else {
-            for i in 0..<3 {
-                d[i] = self[i, i]
-            }
-            e[1] = self[2, 1]
+            d = double3(a00, a11, a22)
+            e[1] = a12
         }
 
         return (Q, d, e)
@@ -214,21 +221,27 @@ extension matrix_double3x3 {
     // Calculates the eigenvalues of a symmetric 3x3 matrix A using Cardano's
     // analytical algorithm.
     var eigenvalues_analytical: double3 {
+        // Load A into registers
+        let  a0 = self[0],     a1 = self[1]
+        let a00 = a0[0]
+        let a01 = a0[1], a11 = a1[1]
+        let a02 = a0[2], a12 = a1[2], a22 = self[2, 2]
+
         // Determine coefficients of characteristic poynomial. We write
         //       | a   d   f  |
         //  A =  | d*  b   e  |
         //       | f*  e*  c  |
-        let de = self[1, 0] * self[2, 1]                                 // d * e
-        let dd = sqr(self[1, 0])                                         // d^2
-        let ee = sqr(self[2, 1])                                         // e^2
-        let ff = sqr(self[2, 0])                                         // f^2
-        let m  = self[0, 0] + self[1, 1] + self[2, 2]
+        let de = a01 * a12                                 // d * e
+        let dd = sqr(a01)                                         // d^2
+        let ee = sqr(a12)                                         // e^2
+        let ff = sqr(a02)                                         // f^2
+        let m  = a00 + a11 + a22
         // a*b + a*c + b*c - d^2 - e^2 - f^2
-        let c1 = (self[0, 0]*self[1, 1] + self[0, 0]*self[2, 2] + self[1, 1]*self[2, 2]) -
+        let c1 = (a00*a11 + a00*a22 + a11*a22) -
             (dd + ee + ff)
         // c*d^2 + a*e^2 + b*f^2 - a*b*c - 2*f*d*e)
-        let c0 = self[2, 2]*dd + self[0, 0]*ee + self[1, 1]*ff - self[0, 0]*self[1, 1]*self[2, 2]
-            - 2.0 * self[2, 0]*de
+        let c0 = a22*dd + a00*ee + a11*ff - a00*a11*a22
+            - 2.0 * a02*de
 
         let p = sqr(m) - 3.0*c1
         let q = m*(p - (3.0/2.0)*c1) - (27.0/2.0)*c0

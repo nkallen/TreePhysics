@@ -1,9 +1,9 @@
 import Foundation
 import simd
 
-let torqueFictitiousMultiplier_i: Float = 1.0
-let torqueFictitiousMultiplier_ii: Float = 0.01
-let torqueFictitiousMultiplier_iii: Float = 1.0
+let torqueFictitiousMultiplier_i: Float = 0.0
+let torqueFictitiousMultiplier_ii: Float = 0.0
+let torqueFictitiousMultiplier_iii: Float = 0.0
 
 final class CPUSimulator {
     let root: RigidBody
@@ -30,12 +30,14 @@ final class CPUSimulator {
         resetForces()
     }
 
+    let start = Date()
+
     func updateFields(at time: TimeInterval) {
         for rigidBody in rigidBodiesReverseLevelOrder { // Order is unimportant
             for field in fields {
                 let position = rigidBody.position
                 if field.applies(to: position) {
-                    let force = field.eval(position: position, velocity: float3.zero, mass: rigidBody.mass, time: time)
+                    let force = field.eval(position: position, velocity: float3.zero, mass: rigidBody.mass, time: Date().timeIntervalSince(start))
                     rigidBody.apply(force: force, at: 0.5)
                 }
             }
