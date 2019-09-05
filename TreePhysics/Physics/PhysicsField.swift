@@ -1,11 +1,12 @@
 import Foundation
 import simd
+import SceneKit
 
 protocol PhysicsField {
     var position: float3 { get }
     var halfExtent: float3? { get }
     var `struct`: PhysicsFieldStruct { get }
-    func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3
+    func eval(rigidBody: RigidBody,time: TimeInterval) -> float3
 }
 
 extension PhysicsField {
@@ -25,8 +26,8 @@ final class GravityField: PhysicsField {
         self.g = g
     }
 
-    func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
-        return g * mass
+    func eval(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+        return g * rigidBody.mass
     }
 
     var `struct`: PhysicsFieldStruct {
@@ -44,8 +45,8 @@ final class AttractorField: PhysicsField {
     let b: Float = 0.01
     let c: Float = 0.1
 
-    func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
-        let delta = self.position - position
+    func eval(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+        let delta = self.position - rigidBody.position
         let distance = length(delta)
         if (distance > 0) {
             let direction = normalize(delta)
@@ -64,40 +65,59 @@ final class AttractorField: PhysicsField {
     }
 }
 
+let j = float3(0,1,0)
+
 final class WindField: PhysicsField {
     var position = float3.zero
-
     var halfExtent: float3? = nil
+    let root: SCNNode
+    var index: [int2:SCNNode] = [:]
 
-    var `struct`: PhysicsFieldStruct {
-        return PhysicsFieldStruct(
-            position: position,
-            halfExtent: halfExtent ?? float3(repeating: -1))
+    init(root: SCNNode) {
+        self.root = root
     }
 
-    let j = float3(0,1,0)
+    let foo: Float = 2
 
-    func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
-        let t: Float = 0.5*Float(time)
-        let pix = floor(position * 10)
-        let magnitude = fbm(position.xz + t) * 0.005
-        let direction = float3(random(pix.x),random(pix.y),random(pix.z))
+    func eval(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+        let t: Float = 0.05*Float(time)
+        let pix = floor(rigidBody.position * foo)
+
+        let key = int2(pix.xz)
+        let node: SCNNode
+        if let value = index[key] {
+            node = value
+        } else {
+            node = createVectorNode(length: 0.25, thickness: 0.5)
+            root.addChildNode(node)
+            index[key] = node
+        }
+        let pxx = pix / foo
+        node.simdWorldPosition = float3(pxx.x, 0, pxx.z)
+
+        let magnitude = fbm(rigidBody.position.xz + t) * 0.005
+        let direction = float3(random(pix.x),random(pix.xz),random(pix.z))
         let DcrossJ = cross(direction, j)
+
 
         guard length(direction) > 10e-10 else { return float3.zero }
         guard length(DcrossJ) > 10e-10 else { return magnitude * direction }
 
         let s = normalize(DcrossJ)
-        let vp = normalize(direction + h(length(position - (dot(position, j))*j))*s)
+        let vp = direction + h(length(pix - (dot(pix, j))*j))*s*sin(Float(time))
+
+        let rotation = simd_quatf(from: j, to: vp)
+        node.simdOrientation = rotation
+        node.simdScale = float3(1,magnitude*500,1)
+
         return magnitude * normalize(vp)
     }
 
     func h(_ t: Float) -> Float {
-        let t = sin(t)
-        let x0: Float = 1
-        let x1: Float = 7
-        let x2: Float = 3
-        let x3: Float = 8
+        let x0: Float = 0.1
+        let x1: Float = 0
+        let x2: Float = 0
+        let x3: Float = 1
         return bezier(x0, x1, x2, x3, t: t)
     }
 
@@ -135,7 +155,7 @@ final class WindField: PhysicsField {
         // Initial values
         var st = st
         var value: Float = 0.0
-        var amplitude: Float = 1.5
+        var amplitude: Float = 0.3
 
         // Loop of octaves
         for _ in 0..<octaves {
@@ -145,4 +165,11 @@ final class WindField: PhysicsField {
         }
         return value
     }
+
+    var `struct`: PhysicsFieldStruct {
+        return PhysicsFieldStruct(
+            position: position,
+            halfExtent: halfExtent ?? float3(repeating: -1))
+    }
+
 }

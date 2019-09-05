@@ -35,10 +35,9 @@ final class CPUSimulator {
     func updateFields(at time: TimeInterval) {
         for rigidBody in rigidBodiesReverseLevelOrder { // Order is unimportant
             for field in fields {
-                let position = rigidBody.position
-                if field.applies(to: position) {
-                    let force = field.eval(position: position, velocity: float3.zero, mass: rigidBody.mass, time: Date().timeIntervalSince(start))
-                    rigidBody.apply(force: force, at: 0.5)
+                if field.applies(to: rigidBody.position) {
+                    let force = field.eval(rigidBody: rigidBody, time: Date().timeIntervalSince(start))
+                    rigidBody.apply(force: force, at: 0.5) // FIXME centerOfMass
                 }
             }
         }

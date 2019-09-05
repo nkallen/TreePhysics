@@ -34,3 +34,11 @@ func createAxesNode(quiverLength: Float, quiverThickness: Float) -> SCNNode {
     return quiverNode
 }
 
+func createVectorNode(length: Float, thickness: Float) -> SCNNode {
+    let thickness = (length / 50.0) * thickness
+    let chamferRadius = thickness / 2.0
+    let vectorBox = SCNBox(width: CGFloat(thickness), height: CGFloat(length), length: CGFloat(thickness), chamferRadius: CGFloat(chamferRadius))
+    vectorBox.firstMaterial?.diffuse.contents = Color.red
+    let vectorNode = SCNNode(geometry: vectorBox)
+    return vectorNode
+}
