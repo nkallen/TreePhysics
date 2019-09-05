@@ -345,3 +345,26 @@ extension float3x3 {
 extension simd_quatf {
     static let identity = simd_quatf(angle: 1, axis: float3.zero)
 }
+
+func simd_bezier(_ v0: float3, _ v1: float3, _ v2: float3, _ v3: float3, t: Float) -> float3 {
+    let v01 = mix(v0, v1, t: t)
+    let v12 = mix(v1, v2, t: t)
+    let v23 = mix(v2, v3, t: t)
+    let v012 = mix(v01, v12, t: t)
+    let v123 = mix(v12, v23, t: t)
+    return mix(v012, v123, t: t)
+}
+
+func bezier(_ x0: Float, _ x1: Float, _ x2: Float, _ x3: Float, t: Float) -> Float {
+    let x01 = mix(x0, x1, t: t)
+    let x12 = mix(x1, x2, t: t)
+    let x23 = mix(x2, x3, t: t)
+    let x012 = mix(x01, x12, t: t)
+    let x123 = mix(x12, x23, t: t)
+    return mix(x012, x123, t: t)
+}
+
+
+func mix(_ x: Float, _ y: Float, t: Float) -> Float {
+    return x * (1-t) + y * t
+}

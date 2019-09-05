@@ -46,4 +46,19 @@ char* s;   // when kstring
 
 ===
 
-                let torqueFictitious_jointSpace_ii = -inertiaTensor_jointSpace * (parentAngularAcceleration_jointSpace + parentAngularVelocity_jointSpace.crossMatrix * childAngularVelocity_jointSpace)
+
+static SIMD_NOINLINE simd_quatf simd_bezier(simd_quatf q0, simd_quatf q1, simd_quatf q2, simd_quatf q3, float t) {
+simd_quatf q01 = _simd_slerp_internal(q0, q1, t);
+simd_quatf q12 = _simd_slerp_internal(q1, q2, t);
+simd_quatf q23 = _simd_slerp_internal(q2, q3, t);
+simd_quatf q012 = _simd_slerp_internal(q01, q12, t);
+simd_quatf q123 = _simd_slerp_internal(q12, q23, t);
+return _simd_slerp_internal(q012, q123, t);
+}
+
+static SIMD_NOINLINE simd_quatf _simd_slerp_internal(simd_quatf q0, simd_quatf q1, float t) {
+float s = 1 - t;
+float a = _simd_angle(q0, q1);
+float r = simd_recip(_simd_sinc(a));
+return simd_normalize(simd_quaternion(_simd_sinc(s*a)*r*s*q0.vector + _simd_sinc(t*a)*r*t*q1.vector));
+}

@@ -260,6 +260,14 @@ class MTLComputeCommandEncoderProxy: NSObject, MTLComputeCommandEncoder {
     func setImageblockWidth(_ width: Int, height: Int) {
         underlying.setImageblockWidth(width, height: height)
     }
+
+    func executeCommands(in indirectCommandBuffer: MTLIndirectCommandBuffer, with executionRange: NSRange) {
+        underlying.executeCommands(in: indirectCommandBuffer, with: executionRange)
+    }
+
+    func executeCommands(in indirectCommandbuffer: MTLIndirectCommandBuffer, indirectBuffer indirectRangeBuffer: MTLBuffer, indirectBufferOffset: Int) {
+        underlying.executeCommands(in: indirectCommandbuffer, indirectBuffer: indirectRangeBuffer, indirectBufferOffset: indirectBufferOffset)
+    }
     #endif
 }
 
@@ -452,7 +460,22 @@ class MTLDeviceProxy: NSObject, MTLDevice {
         return underlying.makeTexture(descriptor: descriptor, iosurface: iosurface, plane: plane)
     }
 
+    func makeSharedTexture(descriptor: MTLTextureDescriptor) -> MTLTexture? {
+        return underlying.makeSharedTexture(descriptor: descriptor)
+    }
+
+    func makeSharedTexture(handle sharedHandle: MTLSharedTextureHandle) -> MTLTexture? {
+        return underlying.makeSharedTexture(handle: sharedHandle)
+    }
+
     #if os(iOS)
+
+    var hasUnifiedMemory: Bool { return underlying.hasUnifiedMemory }
+
+    func supportsFamily(_ gpuFamily: MTLGPUFamily) -> Bool {
+        return underlying.supportsFamily(gpuFamily)
+    }
+
     func makeRenderPipelineState(tileDescriptor descriptor: MTLTileRenderPipelineDescriptor, options: MTLPipelineOption, reflection: AutoreleasingUnsafeMutablePointer<MTLAutoreleasedRenderPipelineReflection?>?) throws -> MTLRenderPipelineState {
         return try underlying.makeRenderPipelineState(tileDescriptor: descriptor, options: options, reflection: reflection)
     }
@@ -470,13 +493,5 @@ class MTLDeviceProxy: NSObject, MTLDevice {
     var recommendedMaxWorkingSetSize: UInt64 { return underlying.recommendedMaxWorkingSetSize }
 
     var isDepth24Stencil8PixelFormatSupported: Bool { return underlying.isDepth24Stencil8PixelFormatSupported }
-
-    func makeSharedTexture(descriptor: MTLTextureDescriptor) -> MTLTexture? {
-        return underlying.makeSharedTexture(descriptor: descriptor)
-    }
-
-    func makeSharedTexture(handle sharedHandle: MTLSharedTextureHandle) -> MTLTexture? {
-        return underlying.makeSharedTexture(handle: sharedHandle)
-    }
     #endif
 }

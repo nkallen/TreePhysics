@@ -97,12 +97,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
     }
 
     static func compositeBodiesBuffer(count: Int, device: MTLDevice) -> MTLBuffer {
-        #if os(macOS)
-        let options: MTLResourceOptions = [.storageModePrivate]
-        #elseif os(iOS)
-        let options: MTLResourceOptions = [.storageModeMemoryless]
-        #endif
-        let buffer = device.makeBuffer(length: count * MemoryLayout<CompositeBodyStruct>.stride, options: options)!
+        let buffer = device.makeBuffer(length: count * MemoryLayout<CompositeBodyStruct>.stride, options: [.storageModePrivate])!
         return buffer
     }
 

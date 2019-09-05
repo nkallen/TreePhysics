@@ -75,12 +75,34 @@ final class WindField: PhysicsField {
             halfExtent: halfExtent ?? float3(repeating: -1))
     }
 
-    func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
-        let t: Float = 0.1*(-Float(time))
+    let j = float3(0,1,0)
 
+    func eval(position: float3, velocity: float3, mass: Float, time: TimeInterval) -> float3 {
+        let t: Float = 0.5*Float(time)
+        let pix = floor(position * 10)
         let magnitude = fbm(position.xz + t) * 0.005
-        let direction = float3(-1,0,0)
-        return magnitude * direction
+        let direction = float3(random(pix.x),random(pix.y),random(pix.z))
+        let DcrossJ = cross(direction, j)
+
+        guard length(direction) > 10e-10 else { return float3.zero }
+        guard length(DcrossJ) > 10e-10 else { return magnitude * direction }
+
+        let s = normalize(DcrossJ)
+        let vp = normalize(direction + h(length(position - (dot(position, j))*j))*s)
+        return magnitude * normalize(vp)
+    }
+
+    func h(_ t: Float) -> Float {
+        let t = sin(t)
+        let x0: Float = 1
+        let x1: Float = 7
+        let x2: Float = 3
+        let x3: Float = 8
+        return bezier(x0, x1, x2, x3, t: t)
+    }
+
+    func random(_ x: Float) -> Float {
+        return modf(sin(x)*1.0).1
     }
 
     func random(_ st: float2) -> Float {
@@ -103,7 +125,7 @@ final class WindField: PhysicsField {
 
         let u = f * f * (3.0 - 2.0 * f);
 
-        return mix(a, b, u.x) +
+        return mix(a, b, t: u.x) +
             (c - a) * u.y * (1.0 - u.x) +
                 (d - b) * u.x * u.y;
     }
@@ -113,7 +135,7 @@ final class WindField: PhysicsField {
         // Initial values
         var st = st
         var value: Float = 0.0
-        var amplitude: Float = 0.5
+        var amplitude: Float = 1.5
 
         // Loop of octaves
         for _ in 0..<octaves {
@@ -123,8 +145,4 @@ final class WindField: PhysicsField {
         }
         return value
     }
-}
-
-func mix(_ x: Float, _ y: Float, _ t: Float) -> Float {
-    return x * (1-t) + y * t
 }
