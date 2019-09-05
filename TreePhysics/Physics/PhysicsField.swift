@@ -68,55 +68,37 @@ final class AttractorField: PhysicsField {
 final class WindField: PhysicsField {
     var position = float3.zero
     var halfExtent: float3? = nil
-    let root: SCNNode
-    var index: [int2:SCNNode] = [:]
 
-    init(root: SCNNode) {
-        self.root = root
-    }
-
-    let gridScale: Float = 2
-    let magnitudeTimeScale: Float = 0.05
-    let amplitude: Float = 0.005
+    let cellSize: Float = 0.5
+    let magnitudeTimeScale: Float = 0.1
+    let rotationTimeScale: Float = 2
+    let amplitude: Float = 0.03
 
     func eval(rigidBody: RigidBody, time: TimeInterval) -> float3 {
-        let t: Float = magnitudeTimeScale*Float(time)
-        let gridPosition = floor(rigidBody.position * gridScale)
+        let magnitudeTime: Float = magnitudeTimeScale*Float(time)
+        let rotationTime: Float = rotationTimeScale*Float(time)
+        let gridPosition = floor(rigidBody.position / cellSize)
 
-        let key = int2(gridPosition.xz)
-        let node: SCNNode
-        if let value = index[key] {
-            node = value
-        } else {
-            node = createVectorNode(length: 0.25, thickness: 0.5)
-            root.addChildNode(node)
-            index[key] = node
-        }
-        node.simdWorldPosition = gridPosition / gridScale * float3(1,0,1)
-
-        let magnitude = fbm(rigidBody.position.xz + t)
-        let direction = float3(random(gridPosition.x),random(gridPosition.xz),random(gridPosition.z))
-        let DcrossJ = cross(direction, .j)
-
-
+        let magnitude = fbm(rigidBody.position.xz + magnitudeTime)
+        var direction = float3(random(gridPosition.x),random(gridPosition.xz),random(gridPosition.z))
         guard length(direction) > 10e-10 else { return float3.zero }
+        let DcrossJ = cross(direction, .j)
+        direction = normalize(direction)
+
         guard length(DcrossJ) > 10e-10 else { return magnitude * direction }
 
         let s = normalize(DcrossJ)
-        let vp = direction + h(length(gridPosition - (dot(gridPosition, .j)) * .j))*s*sin(Float(time))
+        let vp = normalize(direction + h(length(gridPosition - (dot(gridPosition, .j)) * .j))*s*sin(rotationTime))
 
-        let rotation = simd_quatf(from: .j, to: vp)
-        node.simdOrientation = rotation
-        node.simdScale = float3(1,magnitude*500,1)
-
-        return magnitude * normalize(vp)
+        return magnitude * vp
     }
 
     func h(_ t: Float) -> Float {
+        let t = sin(t)
         let x0: Float = 0.1
         let x1: Float = 0
-        let x2: Float = 0
-        let x3: Float = 1
+        let x2: Float = 1
+        let x3: Float = 0
         return bezier(x0, x1, x2, x3, t: t)
     }
 
@@ -171,4 +153,50 @@ final class WindField: PhysicsField {
             halfExtent: halfExtent ?? float3(repeating: -1))
     }
 
+}
+
+final class FieldVisualizer: PhysicsField {
+    let underlying: PhysicsField
+    let root: SCNNode
+    let cellSize: Float
+    var index: [int2:SCNNode] = [:]
+
+    init(_ underlying: PhysicsField, root: SCNNode, cellSize: Float = 0.1) {
+        self.underlying = underlying
+        self.root = root
+        self.cellSize = cellSize
+    }
+
+    var position: float3 { return underlying.position }
+    var halfExtent: float3? { return underlying.halfExtent }
+    var `struct`: PhysicsFieldStruct { return underlying.struct}
+
+    func eval(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+        let gridPosition = floor(rigidBody.position / cellSize)
+
+        let key = int2(gridPosition.xz)
+        let node: SCNNode
+        if let value = index[key] {
+            node = value
+        } else {
+            node = createVectorNode(length: 1, thickness: 0.3)
+            root.addChildNode(node)
+            index[key] = node
+        }
+        node.simdWorldPosition = gridPosition * cellSize * float3(1,0,1)
+
+        let result = underlying.eval(rigidBody: rigidBody, time: time)
+        let magnitude = length(result)
+
+        guard magnitude > 10e-10 else {
+            node.simdScale = float3.zero
+            return result
+        }
+
+        let rotation = simd_quatf(from: .j, to: normalize(result))
+        node.simdOrientation = rotation
+        node.simdScale = float3(1,magnitude * 10,1)
+
+        return result
+    }
 }
