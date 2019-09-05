@@ -334,6 +334,10 @@ extension float3 {
     init(_ h: half3) {
         self = float3(float(h.x), float(h.y), float(h.z))
     }
+
+    static let i = float3(1,0,0)
+    static let j = float3(0,1,0)
+    static let k = float3(0,0,1)
 }
 
 extension float3x3 {

@@ -65,8 +65,6 @@ final class AttractorField: PhysicsField {
     }
 }
 
-let j = float3(0,1,0)
-
 final class WindField: PhysicsField {
     var position = float3.zero
     var halfExtent: float3? = nil
@@ -77,13 +75,15 @@ final class WindField: PhysicsField {
         self.root = root
     }
 
-    let foo: Float = 2
+    let gridScale: Float = 2
+    let magnitudeTimeScale: Float = 0.05
+    let amplitude: Float = 0.005
 
     func eval(rigidBody: RigidBody, time: TimeInterval) -> float3 {
-        let t: Float = 0.05*Float(time)
-        let pix = floor(rigidBody.position * foo)
+        let t: Float = magnitudeTimeScale*Float(time)
+        let gridPosition = floor(rigidBody.position * gridScale)
 
-        let key = int2(pix.xz)
+        let key = int2(gridPosition.xz)
         let node: SCNNode
         if let value = index[key] {
             node = value
@@ -92,21 +92,20 @@ final class WindField: PhysicsField {
             root.addChildNode(node)
             index[key] = node
         }
-        let pxx = pix / foo
-        node.simdWorldPosition = float3(pxx.x, 0, pxx.z)
+        node.simdWorldPosition = gridPosition / gridScale * float3(1,0,1)
 
-        let magnitude = fbm(rigidBody.position.xz + t) * 0.005
-        let direction = float3(random(pix.x),random(pix.xz),random(pix.z))
-        let DcrossJ = cross(direction, j)
+        let magnitude = fbm(rigidBody.position.xz + t)
+        let direction = float3(random(gridPosition.x),random(gridPosition.xz),random(gridPosition.z))
+        let DcrossJ = cross(direction, .j)
 
 
         guard length(direction) > 10e-10 else { return float3.zero }
         guard length(DcrossJ) > 10e-10 else { return magnitude * direction }
 
         let s = normalize(DcrossJ)
-        let vp = direction + h(length(pix - (dot(pix, j))*j))*s*sin(Float(time))
+        let vp = direction + h(length(gridPosition - (dot(gridPosition, .j)) * .j))*s*sin(Float(time))
 
-        let rotation = simd_quatf(from: j, to: vp)
+        let rotation = simd_quatf(from: .j, to: vp)
         node.simdOrientation = rotation
         node.simdScale = float3(1,magnitude*500,1)
 
@@ -155,7 +154,7 @@ final class WindField: PhysicsField {
         // Initial values
         var st = st
         var value: Float = 0.0
-        var amplitude: Float = 0.3
+        var amplitude: Float = self.amplitude
 
         // Loop of octaves
         for _ in 0..<octaves {
