@@ -76,7 +76,7 @@ final class Internode: RigidBody {
         return translation // FIXME should be center of mass
     }
     
-    func add(_ child: Internode, at rotation: simd_quatf) -> Joint {
+    func add(_ child: RigidBody, at rotation: simd_quatf) -> Joint {
         let joint = Joint(parent: self, child: child, at: rotation)
         childJoints.append(joint)
         child.parentJoint = joint
@@ -143,13 +143,14 @@ extension Internode {
     func levels() -> [Level] {
         var result: [Level] = []
         var visited: Set<Internode> = []
-        
+
         var remaining = self.leaves
         repeat {
             var level: Level = []
             var nextRemaining: [Internode] = []
             while var n = remaining.popLast() {
-                if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody) }) && !visited.contains(n) {
+                // FIXME cast is temporary hack
+                if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody as! Internode) }) && !visited.contains(n) {
                     var climbers: [Internode] = []
                     let beforeClimb = n
                     while let parentRigidBody = n.parentRigidBody, parentRigidBody.hasOneChild {
@@ -194,7 +195,7 @@ extension Internode {
     var leaves: [Internode] {
         var result: [Internode] = []
         for childJoint in childJoints {
-            let childRigidBody = childJoint.childRigidBody
+            let childRigidBody = childJoint.childRigidBody as! Internode
             if childRigidBody.isLeaf {
                 result.append(childRigidBody)
             } else {
@@ -213,17 +214,17 @@ extension Internode {
             let start = queue.removeFirst()
             result.append(start)
             for childJoint in start.childJoints {
-                queue.append(childJoint.childRigidBody)
+                queue.append(childJoint.childRigidBody as! Internode)
             }
         }
     }
 }
 
-extension Internode: Equatable, Hashable {
+extension Internode: Hashable {
     static func == (lhs: Internode, rhs: Internode) -> Bool {
         return lhs === rhs
     }
-    
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
     }

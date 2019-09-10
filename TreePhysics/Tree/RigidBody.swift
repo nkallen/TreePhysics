@@ -8,8 +8,9 @@ enum Kind {
 protocol RigidBody: class {
     var kind: Kind { get }
 
-    var parentJoint: Joint? { get }
+    var parentJoint: Joint? { get set }
     var composite: CompositeBody { get }
+    func updateTransform()
 
     var mass: Float { get }
     var inertiaTensor: float3x3 { get }

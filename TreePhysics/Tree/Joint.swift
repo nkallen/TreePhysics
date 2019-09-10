@@ -4,7 +4,7 @@ import SceneKit
 
 final class Joint {
     unowned let parentRigidBody: Internode
-    let childRigidBody: Internode
+    let childRigidBody: RigidBody
 
     var rotation_local: simd_quatf = simd_quatf.identity
     var rotation: simd_quatf = simd_quatf.identity
@@ -17,7 +17,7 @@ final class Joint {
 
     let k: Float
 
-    init(parent: Internode, child: Internode, at rotation: simd_quatf) {
+    init(parent: Internode, child: RigidBody, at rotation: simd_quatf) {
         self.parentRigidBody = parent
         self.childRigidBody = child
         self.rotation_local = rotation
