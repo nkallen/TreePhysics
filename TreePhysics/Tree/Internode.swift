@@ -61,7 +61,7 @@ final class Internode: RigidBody {
 
         self.inertiaTensor = inertiaTensor_local
         
-        self.centerOfMass_local = float3(0, 1, 0) * length / 2
+        self.centerOfMass_local = float3(0, length/2, 0)
 
         let node = SCNNode(geometry: SCNSphere(radius: 0.01))
         self.node = node
@@ -83,14 +83,21 @@ final class Internode: RigidBody {
         child.updateTransform()
         return joint
     }
-    
+
     // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
     // distance is in normalize [0..1] coordinates
     func apply(force: float3, at distance: Float) {
         guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
-        
+
+        let torque = cross(rotation.act(float3(0, distance * length, 0)), force)
+        apply(force: force, torque: torque)
+    }
+
+    func apply(force: float3, torque: float3? = nil) {
+        // FIXME: This torque seems wrong
+        let torque = torque ?? cross(rotation.act(centerOfMass_local), force)
         self.force += force
-        self.torque += cross(translation + rotation.act(float3(0, distance * length, 0)) - self.translation, force)
+        self.torque += torque
     }
     
     func resetForces() {

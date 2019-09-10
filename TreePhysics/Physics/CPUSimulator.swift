@@ -36,8 +36,10 @@ final class CPUSimulator {
         for rigidBody in rigidBodiesReverseLevelOrder { // Order is unimportant
             for field in fields {
                 if field.applies(to: rigidBody.position) {
-                    let force = field.eval(rigidBody: rigidBody, time: Date().timeIntervalSince(start))
-                    rigidBody.apply(force: force, at: 0.5) // FIXME centerOfMass
+                    let time = Date().timeIntervalSince(start)
+                    let force = field.force(rigidBody: rigidBody, time: time)
+                    let torque = field.torque(rigidBody: rigidBody, time: time)
+                    rigidBody.apply(force: force, torque: torque)
                 }
             }
         }

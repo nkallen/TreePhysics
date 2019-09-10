@@ -6,7 +6,8 @@ protocol PhysicsField {
     var position: float3 { get }
     var halfExtent: float3? { get }
     var `struct`: PhysicsFieldStruct { get }
-    func eval(rigidBody: Internode,time: TimeInterval) -> float3
+    func force(rigidBody: Internode, time: TimeInterval) -> float3
+    func torque(rigidBody: Internode, time: TimeInterval) -> float3?
 }
 
 extension PhysicsField {
@@ -14,6 +15,10 @@ extension PhysicsField {
         guard let halfExtent = halfExtent else { return true }
 
         return position.in(min: self.position - halfExtent, max: self.position + halfExtent)
+    }
+
+    func torque(rigidBody: Internode, time: TimeInterval) -> float3? {
+        return nil
     }
 }
 
@@ -26,7 +31,7 @@ final class GravityField: PhysicsField {
         self.g = g
     }
 
-    func eval(rigidBody: Internode, time: TimeInterval) -> float3 {
+    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
         return g * rigidBody.mass
     }
 
@@ -45,7 +50,7 @@ final class AttractorField: PhysicsField {
     let b: Float = 0.01
     let c: Float = 0.1
 
-    func eval(rigidBody: Internode, time: TimeInterval) -> float3 {
+    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
         let delta = self.position - rigidBody.position
         let distance = length(delta)
         if (distance > 0) {
@@ -74,7 +79,7 @@ final class WindField: PhysicsField {
     let rotationTimeScale: Float = 2
     let amplitude: Float = 0.03
 
-    func eval(rigidBody: Internode, time: TimeInterval) -> float3 {
+    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
         let magnitudeTime: Float = magnitudeTimeScale*Float(time)
         let rotationTime: Float = rotationTimeScale*Float(time)
         let gridPosition = floor(rigidBody.position / cellSize)
@@ -171,7 +176,7 @@ final class FieldVisualizer: PhysicsField {
     var halfExtent: float3? { return underlying.halfExtent }
     var `struct`: PhysicsFieldStruct { return underlying.struct}
 
-    func eval(rigidBody: Internode, time: TimeInterval) -> float3 {
+    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
         let gridPosition = floor(rigidBody.position / cellSize)
 
         let key = int2(gridPosition.xz)
@@ -185,7 +190,7 @@ final class FieldVisualizer: PhysicsField {
         }
         node.simdWorldPosition = gridPosition * cellSize * float3(1,0,1)
 
-        let result = underlying.eval(rigidBody: rigidBody, time: time)
+        let result = underlying.force(rigidBody: rigidBody, time: time)
         let magnitude = length(result)
 
         guard magnitude > 10e-10 else {
