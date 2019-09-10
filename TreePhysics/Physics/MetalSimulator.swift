@@ -13,7 +13,7 @@ class MetalSimulator {
 
     internal let compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer
 
-    internal var rigidBodies: [RigidBody]
+    internal var rigidBodies: [Internode]
 
     private var fields: [PhysicsField] = []
 
@@ -21,7 +21,7 @@ class MetalSimulator {
         fields.append(field)
     }
 
-    init(device: MTLDevice, root: RigidBody) {
+    init(device: MTLDevice, root: Internode) {
         self.device = device
 
         // Initialize buffers:

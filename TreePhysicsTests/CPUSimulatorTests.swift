@@ -6,18 +6,18 @@ fileprivate let sqrt2: Float = sqrtf(2)
 
 class CPUSimulatorTests: XCTestCase {
     var simulator: CPUSimulator!
-    var root: RigidBody!
-    var b1: RigidBody!
-    var b2: RigidBody!
+    var root: Internode!
+    var b1: Internode!
+    var b2: Internode!
     var forceAppliedPosition: float3!
     let force = float3(0, 1, 0) // world coordinates
 
     override func setUp() {
         super.setUp()
 
-        root = RigidBody()
-        b1 = RigidBody()
-        b2 = RigidBody()
+        root = Internode()
+        b1 = Internode()
+        b2 = Internode()
         _ = root.add(b1)
         _ = b1.add(b2)
 

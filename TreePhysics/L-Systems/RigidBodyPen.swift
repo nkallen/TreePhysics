@@ -2,12 +2,12 @@ import Foundation
 import simd
 
 final class RigidBodyPen: Pen {
-    typealias T = RigidBody
+    typealias T = Internode
 
-    private var parentBranch: RigidBody
+    private var parentBranch: Internode
     private var start: float3? = nil
 
-    init(parent: RigidBody) {
+    init(parent: Internode) {
         self.parentBranch = parent
     }
 
@@ -15,10 +15,10 @@ final class RigidBodyPen: Pen {
         start = at
     }
 
-    func cont(distance: Float, tangent: float3, thickness: Float) -> RigidBody {
+    func cont(distance: Float, tangent: float3, thickness: Float) -> Internode {
         guard let start = start else { fatalError() }
 
-        let newBranch = RigidBody(length: distance, radius: sqrt(thickness / .pi), density: 750)
+        let newBranch = Internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
         let parentTangent = parentBranch.translation + parentBranch.rotation.act(float3(0,1,0)) - parentBranch.position
         let rotation = simd_quatf(from: parentTangent, to: tangent).normalized

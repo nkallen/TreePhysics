@@ -6,12 +6,12 @@ let torqueFictitiousMultiplier_ii: Float = 0.0
 let torqueFictitiousMultiplier_iii: Float = 0.0
 
 final class CPUSimulator {
-    let root: RigidBody
-    let rigidBodiesLevelOrder: [RigidBody]
-    let rigidBodiesReverseLevelOrder: [RigidBody]
+    let root: Internode
+    let rigidBodiesLevelOrder: [Internode]
+    let rigidBodiesReverseLevelOrder: [Internode]
     private var fields: [PhysicsField] = []
 
-    init(root: RigidBody) {
+    init(root: Internode) {
         self.root = root
         self.rigidBodiesLevelOrder = root.flattened().filter { $0.kind == .dynamic }
         self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
@@ -132,7 +132,7 @@ final class CPUSimulator {
                 let torque_diagonal = U_transpose * torqueTotal_jointSpace
                 let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
                 let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
-                let βΛ = RigidBody.β * Λ
+                let βΛ = Internode.β * Λ
 
                 // 2.a. thanks to diagonalization, we now have three independent 2nd-order
                 // differential equations, θ'' + bθ' + kθ = f

@@ -6,14 +6,14 @@ import SceneKit
 class RigidBodyTests: XCTestCase {
 
     func testFlattenIsBreadthFirst() {
-        let root = RigidBody()
-        let b1 = RigidBody()
-        let b2 = RigidBody()
-        let b3 = RigidBody()
-        let b4 = RigidBody()
-        let b5 = RigidBody()
-        let b6 = RigidBody()
-        let b7 = RigidBody()
+        let root = Internode()
+        let b1 = Internode()
+        let b2 = Internode()
+        let b3 = Internode()
+        let b4 = Internode()
+        let b5 = Internode()
+        let b6 = Internode()
+        let b7 = Internode()
         _ = root.add(b1)
         _ = root.add(b2)
         _ = b1.add(b3)
@@ -27,9 +27,9 @@ class RigidBodyTests: XCTestCase {
     }
     
     func testLevelsSimple() {
-        let root = RigidBody()
-        let b1 = RigidBody()
-        let b2 = RigidBody()
+        let root = Internode()
+        let b1 = Internode()
+        let b2 = Internode()
         _ = root.add(b1)
         _ = b1.add(b2)
 
@@ -40,16 +40,16 @@ class RigidBodyTests: XCTestCase {
     }
 
     func testLevelsComplex() {
-        let root = RigidBody()
-        let b1 = RigidBody()
-        let b2 = RigidBody()
-        let b3 = RigidBody()
-        let b4 = RigidBody()
-        let b5 = RigidBody()
-        let b6 = RigidBody()
-        let b7 = RigidBody()
-        let b8 = RigidBody()
-        let b9 = RigidBody()
+        let root = Internode()
+        let b1 = Internode()
+        let b2 = Internode()
+        let b3 = Internode()
+        let b4 = Internode()
+        let b5 = Internode()
+        let b6 = Internode()
+        let b7 = Internode()
+        let b8 = Internode()
+        let b9 = Internode()
 
         _ = root.add(b1)
         _ = b1.add(b2)
@@ -61,7 +61,7 @@ class RigidBodyTests: XCTestCase {
         _ = b7.add(b8)
         _ = b7.add(b9)
 
-        let empty: [RigidBody] = []
+        let empty: [Internode] = []
 
         let expected: [Level] = [
             [

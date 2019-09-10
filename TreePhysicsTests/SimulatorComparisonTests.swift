@@ -8,7 +8,7 @@ class SimulatorComparisonTests: XCTestCase {
 
     var cpuSimulator: CPUSimulator!
     var metalSimulator: MetalSimulator!
-    var expecteds: [RigidBody]!
+    var expecteds: [Internode]!
 
     var attractorField: AttractorField!
 
@@ -17,7 +17,7 @@ class SimulatorComparisonTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)
+        let root = Internode(length: 0, radius: 0, density: 0, kind: .static)
         let rigidBodyPen = RigidBodyPen(parent: root)
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFA]/////[!"&FFFA]/////[!"&FFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)

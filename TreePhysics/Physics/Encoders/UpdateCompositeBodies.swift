@@ -46,14 +46,14 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         commandEncoder.endEncoding()
     }
 
-    static func rigidBodiesBuffer(root: RigidBody, device: MTLDevice) -> ([RigidBody], MTLBuffer, [Range<Int>]) {
+    static func rigidBodiesBuffer(root: Internode, device: MTLDevice) -> ([Internode], MTLBuffer, [Range<Int>]) {
         var rangesOfWork: [Range<Int>] = []
         let levels = root.levels()
         var offset = 0
         var id = 0
-        var index: [RigidBody:Int] = [:]
-        var allClimbers: [RigidBody] = []
-        var rigidBodies: [RigidBody] = []
+        var index: [Internode:Int] = [:]
+        var allClimbers: [Internode] = []
+        var rigidBodies: [Internode] = []
 
         // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
         for level in levels {
@@ -103,7 +103,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
 
     typealias ChildIdsType = (Int32, Int32, Int32)
 
-    private static func `struct`(rigidBody: RigidBody, climbers: [RigidBody] = [], index: [RigidBody:Int]) -> RigidBodyStruct {
+    private static func `struct`(rigidBody: Internode, climbers: [Internode] = [], index: [Internode:Int]) -> RigidBodyStruct {
         // Parent
         let parentId: Int32
         if let parentJoint = rigidBody.parentJoint {

@@ -97,7 +97,7 @@ func XCTAssertEqual(_ a: Joint, _ b: JointStruct, accuracy: Float, _ message: @a
     XCTAssertEqual(a.θ, b.θ, accuracy: accuracy, message(), file: file, line: line)
 }
 
-func XCTAssertEqual(_ a: RigidBody, _ b: RigidBodyStruct, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: Internode, _ b: RigidBodyStruct, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.mass, b.mass, accuracy: accuracy, "mass", file: file, line: line)
     XCTAssertEqual(a.force, b.force, accuracy: accuracy, "force", file: file, line: line)
     XCTAssertEqual(a.torque, b.torque, accuracy: accuracy, "torque", file: file, line: line)
@@ -161,8 +161,8 @@ class SharedBuffersMTLDevice: MTLDeviceProxy {
     }
 }
 
-extension RigidBody {
-    func add(_ child: RigidBody) -> Joint {
+extension Internode {
+    func add(_ child: Internode) -> Joint {
         return add(child, at: simd_quatf(angle: -.pi/4, axis: float3(0,0,1)))
     }
 }

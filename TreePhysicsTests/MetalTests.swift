@@ -10,7 +10,7 @@ class ApplyPhysicsFieldsTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer: MTLBuffer!
 
-    var root, b1, b2: RigidBody!
+    var root, b1, b2: Internode!
 
     override func setUp() {
         super.setUp()
@@ -18,9 +18,9 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = RigidBody()
-        self.b1 = RigidBody()
-        self.b2 = RigidBody()
+        self.root = Internode()
+        self.b1 = Internode()
+        self.b2 = Internode()
         _ = root.add(b1)
         _ = b1.add(b2)
 
@@ -52,7 +52,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer: MTLBuffer!
 
-    var root, b1, b2: RigidBody!
+    var root, b1, b2: Internode!
     let force: float3 = float3(0, 1, 0) // world coordinates
 
     override func setUp() {
@@ -61,9 +61,9 @@ class UpdateCompositeBodiesTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = RigidBody()
-        self.b1 = RigidBody()
-        self.b2 = RigidBody()
+        self.root = Internode()
+        self.b1 = Internode()
+        self.b2 = Internode()
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
@@ -123,7 +123,7 @@ class UpdateJointsTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer: MTLBuffer!
 
-    var root, b1, b2: RigidBody!
+    var root, b1, b2: Internode!
     let force: float3 = float3(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
@@ -133,9 +133,9 @@ class UpdateJointsTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = RigidBody()
-        self.b1 = RigidBody()
-        self.b2 = RigidBody()
+        self.root = Internode()
+        self.b1 = Internode()
+        self.b2 = Internode()
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
@@ -192,7 +192,7 @@ class UpdateRigidBodiesTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
-    var root, b1, b2: RigidBody!
+    var root, b1, b2: Internode!
     let force: float3 = float3(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
@@ -202,9 +202,9 @@ class UpdateRigidBodiesTests: XCTestCase {
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = RigidBody()
-        self.b1 = RigidBody()
-        self.b2 = RigidBody()
+        self.root = Internode()
+        self.b1 = Internode()
+        self.b2 = Internode()
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
@@ -272,7 +272,7 @@ class AdvancedMetalTests: XCTestCase {
     var cpuSimulator: CPUSimulator!
     var metalSimulator: MetalSimulator!
 
-    var expecteds: [RigidBody]!
+    var expecteds: [Internode]!
 
     override func setUp() {
         super.setUp()
@@ -280,16 +280,16 @@ class AdvancedMetalTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        let root = RigidBody()
-        let b1 = RigidBody()
-        let b2 = RigidBody()
-        let b3 = RigidBody()
-        let b4 = RigidBody()
-        let b5 = RigidBody()
-        let b6 = RigidBody()
-        let b7 = RigidBody()
-        let b8 = RigidBody()
-        let b9 = RigidBody()
+        let root = Internode()
+        let b1 = Internode()
+        let b2 = Internode()
+        let b3 = Internode()
+        let b4 = Internode()
+        let b5 = Internode()
+        let b6 = Internode()
+        let b7 = Internode()
+        let b8 = Internode()
+        let b9 = Internode()
 
         _ = root.add(b1)
         _ = b1.add(b2)
@@ -358,7 +358,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        let root = RigidBody(length: 0, radius: 0, density: 0, kind: .static)
+        let root = Internode(length: 0, radius: 0, density: 0, kind: .static)
         let rigidBodyPen = RigidBodyPen(parent: root)
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)

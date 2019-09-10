@@ -6,7 +6,7 @@ import SceneKit
 typealias Indices = [UInt16]
 
 final class SkinningPen: Pen {
-    typealias T = (Indices, RigidBody)
+    typealias T = (Indices, Internode)
 
     let cylinderPen: CylinderPen
     let rigidBodyPen: RigidBodyPen
