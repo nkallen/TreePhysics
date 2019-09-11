@@ -21,6 +21,9 @@ final class FakePen: Pen {
         points.append(points.last! + distance * tangent)
     }
 
+    func copy(scale: Float, orientation: simd_quatf) -> () {
+    }
+
     var branch: FakePen { return _branch! }
 }
 

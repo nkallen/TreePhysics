@@ -1,5 +1,6 @@
 import Foundation
 import SceneKit
+import ModelIO
 
 // NOTE: We need to keep all the vertices to gether in one array; however, we can keep the
 // indices separate so that there are distinct SCNGeometryElement objects. It's unclear how this
@@ -44,6 +45,25 @@ final class CylinderPen: Pen {
         }
 
         self.start = start + distance * tangent
+
+        return addSegment(rotatedVertices, indices)
+    }
+
+    func copy(scale: Float, orientation: simd_quatf) -> Indices {
+        guard let start = start else { fatalError() }
+
+        let sphere = MDLMesh.newEllipsoid(withRadii: float3(repeating: scale), radialSegments: 10, verticalSegments: 10, geometryType: .triangleStrips, inwardNormals: false, hemisphere: false, allocator: nil)
+        let submesh = sphere.submeshes?.firstObject! as! MDLSubmesh
+        let verticesPointer = sphere.vertexBuffers.first!.map().bytes.bindMemory(to: float3.self, capacity: sphere.vertexCount)
+        let indicesPointer = submesh.indexBuffer.map().bytes.bindMemory(to: UInt16.self, capacity: submesh.indexCount)
+
+        let vertices = Array(UnsafeBufferPointer(start: verticesPointer, count: sphere.vertexCount))
+        let indices = Array(UnsafeBufferPointer(start: indicesPointer, count: submesh.indexCount))
+
+        let rotatedVertices: [float3]
+        rotatedVertices = vertices.map { vertex in
+            start + orientation.act(vertex)
+        }
 
         return addSegment(rotatedVertices, indices)
     }

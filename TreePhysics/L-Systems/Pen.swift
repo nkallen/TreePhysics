@@ -9,5 +9,6 @@ protocol Pen {
 
     func start(at: float3, thickness: Float)
     func cont(distance: Float, tangent: float3, thickness: Float) -> T
+    func copy(scale: Float, orientation: simd_quatf) -> T
     var branch: Self { get }
 }

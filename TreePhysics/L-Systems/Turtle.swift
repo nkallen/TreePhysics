@@ -17,6 +17,7 @@ enum Command {
     case pitchDown(Float?)
     case push
     case pop
+    case copy(scale: Float?)
 }
 
 fileprivate let initialOrientation = float3x3(columns: (.y, -.x, .z))
@@ -58,7 +59,7 @@ class Interpreter<P> where P: Pen {
 
     struct State {
         var position: float3
-        var orientation: float3x3
+        var orientation: float3x3 // FIXME make a quat?
         var stepSize: Float // meters
         var thickness: Float // meters^2
         let pen: P
@@ -93,6 +94,8 @@ class Interpreter<P> where P: Pen {
                 result.append(.rollRight(nil))
             case "&":
                 result.append(.pitchDown(nil))
+            case "J":
+                result.append(.copy(scale: nil))
             default: ()
 //                fatalError()
             }
@@ -156,6 +159,9 @@ class Interpreter<P> where P: Pen {
                 state.stepSize *= stepSizeScale ?? configuration.stepSizeScale
             case let .multiplyThickness(thicknessScale):
                 state.thickness *= thicknessScale ?? configuration.thicknessScale
+            case let .copy(scale):
+                let scale = scale ?? state.stepSize
+                _ = state.pen.copy(scale: scale, orientation: simd_quatf(state.orientation))
             case .push:
                 self.stack.append(state)
                 let pen = state.pen.branch

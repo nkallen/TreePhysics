@@ -31,6 +31,10 @@ final class RigidBodyPen: Pen {
         return newBranch
     }
 
+    func copy(scale: Float, orientation: simd_quatf) -> Internode {
+        fatalError()
+    }
+
     var branch: RigidBodyPen {
         return RigidBodyPen(parent: parentBranch)
     }

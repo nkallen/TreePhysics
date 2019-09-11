@@ -30,6 +30,12 @@ final class SkinningPen: Pen {
         return addBone((vertices, rigidBody))
     }
 
+    func copy(scale: Float, orientation: simd_quatf) -> T {
+        let vertices = cylinderPen.copy(scale: scale, orientation: orientation)
+        let rigidBody = rigidBodyPen.copy(scale: scale, orientation: orientation)
+        return addBone((vertices, rigidBody))
+    }
+
     func addBone(_ bone: T) -> T {
         if let parent = parent {
             return parent.addBone(bone)
