@@ -1,4 +1,6 @@
 import Foundation
+import simd
+import ShaderTypes
 
 extension Joint: CustomDebugStringConvertible {
     var debugDescription: String {
@@ -13,7 +15,7 @@ extension JointStruct: CustomDebugStringConvertible {
 }
 
 extension Internode: CustomDebugStringConvertible {
-    var debugDescription: String {
+    public var debugDescription: String {
         return "RigidBody \(name): position=\(position), rotation=\(rotation), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
     }
 }

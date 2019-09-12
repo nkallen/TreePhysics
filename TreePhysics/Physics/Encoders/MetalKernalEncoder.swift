@@ -1,5 +1,6 @@
 import Foundation
 import MetalKit
+import ShaderTypes
 
 let maxBuffersInFlight = 3
 

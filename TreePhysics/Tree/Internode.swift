@@ -228,11 +228,11 @@ extension Internode {
 }
 
 extension Internode: Hashable {
-    static func == (lhs: Internode, rhs: Internode) -> Bool {
+    public static func == (lhs: Internode, rhs: Internode) -> Bool {
         return lhs === rhs
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
     }
 }

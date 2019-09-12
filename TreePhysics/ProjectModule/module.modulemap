@@ -1,0 +1,5 @@
+module ShaderTypes {
+    header "../Physics/Kernels/ShaderTypes.h"
+    header "../Physics/Kernels/Half.h"
+    export *
+}

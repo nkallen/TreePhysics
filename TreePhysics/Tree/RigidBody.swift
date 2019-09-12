@@ -1,4 +1,5 @@
 import Foundation
+import simd
 
 enum Kind {
     case `static`

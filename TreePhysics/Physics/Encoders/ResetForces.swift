@@ -1,6 +1,7 @@
 import Foundation
 import MetalKit
 import Metal
+import ShaderTypes
 
 final class ResetForces: MetalKernelEncoder {
     let rigidBodiesBuffer: MTLBuffer

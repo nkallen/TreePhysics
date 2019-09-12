@@ -2,6 +2,7 @@ import Foundation
 import MetalKit
 import Metal
 import SceneKit
+import ShaderTypes
 
 final class UpdateCompositeBodies: MetalKernelEncoder {
     let rigidBodiesBuffer: MTLBuffer

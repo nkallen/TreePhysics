@@ -1,6 +1,7 @@
 import Foundation
 import simd
 import SceneKit
+import ShaderTypes
 
 protocol PhysicsField {
     var position: float3 { get }

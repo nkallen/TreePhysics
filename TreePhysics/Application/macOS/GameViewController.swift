@@ -1,6 +1,7 @@
 #if os(macOS)
 import Foundation
 import SceneKit
+@testable import TreePhysics
 
 class GameViewController: NSViewController {
     var scene: Scene!

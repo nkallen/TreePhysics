@@ -7,9 +7,14 @@
 		<key>TreePhysics-iOS.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<key>TreePhysics-macOS copy.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>TreePhysics-macOS.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
@@ -22,6 +27,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>9E1F427C23290694009E0E52</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>9EE7EB9D22DDDC6C00535997</key>
 		<dict>
 			<key>primary</key>

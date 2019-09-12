@@ -1,6 +1,7 @@
 import Foundation
 import Darwin
 import simd
+import ShaderTypes
 
 typealias half3 = vector_half3
 

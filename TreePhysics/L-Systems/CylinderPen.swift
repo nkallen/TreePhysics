@@ -9,8 +9,9 @@ import ModelIO
 final class CylinderPen: Pen {
     typealias T = Indices
 
-    private(set) var vertices: [float3] = []
-    private(set) var indices: Indices = []
+    let branchGeometry: GeometryBuilder
+    let leafGeometry: GeometryBuilder
+
     weak var parent: CylinderPen?
 
     private var start: float3? = nil
@@ -24,6 +25,14 @@ final class CylinderPen: Pen {
         self.radialSegmentCount = radialSegmentCount
         self.heightSegmentCount = heightSegmentCount
         self.parent = parent
+
+        if let parent = parent {
+            self.branchGeometry = parent.branchGeometry
+            self.leafGeometry = parent.leafGeometry
+        } else {
+            self.branchGeometry = GeometryBuilder(primitiveType: .triangleStrip)
+            self.leafGeometry = GeometryBuilder(primitiveType: .triangles)
+        }
     }
 
     func start(at: float3, thickness: Float) {
@@ -46,15 +55,25 @@ final class CylinderPen: Pen {
 
         self.start = start + distance * tangent
 
-        return addSegment(rotatedVertices, indices)
+        return branchGeometry.addSegment(rotatedVertices, indices)
     }
 
     func copy(scale: Float, orientation: simd_quatf) -> Indices {
         guard let start = start else { fatalError() }
+        let sphere = MDLMesh.newEllipsoid(withRadii: float3(repeating: scale * 0.1), radialSegments: 10, verticalSegments: 10, geometryType: .triangles, inwardNormals: false, hemisphere: false, allocator: nil)
 
-        let sphere = MDLMesh.newEllipsoid(withRadii: float3(repeating: scale), radialSegments: 10, verticalSegments: 10, geometryType: .triangleStrips, inwardNormals: false, hemisphere: false, allocator: nil)
+        let descriptor = MDLVertexDescriptor()
+        let attribute = MDLVertexAttribute()
+        attribute.name = "position"
+        attribute.format = .float3
+        descriptor.addOrReplaceAttribute(attribute)
+        let layout = MDLVertexBufferLayout(stride: MemoryLayout<float3>.stride)
+        descriptor.layouts = [layout]
+        sphere.vertexDescriptor = descriptor
+
         let submesh = sphere.submeshes?.firstObject! as! MDLSubmesh
-        let verticesPointer = sphere.vertexBuffers.first!.map().bytes.bindMemory(to: float3.self, capacity: sphere.vertexCount)
+        let verticesPointer = sphere.vertexAttributeData(forAttributeNamed: "position")!.map.bytes.bindMemory(to: float3.self, capacity: sphere.vertexCount)
+
         let indicesPointer = submesh.indexBuffer.map().bytes.bindMemory(to: UInt16.self, capacity: submesh.indexCount)
 
         let vertices = Array(UnsafeBufferPointer(start: verticesPointer, count: sphere.vertexCount))
@@ -65,26 +84,7 @@ final class CylinderPen: Pen {
             start + orientation.act(vertex)
         }
 
-        return addSegment(rotatedVertices, indices)
-    }
-
-    func addSegment(_ vertices: [float3], _ indices: Indices) -> Indices {
-        if let parent = parent {
-            return parent.addSegment(vertices, indices)
-        } else {
-            let offset = UInt16(self.vertices.count)
-            let offsetIndices = indices.map { offset + $0 }
-
-            if let last = self.indices.last {
-                let degenerate = [last, offsetIndices.first!]
-                self.indices.append(contentsOf: degenerate)
-            }
-
-            self.vertices.append(contentsOf: vertices)
-            self.indices.append(contentsOf: offsetIndices)
-
-            return Array(Set(offsetIndices))
-        }
+        return leafGeometry.addSegment(rotatedVertices, indices)
     }
 
     var branch: CylinderPen {
@@ -103,15 +103,50 @@ final class CylinderPen: Pen {
             let rCosTheta = radius*cos(theta)
             let rSinTheta = radius*sin(theta)
 
-            vertices.append(float3(rCosTheta, 0, rSinTheta)) // XXX can skip in subsequent
+            vertices.append(float3(rCosTheta, 0, rSinTheta)) // FIXME can skip in subsequent
             vertices.append(float3(rCosTheta, height, rSinTheta))
         }
         let indices = Array(0..<(radialSegmentCountUInt16*2)) + [0,1]
         return (vertices, indices)
     }
 
+    var node: SCNNode {
+        let parent = SCNNode()
+        let leaves = SCNNode(geometry: leafGeometry.geometry)
+        leaves.geometry?.firstMaterial!.diffuse.contents = NSColor(red: 1, green: 0.718, blue: 0.773, alpha: 0.9)
+        let branches = SCNNode(geometry: branchGeometry.geometry)
+        parent.addChildNode(leaves)
+        parent.addChildNode(branches)
+        return parent
+    }
+}
+
+final class GeometryBuilder {
+    private let primitiveType: SCNGeometryPrimitiveType
+    var vertices: [float3] = []
+    var indices: Indices = []
+
+    init(primitiveType: SCNGeometryPrimitiveType) {
+        self.primitiveType = primitiveType
+    }
+
+    func addSegment(_ vertices: [float3], _ indices: Indices) -> Indices {
+        let offset = UInt16(self.vertices.count)
+        let offsetIndices = indices.map { offset + $0 }
+
+        if primitiveType == .triangleStrip, let last = self.indices.last {
+            let degenerate = [last, offsetIndices.first!]
+            self.indices.append(contentsOf: degenerate)
+        }
+
+        self.vertices.append(contentsOf: vertices)
+        self.indices.append(contentsOf: offsetIndices)
+
+        return Array(Set(offsetIndices))
+    }
+
     private(set) lazy var element: SCNGeometryElement = {
-        return SCNGeometryElement(indices: indices, primitiveType: .triangleStrip)
+        return SCNGeometryElement(indices: indices, primitiveType: primitiveType)
     }()
 
     private(set) lazy var source: SCNGeometrySource = {

@@ -52,8 +52,8 @@ final class SkinningPen: Pen {
     var node: SCNNode {
         var boneNodes: [SCNNode] = []
         var boneInverseBindTransforms: [NSValue] = []
-        var boneWeights: [Float] = Array(repeating: 1.0, count: cylinderPen.vertices.count)
-        var boneIndices: Indices = Array(repeating: 0, count: cylinderPen.vertices.count)
+        var boneWeights: [Float] = Array(repeating: 1.0, count: cylinderPen.branchGeometry.source.vectorCount)
+        var boneIndices: Indices = Array(repeating: 0, count: cylinderPen.branchGeometry.source.vectorCount)
 
         for (boneIndex, bone) in bones.enumerated() {
             let (vertexIndices, rigidBody) = bone
@@ -71,9 +71,9 @@ final class SkinningPen: Pen {
         let boneWeightsGeometrySource = SCNGeometrySource(data: boneWeightsData, semantic: .boneWeights, vectorCount: boneWeights.count, usesFloatComponents: true, componentsPerVector: 1, bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0, dataStride: MemoryLayout<Float>.size)
         let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<UInt16>.size, dataOffset: 0, dataStride: MemoryLayout<UInt16>.size)
 
-        let skinner = SCNSkinner(baseGeometry: cylinderPen.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
+        let skinner = SCNSkinner(baseGeometry: cylinderPen.branchGeometry.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
 
-        let node = SCNNode(geometry: cylinderPen.geometry)
+        let node = SCNNode(geometry: cylinderPen.branchGeometry.geometry)
         node.skinner = skinner
 
         return node
