@@ -1,6 +1,7 @@
 import XCTest
 @testable import TreePhysics
 import simd
+import ShaderTypes
 
 class SimulatorComparisonTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!

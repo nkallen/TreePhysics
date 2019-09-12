@@ -26,7 +26,7 @@ class CylinderPenTests: XCTestCase {
 
             float3(cos(2*arcLength), 0, sin(2*arcLength)),
             float3(cos(2*arcLength), 1, sin(2*arcLength)),
-            ], pen.vertices)
+            ], pen.branchGeometry.vertices)
     }
 
     func testIndices() {
@@ -37,6 +37,6 @@ class CylinderPenTests: XCTestCase {
             5,
             0,
             1
-            ], pen.indices)
+            ], pen.branchGeometry.indices)
     }
 }

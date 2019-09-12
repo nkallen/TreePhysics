@@ -2,6 +2,7 @@ import Foundation
 import XCTest
 @testable import TreePhysics
 import MetalKit
+import ShaderTypes
 
 fileprivate let sqrt2: Float = sqrt(2)
 
