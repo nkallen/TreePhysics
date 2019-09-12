@@ -1,5 +1,6 @@
 import Foundation
 import simd
+import SceneKit
 
 enum Kind {
     case `static`
@@ -7,11 +8,10 @@ enum Kind {
 }
 
 protocol RigidBody: class {
-    var kind: Kind { get }
+    var kind: Kind { get } // FIXME remove
 
     var parentJoint: Joint? { get set }
     var composite: CompositeBody { get }
-    func updateTransform()
 
     var mass: Float { get }
     var inertiaTensor: float3x3 { get }
@@ -25,4 +25,10 @@ protocol RigidBody: class {
     var angularAcceleration: float3 { get }
     var velocity: float3 { get }
     var acceleration: float3 { get }
+
+    func apply(force: float3, torque: float3?)
+    func updateTransform()
+    func resetForces()
+
+    var node: SCNNode { get }
 }

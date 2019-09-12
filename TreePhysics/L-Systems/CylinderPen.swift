@@ -60,6 +60,7 @@ final class CylinderPen: Pen {
 
     func copy(scale: Float, orientation: simd_quatf) -> Indices {
         guard let start = start else { fatalError() }
+
         let sphere = MDLMesh.newEllipsoid(withRadii: float3(repeating: scale * 0.1), radialSegments: 10, verticalSegments: 10, geometryType: .triangles, inwardNormals: false, hemisphere: false, allocator: nil)
 
         let descriptor = MDLVertexDescriptor()

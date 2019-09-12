@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 final class RigidBodyPen: Pen {
-    typealias T = Internode
+    typealias T = RigidBody
 
     private var parentBranch: Internode
     private var start: float3? = nil
@@ -15,7 +15,7 @@ final class RigidBodyPen: Pen {
         start = at
     }
 
-    func cont(distance: Float, tangent: float3, thickness: Float) -> Internode {
+    func cont(distance: Float, tangent: float3, thickness: Float) -> RigidBody {
         guard let start = start else { fatalError() }
 
         let newBranch = Internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
@@ -31,8 +31,14 @@ final class RigidBodyPen: Pen {
         return newBranch
     }
 
-    func copy(scale: Float, orientation: simd_quatf) -> Internode {
-        fatalError()
+    func copy(scale: Float, orientation: simd_quatf) -> RigidBody {
+        guard let _ = start else { fatalError() }
+
+        let newLeaf = Leaf(length: scale * 0.1, density: 750)
+
+        _ = parentBranch.add(newLeaf, at: orientation)
+
+        return newLeaf
     }
 
     var branch: RigidBodyPen {

@@ -101,6 +101,7 @@
 		9EAE863A232A67FE0037EA92 /* Math.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801AB22FC483B00198166 /* Math.metal */; };
 		9EAE863B232A68010037EA92 /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
 		9EAE863C232A68040037EA92 /* Debug.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA7010B231064F3009077A0 /* Debug.metal */; };
+		9EAE863E232A69F40037EA92 /* Leaf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE863D232A69F40037EA92 /* Leaf.swift */; };
 		9EBEB1CD2327B3EF0073E5D9 /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */; };
 		9EC88E25231989930049737D /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC88E24231989930049737D /* ModelTests.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
@@ -192,6 +193,7 @@
 		9EA619CB230AE78400BE2213 /* PrettyPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrettyPrint.swift; sourceTree = "<group>"; };
 		9EA7010B231064F3009077A0 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT18_03SCF11_s13_2text.pdf; sourceTree = "<group>"; };
+		9EAE863D232A69F40037EA92 /* Leaf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Leaf.swift; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
 		9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBody.swift; sourceTree = "<group>"; };
 		9EBEB1CF2329052A0073E5D9 /* Playground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Playground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -345,6 +347,7 @@
 				9E56C94622E78FEC0095C8AC /* Internode.swift */,
 				9E56C94822E78FFC0095C8AC /* CompositeBody.swift */,
 				9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */,
+				9EAE863D232A69F40037EA92 /* Leaf.swift */,
 			);
 			path = Tree;
 			sourceTree = "<group>";
@@ -672,6 +675,7 @@
 				9EAA8C1523292434002E9260 /* MetalSimulator.swift in Sources */,
 				9EAA8C1823292444002E9260 /* Visualization.swift in Sources */,
 				9E34C49023291257008C7353 /* CompositeBody.swift in Sources */,
+				9EAE863E232A69F40037EA92 /* Leaf.swift in Sources */,
 				9EAE8631232A67270037EA92 /* Math.metal in Sources */,
 				9EAE8632232A672A0037EA92 /* Print.metal in Sources */,
 				9E34C48823291201008C7353 /* Turtle.swift in Sources */,

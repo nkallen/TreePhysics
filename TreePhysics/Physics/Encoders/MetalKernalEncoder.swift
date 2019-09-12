@@ -10,6 +10,7 @@ class MetalKernelEncoder {
 
     init(device: MTLDevice, name: String) {
         self.device = device
+        // FIXME cf https://stackoverflow.com/questions/46742403/metal-file-as-part-of-an-ios-framework for a better way to embed
         let library = device.makeDefaultLibrary()!
         let function = library.makeFunction(name: name)!
         self.computePipelineState = try! device.makeComputePipelineState(function: function)
