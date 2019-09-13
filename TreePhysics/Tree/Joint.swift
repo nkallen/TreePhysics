@@ -2,7 +2,7 @@ import Foundation
 import simd
 import SceneKit
 
-final class Joint {
+public final class Joint {
     unowned let parentRigidBody: Internode
     let childRigidBody: RigidBody
 
@@ -37,6 +37,8 @@ final class Joint {
 
         self.acceleration = parentRigidBody.acceleration +
             (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(translation_local)
+
+        assert(isFinite)
     }
 
     func rotate(tensor: float3x3) -> float3x3 {
@@ -49,5 +51,9 @@ final class Joint {
 
     private static func computeK(radius: Float, length: Float) -> Float {
         return Internode.K
+    }
+
+    var isFinite: Bool {
+        return rotation.isFinite && translation.isFinite && acceleration.isFinite
     }
 }

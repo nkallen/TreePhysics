@@ -2,17 +2,22 @@ import Foundation
 
 // L-system rewriter
 
-class Rewriter {
-    struct Rule {
-        let symbol: Character
-        let replacement: String
+public class Rewriter {
+    public struct Rule {
+        public let symbol: Character
+        public let replacement: String
+
+        public init(symbol: Character, replacement: String) {
+            self.symbol = symbol
+            self.replacement = replacement
+        }
 
         func matches(_ character: Character) -> Bool {
             return symbol == character
         }
     }
 
-    static func rewrite(premise: String, rules: [Rule], generations: Int) -> String {
+    public static func rewrite(premise: String, rules: [Rule], generations: Int) -> String {
         var premise = premise
         for _ in 0..<generations {
             let unchanged = premise

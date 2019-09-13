@@ -194,6 +194,7 @@
 		9EA7010B231064F3009077A0 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT18_03SCF11_s13_2text.pdf; sourceTree = "<group>"; };
 		9EAE863D232A69F40037EA92 /* Leaf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Leaf.swift; sourceTree = "<group>"; };
+		9EAE863F232BCBB10037EA92 /* tanabe94.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = tanabe94.pdf; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
 		9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBody.swift; sourceTree = "<group>"; };
 		9EBEB1CF2329052A0073E5D9 /* Playground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Playground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -326,6 +327,7 @@
 		9E4C09F8230ED45700F1DD6B /* References */ = {
 			isa = PBXGroup;
 			children = (
+				9EAE863F232BCBB10037EA92 /* tanabe94.pdf */,
 				9E08F85F2316FEC700D48ADD /* sensors-11-08536.pdf */,
 				9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */,
 				9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */,

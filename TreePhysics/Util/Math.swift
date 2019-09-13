@@ -237,15 +237,9 @@ extension float3x3 {
         return self == self.transpose
     }
 
-    var isValid: Bool {
-        for i in 0..<3 {
-            for j in 0..<3 {
-                if self[i, j].isInfinite || self[i, j].isNaN {
-                    return false
-                }
-            }
-        }
-        return true
+    var isFinite: Bool {
+        let (i, j, k) = columns
+        return i.isFinite && j.isFinite && k.isFinite
     }
 
     var isPositiveDefinite: Bool {
@@ -339,6 +333,10 @@ extension float3 {
     static let i = float3(1,0,0)
     static let j = float3(0,1,0)
     static let k = float3(0,0,1)
+
+    var isFinite: Bool {
+        return x.isFinite && y.isFinite && z.isFinite
+    }
 }
 
 extension float3x3 {
@@ -349,6 +347,10 @@ extension float3x3 {
 
 extension simd_quatf {
     static let identity = simd_quatf(angle: 1, axis: float3.zero)
+
+    var isFinite: Bool {
+        return real.isFinite && imag.isFinite
+    }
 }
 
 func simd_bezier(_ v0: float3, _ v1: float3, _ v2: float3, _ v3: float3, t: Float) -> float3 {

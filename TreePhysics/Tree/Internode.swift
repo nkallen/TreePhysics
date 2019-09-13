@@ -10,33 +10,33 @@ extension Internode {
     static let minAngle: Float = -Float.pi / 3
 }
 
-final class Internode: RigidBody {
-    let kind: Kind
+public final class Internode: RigidBody {
+    public let kind: Kind
     let name: String
-    weak var parentJoint: Joint?
-    var childJoints: [Joint] = []
+    weak public var parentJoint: Joint?
+    public var childJoints: [Joint] = []
     
-    let composite: CompositeBody
+    public let composite: CompositeBody
     
-    let mass: Float
+    public let mass: Float
     let length: Float
     let radius: Float
     let inertiaTensor_local: float3x3
     let centerOfMass_local: float3
 
-    var force: float3 = float3.zero
-    var torque: float3 = float3.zero
+    public var force: float3 = float3.zero
+    public var torque: float3 = float3.zero
 
-    var inertiaTensor: float3x3
-    var rotation: simd_quatf = simd_quatf.identity
-    var translation: float3 = float3.zero
-    var centerOfMass: float3 = float3.zero
-    var angularVelocity: float3 = float3.zero
-    var angularAcceleration: float3 = float3.zero
-    var velocity: float3 = float3.zero
-    var acceleration: float3 = float3.zero
+    public var inertiaTensor: float3x3
+    public var rotation: simd_quatf = simd_quatf.identity
+    public var translation: float3 = float3.zero
+    public var centerOfMass: float3 = float3.zero
+    public var angularVelocity: float3 = float3.zero
+    public var angularAcceleration: float3 = float3.zero
+    public var velocity: float3 = float3.zero
+    public var acceleration: float3 = float3.zero
 
-    let node: SCNNode
+    public let node: SCNNode
 
     // FIXME think about these whether they should be stored properties or what
     var normal: float3 {
@@ -47,7 +47,7 @@ final class Internode: RigidBody {
         return .pi * radius * length
     }
     
-    init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
+    public init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
         self.name = "Branch[\(i)]"
         print(name)
         i += 1
@@ -98,19 +98,19 @@ final class Internode: RigidBody {
         apply(force: force, torque: torque)
     }
 
-    func apply(force: float3, torque: float3? = nil) {
+    public func apply(force: float3, torque: float3? = nil) {
         // FIXME: This torque seems wrong
         let torque = torque ?? cross(rotation.act(centerOfMass_local), force)
         self.force += force
         self.torque += torque
     }
     
-    func resetForces() {
+    public func resetForces() {
         self.force = float3.zero
         self.torque = float3.zero
     }
 
-    func updateTransform() {
+    public func updateTransform() {
         guard let parentJoint = parentJoint else { return }
         let parentRigidBody = parentJoint.parentRigidBody
 
@@ -132,6 +132,8 @@ final class Internode: RigidBody {
         self.acceleration = parentJoint.acceleration - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation.act(-centerOfMass_local)
 
         self.centerOfMass = translation + rotation.act(centerOfMass_local)
+
+        assert(isFinite)
     }
 }
 

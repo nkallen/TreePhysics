@@ -1,7 +1,7 @@
 import Foundation
 import simd
 
-final class CompositeBody {
+public final class CompositeBody {
     var mass: Float
     var inertiaTensor: float3x3
     var force: float3

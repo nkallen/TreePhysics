@@ -3,7 +3,7 @@ import simd
 import SceneKit
 import ShaderTypes
 
-protocol PhysicsField {
+public protocol PhysicsField {
     var position: float3 { get }
     var halfExtent: float3? { get }
     var `struct`: PhysicsFieldStruct { get }
@@ -18,40 +18,42 @@ extension PhysicsField {
         return position.in(min: self.position - halfExtent, max: self.position + halfExtent)
     }
 
-    func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
+    public func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
         return nil
     }
 }
 
-final class GravityField: PhysicsField {
-    var g: float3
-    let position: float3 = float3.zero
-    let halfExtent: float3? = nil
+public final class GravityField: PhysicsField {
+    public var g: float3
+    public let position: float3 = float3.zero
+    public let halfExtent: float3? = nil
 
-    init(_ g: float3 = float3.zero) {
+    public init(_ g: float3 = float3.zero) {
         self.g = g
     }
 
-    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         return g * rigidBody.mass
     }
 
-    var `struct`: PhysicsFieldStruct {
+    public var `struct`: PhysicsFieldStruct {
         return PhysicsFieldStruct(
             position: position,
             halfExtent: halfExtent ?? float3(repeating: -1))
     }
 }
 
-final class AttractorField: PhysicsField {
-    var position: float3 = float3.zero
-    let halfExtent: float3? = float3(1, 1, 1)
+public final class AttractorField: PhysicsField {
+    public var position: float3 = float3.zero
+    public let halfExtent: float3? = float3(1, 1, 1)
 
     let a: Float = 0.05
     let b: Float = 0.01
     let c: Float = 0.1
 
-    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+    public init() {}
+
+    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         let delta = self.position - rigidBody.centerOfMass
         let distance = length(delta)
         if (distance > 0) {
@@ -64,23 +66,25 @@ final class AttractorField: PhysicsField {
         }
     }
 
-    var `struct`: PhysicsFieldStruct {
+    public var `struct`: PhysicsFieldStruct {
         return PhysicsFieldStruct(
             position: position,
             halfExtent: halfExtent ?? float3(repeating: -1))
     }
 }
 
-final class WindField: PhysicsField {
-    var position = float3.zero
-    var halfExtent: float3? = nil
+public final class WindField: PhysicsField {
+    public var position = float3.zero
+    public var halfExtent: float3? = nil
 
     let cellSize: Float = 0.1
-    let magnitudeTimeScale: Float = 0.1
+    let magnitudeTimeScale: Float = 0.01
     let rotationTimeScale: Float = 2
-    let amplitude: Float = 10
+    let amplitude: Float = 50
 
-    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+    public init() {}
+
+    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         switch rigidBody {
         case let internode as Internode:
             return force(internode: internode, time: time)
@@ -103,9 +107,9 @@ final class WindField: PhysicsField {
 
     // FIXME move to organized place and reconsider names
     let leafScale: Float = 1
-    let airDensity: Float = 1
-    let airResistanceMultiplier: Float = 1
-    let normal2tangentialDragCoefficientRatio: Float = 1
+    let airDensity: Float = 0.1
+    let airResistanceMultiplier: Float = -1
+    let normal2tangentialDragCoefficientRatio: Float = 100
 
     func force(leaf: Leaf, time: TimeInterval) -> float3 {
         let windVelocity = self.windVelocity(at: leaf.centerOfMass, time: time)
@@ -114,6 +118,10 @@ final class WindField: PhysicsField {
         let relativeVelocity_tangential = relativeVelocity - relativeVelocity_normal
         var result: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
         result += airResistanceMultiplier * leaf.mass * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
+
+        assert(length(result) < 10) // FIXME
+
+        assert(result.isFinite)
         return result
     }
 
@@ -122,7 +130,7 @@ final class WindField: PhysicsField {
         let rotationTime: Float = rotationTimeScale * Float(time)
         let gridPosition = floor(position / cellSize)
 
-        let magnitude = fbm(position.xz + magnitudeTime)
+        let magnitude = fbm(position.xz * 0.5 + magnitudeTime)
         var direction = float3(random(gridPosition.x),random(gridPosition.xz),random(gridPosition.z))
         guard length(direction) > 10e-10 else { return float3.zero }
         let DcrossJ = cross(direction, .j)
@@ -190,7 +198,7 @@ final class WindField: PhysicsField {
         return value
     }
 
-    var `struct`: PhysicsFieldStruct {
+    public var `struct`: PhysicsFieldStruct {
         return PhysicsFieldStruct(
             position: position,
             halfExtent: halfExtent ?? float3(repeating: -1))
@@ -198,23 +206,23 @@ final class WindField: PhysicsField {
 
 }
 
-final class FieldVisualizer: PhysicsField {
+public final class FieldVisualizer: PhysicsField {
     let underlying: PhysicsField
     let root: SCNNode
     let cellSize: Float
     var index: [int2:SCNNode] = [:]
 
-    init(_ underlying: PhysicsField, root: SCNNode, cellSize: Float = 0.1) {
+    public init(_ underlying: PhysicsField, root: SCNNode, cellSize: Float = 0.1) {
         self.underlying = underlying
         self.root = root
         self.cellSize = cellSize
     }
 
-    var position: float3 { return underlying.position }
-    var halfExtent: float3? { return underlying.halfExtent }
-    var `struct`: PhysicsFieldStruct { return underlying.struct}
+    public var position: float3 { return underlying.position }
+    public var halfExtent: float3? { return underlying.halfExtent }
+    public var `struct`: PhysicsFieldStruct { return underlying.struct}
 
-    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         let gridPosition = floor(rigidBody.centerOfMass / cellSize)
 
         let key = int2(gridPosition.xz)

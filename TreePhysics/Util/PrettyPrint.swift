@@ -3,7 +3,7 @@ import simd
 import ShaderTypes
 
 extension Joint: CustomDebugStringConvertible {
-    var debugDescription: String {
+    public var debugDescription: String {
         return "Joint \(parentRigidBody.name): k=\(k), θ=\(θ)"
     }
 }
@@ -27,7 +27,7 @@ extension RigidBodyStruct: CustomDebugStringConvertible {
 }
 
 extension CompositeBody: CustomDebugStringConvertible {
-    var debugDescription: String {
+    public var debugDescription: String {
         return "Composite Body: mass=\(mass), inertiaTensor=\(inertiaTensor), force=\(force), torque=\(torque), centerOfMass=\(centerOfMass)"
     }
 }

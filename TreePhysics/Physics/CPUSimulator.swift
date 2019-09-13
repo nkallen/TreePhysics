@@ -5,24 +5,24 @@ let torqueFictitiousMultiplier_i: Float = 0.0
 let torqueFictitiousMultiplier_ii: Float = 0.0
 let torqueFictitiousMultiplier_iii: Float = 0.0
 
-final class CPUSimulator {
+public final class CPUSimulator {
     let root: Internode
     let rigidBodiesLevelOrder: [RigidBody]
     let rigidBodiesReverseLevelOrder: [RigidBody]
     private var fields: [PhysicsField] = []
 
-    init(root: Internode) {
+    public init(root: Internode) {
         self.root = root
         self.rigidBodiesLevelOrder = root.flattened().filter { $0.kind == .dynamic }
         self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
         updateRigidBodies()
     }
 
-    func add(field: PhysicsField) {
+    public func add(field: PhysicsField) {
         fields.append(field)
     }
 
-    func update(at time: TimeInterval) {
+    public func update(at time: TimeInterval) {
         updateFields(at: time)
         updateCompositeBodies()
         updateJoints(at: time)

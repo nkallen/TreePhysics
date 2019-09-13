@@ -7,7 +7,7 @@ typealias Color = UIColor
 typealias Color = NSColor
 #endif
 
-func createAxesNode(quiverLength: Float, quiverThickness: Float) -> SCNNode {
+public func createAxesNode(quiverLength: Float, quiverThickness: Float) -> SCNNode {
     let quiverThickness = (quiverLength / 50.0) * quiverThickness
     let chamferRadius = quiverThickness / 2.0
 

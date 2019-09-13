@@ -3,10 +3,10 @@ import SceneKit
 
 // A composite pen that "draws" cylinders and rigid bodies simultaneously.
 
-typealias Indices = [UInt16]
+public typealias Indices = [UInt16]
 
-final class SkinningPen: Pen {
-    typealias T = (Indices, RigidBody)
+public final class SkinningPen: Pen {
+    public typealias T = (Indices, RigidBody)
 
     let branchBones: BoneBuilder
     let leafBones: BoneBuilder
@@ -15,7 +15,7 @@ final class SkinningPen: Pen {
     let rigidBodyPen: RigidBodyPen
     weak var parent: SkinningPen?
 
-    init(cylinderPen: CylinderPen, rigidBodyPen: RigidBodyPen, parent: SkinningPen? = nil) {
+    public init(cylinderPen: CylinderPen, rigidBodyPen: RigidBodyPen, parent: SkinningPen? = nil) {
         self.cylinderPen = cylinderPen
         self.rigidBodyPen = rigidBodyPen
         self.parent = parent
@@ -29,24 +29,24 @@ final class SkinningPen: Pen {
         }
     }
 
-    func start(at: float3, thickness: Float) {
+    public func start(at: float3, thickness: Float) {
         cylinderPen.start(at: at, thickness: thickness)
         rigidBodyPen.start(at: at, thickness: thickness)
     }
 
-    func cont(distance: Float, tangent: float3, thickness: Float) -> T {
+    public func cont(distance: Float, tangent: float3, thickness: Float) -> T {
         let vertices = cylinderPen.cont(distance: distance, tangent: tangent, thickness: thickness)
         let rigidBody = rigidBodyPen.cont(distance: distance, tangent: tangent, thickness: thickness)
         return branchBones.add(bone: (vertices, rigidBody))
     }
 
-    func copy(scale: Float, orientation: simd_quatf) -> T {
+    public func copy(scale: Float, orientation: simd_quatf) -> T {
         let vertices = cylinderPen.copy(scale: scale, orientation: orientation)
         let rigidBody = rigidBodyPen.copy(scale: scale, orientation: orientation)
         return leafBones.add(bone: (vertices, rigidBody))
     }
 
-    var node: SCNNode {
+    public var node: SCNNode {
         let parent = SCNNode()
         let branches = branchBones.node(for: cylinderPen.branchGeometry)
         let leaves = leafBones.node(for: cylinderPen.leafGeometry)
@@ -55,7 +55,7 @@ final class SkinningPen: Pen {
         return parent
     }
 
-    var branch: SkinningPen {
+    public var branch: SkinningPen {
         return SkinningPen(cylinderPen: cylinderPen.branch, rigidBodyPen: rigidBodyPen.branch, parent: self)
     }
 }

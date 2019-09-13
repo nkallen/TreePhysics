@@ -6,8 +6,8 @@ import ModelIO
 // indices separate so that there are distinct SCNGeometryElement objects. It's unclear how this
 // affects rendering performance however.
 
-final class CylinderPen: Pen {
-    typealias T = Indices
+public final class CylinderPen: Pen {
+    public typealias T = Indices
 
     let branchGeometry: GeometryBuilder
     let leafGeometry: GeometryBuilder
@@ -19,7 +19,7 @@ final class CylinderPen: Pen {
     let radialSegmentCount: Int
     let heightSegmentCount: Int
 
-    init(radialSegmentCount: Int = 48, heightSegmentCount: Int = 1, parent: CylinderPen? = nil) {
+    public init(radialSegmentCount: Int = 48, heightSegmentCount: Int = 1, parent: CylinderPen? = nil) {
         guard radialSegmentCount >= 3 else { fatalError() }
 
         self.radialSegmentCount = radialSegmentCount
@@ -35,11 +35,11 @@ final class CylinderPen: Pen {
         }
     }
 
-    func start(at: float3, thickness: Float) {
+    public func start(at: float3, thickness: Float) {
         start = at
     }
 
-    func cont(distance: Float, tangent: float3, thickness: Float) -> Indices {
+    public func cont(distance: Float, tangent: float3, thickness: Float) -> Indices {
         precondition(length(tangent) > 0)
         guard let start = start else { fatalError() }
 
@@ -58,10 +58,10 @@ final class CylinderPen: Pen {
         return branchGeometry.addSegment(rotatedVertices, indices)
     }
 
-    func copy(scale: Float, orientation: simd_quatf) -> Indices {
+    public func copy(scale: Float, orientation: simd_quatf) -> Indices {
         guard let start = start else { fatalError() }
 
-        let sphere = MDLMesh.newEllipsoid(withRadii: float3(repeating: scale * 0.1), radialSegments: 10, verticalSegments: 10, geometryType: .triangles, inwardNormals: false, hemisphere: false, allocator: nil)
+        let sphere = MDLMesh.newPlane(withDimensions: float2(repeating: scale), segments: uint2(1,1), geometryType: .triangles, allocator: nil)
 
         let descriptor = MDLVertexDescriptor()
         let attribute = MDLVertexAttribute()
@@ -88,7 +88,7 @@ final class CylinderPen: Pen {
         return leafGeometry.addSegment(rotatedVertices, indices)
     }
 
-    var branch: CylinderPen {
+    public var branch: CylinderPen {
         guard let start = start else { fatalError() }
         let pen = CylinderPen(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
         pen.start(at: start, thickness: 1)

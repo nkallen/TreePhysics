@@ -1,22 +1,22 @@
 import Foundation
 import simd
 
-final class RigidBodyPen: Pen {
-    typealias T = RigidBody
+public final class RigidBodyPen: Pen {
+    public typealias T = RigidBody
 
     private var parentBranch: Internode
     private var start: float3? = nil
 
-    init(parent: Internode) {
+    public init(parent: Internode) {
         self.parentBranch = parent
     }
 
-    func start(at: float3, thickness: Float) {
+    public func start(at: float3, thickness: Float) {
         start = at
     }
 
     // FIXME replace tangent with orientation
-    func cont(distance: Float, tangent: float3, thickness: Float) -> RigidBody {
+    public func cont(distance: Float, tangent: float3, thickness: Float) -> RigidBody {
         guard let start = start else { fatalError() }
 
         let newBranch = Internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
@@ -32,17 +32,17 @@ final class RigidBodyPen: Pen {
         return newBranch
     }
 
-    func copy(scale: Float, orientation: simd_quatf) -> RigidBody {
+    public func copy(scale: Float, orientation: simd_quatf) -> RigidBody {
         guard let _ = start else { fatalError() }
 
-        let newLeaf = Leaf(length: scale * 0.1, density: 750)
+        let newLeaf = Leaf(length: scale, density: 750)
 
         _ = parentBranch.add(newLeaf, at: orientation)
 
         return newLeaf
     }
 
-    var branch: RigidBodyPen {
+    public var branch: RigidBodyPen {
         return RigidBodyPen(parent: parentBranch)
     }
 }

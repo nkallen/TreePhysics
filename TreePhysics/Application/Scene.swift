@@ -1,7 +1,7 @@
 import Foundation
 import SceneKit
 import ShaderTypes
-@testable import TreePhysics
+import TreePhysics
 
 class Scene: NSObject {
     let scene: SCNScene

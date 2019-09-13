@@ -3,12 +3,12 @@ import simd
 import SceneKit
 
 // FIXME remove
-enum Kind {
+public enum Kind {
     case `static`
     case `dynamic`
 }
 
-protocol RigidBody: class {
+public protocol RigidBody: class {
     var kind: Kind { get } // FIXME remove
 
     var parentJoint: Joint? { get set }
@@ -83,6 +83,19 @@ extension RigidBody {
                 queue.append(childJoint.childRigidBody)
             }
         }
+    }
+}
+
+extension RigidBody {
+    var isFinite: Bool {
+        return translation.isFinite &&
+            rotation.isFinite &&
+            inertiaTensor.isFinite &&
+            angularVelocity.isFinite &&
+            angularAcceleration.isFinite &&
+            velocity.isFinite &&
+            acceleration.isFinite &&
+            centerOfMass.isFinite
     }
 }
 

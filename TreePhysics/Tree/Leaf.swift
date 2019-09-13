@@ -98,5 +98,7 @@ final class Leaf: RigidBody {
         self.acceleration = parentJoint.acceleration - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation.act(-centerOfMass_local)
 
         self.centerOfMass = translation + rotation.act(centerOfMass_local)
+
+        assert(isFinite)
     }
 }
