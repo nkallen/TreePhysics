@@ -47,20 +47,20 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         commandEncoder.endEncoding()
     }
 
-    static func rigidBodiesBuffer(root: Internode, device: MTLDevice) -> ([Internode], MTLBuffer, [Range<Int>]) {
+    static func rigidBodiesBuffer(root: Internode, device: MTLDevice) -> ([RigidBody], MTLBuffer, [Range<Int>]) {
         var rangesOfWork: [Range<Int>] = []
         let levels = root.levels()
         var offset = 0
         var id = 0
-        var index: [Wrap:Int] = [:]
-        var allClimbers: [Internode] = []
-        var rigidBodies: [Internode] = []
+        let index = RigidBodyDict<Int>()
+        var allClimbers: [RigidBody] = []
+        var rigidBodies: [RigidBody] = []
 
         // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
         for level in levels {
             for unitOfWork in level {
                 allClimbers.append(contentsOf: unitOfWork.climbers)
-                index[Wrap(unitOfWork.rigidBody)] = id
+                index[unitOfWork.rigidBody] = id
                 id += 1
             }
 
@@ -69,10 +69,10 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
             offset += level.count
         }
         for rigidBody in allClimbers {
-            index[Wrap(rigidBody)] = id
+            index[rigidBody] = id
             id += 1
         }
-        index[Wrap(root)] = id
+        index[root] = id
 
         // Step 1: Allocate the buffer
         let count = offset + allClimbers.count + 1 // +1 for root
@@ -82,17 +82,17 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         let rigidBodyStructs = UnsafeMutableRawPointer(buffer.contents())!.bindMemory(to: RigidBodyStruct.self, capacity: count)
         for level in levels {
             for unitOfWork in level {
-                let id = index[Wrap(unitOfWork.rigidBody)]!
+                let id = index[unitOfWork.rigidBody]!
                 rigidBodyStructs[id] = `struct`(rigidBody: unitOfWork.rigidBody, climbers: unitOfWork.climbers, index: index)
                 rigidBodies.append(unitOfWork.rigidBody)
             }
         }
         for rigidBody in allClimbers {
-            let id = index[Wrap(rigidBody)]!
+            let id = index[rigidBody]!
             rigidBodyStructs[id] = `struct`(rigidBody: rigidBody, index: index)
             rigidBodies.append(rigidBody)
         }
-        rigidBodyStructs[index[Wrap(root)]!] = `struct`(rigidBody: root, index: index)
+        rigidBodyStructs[index[root]!] = `struct`(rigidBody: root, index: index)
         rigidBodies.append(root)
         return (rigidBodies, buffer, rangesOfWork)
     }
@@ -104,11 +104,11 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
 
     typealias ChildIdsType = (Int32, Int32, Int32)
 
-    private static func `struct`(rigidBody: Internode, climbers: [Internode] = [], index: [Wrap:Int]) -> RigidBodyStruct {
+    private static func `struct`(rigidBody: RigidBody, climbers: [RigidBody] = [], index: RigidBodyDict<Int>) -> RigidBodyStruct {
         // Parent
         let parentId: Int32
         if let parentJoint = rigidBody.parentJoint {
-            parentId = Int32(index[Wrap(parentJoint.parentRigidBody)]!)
+            parentId = Int32(index[parentJoint.parentRigidBody]!)
         } else {
             parentId = -1
         }
@@ -116,13 +116,13 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         // Child
         let childRigidBodies = rigidBody.childJoints.map { $0.childRigidBody }
         assert(childRigidBodies.count <= 5)
-        var childRigidBodyIndices: [Int32] = childRigidBodies.map { Int32(index[Wrap($0)]!) }
+        var childRigidBodyIndices: [Int32] = childRigidBodies.map { Int32(index[$0]!) }
         var childIds: ChildIdsType = (0,0,0)
         memcpy(&childIds, &childRigidBodyIndices, childRigidBodyIndices.count * MemoryLayout<Int32>.stride)
 
         // Climbers
-//        assert(climbers.count <= 10)
-        let climberOffset = Int32(climbers.first.map { index[Wrap($0)]! } ?? 0)
+//        assert(climbers.count <= 10) FIXME
+        let climberOffset = Int32(climbers.first.map { index[$0]! } ?? 0)
 
         let strct = RigidBodyStruct(
             parentId: parentId,
@@ -131,13 +131,15 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
             childCount: ushort(childRigidBodies.count),
             climberCount: ushort(climbers.count),
             mass: rigidBody.mass,
-            length: rigidBody.length,
-            radius: rigidBody.radius,
+            // FIXME cast
+            length: (rigidBody as! Internode).length,
+            radius: (rigidBody as! Internode).radius,
 
             jointStiffness: 200.0,
             jointLocalRotation: rigidBody.parentJoint.map { float3x3($0.rotation_local) } ?? matrix_identity_float3x3,
 
-            position: rigidBody.position,
+            // FIXME rename
+            position: rigidBody.translation,
             rotation: float3x3(rigidBody.rotation),
             inertiaTensor: rigidBody.inertiaTensor,
             centerOfMass: rigidBody.centerOfMass,
@@ -145,21 +147,5 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
             force: rigidBody.force,
             torque: rigidBody.torque)
         return strct
-    }
-}
-
-fileprivate class Wrap: Hashable {
-    let underlying: RigidBody
-
-    init(_ underlying: RigidBody) {
-        self.underlying = underlying
-    }
-
-    static func ==(lhs: Wrap, rhs: Wrap) -> Bool {
-        return lhs.underlying === rhs.underlying
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(underlying))
     }
 }

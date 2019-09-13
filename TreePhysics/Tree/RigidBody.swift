@@ -2,6 +2,7 @@ import Foundation
 import simd
 import SceneKit
 
+// FIXME remove
 enum Kind {
     case `static`
     case `dynamic`
@@ -11,6 +12,7 @@ protocol RigidBody: class {
     var kind: Kind { get } // FIXME remove
 
     var parentJoint: Joint? { get set }
+    var childJoints: [Joint] { get }
     var composite: CompositeBody { get }
 
     var mass: Float { get }
@@ -19,8 +21,10 @@ protocol RigidBody: class {
     var force: float3 { get }
     var torque: float3 { get }
 
-    var centerOfMass: float3 { get }
+    var translation: float3 { get }
     var rotation: simd_quatf { get }
+
+    var centerOfMass: float3 { get }
     var angularVelocity: float3 { get }
     var angularAcceleration: float3 { get }
     var velocity: float3 { get }
@@ -31,4 +35,82 @@ protocol RigidBody: class {
     func resetForces()
 
     var node: SCNNode { get }
+}
+
+// FIXME think of isolating the articulatedness
+extension RigidBody {
+    var isRoot: Bool {
+        return parentJoint == nil
+    }
+
+    var isLeaf: Bool {
+        return childJoints.isEmpty
+    }
+
+    var hasOneChild: Bool {
+        return childJoints.count == 1
+    }
+
+    var parentRigidBody: RigidBody? {
+        return parentJoint?.parentRigidBody
+    }
+
+    func flattened() -> [RigidBody] {
+        var result: [RigidBody] = []
+        var queue: [RigidBody] = [self]
+        searchBreadthFirst(queue: &queue, result: &result)
+        return result
+    }
+
+    var leaves: [RigidBody] {
+        var result: [RigidBody] = []
+        for childJoint in childJoints {
+            let childRigidBody = childJoint.childRigidBody
+            if childRigidBody.isLeaf {
+                result.append(childRigidBody)
+            } else {
+                result.append(contentsOf: childRigidBody.leaves)
+            }
+        }
+        return result
+    }
+
+    private func searchBreadthFirst(queue: inout [RigidBody], result: inout [RigidBody]) {
+        while !queue.isEmpty {
+            let start = queue.removeFirst()
+            result.append(start)
+            for childJoint in start.childJoints {
+                queue.append(childJoint.childRigidBody)
+            }
+        }
+    }
+}
+
+class HashRigidBody: Hashable {
+    let underlying: RigidBody
+
+    init(_ underlying: RigidBody) {
+        self.underlying = underlying
+    }
+
+    static func ==(lhs: HashRigidBody, rhs: HashRigidBody) -> Bool {
+        return lhs.underlying === rhs.underlying
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(underlying))
+    }
+}
+
+class RigidBodyDict<Value> {
+    var dict: [HashRigidBody:Value] = [:]
+
+    subscript(index: RigidBody) -> Value? {
+        get {
+            return dict[HashRigidBody(index)]
+        }
+        set(newValue) {
+            dict[HashRigidBody(index)] = newValue
+        }
+    }
 }

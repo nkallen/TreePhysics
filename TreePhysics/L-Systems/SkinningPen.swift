@@ -8,15 +8,25 @@ typealias Indices = [UInt16]
 final class SkinningPen: Pen {
     typealias T = (Indices, RigidBody)
 
+    let branchBones: BoneBuilder
+    let leafBones: BoneBuilder
+
     let cylinderPen: CylinderPen
     let rigidBodyPen: RigidBodyPen
     weak var parent: SkinningPen?
-    private(set) var bones: [T] = []
 
     init(cylinderPen: CylinderPen, rigidBodyPen: RigidBodyPen, parent: SkinningPen? = nil) {
         self.cylinderPen = cylinderPen
         self.rigidBodyPen = rigidBodyPen
         self.parent = parent
+
+        if let parent = parent {
+            self.branchBones = parent.branchBones
+            self.leafBones = parent.leafBones
+        } else {
+            self.branchBones = BoneBuilder()
+            self.leafBones = BoneBuilder()
+        }
     }
 
     func start(at: float3, thickness: Float) {
@@ -27,33 +37,46 @@ final class SkinningPen: Pen {
     func cont(distance: Float, tangent: float3, thickness: Float) -> T {
         let vertices = cylinderPen.cont(distance: distance, tangent: tangent, thickness: thickness)
         let rigidBody = rigidBodyPen.cont(distance: distance, tangent: tangent, thickness: thickness)
-        return addBone((vertices, rigidBody))
+        return branchBones.add(bone: (vertices, rigidBody))
     }
 
     func copy(scale: Float, orientation: simd_quatf) -> T {
         let vertices = cylinderPen.copy(scale: scale, orientation: orientation)
         let rigidBody = rigidBodyPen.copy(scale: scale, orientation: orientation)
-        return addBone((vertices, rigidBody))
+        return leafBones.add(bone: (vertices, rigidBody))
     }
 
-    func addBone(_ bone: T) -> T {
-        if let parent = parent {
-            return parent.addBone(bone)
-        } else {
-            bones.append(bone)
-            return bone
-        }
+    var node: SCNNode {
+        let parent = SCNNode()
+        let branches = branchBones.node(for: cylinderPen.branchGeometry)
+        let leaves = leafBones.node(for: cylinderPen.leafGeometry)
+        parent.addChildNode(branches)
+        parent.addChildNode(leaves)
+        return parent
     }
 
     var branch: SkinningPen {
         return SkinningPen(cylinderPen: cylinderPen.branch, rigidBodyPen: rigidBodyPen.branch, parent: self)
     }
+}
 
-    var node: SCNNode {
+final class BoneBuilder {
+    typealias T = (Indices, RigidBody)
+    private(set) var bones: [T] = []
+
+    func add(bone: T) -> T {
+        bones.append(bone)
+        return bone
+    }
+
+    func node(for builder: GeometryBuilder) -> SCNNode {
+        guard !bones.isEmpty else { return SCNNode() }
+
         var boneNodes: [SCNNode] = []
         var boneInverseBindTransforms: [NSValue] = []
-        var boneWeights: [Float] = Array(repeating: 1.0, count: cylinderPen.branchGeometry.source.vectorCount)
-        var boneIndices: Indices = Array(repeating: 0, count: cylinderPen.branchGeometry.source.vectorCount)
+        let vectorCount = builder.source.vectorCount
+        var boneWeights: [Float] = Array(repeating: 1.0, count: vectorCount)
+        var boneIndices: Indices = Array(repeating: 0, count: vectorCount)
 
         for (boneIndex, bone) in bones.enumerated() {
             let (vertexIndices, rigidBody) = bone
@@ -71,9 +94,9 @@ final class SkinningPen: Pen {
         let boneWeightsGeometrySource = SCNGeometrySource(data: boneWeightsData, semantic: .boneWeights, vectorCount: boneWeights.count, usesFloatComponents: true, componentsPerVector: 1, bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0, dataStride: MemoryLayout<Float>.size)
         let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<UInt16>.size, dataOffset: 0, dataStride: MemoryLayout<UInt16>.size)
 
-        let skinner = SCNSkinner(baseGeometry: cylinderPen.branchGeometry.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
+        let skinner = SCNSkinner(baseGeometry: builder.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
 
-        let node = SCNNode(geometry: cylinderPen.branchGeometry.geometry)
+        let node = SCNNode(geometry: builder.geometry)
         node.skinner = skinner
 
         return node

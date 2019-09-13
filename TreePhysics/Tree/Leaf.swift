@@ -3,10 +3,14 @@ import SceneKit
 import simd
 
 extension Leaf {
+    static let thickness: Float = 0.001
 }
 
 final class Leaf: RigidBody {
     let kind: Kind = .dynamic
+
+    // FIXME is this right?
+    let childJoints: [Joint] = []
 
     weak var parentJoint: Joint?
     let composite: CompositeBody
@@ -32,9 +36,16 @@ final class Leaf: RigidBody {
     let centerOfMass_local: float3
     let length: Float
 
+    let area: Float
+
+    var normal: float3 {
+        return rotation.act(float3.z)
+    }
+
     init(length: Float = 1.0, density: Float = 1.0) {
         self.length = length
-        self.mass = density * sqr(length)
+        self.area = sqr(length)
+        self.mass = density * area * Leaf.thickness
 
         // Inertia tensor for rectangular plate:
         self.inertiaTensor_local = float3x3(diagonal:
@@ -64,6 +75,7 @@ final class Leaf: RigidBody {
         self.torque = float3.zero
     }
 
+    // FIXME totally duplicated
     func updateTransform() {
         guard let parentJoint = parentJoint else { return }
         let parentRigidBody = parentJoint.parentRigidBody

@@ -7,8 +7,8 @@ let torqueFictitiousMultiplier_iii: Float = 0.0
 
 final class CPUSimulator {
     let root: Internode
-    let rigidBodiesLevelOrder: [Internode]
-    let rigidBodiesReverseLevelOrder: [Internode]
+    let rigidBodiesLevelOrder: [RigidBody]
+    let rigidBodiesReverseLevelOrder: [RigidBody]
     private var fields: [PhysicsField] = []
 
     init(root: Internode) {
@@ -35,7 +35,7 @@ final class CPUSimulator {
     func updateFields(at time: TimeInterval) {
         for rigidBody in rigidBodiesReverseLevelOrder { // Order is unimportant
             for field in fields {
-                if field.applies(to: rigidBody.position) {
+                if field.applies(to: rigidBody.centerOfMass) {
                     let time = Date().timeIntervalSince(start)
                     let force = field.force(rigidBody: rigidBody, time: time)
                     let torque = field.torque(rigidBody: rigidBody, time: time)
@@ -63,7 +63,7 @@ final class CPUSimulator {
 
                 // this is due to distributivity of cross product
                 composite.torque +=
-                    cross(childJoint.position - rigidBody.position, childComposite.force) + childComposite.torque
+                    cross(childJoint.position - rigidBody.translation, childComposite.force) + childComposite.torque
 
                 composite.centerOfMass += childComposite.mass * childComposite.centerOfMass
             }

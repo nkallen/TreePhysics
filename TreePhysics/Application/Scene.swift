@@ -10,7 +10,7 @@ class Scene: NSObject {
     let attractor: SCNNode
     let root: Internode
 
-    private let metalSimulator: MetalSimulator
+//    private let metalSimulator: MetalSimulator
     private let cpuSimulator: CPUSimulator
 
     let device: MTLDevice, commandQueue: MTLCommandQueue
@@ -43,8 +43,8 @@ class Scene: NSObject {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFJFA]/////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
@@ -73,11 +73,11 @@ class Scene: NSObject {
         self.attractorField = attractorField
         self.attractor = attractor
 
-        self.metalSimulator = MetalSimulator(device: device, root: root)
+//        self.metalSimulator = MetalSimulator(device: device, root: root)
 
         cpuSimulator.add(field: gravityField)
         cpuSimulator.add(field: attractorField)
-        metalSimulator.add(field: attractorField)
+//        metalSimulator.add(field: attractorField)
 
         let windField = WindField()
         cpuSimulator.add(field: FieldVisualizer(windField, root: scene.rootNode))
@@ -101,19 +101,19 @@ extension Scene: SCNSceneRendererDelegate {
         cpuSimulator.update(at: 1.0 / 60)
         renderer.isPlaying = true
 
-        return ()
-        let commandBuffer = commandQueue.makeCommandBuffer()!
-        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 100)
-        commandBuffer.addCompletedHandler { [unowned self] _ in
-            let metalSimulator = self.metalSimulator
-            DispatchQueue.main.async {
-                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
-
-                for i in 0..<(metalSimulator.rigidBodies.count-1) {
-                    metalSimulator.rigidBodies[i].node.simdPosition = rigidBodies[i].position
-                }
-            }
-        }
-        commandBuffer.commit()
+//        return ()
+//        let commandBuffer = commandQueue.makeCommandBuffer()!
+//        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 100)
+//        commandBuffer.addCompletedHandler { [unowned self] _ in
+//            let metalSimulator = self.metalSimulator
+//            DispatchQueue.main.async {
+//                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+//
+//                for i in 0..<(metalSimulator.rigidBodies.count-1) {
+//                    metalSimulator.rigidBodies[i].node.simdPosition = rigidBodies[i].position
+//                }
+//            }
+//        }
+//        commandBuffer.commit()
     }
 }

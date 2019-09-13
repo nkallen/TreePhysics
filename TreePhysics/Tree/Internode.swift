@@ -37,6 +37,15 @@ final class Internode: RigidBody {
     var acceleration: float3 = float3.zero
 
     let node: SCNNode
+
+    // FIXME think about these whether they should be stored properties or what
+    var normal: float3 {
+        return rotation.act(.y)
+    }
+
+    var crossSectionalArea: Float {
+        return .pi * radius * length
+    }
     
     init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi, kind: Kind = .dynamic) {
         self.name = "Branch[\(i)]"
@@ -72,10 +81,6 @@ final class Internode: RigidBody {
         updateTransform()
     }
 
-    var position: float3 {
-        return translation // FIXME should be center of mass
-    }
-    
     func add(_ child: RigidBody, at rotation: simd_quatf) -> Joint {
         let joint = Joint(parent: self, child: child, at: rotation)
         childJoints.append(joint)
@@ -133,37 +138,28 @@ final class Internode: RigidBody {
 // MARK: Flattening & Leveling
 
 struct UnitOfWork {
-    let rigidBody: Internode
-    let climbers: [Internode]
+    let rigidBody: RigidBody
+    let climbers: [RigidBody]
 }
 typealias Level = [UnitOfWork]
 
 extension Internode {
-    var hasOneChild: Bool {
-        return childJoints.count == 1
-    }
-    
-    var parentRigidBody: Internode? {
-        return parentJoint?.parentRigidBody
-    }
-    
     func levels() -> [Level] {
         var result: [Level] = []
-        var visited: Set<Internode> = []
+        var visited = Set<HashRigidBody>()
 
         var remaining = self.leaves
         repeat {
             var level: Level = []
-            var nextRemaining: [Internode] = []
+            var nextRemaining: [RigidBody] = []
             while var n = remaining.popLast() {
-                // FIXME cast is temporary hack
-                if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody as! Internode) }) && !visited.contains(n) {
-                    var climbers: [Internode] = []
+                if n.childJoints.allSatisfy({ visited.contains(HashRigidBody($0.childRigidBody)) }) && !visited.contains(HashRigidBody(n)) {
+                    var climbers: [RigidBody] = []
                     let beforeClimb = n
                     while let parentRigidBody = n.parentRigidBody, parentRigidBody.hasOneChild {
                         n = parentRigidBody
-                        if !visited.contains(n) {
-                            visited.insert(n)
+                        if !visited.contains(HashRigidBody(n)) {
+                            visited.insert(HashRigidBody(n))
                             if !n.isRoot {
                                 climbers.append(n)
                             }
@@ -181,49 +177,11 @@ extension Internode {
             if !level.isEmpty {
                 result.append(level)
             }
-            let beforeClimbs = level.map { $0.rigidBody }
-            visited = visited.union(beforeClimbs)
-            remaining = Array(Set(nextRemaining))
+            let beforeClimbs = level.map { HashRigidBody($0.rigidBody) }
+            visited.formUnion(beforeClimbs)
+            remaining = Array(Set(nextRemaining.map { HashRigidBody($0) })).map { $0.underlying }
         } while !remaining.isEmpty
         return result
-    }
-    
-    var isRoot: Bool {
-        return parentJoint == nil
-    }
-    
-    func flattened() -> [Internode] {
-        var result: [Internode] = []
-        var queue: [Internode] = [self]
-        searchBreadthFirst(queue: &queue, result: &result)
-        return result
-    }
-    
-    var leaves: [Internode] {
-        var result: [Internode] = []
-        for childJoint in childJoints {
-            let childRigidBody = childJoint.childRigidBody as! Internode
-            if childRigidBody.isLeaf {
-                result.append(childRigidBody)
-            } else {
-                result.append(contentsOf: childRigidBody.leaves)
-            }
-        }
-        return result
-    }
-    
-    var isLeaf: Bool {
-        return childJoints.count == 0
-    }
-    
-    private func searchBreadthFirst(queue: inout [Internode], result: inout [Internode]) {
-        while !queue.isEmpty {
-            let start = queue.removeFirst()
-            result.append(start)
-            for childJoint in start.childJoints {
-                queue.append(childJoint.childRigidBody as! Internode)
-            }
-        }
     }
 }
 

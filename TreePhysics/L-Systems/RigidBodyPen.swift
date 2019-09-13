@@ -15,12 +15,13 @@ final class RigidBodyPen: Pen {
         start = at
     }
 
+    // FIXME replace tangent with orientation
     func cont(distance: Float, tangent: float3, thickness: Float) -> RigidBody {
         guard let start = start else { fatalError() }
 
         let newBranch = Internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
-        let parentTangent = parentBranch.translation + parentBranch.rotation.act(float3(0,1,0)) - parentBranch.position
+        let parentTangent = parentBranch.rotation.act(float3(0,1,0))
         let rotation = simd_quatf(from: parentTangent, to: tangent).normalized
 
         _ = parentBranch.add(newBranch, at: rotation)

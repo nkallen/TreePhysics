@@ -13,7 +13,7 @@ class MetalSimulator {
 
     internal let compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer
 
-    internal var rigidBodies: [Internode]
+    internal var rigidBodies: [RigidBody]
 
     private var fields: [PhysicsField] = []
 

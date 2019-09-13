@@ -7,8 +7,8 @@ protocol PhysicsField {
     var position: float3 { get }
     var halfExtent: float3? { get }
     var `struct`: PhysicsFieldStruct { get }
-    func force(rigidBody: Internode, time: TimeInterval) -> float3
-    func torque(rigidBody: Internode, time: TimeInterval) -> float3?
+    func force(rigidBody: RigidBody, time: TimeInterval) -> float3
+    func torque(rigidBody: RigidBody, time: TimeInterval) -> float3?
 }
 
 extension PhysicsField {
@@ -18,7 +18,7 @@ extension PhysicsField {
         return position.in(min: self.position - halfExtent, max: self.position + halfExtent)
     }
 
-    func torque(rigidBody: Internode, time: TimeInterval) -> float3? {
+    func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
         return nil
     }
 }
@@ -32,7 +32,7 @@ final class GravityField: PhysicsField {
         self.g = g
     }
 
-    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
+    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         return g * rigidBody.mass
     }
 
@@ -51,8 +51,8 @@ final class AttractorField: PhysicsField {
     let b: Float = 0.01
     let c: Float = 0.1
 
-    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
-        let delta = self.position - rigidBody.position
+    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+        let delta = self.position - rigidBody.centerOfMass
         let distance = length(delta)
         if (distance > 0) {
             let direction = normalize(delta)
@@ -75,17 +75,54 @@ final class WindField: PhysicsField {
     var position = float3.zero
     var halfExtent: float3? = nil
 
-    let cellSize: Float = 0.5
+    let cellSize: Float = 0.1
     let magnitudeTimeScale: Float = 0.1
     let rotationTimeScale: Float = 2
-    let amplitude: Float = 0.03
+    let amplitude: Float = 10
 
-    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
-        let magnitudeTime: Float = magnitudeTimeScale*Float(time)
-        let rotationTime: Float = rotationTimeScale*Float(time)
-        let gridPosition = floor(rigidBody.position / cellSize)
+    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+        switch rigidBody {
+        case let internode as Internode:
+            return force(internode: internode, time: time)
+        case let leaf as Leaf:
+            return force(leaf: leaf, time: time)
+        default:
+            fatalError()
+        }
+    }
 
-        let magnitude = fbm(rigidBody.position.xz + magnitudeTime)
+    let branchScale: Float = 1
+
+    func force(internode: Internode, time: TimeInterval) -> float3 {
+        let windVelocity = self.windVelocity(at: internode.centerOfMass, time: time)
+        let relativeVelocity = windVelocity - internode.velocity
+        let relativeVelocity_normal = dot(relativeVelocity, internode.normal) * internode.normal
+        let result = branchScale * airDensity * internode.crossSectionalArea * length(relativeVelocity_normal) * relativeVelocity_normal
+        return result
+    }
+
+    // FIXME move to organized place and reconsider names
+    let leafScale: Float = 1
+    let airDensity: Float = 1
+    let airResistanceMultiplier: Float = 1
+    let normal2tangentialDragCoefficientRatio: Float = 1
+
+    func force(leaf: Leaf, time: TimeInterval) -> float3 {
+        let windVelocity = self.windVelocity(at: leaf.centerOfMass, time: time)
+        let relativeVelocity = windVelocity - leaf.velocity
+        let relativeVelocity_normal = dot(relativeVelocity, leaf.normal) * leaf.normal
+        let relativeVelocity_tangential = relativeVelocity - relativeVelocity_normal
+        var result: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
+        result += airResistanceMultiplier * leaf.mass * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
+        return result
+    }
+
+    func windVelocity(at position: float3, time: TimeInterval) -> float3 {
+        let magnitudeTime: Float = magnitudeTimeScale * Float(time)
+        let rotationTime: Float = rotationTimeScale * Float(time)
+        let gridPosition = floor(position / cellSize)
+
+        let magnitude = fbm(position.xz + magnitudeTime)
         var direction = float3(random(gridPosition.x),random(gridPosition.xz),random(gridPosition.z))
         guard length(direction) > 10e-10 else { return float3.zero }
         let DcrossJ = cross(direction, .j)
@@ -177,8 +214,8 @@ final class FieldVisualizer: PhysicsField {
     var halfExtent: float3? { return underlying.halfExtent }
     var `struct`: PhysicsFieldStruct { return underlying.struct}
 
-    func force(rigidBody: Internode, time: TimeInterval) -> float3 {
-        let gridPosition = floor(rigidBody.position / cellSize)
+    func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+        let gridPosition = floor(rigidBody.centerOfMass / cellSize)
 
         let key = int2(gridPosition.xz)
         let node: SCNNode
@@ -200,8 +237,8 @@ final class FieldVisualizer: PhysicsField {
         }
 
         let rotation = simd_quatf(from: .j, to: normalize(result))
+        node.simdScale = float3(1, 0.05 + magnitude*5, 1)
         node.simdOrientation = rotation
-        node.simdScale = float3(1,magnitude * 10,1)
 
         return result
     }
