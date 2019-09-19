@@ -58,7 +58,6 @@
 		9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
 		9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
 		9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
-		9E9D4B7C22F37244007DCF49 /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
 		9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
 		9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
 		9E9D4B7F22F37244007DCF49 /* Internode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94622E78FEC0095C8AC /* Internode.swift */; };
@@ -102,6 +101,9 @@
 		9EAE863B232A68010037EA92 /* Print.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8E27BE2307335300652DAC /* Print.metal */; };
 		9EAE863C232A68040037EA92 /* Debug.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA7010B231064F3009077A0 /* Debug.metal */; };
 		9EAE863E232A69F40037EA92 /* Leaf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE863D232A69F40037EA92 /* Leaf.swift */; };
+		9EAE86422332717C0037EA92 /* GravityField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE86412332717C0037EA92 /* GravityField.swift */; };
+		9EAE8644233271910037EA92 /* AttractorField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE8643233271910037EA92 /* AttractorField.swift */; };
+		9EAE8646233271BF0037EA92 /* WindField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE8645233271BF0037EA92 /* WindField.swift */; };
 		9EBEB1CD2327B3EF0073E5D9 /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */; };
 		9EC88E25231989930049737D /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC88E24231989930049737D /* ModelTests.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
@@ -195,9 +197,12 @@
 		9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT18_03SCF11_s13_2text.pdf; sourceTree = "<group>"; };
 		9EAE863D232A69F40037EA92 /* Leaf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Leaf.swift; sourceTree = "<group>"; };
 		9EAE863F232BCBB10037EA92 /* tanabe94.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = tanabe94.pdf; sourceTree = "<group>"; };
+		9EAE86412332717C0037EA92 /* GravityField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityField.swift; sourceTree = "<group>"; };
+		9EAE8643233271910037EA92 /* AttractorField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttractorField.swift; sourceTree = "<group>"; };
+		9EAE8645233271BF0037EA92 /* WindField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindField.swift; sourceTree = "<group>"; };
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
 		9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBody.swift; sourceTree = "<group>"; };
-		9EBEB1CF2329052A0073E5D9 /* Playground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Playground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		9EBEB1CF2329052A0073E5D9 /* L-Systems.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = "L-Systems.playground"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		9EC88E24231989930049737D /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodies.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics_macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics_macOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -357,10 +362,10 @@
 		9E9D4B6422F313BD007DCF49 /* Physics */ = {
 			isa = PBXGroup;
 			children = (
+				9EAE8640233271690037EA92 /* Fields */,
 				9E0674EB230AD8440044C3C4 /* Encoders */,
 				9E0674DC230ACFC90044C3C4 /* Kernels */,
 				9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */,
-				9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */,
 				9E8F711E230D87C200583AAE /* MetalSimulator.swift */,
 			);
 			path = Physics;
@@ -398,10 +403,21 @@
 			path = iOS;
 			sourceTree = "<group>";
 		};
+		9EAE8640233271690037EA92 /* Fields */ = {
+			isa = PBXGroup;
+			children = (
+				9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */,
+				9EAE86412332717C0037EA92 /* GravityField.swift */,
+				9EAE8643233271910037EA92 /* AttractorField.swift */,
+				9EAE8645233271BF0037EA92 /* WindField.swift */,
+			);
+			path = Fields;
+			sourceTree = "<group>";
+		};
 		9EE7EB9522DDDC6C00535997 = {
 			isa = PBXGroup;
 			children = (
-				9EBEB1CF2329052A0073E5D9 /* Playground.playground */,
+				9EBEB1CF2329052A0073E5D9 /* L-Systems.playground */,
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
 				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
 				9E1F427E23290694009E0E52 /* TreePhysics */,
@@ -652,16 +668,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EAE86422332717C0037EA92 /* GravityField.swift in Sources */,
 				9E34C494232912F3008C7353 /* Half.c in Sources */,
 				9E34C48E23291252008C7353 /* Joint.swift in Sources */,
 				9EAA8C0C232923FD002E9260 /* MetalKernalEncoder.swift in Sources */,
 				9E34C4932329127C008C7353 /* Diagonalization.swift in Sources */,
 				9EAA8C132329242C002E9260 /* CPUSimulator.swift in Sources */,
 				9EAA8C0A232923D2002E9260 /* ApplyPhysicsFields.swift in Sources */,
+				9EAE8644233271910037EA92 /* AttractorField.swift in Sources */,
 				9E34C48A23291207008C7353 /* CylinderPen.swift in Sources */,
 				9EAE862C232A67170037EA92 /* ResetForces.metal in Sources */,
 				9EAE862E232A671E0037EA92 /* UpdateCompositeBodies.metal in Sources */,
 				9EAE862F232A67210037EA92 /* UpdateJoints.metal in Sources */,
+				9EAE8646233271BF0037EA92 /* WindField.swift in Sources */,
 				9E34C49223291277008C7353 /* Math.swift in Sources */,
 				9E34C48F23291254008C7353 /* Internode.swift in Sources */,
 				9E34C4912329125B008C7353 /* RigidBody.swift in Sources */,
@@ -720,7 +739,6 @@
 				9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */,
 				9EE801B122FC492900198166 /* UpdateJoints.swift in Sources */,
 				9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */,
-				9E9D4B7C22F37244007DCF49 /* PhysicsField.swift in Sources */,
 				9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */,
 				9E0674E3230AD2490044C3C4 /* Math.metal in Sources */,
 				9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */,

@@ -1,77 +1,6 @@
 import Foundation
 import simd
-import SceneKit
 import ShaderTypes
-
-public protocol PhysicsField {
-    var position: float3 { get }
-    var halfExtent: float3? { get }
-    var `struct`: PhysicsFieldStruct { get }
-    func force(rigidBody: RigidBody, time: TimeInterval) -> float3
-    func torque(rigidBody: RigidBody, time: TimeInterval) -> float3?
-}
-
-extension PhysicsField {
-    func applies(to position: float3) -> Bool {
-        guard let halfExtent = halfExtent else { return true }
-
-        return position.in(min: self.position - halfExtent, max: self.position + halfExtent)
-    }
-
-    public func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
-        return nil
-    }
-}
-
-public final class GravityField: PhysicsField {
-    public var g: float3
-    public let position: float3 = float3.zero
-    public let halfExtent: float3? = nil
-
-    public init(_ g: float3 = float3.zero) {
-        self.g = g
-    }
-
-    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
-        return g * rigidBody.mass
-    }
-
-    public var `struct`: PhysicsFieldStruct {
-        return PhysicsFieldStruct(
-            position: position,
-            halfExtent: halfExtent ?? float3(repeating: -1))
-    }
-}
-
-public final class AttractorField: PhysicsField {
-    public var position: float3 = float3.zero
-    public let halfExtent: float3? = float3(1, 1, 1)
-
-    let a: Float = 0.05
-    let b: Float = 0.01
-    let c: Float = 0.1
-
-    public init() {}
-
-    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
-        let delta = self.position - rigidBody.centerOfMass
-        let distance = length(delta)
-        if (distance > 0) {
-            let direction = normalize(delta)
-            // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
-            let force = direction * a * powf(.e, -sqr(distance - b)/(2*c))
-            return force
-        } else {
-            return float3(repeating: 0)
-        }
-    }
-
-    public var `struct`: PhysicsFieldStruct {
-        return PhysicsFieldStruct(
-            position: position,
-            halfExtent: halfExtent ?? float3(repeating: -1))
-    }
-}
 
 public final class WindField: PhysicsField {
     public var position = float3.zero
@@ -79,7 +8,7 @@ public final class WindField: PhysicsField {
 
     let cellSize: Float = 0.1
     let magnitudeTimeScale: Float = 0.01
-    let rotationTimeScale: Float = 2
+    let rotationTimeScale: Float = 0.5
     let amplitude: Float = 50
 
     public init() {}
@@ -95,9 +24,20 @@ public final class WindField: PhysicsField {
         }
     }
 
+    public func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
+        switch rigidBody {
+        case let _ as Internode:
+            return nil
+        case let leaf as Leaf:
+            return torque(leaf: leaf, time: time)
+        default: fatalError()
+        }
+    }
+
     let branchScale: Float = 1
 
     func force(internode: Internode, time: TimeInterval) -> float3 {
+        return float3.zero
         let windVelocity = self.windVelocity(at: internode.centerOfMass, time: time)
         let relativeVelocity = windVelocity - internode.velocity
         let relativeVelocity_normal = dot(relativeVelocity, internode.normal) * internode.normal
@@ -108,7 +48,7 @@ public final class WindField: PhysicsField {
     // FIXME move to organized place and reconsider names
     let leafScale: Float = 1
     let airDensity: Float = 0.1
-    let airResistanceMultiplier: Float = -1
+    let airResistanceMultiplier: Float = 1
     let normal2tangentialDragCoefficientRatio: Float = 100
 
     func force(leaf: Leaf, time: TimeInterval) -> float3 {
@@ -119,19 +59,32 @@ public final class WindField: PhysicsField {
         var result: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
         result += airResistanceMultiplier * leaf.mass * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
 
-        assert(length(result) < 10) // FIXME
+//        assert(length(result) < 10) // FIXME
 
         assert(result.isFinite)
         return result
     }
 
+    func torque(leaf: Leaf, time: TimeInterval) -> float3 {
+        let windVelocity = self.windVelocity(at: leaf.centerOfMass, time: time)
+        let relativeVelocity = windVelocity - leaf.velocity
+        let K = leafScale * airDensity * leaf.area/2 * sqrt(leaf.area/Float.pi)
+        let phi: Float = 0
+        var result: float3 = K * dot(relativeVelocity, leaf.normal) * leaf.normal.crossMatrix * (relativeVelocity * cos(phi) + leaf.normal.crossMatrix * relativeVelocity * sin(phi))
+        result -= airResistanceMultiplier * leaf.inertiaTensor * leaf.angularVelocity
+        print(result)
+        return result
+    }
+
     func windVelocity(at position: float3, time: TimeInterval) -> float3 {
+        return simd_quatf(angle: Float(sin(time) * 2 * .pi), axis: .j).act(.i) * 100
+
         let magnitudeTime: Float = magnitudeTimeScale * Float(time)
         let rotationTime: Float = rotationTimeScale * Float(time)
         let gridPosition = floor(position / cellSize)
 
         let magnitude = fbm(position.xz * 0.5 + magnitudeTime)
-        var direction = float3(random(gridPosition.x),random(gridPosition.xz),random(gridPosition.z))
+        var direction = float3(1, 0, 0)
         guard length(direction) > 10e-10 else { return float3.zero }
         let DcrossJ = cross(direction, .j)
         direction = normalize(direction)
@@ -146,9 +99,9 @@ public final class WindField: PhysicsField {
 
     func h(_ t: Float) -> Float {
         let t = sin(t)
-        let x0: Float = 0.1
+        let x0: Float = 0
         let x1: Float = 0
-        let x2: Float = 1
+        let x2: Float = 0
         let x3: Float = 0
         return bezier(x0, x1, x2, x3, t: t)
     }
@@ -179,10 +132,12 @@ public final class WindField: PhysicsField {
 
         return mix(a, b, t: u.x) +
             (c - a) * u.y * (1.0 - u.x) +
-                (d - b) * u.x * u.y;
+            (d - b) * u.x * u.y;
     }
 
-    let octaves = 6
+    let octaves = 4
+    let lacunarity: Float = 1.5
+    let gain: Float = 0.75
     func fbm(_ st: float2) -> Float {
         // Initial values
         var st = st
@@ -192,8 +147,8 @@ public final class WindField: PhysicsField {
         // Loop of octaves
         for _ in 0..<octaves {
             value += amplitude * noise(st)
-            st *= 2.0
-            amplitude *= 0.5
+            st *= lacunarity
+            amplitude *= gain
         }
         return value
     }
@@ -204,50 +159,4 @@ public final class WindField: PhysicsField {
             halfExtent: halfExtent ?? float3(repeating: -1))
     }
 
-}
-
-public final class FieldVisualizer: PhysicsField {
-    let underlying: PhysicsField
-    let root: SCNNode
-    let cellSize: Float
-    var index: [int2:SCNNode] = [:]
-
-    public init(_ underlying: PhysicsField, root: SCNNode, cellSize: Float = 0.1) {
-        self.underlying = underlying
-        self.root = root
-        self.cellSize = cellSize
-    }
-
-    public var position: float3 { return underlying.position }
-    public var halfExtent: float3? { return underlying.halfExtent }
-    public var `struct`: PhysicsFieldStruct { return underlying.struct}
-
-    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
-        let gridPosition = floor(rigidBody.centerOfMass / cellSize)
-
-        let key = int2(gridPosition.xz)
-        let node: SCNNode
-        if let value = index[key] {
-            node = value
-        } else {
-            node = createVectorNode(length: 1, thickness: 0.3)
-            root.addChildNode(node)
-            index[key] = node
-        }
-        node.simdWorldPosition = gridPosition * cellSize * float3(1,0,1)
-
-        let result = underlying.force(rigidBody: rigidBody, time: time)
-        let magnitude = length(result)
-
-        guard magnitude > 10e-10 else {
-            node.simdScale = float3.zero
-            return result
-        }
-
-        let rotation = simd_quatf(from: .j, to: normalize(result))
-        node.simdScale = float3(1, 0.05 + magnitude*5, 1)
-        node.simdOrientation = rotation
-
-        return result
-    }
 }
