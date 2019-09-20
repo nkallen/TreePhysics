@@ -17,6 +17,12 @@ extension PhysicsField {
 
         return position.in(min: self.position - halfExtent, max: self.position + halfExtent)
     }
+
+    func apply(rigidBody: RigidBody, time: TimeInterval) {
+        let force = self.force(rigidBody: rigidBody, time: time)
+        let torque = self.torque(rigidBody: rigidBody, time: time)
+        rigidBody.apply(force: force, torque: torque)
+    }
 }
 
 public final class FieldVisualizer: PhysicsField {

@@ -27,6 +27,7 @@ final class Leaf: RigidBody {
 
     var angularVelocity: float3 = float3.zero
     var angularAcceleration: float3 = float3.zero
+    var angularMomentum: float3 = float3.zero
     var velocity: float3 = float3.zero
     var acceleration: float3 = float3.zero
 
@@ -38,6 +39,7 @@ final class Leaf: RigidBody {
 
     let area: Float
 
+    // FIXME
     var normal: float3 {
         return rotation.act(float3.z)
     }
@@ -57,7 +59,9 @@ final class Leaf: RigidBody {
 
         self.centerOfMass_local = float3(length/2, length/2, 0)
 
-        self.node = SCNNode(geometry: SCNSphere(radius: 0.01))
+        let plane = SCNBox(width: CGFloat(length), height: CGFloat(length), length: CGFloat(0.01), chamferRadius: 0)
+        plane.firstMaterial?.isDoubleSided = true
+        self.node = SCNNode(geometry: plane)
         self.composite = CompositeBody()
 
         updateTransform()

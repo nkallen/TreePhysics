@@ -20,7 +20,7 @@ enum Command {
     case copy(scale: Float?)
 }
 
-fileprivate let initialOrientation = float3x3(columns: (.y, -.x, .z))
+fileprivate let initialOrientation: float3x3 = float3x3(columns: (.y, -.x, .z))
 
 public class Interpreter<P> where P: Pen {
     public struct Configuration {

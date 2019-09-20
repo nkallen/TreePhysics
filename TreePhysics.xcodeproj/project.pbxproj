@@ -17,6 +17,7 @@
 		9E0674E6230AD2570044C3C4 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
 		9E0674EC230ADBE40044C3C4 /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
 		9E08F8602316FEC800D48ADD /* sensors-11-08536.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E08F85F2316FEC700D48ADD /* sensors-11-08536.pdf */; };
+		9E1490CB2334E49500FED681 /* Noise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1490CA2334E49500FED681 /* Noise.swift */; };
 		9E1797E622FB704F00FA3892 /* UpdateCompositeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */; };
 		9E1C70F9230C6FB200DA9929 /* SCRATCH in Resources */ = {isa = PBXBuildFile; fileRef = 9E1C70F8230C6FB200DA9929 /* SCRATCH */; };
 		9E1C70FA230C802700DA9929 /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
@@ -147,6 +148,7 @@
 		9E08F85F2316FEC700D48ADD /* sensors-11-08536.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "sensors-11-08536.pdf"; sourceTree = "<group>"; };
 		9E0D67C6230962F9008912E7 /* Half.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Half.h; sourceTree = "<group>"; };
 		9E0D67C7230962F9008912E7 /* Half.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Half.c; sourceTree = "<group>"; };
+		9E1490CA2334E49500FED681 /* Noise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Noise.swift; sourceTree = "<group>"; };
 		9E1C70F8230C6FB200DA9929 /* SCRATCH */ = {isa = PBXFileReference; lastKnownFileType = text; path = SCRATCH; sourceTree = "<group>"; };
 		9E1F427F23290694009E0E52 /* TreePhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TreePhysics.h; sourceTree = "<group>"; };
 		9E1F428023290694009E0E52 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 		9EAE86412332717C0037EA92 /* GravityField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityField.swift; sourceTree = "<group>"; };
 		9EAE8643233271910037EA92 /* AttractorField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttractorField.swift; sourceTree = "<group>"; };
 		9EAE8645233271BF0037EA92 /* WindField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindField.swift; sourceTree = "<group>"; };
+		9EAE864723339FFF0037EA92 /* Leaves.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Leaves.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
 		9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBody.swift; sourceTree = "<group>"; };
 		9EBEB1CF2329052A0073E5D9 /* L-Systems.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = "L-Systems.playground"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -414,10 +417,19 @@
 			path = Fields;
 			sourceTree = "<group>";
 		};
-		9EE7EB9522DDDC6C00535997 = {
+		9EAE86482333A0090037EA92 /* Playgrounds */ = {
 			isa = PBXGroup;
 			children = (
 				9EBEB1CF2329052A0073E5D9 /* L-Systems.playground */,
+				9EAE864723339FFF0037EA92 /* Leaves.playground */,
+			);
+			path = Playgrounds;
+			sourceTree = "<group>";
+		};
+		9EE7EB9522DDDC6C00535997 = {
+			isa = PBXGroup;
+			children = (
+				9EAE86482333A0090037EA92 /* Playgrounds */,
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
 				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
 				9E1F427E23290694009E0E52 /* TreePhysics */,
@@ -484,6 +496,7 @@
 				9E6372A122FEC7AA001D4466 /* MetalProxy.swift */,
 				9EA619CB230AE78400BE2213 /* PrettyPrint.swift */,
 				9E57566823184C9C0036F68B /* Visualization.swift */,
+				9E1490CA2334E49500FED681 /* Noise.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -694,6 +707,7 @@
 				9EAA8C162329243A002E9260 /* MetalProxy.swift in Sources */,
 				9EAE8630232A67240037EA92 /* UpdateRigidBodies.metal in Sources */,
 				9EAA8C1523292434002E9260 /* MetalSimulator.swift in Sources */,
+				9E1490CB2334E49500FED681 /* Noise.swift in Sources */,
 				9EAA8C1823292444002E9260 /* Visualization.swift in Sources */,
 				9E34C49023291257008C7353 /* CompositeBody.swift in Sources */,
 				9EAE863E232A69F40037EA92 /* Leaf.swift in Sources */,
@@ -982,6 +996,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "-Xfrontend -warn-long-function-bodies=1000 -Xfrontend -warn-long-expression-type-checking=1000";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/TreePhysics/ProjectModule";

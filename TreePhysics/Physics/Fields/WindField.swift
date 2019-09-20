@@ -7,9 +7,9 @@ public final class WindField: PhysicsField {
     public var halfExtent: float3? = nil
 
     let cellSize: Float = 0.1
-    let magnitudeTimeScale: Float = 0.01
-    let rotationTimeScale: Float = 0.5
-    let amplitude: Float = 50
+    let magnitudeTimeScale: Float = 1
+    let rotationTimeScale: Float = 0.00001
+    let amplitude: Float = 10
 
     public init() {}
 
@@ -37,7 +37,6 @@ public final class WindField: PhysicsField {
     let branchScale: Float = 1
 
     func force(internode: Internode, time: TimeInterval) -> float3 {
-        return float3.zero
         let windVelocity = self.windVelocity(at: internode.centerOfMass, time: time)
         let relativeVelocity = windVelocity - internode.velocity
         let relativeVelocity_normal = dot(relativeVelocity, internode.normal) * internode.normal
@@ -48,18 +47,17 @@ public final class WindField: PhysicsField {
     // FIXME move to organized place and reconsider names
     let leafScale: Float = 1
     let airDensity: Float = 0.1
-    let airResistanceMultiplier: Float = 1
+    let airResistanceMultiplier: Float = 4
     let normal2tangentialDragCoefficientRatio: Float = 100
 
     func force(leaf: Leaf, time: TimeInterval) -> float3 {
-        let windVelocity = self.windVelocity(at: leaf.centerOfMass, time: time)
-        let relativeVelocity = windVelocity - leaf.velocity
-        let relativeVelocity_normal = dot(relativeVelocity, leaf.normal) * leaf.normal
-        let relativeVelocity_tangential = relativeVelocity - relativeVelocity_normal
+        let windVelocity: float3 = self.windVelocity(at: leaf.centerOfMass, time: time)
+        let relativeVelocity: float3 = windVelocity - leaf.velocity
+        let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
+        let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
         var result: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
-        result += airResistanceMultiplier * leaf.mass * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
-
-//        assert(length(result) < 10) // FIXME
+        let I = (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
+        result += airResistanceMultiplier * leaf.mass * I
 
         assert(result.isFinite)
         return result
@@ -68,17 +66,17 @@ public final class WindField: PhysicsField {
     func torque(leaf: Leaf, time: TimeInterval) -> float3 {
         let windVelocity = self.windVelocity(at: leaf.centerOfMass, time: time)
         let relativeVelocity = windVelocity - leaf.velocity
-        let K = leafScale * airDensity * leaf.area/2 * sqrt(leaf.area/Float.pi)
+        let K = leafScale * airDensity * leaf.area/2 * sqrt(leaf.area/Float.pi) * dot(relativeVelocity, leaf.normal)
+        let J: float3x3 = K * leaf.normal.crossMatrix
         let phi: Float = 0
-        var result: float3 = K * dot(relativeVelocity, leaf.normal) * leaf.normal.crossMatrix * (relativeVelocity * cos(phi) + leaf.normal.crossMatrix * relativeVelocity * sin(phi))
+        let M: float3 = leaf.normal.crossMatrix * relativeVelocity * sin(phi)
+        let L: float3 = (relativeVelocity * cos(phi) + M)
+        var result: float3 = J * L
         result -= airResistanceMultiplier * leaf.inertiaTensor * leaf.angularVelocity
-        print(result)
         return result
     }
 
     func windVelocity(at position: float3, time: TimeInterval) -> float3 {
-        return simd_quatf(angle: Float(sin(time) * 2 * .pi), axis: .j).act(.i) * 100
-
         let magnitudeTime: Float = magnitudeTimeScale * Float(time)
         let rotationTime: Float = rotationTimeScale * Float(time)
         let gridPosition = floor(position / cellSize)
@@ -116,6 +114,8 @@ public final class WindField: PhysicsField {
             43758.5453123).1
     }
 
+    // FIXME use Noise() class
+
     // Based on Morgan McGuire @morgan3d
     // https://www.shadertoy.com/view/4dS3Wd
     func noise(_ st: float2) -> Float {
@@ -128,14 +128,14 @@ public final class WindField: PhysicsField {
         let c = random(i + float2(0.0, 1.0))
         let d = random(i + float2(1.0, 1.0))
 
-        let u = f * f * (3.0 - 2.0 * f);
+        let u: float2 = f * f * (3.0 - 2.0 * f)
 
         return mix(a, b, t: u.x) +
             (c - a) * u.y * (1.0 - u.x) +
             (d - b) * u.x * u.y;
     }
 
-    let octaves = 4
+    let octaves = 3
     let lacunarity: Float = 1.5
     let gain: Float = 0.75
     func fbm(_ st: float2) -> Float {

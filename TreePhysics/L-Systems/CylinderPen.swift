@@ -61,7 +61,7 @@ public final class CylinderPen: Pen {
     public func copy(scale: Float, orientation: simd_quatf) -> Indices {
         guard let start = start else { fatalError() }
 
-        let sphere = MDLMesh.newPlane(withDimensions: float2(repeating: scale), segments: uint2(1,1), geometryType: .triangles, allocator: nil)
+        let plane = MDLMesh.newPlane(withDimensions: float2(repeating: scale), segments: uint2(1,1), geometryType: .triangles, allocator: nil)
 
         let descriptor = MDLVertexDescriptor()
         let attribute = MDLVertexAttribute()
@@ -70,14 +70,14 @@ public final class CylinderPen: Pen {
         descriptor.addOrReplaceAttribute(attribute)
         let layout = MDLVertexBufferLayout(stride: MemoryLayout<float3>.stride)
         descriptor.layouts = [layout]
-        sphere.vertexDescriptor = descriptor
+        plane.vertexDescriptor = descriptor
 
-        let submesh = sphere.submeshes?.firstObject! as! MDLSubmesh
-        let verticesPointer = sphere.vertexAttributeData(forAttributeNamed: "position")!.map.bytes.bindMemory(to: float3.self, capacity: sphere.vertexCount)
+        let submesh = plane.submeshes?.firstObject! as! MDLSubmesh
+        let verticesPointer = plane.vertexAttributeData(forAttributeNamed: "position")!.map.bytes.bindMemory(to: float3.self, capacity: plane.vertexCount)
 
         let indicesPointer = submesh.indexBuffer.map().bytes.bindMemory(to: UInt16.self, capacity: submesh.indexCount)
 
-        let vertices = Array(UnsafeBufferPointer(start: verticesPointer, count: sphere.vertexCount))
+        let vertices = Array(UnsafeBufferPointer(start: verticesPointer, count: plane.vertexCount))
         let indices = Array(UnsafeBufferPointer(start: indicesPointer, count: submesh.indexCount))
 
         let rotatedVertices: [float3]
