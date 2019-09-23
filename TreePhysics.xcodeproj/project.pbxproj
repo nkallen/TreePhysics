@@ -202,10 +202,9 @@
 		9EAE86412332717C0037EA92 /* GravityField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityField.swift; sourceTree = "<group>"; };
 		9EAE8643233271910037EA92 /* AttractorField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttractorField.swift; sourceTree = "<group>"; };
 		9EAE8645233271BF0037EA92 /* WindField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindField.swift; sourceTree = "<group>"; };
-		9EAE864723339FFF0037EA92 /* Leaves.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Leaves.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
 		9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBody.swift; sourceTree = "<group>"; };
-		9EBEB1CF2329052A0073E5D9 /* L-Systems.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = "L-Systems.playground"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		9EBEB1CF2329052A0073E5D9 /* Playground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Playground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		9EC88E24231989930049737D /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodies.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics_macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics_macOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -420,8 +419,7 @@
 		9EAE86482333A0090037EA92 /* Playgrounds */ = {
 			isa = PBXGroup;
 			children = (
-				9EBEB1CF2329052A0073E5D9 /* L-Systems.playground */,
-				9EAE864723339FFF0037EA92 /* Leaves.playground */,
+				9EBEB1CF2329052A0073E5D9 /* Playground.playground */,
 			);
 			path = Playgrounds;
 			sourceTree = "<group>";

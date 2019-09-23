@@ -28,10 +28,6 @@ let camera = SCNCamera()
 cameraNode.camera = camera
 camera.zNear = 0
 camera.zFar = 10
-camera.wantsHDR = true
-camera.bloomIntensity = 1
-camera.bloomThreshold = 1.1
-camera.bloomBlurRadius = 10
 
 cameraNode.camera = camera
 scene.rootNode.addChildNode(cameraNode)
