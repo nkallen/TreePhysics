@@ -416,18 +416,10 @@
 			path = Fields;
 			sourceTree = "<group>";
 		};
-		9EAE86482333A0090037EA92 /* Playgrounds */ = {
-			isa = PBXGroup;
-			children = (
-				9EBEB1CF2329052A0073E5D9 /* Playground.playground */,
-			);
-			path = Playgrounds;
-			sourceTree = "<group>";
-		};
 		9EE7EB9522DDDC6C00535997 = {
 			isa = PBXGroup;
 			children = (
-				9EAE86482333A0090037EA92 /* Playgrounds */,
+				9EBEB1CF2329052A0073E5D9 /* Playground.playground */,
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
 				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
 				9E1F427E23290694009E0E52 /* TreePhysics */,
