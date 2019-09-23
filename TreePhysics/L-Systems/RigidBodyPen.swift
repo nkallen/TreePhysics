@@ -35,7 +35,7 @@ public final class RigidBodyPen: Pen {
     public func copy(scale: Float, orientation: simd_quatf) -> RigidBody {
         guard let _ = start else { fatalError() }
 
-        let newLeaf = Leaf(length: scale, density: 750)
+        let newLeaf = Leaf(length: scale, density: 500)
 
         _ = parentBranch.add(newLeaf, at: orientation)
 

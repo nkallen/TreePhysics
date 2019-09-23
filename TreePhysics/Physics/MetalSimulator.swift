@@ -15,9 +15,9 @@ class MetalSimulator {
 
     internal var rigidBodies: [RigidBody]
 
-    private var fields: [PhysicsField] = []
+    private var fields: [PhysicsFieldStructConvertible] = []
 
-    func add(field: PhysicsField) {
+    func add(field: PhysicsFieldStructConvertible) {
         fields.append(field)
     }
 

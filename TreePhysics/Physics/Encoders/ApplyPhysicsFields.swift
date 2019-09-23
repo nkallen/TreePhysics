@@ -14,7 +14,7 @@ final class ApplyPhysicsFields: MetalKernelEncoder {
         super.init(device: device, name: "applyPhysicsFields")
     }
 
-    func encode(commandBuffer: MTLCommandBuffer, field: PhysicsField) {
+    func encode(commandBuffer: MTLCommandBuffer, field: PhysicsFieldStructConvertible) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(computePipelineState)
         commandEncoder.label  = "Apply Physics Fields"

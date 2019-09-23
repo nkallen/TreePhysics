@@ -6,9 +6,13 @@ import ShaderTypes
 public protocol PhysicsField {
     var position: float3 { get }
     var halfExtent: float3? { get }
-    var `struct`: PhysicsFieldStruct { get }
+    // FIXME merge these two fns
     func force(rigidBody: RigidBody, time: TimeInterval) -> float3
     func torque(rigidBody: RigidBody, time: TimeInterval) -> float3?
+}
+
+public protocol PhysicsFieldStructConvertible {
+    var `struct`: PhysicsFieldStruct { get }
 }
 
 extension PhysicsField {
@@ -39,7 +43,6 @@ public final class FieldVisualizer: PhysicsField {
 
     public var position: float3 { return underlying.position }
     public var halfExtent: float3? { return underlying.halfExtent }
-    public var `struct`: PhysicsFieldStruct { return underlying.struct}
 
     public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         let gridPosition = floor(rigidBody.centerOfMass / cellSize)

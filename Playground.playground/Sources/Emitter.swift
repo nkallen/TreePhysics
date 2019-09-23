@@ -4,8 +4,8 @@ import simd
 
 public class Emitter {
     let maxAge: TimeInterval
-    var count = 0
-    var particles: [(Leaf, Date)?]
+    public var count = 0
+    public var particles: [(Leaf, Date)?]
     let noise = Noise()
     var total = 0
 
@@ -17,7 +17,7 @@ public class Emitter {
     public func emit() -> Leaf? {
         guard count + 1 < particles.count else { return nil }
 
-        let leaf = Leaf(length: 1, density: 750)
+        let leaf = Leaf(length: 1, density: 500)
         let seed = total
         leaf.rotation =
             simd_quatf(angle: noise.random(seed + 0) * 2 * .pi, axis: .x) *

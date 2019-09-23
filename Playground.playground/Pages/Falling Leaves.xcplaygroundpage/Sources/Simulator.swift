@@ -34,6 +34,7 @@ public class Simulator {
         //        windField.apply(rigidBody: leaf, time: Double(delta))
 
         let relativeVelocity: float3 = windVelocity - leaf.velocity
+
         let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
         let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
         let lift: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal

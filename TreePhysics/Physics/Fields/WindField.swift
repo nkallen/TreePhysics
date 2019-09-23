@@ -17,6 +17,7 @@ public final class WindField: PhysicsField {
         switch rigidBody {
         case let internode as Internode:
             return force(internode: internode, time: time)
+        // FIXME this subclass relation is lame; add some sort of mask of kind
         case let leaf as Leaf:
             return force(leaf: leaf, time: time)
         default:
@@ -47,36 +48,32 @@ public final class WindField: PhysicsField {
     // FIXME move to organized place and reconsider names
     let leafScale: Float = 1
     let airDensity: Float = 0.1
-    let airResistanceMultiplier: Float = 4
+    let airResistanceMultiplier: Float = 1
     let normal2tangentialDragCoefficientRatio: Float = 100
+    public var phi: Float = .pi/4
 
     func force(leaf: Leaf, time: TimeInterval) -> float3 {
-        let windVelocity: float3 = self.windVelocity(at: leaf.centerOfMass, time: time)
+        let windVelocity = float3(0,1,1) * 40
         let relativeVelocity: float3 = windVelocity - leaf.velocity
         let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
         let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
-        var result: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
-        let I = (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
-        result += airResistanceMultiplier * leaf.mass * I
-
-        assert(result.isFinite)
-        return result
+        let lift: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
+        let drag: float3 = airResistanceMultiplier * leaf.mass * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
+        return lift + drag
     }
 
     func torque(leaf: Leaf, time: TimeInterval) -> float3 {
-        let windVelocity = self.windVelocity(at: leaf.centerOfMass, time: time)
-        let relativeVelocity = windVelocity - leaf.velocity
-        let K = leafScale * airDensity * leaf.area/2 * sqrt(leaf.area/Float.pi) * dot(relativeVelocity, leaf.normal)
-        let J: float3x3 = K * leaf.normal.crossMatrix
-        let phi: Float = 0
-        let M: float3 = leaf.normal.crossMatrix * relativeVelocity * sin(phi)
-        let L: float3 = (relativeVelocity * cos(phi) + M)
-        var result: float3 = J * L
-        result -= airResistanceMultiplier * leaf.inertiaTensor * leaf.angularVelocity
-        return result
+        let windVelocity = float3(0,1,1) * 40
+        let relativeVelocity: float3 = windVelocity - leaf.velocity
+        let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
+        let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
+        var torque: float3 = leafScale * airDensity * leaf.area / 2 * dot(relativeVelocity, leaf.normal) * leaf.normal.crossMatrix * (relativeVelocity * cos(phi) + leaf.normal.crossMatrix * relativeVelocity * sin(phi))
+        torque -= airResistanceMultiplier * leaf.inertiaTensor * leaf.angularVelocity
+        return torque
     }
 
     func windVelocity(at position: float3, time: TimeInterval) -> float3 {
+        return float3(1,1,1) * 30
         let magnitudeTime: Float = magnitudeTimeScale * Float(time)
         let rotationTime: Float = rotationTimeScale * Float(time)
         let gridPosition = floor(position / cellSize)
@@ -153,6 +150,7 @@ public final class WindField: PhysicsField {
         return value
     }
 
+    // FIXME move this method to PhysicsFieldSerializable
     public var `struct`: PhysicsFieldStruct {
         return PhysicsFieldStruct(
             position: position,

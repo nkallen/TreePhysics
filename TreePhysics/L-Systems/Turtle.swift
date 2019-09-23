@@ -23,6 +23,7 @@ enum Command {
 fileprivate let initialOrientation: float3x3 = float3x3(columns: (.y, -.x, .z))
 
 public class Interpreter<P> where P: Pen {
+    // FIXME make InterpreterConfiguraiton and indep of type
     public struct Configuration {
         public init(
             randomScale: Float = 0,

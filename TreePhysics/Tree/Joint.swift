@@ -21,7 +21,12 @@ public final class Joint {
         self.parentRigidBody = parent
         self.childRigidBody = child
         self.rotation_local = rotation
-        self.k = Joint.computeK(radius: parent.radius, length: parent.length)
+        switch child {
+        case is Leaf:
+            self.k = 1
+        default:
+            self.k = 4000
+        }
         self.translation_local = float3(0, parentRigidBody.length, 0)
         updateTransform()
     }
