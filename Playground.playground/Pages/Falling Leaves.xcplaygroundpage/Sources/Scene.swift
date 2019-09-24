@@ -3,11 +3,13 @@ import SceneKit
 import simd
 @testable import TreePhysics
 
+let delta: Float = 1/60
+
 public class Scene: SCNScene, SCNSceneRendererDelegate {
-    let simulator: Simulator
+    let simulator: CPUSimulator
     let emitter: Emitter
     
-    public init(simulator: Simulator, emitter: Emitter) {
+    public init(simulator: CPUSimulator, emitter: Emitter) {
         self.simulator = simulator
         self.emitter = emitter
         super.init()
@@ -21,7 +23,7 @@ public class Scene: SCNScene, SCNSceneRendererDelegate {
     
     public func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         emitter.update()
-        simulator.update()
+        simulator.update(at: Double(delta))
         if i % 5 == 0 {
             if let leaf = emitter.emit() {
                 rootNode.addChildNode(leaf.node)
@@ -32,11 +34,11 @@ public class Scene: SCNScene, SCNSceneRendererDelegate {
     
     @objc public func airResistanceMultiplierSliderDidChange(sender: NSSlider) {
         print(sender.floatValue)
-        simulator.airResistanceMultiplier = sender.floatValue
+//        simulator.airResistanceMultiplier = sender.floatValue
     }
     
     @objc public func phiSliderDidChange(sender: NSSlider) {
         print(sender.floatValue)
-        simulator.phi = sender.floatValue
+//        simulator.phi = sender.floatValue
     }
 }

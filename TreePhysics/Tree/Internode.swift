@@ -21,7 +21,7 @@ public final class Internode: RigidBody {
     public let mass: Float
     let length: Float
     let radius: Float
-    let inertiaTensor_local: float3x3
+    public let inertiaTensor_local: float3x3
     let centerOfMass_local: float3
 
     public var force: float3 = float3.zero
@@ -33,6 +33,7 @@ public final class Internode: RigidBody {
     public var centerOfMass: float3 = float3.zero
     public var angularVelocity: float3 = float3.zero
     public var angularAcceleration: float3 = float3.zero
+    public var angularMomentum: float3 = float3.zero
     public var velocity: float3 = float3.zero
     public var acceleration: float3 = float3.zero
 

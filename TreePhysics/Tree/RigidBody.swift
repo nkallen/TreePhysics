@@ -16,20 +16,22 @@ public protocol RigidBody: class {
     var composite: CompositeBody { get }
 
     var mass: Float { get }
-    var inertiaTensor: float3x3 { get }
+    var inertiaTensor: float3x3 { get set }
+    var inertiaTensor_local: float3x3 { get }
 
     var force: float3 { get }
     var torque: float3 { get }
 
     // FIXME /position/
-    var translation: float3 { get }
-    var rotation: simd_quatf { get }
+    var translation: float3 { get set }
+    var rotation: simd_quatf { get set}
 
-    var centerOfMass: float3 { get }
-    var angularVelocity: float3 { get }
-    var angularAcceleration: float3 { get }
-    var velocity: float3 { get }
-    var acceleration: float3 { get }
+    var centerOfMass: float3 { get set }
+    var angularVelocity: float3 { get set }
+    var angularAcceleration: float3 { get set }
+    var angularMomentum: float3 { get set } // FIXME acc and momentum are used Either/or
+    var velocity: float3 { get set }
+    var acceleration: float3 { get set }
 
     func apply(force: float3, torque: float3?)
     func updateTransform()

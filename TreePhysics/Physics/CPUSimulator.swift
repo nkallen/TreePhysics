@@ -5,16 +5,19 @@ let torqueFictitiousMultiplier_i: Float = 0.0
 let torqueFictitiousMultiplier_ii: Float = 0.0
 let torqueFictitiousMultiplier_iii: Float = 0.0
 
+// FIXME extract a World object that has add/remove methods and so forth.
 public final class CPUSimulator {
-    let root: Internode
-    let rigidBodiesLevelOrder: [RigidBody]
-    let rigidBodiesReverseLevelOrder: [RigidBody]
+    var rigidBodiesLevelOrder: [RigidBody] = []
     private var fields: [PhysicsField] = []
 
-    public init(root: Internode) {
-        self.root = root
-        self.rigidBodiesLevelOrder = root.flattened().filter { $0.kind == .dynamic }
-        self.rigidBodiesReverseLevelOrder = self.rigidBodiesLevelOrder.reversed()
+    public init() {}
+
+    var rigidBodiesUnordered: [RigidBody] {
+        return rigidBodiesLevelOrder
+    }
+
+    func add(rigidBody: RigidBody) {
+        self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
         updateRigidBodies()
     }
 
@@ -27,13 +30,14 @@ public final class CPUSimulator {
         updateCompositeBodies()
         updateJoints(at: time)
         updateRigidBodies()
+        updateFreeBodies(at: time)
         resetForces()
     }
 
     let start = Date()
 
     func updateFields(at time: TimeInterval) {
-        for rigidBody in rigidBodiesReverseLevelOrder { // Order is unimportant
+        for rigidBody in rigidBodiesUnordered {
             for field in fields {
                 if field.applies(to: rigidBody.centerOfMass) {
                     let time = Date().timeIntervalSince(start)
@@ -46,7 +50,7 @@ public final class CPUSimulator {
     }
 
     func updateCompositeBodies() {
-        for rigidBody in rigidBodiesReverseLevelOrder {
+        for rigidBody in rigidBodiesLevelOrder.reversed() {
             let composite = rigidBody.composite
 
             composite.mass = rigidBody.mass
@@ -85,7 +89,7 @@ public final class CPUSimulator {
 
     func updateJoints(at time: TimeInterval) {
         let time = Float(time)
-        for rigidBody in rigidBodiesReverseLevelOrder { // Order does not matter
+        for rigidBody in rigidBodiesUnordered {
             if let parentJoint = rigidBody.parentJoint {
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
 
@@ -154,6 +158,27 @@ public final class CPUSimulator {
             for joint in rigidBody.childJoints {
                 joint.updateTransform()
             }
+        }
+    }
+
+    func updateFreeBodies(at time: TimeInterval) {
+        let time = Float(time)
+        for rigidBody in rigidBodiesUnordered {
+            rigidBody.acceleration = rigidBody.force / rigidBody.mass
+            rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque
+
+            rigidBody.velocity = rigidBody.velocity + time * rigidBody.acceleration
+            rigidBody.angularVelocity = rigidBody.inertiaTensor.inverse * rigidBody.angularMomentum
+
+            rigidBody.translation = rigidBody.translation + time * rigidBody.velocity
+            let angularVelocityQuat = simd_quatf(real: 0, imag: rigidBody.angularVelocity)
+            rigidBody.rotation = rigidBody.rotation + time/2 * angularVelocityQuat * rigidBody.rotation
+            rigidBody.rotation = rigidBody.rotation.normalized
+
+            rigidBody.node.simdPosition = rigidBody.translation
+            rigidBody.node.simdOrientation = rigidBody.rotation
+
+            rigidBody.inertiaTensor = float3x3(rigidBody.rotation) * rigidBody.inertiaTensor_local * float3x3(rigidBody.rotation).transpose
         }
     }
 

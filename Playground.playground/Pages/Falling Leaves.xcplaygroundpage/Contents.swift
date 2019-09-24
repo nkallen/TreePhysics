@@ -3,21 +3,26 @@ import SceneKit
 import PlaygroundSupport
 @testable import TreePhysics
 
-let emitter = Emitter(max: 1000, maxAge: 20)
-let simulator = Simulator(emitter: emitter)
+let simulator = CPUSimulator()
+let emitter = Emitter(max: 1000, maxAge: 20, simulator: simulator)
 let scene = Scene(simulator: simulator, emitter: emitter)
+
+let windField = WindField(windVelocity: float3.zero)
+let gravityField = GravityField(float3(0,-9.81,0))
+simulator.add(field: windField)
+simulator.add(field: gravityField)
 
 let scnView = SCNView(frame: CGRect(x: 0, y: 0, width: 640, height: 480))
 
-let settings: Settings = [
-    ("Phi", simulator.phi, 0, 2 * Float.pi, scene,  #selector(scene.phiSliderDidChange(sender:))),
-    ("airResistanceMultiplier", simulator.airResistanceMultiplier, 0, 50, scene,  #selector(scene.airResistanceMultiplierSliderDidChange(sender:)))
-]
+//let settings: Settings = [
+//    ("Phi", simulator.phi, 0, 2 * Float.pi, scene,  #selector(scene.phiSliderDidChange(sender:))),
+//    ("airResistanceMultiplier", simulator.airResistanceMultiplier, 0, 50, scene,  #selector(scene.airResistanceMultiplierSliderDidChange(sender:)))
+//]
+//
+//let view = SettingsView(settings: settings,
+//                        frame: CGRect(x: 0, y: 0, width: 640, height: 480 + 100))
 
-let view = SettingsView(settings: settings,
-                        frame: CGRect(x: 0, y: 0, width: 640, height: 480 + 100))
-
-view.addArrangedSubview(scnView)
+//view.addArrangedSubview(scnView)
 
 let cameraNode = SCNNode()
 let camera = SCNCamera()
@@ -35,5 +40,5 @@ scnView.showsStatistics = true
 scnView.allowsCameraControl = true
 scnView.isPlaying = true
 
-PlaygroundPage.current.liveView = view
+PlaygroundPage.current.liveView = scnView
 

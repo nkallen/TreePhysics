@@ -6,6 +6,8 @@ public final class WindField: PhysicsField {
     public var position = float3.zero
     public var halfExtent: float3? = nil
 
+    let windVelocity: float3
+
     public var airResistanceMultiplier: Float = 1
     public var phi: Float = .pi/4
     let leafScale: Float = 1
@@ -13,7 +15,9 @@ public final class WindField: PhysicsField {
     let normal2tangentialDragCoefficientRatio: Float = 100
     let branchScale: Float = 1
 
-    public init() {}
+    public init(windVelocity: float3 = float3(0,5,5)) {
+        self.windVelocity = windVelocity
+    }
 
     public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         switch rigidBody {
@@ -28,7 +32,6 @@ public final class WindField: PhysicsField {
     }
 
     func force(internode: Internode, time: TimeInterval) -> float3 {
-        let windVelocity = float3(0,1,1) * 5
         let relativeVelocity = windVelocity - internode.velocity
         let relativeVelocity_normal = dot(relativeVelocity, internode.normal) * internode.normal
         let result = branchScale * airDensity * internode.crossSectionalArea * length(relativeVelocity_normal) * relativeVelocity_normal
@@ -46,7 +49,6 @@ public final class WindField: PhysicsField {
     }
 
     func force(leaf: Leaf, time: TimeInterval) -> float3 {
-        let windVelocity = float3(0,1,1) * 5
         let relativeVelocity: float3 = windVelocity - leaf.velocity
         let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
         let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
@@ -56,7 +58,6 @@ public final class WindField: PhysicsField {
     }
 
     func torque(leaf: Leaf, time: TimeInterval) -> float3 {
-        let windVelocity = float3(0,1,1) * 10
         let relativeVelocity: float3 = windVelocity - leaf.velocity
         let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
         let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal

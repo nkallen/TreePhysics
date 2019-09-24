@@ -4,14 +4,17 @@ import simd
 
 public class Emitter {
     let maxAge: TimeInterval
+    let simulator: CPUSimulator
+
     public var count = 0
     public var particles: [(Leaf, Date)?]
     let noise = Noise()
     var total = 0
 
-    public init(max: Int, maxAge: TimeInterval) {
+    public init(max: Int, maxAge: TimeInterval, simulator: CPUSimulator) {
         self.maxAge = maxAge
         self.particles = [(Leaf, Date)?](repeating: nil, count: max)
+        self.simulator = simulator
     }
 
     public func emit() -> Leaf? {
@@ -27,6 +30,7 @@ public class Emitter {
         leaf.node.simdOrientation = leaf.rotation
 
         particles[count] = (leaf, Date())
+        simulator.add(rigidBody: leaf)
 
         count += 1
         count %= particles.count
