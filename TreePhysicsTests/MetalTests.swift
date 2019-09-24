@@ -318,21 +318,21 @@ class AdvancedMetalTests: XCTestCase {
 
         commandBuffer.addCompletedHandler { _ in
             let metalSimulator = self.metalSimulator!
-            let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let rigidBodyStructs = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
             let compositeBodies = UnsafeMutableRawPointer(metalSimulator.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
             let joints = UnsafeMutableRawPointer(metalSimulator.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: metalSimulator.rigidBodies.count)
 
             for i in 0..<(metalSimulator.rigidBodies.count-1) {
                 let compositeBody = compositeBodies[i]
                 let joint = joints[i]
-                let rigidBody = rigidBodies[i]
+                let rigidBody = rigidBodyStructs[i]
                 let expected = metalSimulator.rigidBodies[i]
 
                 XCTAssertEqual(expected.composite, compositeBody, accuracy: 0.01)
                 if let parentJoint = expected.parentJoint {
                     XCTAssertEqual(parentJoint, joint, accuracy: 0.0001)
                 }
-                XCTAssertEqual(expected, rigidBody, accuracy: 0.001)
+                XCTAssertEqual(expected as! Internode, rigidBody, accuracy: 0.001)
             }
 
             expect.fulfill()
@@ -373,7 +373,8 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
         interpreter.interpret(lSystem)
 
-        root.flattened().last!.apply(force: force, at: 1)
+        // FIXME
+        (root.flattened().last! as! Internode).apply(force: force, at: 1)
 
         self.cpuSimulator = CPUSimulator(root: root)
         self.metalSimulator = MetalSimulator(device: device, root: root)
@@ -389,17 +390,18 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
 
         commandBuffer.addCompletedHandler { _ in
             let metalSimulator = self.metalSimulator!
-            let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+            let rigidBodyStructs = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
             let compositeBodies = UnsafeMutableRawPointer(metalSimulator.compositeBodiesBuffer.contents()).bindMemory(to: CompositeBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
             let joints = UnsafeMutableRawPointer(metalSimulator.jointsBuffer.contents()).bindMemory(to: JointStruct.self, capacity: metalSimulator.rigidBodies.count)
 
             for i in 0..<(metalSimulator.rigidBodies.count-1) {
                 let compositeBody = compositeBodies[i]
                 let joint = joints[i]
-                let rigidBody = rigidBodies[i]
+                let rigidBody = rigidBodyStructs[i]
                 let expected = metalSimulator.rigidBodies[i]
 
-                XCTAssertEqual(expected, rigidBody, accuracy: 0.001)
+                // FIXME
+                XCTAssertEqual(expected as! Internode, rigidBody, accuracy: 0.001)
                 XCTAssertEqual(expected.composite, compositeBody, accuracy: 0.0001)
                 if let parentJoint = expected.parentJoint {
                     XCTAssertEqual(parentJoint, joint, accuracy: 0.0001)

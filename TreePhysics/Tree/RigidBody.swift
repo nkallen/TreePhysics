@@ -21,6 +21,7 @@ public protocol RigidBody: class {
     var force: float3 { get }
     var torque: float3 { get }
 
+    // FIXME /position/
     var translation: float3 { get }
     var rotation: simd_quatf { get }
 

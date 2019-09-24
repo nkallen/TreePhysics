@@ -129,11 +129,11 @@
 			remoteGlobalIDString = 9E34C47F232911C6008C7353;
 			remoteInfo = TreePhysics;
 		};
-		9EE7EBBE22DE1AD100535997 /* PBXContainerItemProxy */ = {
+		9EC1DE86233A5630003D7B7B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9EE7EB9622DDDC6C00535997 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 9EE7EB9D22DDDC6C00535997;
+			remoteGlobalIDString = 9E34C47F232911C6008C7353;
 			remoteInfo = TreePhysics;
 		};
 /* End PBXContainerItemProxy section */
@@ -569,7 +569,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				9EE7EBBF22DE1AD100535997 /* PBXTargetDependency */,
+				9EC1DE87233A5630003D7B7B /* PBXTargetDependency */,
 			);
 			name = TreePhysicsTests;
 			productName = TreePhysicsTests;
@@ -798,10 +798,10 @@
 			target = 9E34C47F232911C6008C7353 /* TreePhysics */;
 			targetProxy = 9E7687F5232922EE003C5A9C /* PBXContainerItemProxy */;
 		};
-		9EE7EBBF22DE1AD100535997 /* PBXTargetDependency */ = {
+		9EC1DE87233A5630003D7B7B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9EE7EB9D22DDDC6C00535997 /* TreePhysics-macOS */;
-			targetProxy = 9EE7EBBE22DE1AD100535997 /* PBXContainerItemProxy */;
+			target = 9E34C47F232911C6008C7353 /* TreePhysics */;
+			targetProxy = 9EC1DE86233A5630003D7B7B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

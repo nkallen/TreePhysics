@@ -2,7 +2,7 @@ import Foundation
 import ShaderTypes
 import simd
 
-public final class AttractorField: PhysicsField {
+public final class AttractorField: PhysicsField, PhysicsFieldStructConvertible {
     public var position: float3 = float3.zero
     public let halfExtent: float3? = float3(1, 1, 1)
 

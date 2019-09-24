@@ -96,7 +96,7 @@ let configuration = Interpreter<SkinningPen>.Configuration(
 let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
 interpreter.interpret("F+F+F+F+F+F+F+F+J")
 
-let windField = WindField()
+let windField = MyField()
 
 let simulator = CPUSimulator(root: root)
 simulator.add(field: windField)
