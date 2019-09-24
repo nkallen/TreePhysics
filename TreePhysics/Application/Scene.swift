@@ -5,9 +5,9 @@ import TreePhysics
 
 class Scene: NSObject {
     let scene: SCNScene
-    let gravityField: GravityField
-    let attractorField: AttractorField
-    let attractor: SCNNode
+//    let gravityField: GravityField
+//    let attractorField: AttractorField
+//    let attractor: SCNNode
     let root: Internode
 
 //    private let metalSimulator: MetalSimulator
@@ -44,7 +44,7 @@ class Scene: NSObject {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
 
         let configuration = Interpreter<SkinningPen>.Configuration(
             randomScale: 0.4,
@@ -63,20 +63,20 @@ class Scene: NSObject {
         scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.25))
 
         // Forces:
-        let gravityField = GravityField(float3.zero)
-        let attractorField = AttractorField()
+//        let gravityField = GravityField(float3.zero)
+//        let attractorField = AttractorField()
 
-        let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
-        scene.rootNode.addChildNode(attractor)
-        
-        self.gravityField = gravityField
-        self.attractorField = attractorField
-        self.attractor = attractor
+//        let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
+//        scene.rootNode.addChildNode(attractor)
+
+//        self.gravityField = gravityField
+//        self.attractorField = attractorField
+//        self.attractor = attractor
 
 //        self.metalSimulator = MetalSimulator(device: device, root: root)
 
-        cpuSimulator.add(field: gravityField)
-        cpuSimulator.add(field: attractorField)
+//        cpuSimulator.add(field: gravityField)
+//        cpuSimulator.add(field: attractorField)
 //        metalSimulator.add(field: attractorField)
 
         let windField = WindField()

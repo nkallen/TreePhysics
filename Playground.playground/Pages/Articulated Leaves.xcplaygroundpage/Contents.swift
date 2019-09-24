@@ -31,16 +31,26 @@ public class MyField: PhysicsField {
     let leafScale: Float = 1
     let airDensity: Float = 0.1
     let normal2tangentialDragCoefficientRatio: Float = 100
+    let branchScale: Float = 1
 
     public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         switch rigidBody {
         case let internode as Internode:
-            return float3.zero
+            return force(internode: internode, time: time)
+        // FIXME this subclass relation is lame; add some sort of mask of kind
         case let leaf as Leaf:
             return force(leaf: leaf, time: time)
         default:
             fatalError()
         }
+    }
+
+    func force(internode: Internode, time: TimeInterval) -> float3 {
+        let windVelocity = float3(0,1,1) * 5
+        let relativeVelocity = windVelocity - internode.velocity
+        let relativeVelocity_normal = dot(relativeVelocity, internode.normal) * internode.normal
+        let result = branchScale * airDensity * internode.crossSectionalArea * length(relativeVelocity_normal) * relativeVelocity_normal
+        return result
     }
 
     public func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
@@ -55,7 +65,7 @@ public class MyField: PhysicsField {
 
     let start = Date()
     func force(leaf: Leaf, time: TimeInterval) -> float3 {
-        let windVelocity = float3(0,1,1) * 10
+        let windVelocity = float3(0,1,1) * 5
         let relativeVelocity: float3 = windVelocity - leaf.velocity
         let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
         let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
@@ -86,7 +96,7 @@ let configuration = Interpreter<SkinningPen>.Configuration(
 let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
 interpreter.interpret("F+F+F+F+F+F+F+F+J")
 
-let windField = MyField()
+let windField = WindField()
 
 let simulator = CPUSimulator(root: root)
 simulator.add(field: windField)

@@ -25,7 +25,7 @@ public final class Joint {
         case is Leaf:
             self.k = 1
         default:
-            self.k = 4000
+            self.k = Internode.K
         }
         self.translation_local = float3(0, parentRigidBody.length, 0)
         updateTransform()
