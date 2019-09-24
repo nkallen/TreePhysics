@@ -28,7 +28,8 @@ class Noise {
         let c = random(i + float2(0.0, 1.0))
         let d = random(i + float2(1.0, 1.0))
 
-        let u: float2 = f * f * (3.0 - 2.0 * f)
+        var u: float2 = f * f
+        u *= (3.0 - 2.0 * f)
 
         return mix(a, b, t: u.x) +
             (c - a) * u.y * (1.0 - u.x) +

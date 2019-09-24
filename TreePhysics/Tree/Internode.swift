@@ -22,7 +22,7 @@ public final class Internode: RigidBody {
     let length: Float
     let radius: Float
     public let inertiaTensor_local: float3x3
-    let centerOfMass_local: float3
+    public let centerOfMass_local: float3
 
     public var force: float3 = float3.zero
     public var torque: float3 = float3.zero
@@ -113,7 +113,6 @@ public final class Internode: RigidBody {
 
     public func updateTransform() {
         guard let parentJoint = parentJoint else { return }
-        let parentRigidBody = parentJoint.parentRigidBody
 
         let sora = parentJoint.θ[0]
         let rotation_local = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
@@ -121,20 +120,12 @@ public final class Internode: RigidBody {
         self.rotation = (parentJoint.rotation * rotation_local).normalized
         self.translation = parentJoint.translation
 
-        node.simdPosition = self.translation
-        node.simdOrientation = self.rotation
-
         self.inertiaTensor = float3x3(rotation) * inertiaTensor_local * float3x3(rotation).transpose
-
-        self.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation.act(parentJoint.θ[1])
-        self.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.crossMatrix * self.angularVelocity
-
-        self.velocity = parentRigidBody.velocity + parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.translation_local) - self.angularVelocity.crossMatrix * rotation.act(-centerOfMass_local)
-        self.acceleration = parentJoint.acceleration - (self.angularAcceleration.crossMatrix + sqr(self.angularVelocity.crossMatrix)) * rotation.act(-centerOfMass_local)
 
         self.centerOfMass = translation + rotation.act(centerOfMass_local)
 
-        assert(isFinite)
+        node.simdPosition = self.translation
+        node.simdOrientation = self.rotation
     }
 }
 

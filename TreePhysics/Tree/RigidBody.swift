@@ -27,6 +27,8 @@ public protocol RigidBody: class {
     var rotation: simd_quatf { get set}
 
     var centerOfMass: float3 { get set }
+    var centerOfMass_local: float3 { get }
+
     var angularVelocity: float3 { get set }
     var angularAcceleration: float3 { get set }
     var angularMomentum: float3 { get set } // FIXME acc and momentum are used Either/or

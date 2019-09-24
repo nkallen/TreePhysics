@@ -12,7 +12,7 @@ public final class Joint {
     var acceleration: float3 = float3.zero
     // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3 = float3x3(0)
-    private(set) var rotation_world2local: simd_quatf = simd_quatf.identity
+    var rotation_world2local: simd_quatf = simd_quatf.identity
     let translation_local: float3
 
     let k: Float
@@ -39,11 +39,6 @@ public final class Joint {
         self.rotation = (parentRigidBody.rotation * rotation_local).normalized
         self.translation = parentRigidBody.translation + parentRigidBody.rotation.act(translation_local)
         self.rotation_world2local = rotation.inverse.normalized
-
-        self.acceleration = parentRigidBody.acceleration +
-            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(translation_local)
-
-        assert(isFinite)
     }
 
     func rotate(tensor: float3x3) -> float3x3 {

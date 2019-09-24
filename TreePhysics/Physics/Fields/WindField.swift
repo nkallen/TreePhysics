@@ -40,7 +40,7 @@ public final class WindField: PhysicsField {
 
     public func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
         switch rigidBody {
-        case let _ as Internode:
+        case _ as Internode:
             return nil
         case let leaf as Leaf:
             return torque(leaf: leaf, time: time)
@@ -53,15 +53,15 @@ public final class WindField: PhysicsField {
         let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
         let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
         let lift: float3 = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
-        let drag: float3 = airResistanceMultiplier * leaf.mass * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
+        let k: Float = airResistanceMultiplier * leaf.mass
+        let drag: float3 = k * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
         return lift + drag
     }
 
     func torque(leaf: Leaf, time: TimeInterval) -> float3 {
         let relativeVelocity: float3 = windVelocity - leaf.velocity
-        let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
-        let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
-        var torque: float3 = leafScale * airDensity * leaf.area / 2 * dot(relativeVelocity, leaf.normal) * leaf.normal.crossMatrix * (relativeVelocity * cos(phi) + leaf.normal.crossMatrix * relativeVelocity * sin(phi))
+        let k: Float = leafScale * airDensity * leaf.area / 2 * dot(relativeVelocity, leaf.normal)
+        var torque: float3 = k * cross(leaf.normal, relativeVelocity * cos(phi) + cross(leaf.normal, relativeVelocity * sin(phi)))
         torque -= airResistanceMultiplier * leaf.inertiaTensor * leaf.angularVelocity
         return torque
     }

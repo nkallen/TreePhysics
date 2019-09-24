@@ -18,7 +18,7 @@ public final class CPUSimulator {
 
     func add(rigidBody: RigidBody) {
         self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
-        updateRigidBodies()
+        updateArticulatedBodies()
     }
 
     public func add(field: PhysicsField) {
@@ -29,7 +29,7 @@ public final class CPUSimulator {
         updateFields(at: time)
         updateCompositeBodies()
         updateJoints(at: time)
-        updateRigidBodies()
+        updateArticulatedBodies()
         updateFreeBodies(at: time)
         resetForces()
     }
@@ -152,11 +152,11 @@ public final class CPUSimulator {
         }
     }
 
-    func updateRigidBodies() {
+    func updateArticulatedBodies() {
         for rigidBody in rigidBodiesLevelOrder {
-            rigidBody.updateTransform()
+            updateArticulatedBody(rigidBody: rigidBody)
             for joint in rigidBody.childJoints {
-                joint.updateTransform()
+                updateArticulatedBody(joint: joint, parentRigidBody: rigidBody)
             }
         }
     }
@@ -164,21 +164,7 @@ public final class CPUSimulator {
     func updateFreeBodies(at time: TimeInterval) {
         let time = Float(time)
         for rigidBody in rigidBodiesUnordered {
-            rigidBody.acceleration = rigidBody.force / rigidBody.mass
-            rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque
-
-            rigidBody.velocity = rigidBody.velocity + time * rigidBody.acceleration
-            rigidBody.angularVelocity = rigidBody.inertiaTensor.inverse * rigidBody.angularMomentum
-
-            rigidBody.translation = rigidBody.translation + time * rigidBody.velocity
-            let angularVelocityQuat = simd_quatf(real: 0, imag: rigidBody.angularVelocity)
-            rigidBody.rotation = rigidBody.rotation + time/2 * angularVelocityQuat * rigidBody.rotation
-            rigidBody.rotation = rigidBody.rotation.normalized
-
-            rigidBody.node.simdPosition = rigidBody.translation
-            rigidBody.node.simdOrientation = rigidBody.rotation
-
-            rigidBody.inertiaTensor = float3x3(rigidBody.rotation) * rigidBody.inertiaTensor_local * float3x3(rigidBody.rotation).transpose
+            updateFreeBody(rigidBody: rigidBody, at: time)
         }
     }
 
@@ -186,5 +172,49 @@ public final class CPUSimulator {
         for rigidBody in rigidBodiesLevelOrder {
             rigidBody.resetForces()
         }
+    }
+
+    private func updateArticulatedBody(rigidBody: RigidBody) {
+        guard let parentJoint = rigidBody.parentJoint else { return }
+        let parentRigidBody = parentJoint.parentRigidBody
+
+        rigidBody.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation.act(parentJoint.θ[1])
+        rigidBody.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.crossMatrix * rigidBody.angularVelocity
+
+        rigidBody.velocity = parentRigidBody.velocity
+        rigidBody.velocity += parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.translation_local)
+        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(-rigidBody.centerOfMass_local)
+        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(-rigidBody.centerOfMass_local)
+
+        rigidBody.updateTransform()
+    }
+
+    private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {
+        joint.updateTransform()
+
+        joint.acceleration = parentRigidBody.acceleration +
+            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(joint.translation_local)
+
+        assert(joint.isFinite)
+    }
+
+    private func updateFreeBody(rigidBody: RigidBody, at time: Float) {
+        rigidBody.acceleration = rigidBody.force / rigidBody.mass
+        rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque
+
+        rigidBody.velocity = rigidBody.velocity + time * rigidBody.acceleration
+        rigidBody.angularVelocity = rigidBody.inertiaTensor.inverse * rigidBody.angularMomentum
+
+        rigidBody.translation = rigidBody.translation + time * rigidBody.velocity
+        let angularVelocityQuat = simd_quatf(real: 0, imag: rigidBody.angularVelocity)
+        rigidBody.rotation = rigidBody.rotation + time/2 * angularVelocityQuat * rigidBody.rotation
+        rigidBody.rotation = rigidBody.rotation.normalized
+
+        rigidBody.inertiaTensor = float3x3(rigidBody.rotation) * rigidBody.inertiaTensor_local * float3x3(rigidBody.rotation).transpose
+
+        rigidBody.node.simdPosition = rigidBody.translation
+        rigidBody.node.simdOrientation = rigidBody.rotation
+
+        assert(rigidBody.isFinite)
     }
 }
