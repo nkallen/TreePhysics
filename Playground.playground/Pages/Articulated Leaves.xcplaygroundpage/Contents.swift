@@ -33,7 +33,7 @@ let configuration = Interpreter<SkinningPen>.Configuration(
 let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
 interpreter.interpret("F+F+F+F+F+F+F+F+J")
 
-let windField = WindField()
+let windField = WindField(windVelocity: float3(8.6,0,5))
 
 let simulator = CPUSimulator()
 simulator.add(rigidBody: root)

@@ -28,6 +28,7 @@ public final class CPUSimulator {
     public func update(at time: TimeInterval) {
         updateFields(at: time)
         updateCompositeBodies()
+        deArticulateBodies()
         updateJoints(at: time)
         updateArticulatedBodies()
         updateFreeBodies(at: time)
@@ -83,6 +84,16 @@ public final class CPUSimulator {
                 // using the parallel axis theorem I' = I + md^2, but with tensors:
                 composite.inertiaTensor += childComposite.inertiaTensor -
                     childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).crossMatrix)
+            }
+        }
+    }
+
+    func deArticulateBodies() {
+        for rigidBody in rigidBodiesUnordered {
+            if let parentJoint = rigidBody.parentJoint {
+                if length(rigidBody.torque) > parentJoint.torqueThreshold {
+                    rigidBody.removeFromParent()
+                }
             }
         }
     }
@@ -199,7 +210,7 @@ public final class CPUSimulator {
     }
 
     private func updateFreeBody(rigidBody: RigidBody, at time: Float) {
-        guard rigidBody.kind != .static else { return } // FIXME use composite?
+        guard rigidBody.kind != .static else { return } // FIXME use composite for force?
         guard rigidBody.parentJoint == nil else { return }
 
         rigidBody.acceleration = rigidBody.force / rigidBody.mass

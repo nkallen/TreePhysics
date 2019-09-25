@@ -8,11 +8,13 @@ public enum Kind {
     case `dynamic`
 }
 
+// FIXME distinguish articulated from rigid
+
 public protocol RigidBody: class {
-    var kind: Kind { get } // FIXME remove
+    var kind: Kind { get }
 
     var parentJoint: Joint? { get set }
-    var childJoints: [Joint] { get }
+    var childJoints: [Joint] { get } // FIXME make set
     var composite: CompositeBody { get }
 
     var mass: Float { get }
@@ -34,6 +36,8 @@ public protocol RigidBody: class {
     var angularMomentum: float3 { get set } // FIXME acc and momentum are used Either/or
     var velocity: float3 { get set }
     var acceleration: float3 { get set }
+
+    func removeFromParent()
 
     func apply(force: float3, torque: float3?)
     func updateTransform()

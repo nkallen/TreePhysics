@@ -105,7 +105,17 @@ public final class Internode: RigidBody {
         self.force += force
         self.torque += torque
     }
-    
+
+    public func removeFromParent() {
+        guard let parentJoint = parentJoint else { return }
+        let parentRigidBody = parentJoint.parentRigidBody
+
+        self.parentJoint = nil
+        parentRigidBody.childJoints.removeAll { (joint: Joint) -> Bool in
+            return joint === parentJoint
+        }
+    }
+
     public func resetForces() {
         self.force = float3.zero
         self.torque = float3.zero

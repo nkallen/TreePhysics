@@ -15,7 +15,7 @@ public final class WindField: PhysicsField {
     let normal2tangentialDragCoefficientRatio: Float = 100
     let branchScale: Float = 1
 
-    public init(windVelocity: float3 = float3(2,7,7)) {
+    public init(windVelocity: float3 = float3(2,0,7)) {
         self.windVelocity = windVelocity
     }
 

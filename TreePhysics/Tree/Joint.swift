@@ -15,7 +15,8 @@ public final class Joint {
     var rotation_world2local: simd_quatf = simd_quatf.identity
     let translation_local: float3
 
-    let k: Float
+    let k: Float // FIXME rename stiffness
+    let torqueThreshold: Float
 
     init(parent: Internode, child: RigidBody, at rotation: simd_quatf) {
         self.parentRigidBody = parent
@@ -24,8 +25,10 @@ public final class Joint {
         switch child {
         case is Leaf:
             self.k = 1
+            self.torqueThreshold = 0.4
         default:
             self.k = Internode.K
+            self.torqueThreshold = Float.infinity
         }
         self.translation_local = float3(0, parentRigidBody.length, 0)
         updateTransform()
