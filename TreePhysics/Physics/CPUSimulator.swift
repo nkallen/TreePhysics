@@ -18,7 +18,6 @@ public final class CPUSimulator {
 
     func add(rigidBody: RigidBody) {
         self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
-        updateArticulatedBodies()
     }
 
     public func add(field: PhysicsField) {

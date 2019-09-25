@@ -3,6 +3,7 @@ import Foundation
 // L-system rewriter
 
 public class Rewriter {
+    // FIXME this should be a simple hash
     public struct Rule {
         public let symbol: Character
         public let replacement: String
@@ -17,6 +18,7 @@ public class Rewriter {
         }
     }
 
+    // FIXME this could all be much simpler;
     public static func rewrite(premise: String, rules: [Rule], generations: Int) -> String {
         var premise = premise
         for _ in 0..<generations {

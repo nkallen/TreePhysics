@@ -118,6 +118,11 @@ extension float3 {
     static let y = float3(0,1,0)
     static let z = float3(0,0,1)
 
+    // FIXME remove
+    static let i = float3(1,0,0)
+    static let j = float3(0,1,0)
+    static let k = float3(0,0,1)
+
     init(_ double3: double3) {
         self = float3(Float(double3.x), Float(double3.y), Float(double3.z))
     }
@@ -134,6 +139,7 @@ extension float3 {
         return float2(x, z)
     }
 
+    // FIXME rename skew
     var crossMatrix: float3x3 {
         return float3x3(columns:
             (float3(0, self.z, -self.y),
@@ -149,6 +155,10 @@ extension float3 {
         return self.x >= min.x && self.x <= max.x &&
             self.y >= min.y && self.y <= max.y &&
             self.z >= min.z && self.z <= max.z
+    }
+
+    var isFinite: Bool {
+        return x.isFinite && y.isFinite && z.isFinite
     }
 }
 
@@ -322,26 +332,6 @@ func float(_ x: half) -> Float {
 extension half {
     init (_ x: Float) {
         self = float16_from_float32(x)
-    }
-}
-
-extension float3 {
-    init(_ h: half3) {
-        self = float3(float(h.x), float(h.y), float(h.z))
-    }
-
-    static let i = float3(1,0,0)
-    static let j = float3(0,1,0)
-    static let k = float3(0,0,1)
-
-    var isFinite: Bool {
-        return x.isFinite && y.isFinite && z.isFinite
-    }
-}
-
-extension float3x3 {
-    init(_ h: half3x3) {
-        self = float3x3(float3(h[0]), float3(h[1]), float3(h[2]))
     }
 }
 

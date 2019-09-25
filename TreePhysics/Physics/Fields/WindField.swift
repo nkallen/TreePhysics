@@ -3,9 +3,6 @@ import simd
 import ShaderTypes
 
 public final class WindField: PhysicsField {
-    public var position = float3.zero
-    public var halfExtent: float3? = nil
-
     let windVelocity: float3
 
     public var airResistanceMultiplier: Float = 1
@@ -19,7 +16,7 @@ public final class WindField: PhysicsField {
         self.windVelocity = windVelocity
     }
 
-    public func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+    public override func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         switch rigidBody {
         case let internode as Internode:
             return force(internode: internode, time: time)
@@ -38,10 +35,10 @@ public final class WindField: PhysicsField {
         return result
     }
 
-    public func torque(rigidBody: RigidBody, time: TimeInterval) -> float3? {
+    override func torque(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         switch rigidBody {
         case _ as Internode:
-            return nil
+            return float3.zero
         case let leaf as Leaf:
             return torque(leaf: leaf, time: time)
         default: fatalError()

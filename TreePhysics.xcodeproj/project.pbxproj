@@ -37,6 +37,7 @@
 		9E34C49223291277008C7353 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
 		9E34C4932329127C008C7353 /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
 		9E34C494232912F3008C7353 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
+		9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39374A233B803100AE1897 /* PhysicsWorld.swift */; };
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
 		9E4C09FD230ED50F00F1DD6B /* hanan.dis1992.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */; };
 		9E4C09FF230F11D900F1DD6B /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FE230F11D900F1DD6B /* TODO */; };
@@ -161,6 +162,7 @@
 		9E34C480232911C6008C7353 /* TreePhysics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TreePhysics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E34C482232911C6008C7353 /* TreePhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TreePhysics.h; sourceTree = "<group>"; };
 		9E34C483232911C6008C7353 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9E39374A233B803100AE1897 /* PhysicsWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsWorld.swift; sourceTree = "<group>"; };
 		9E461B3222E5E025008AB788 /* Pen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pen.swift; sourceTree = "<group>"; };
 		9E461B3422E7017F008AB788 /* CylinderPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderPen.swift; sourceTree = "<group>"; };
 		9E461B3622E704BD008AB788 /* CylinderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderTest.swift; sourceTree = "<group>"; };
@@ -369,6 +371,7 @@
 				9E0674DC230ACFC90044C3C4 /* Kernels */,
 				9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */,
 				9E8F711E230D87C200583AAE /* MetalSimulator.swift */,
+				9E39374A233B803100AE1897 /* PhysicsWorld.swift */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -706,6 +709,7 @@
 				9E34C48823291201008C7353 /* Turtle.swift in Sources */,
 				9E34C48923291204008C7353 /* Pen.swift in Sources */,
 				9EAA8C0D23292401002E9260 /* ResetForces.swift in Sources */,
+				9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */,
 				9EAA8C1423292430002E9260 /* PhysicsField.swift in Sources */,
 				9EAA8C1023292411002E9260 /* UpdateJoints.swift in Sources */,
 				9EAA8C1723292440002E9260 /* PrettyPrint.swift in Sources */,
