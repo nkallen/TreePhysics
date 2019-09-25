@@ -6,7 +6,7 @@ import SceneKit
 class SkinnerTests: XCTestCase {
     func testFoo() {
         let pen = CylinderPen(radialSegmentCount: 5)
-        let configuration = Interpreter<CylinderPen>.Configuration(angle: .pi / 4, stepSize: 1)
+        let configuration = InterpreterConfiguration(angle: .pi / 4, stepSize: 1)
         let interpreter = Interpreter(configuration: configuration, pen: pen)
         interpreter.interpret("""
 F[-F]

@@ -109,38 +109,6 @@ func XCTAssertEqual(_ a: Internode, _ b: RigidBodyStruct, accuracy: Float, _ mes
     XCTAssertEqual(float3x3(a.rotation), b.rotation, accuracy: accuracy, "rotation", file: file, line: line)
 }
 
-// MARK: Half Arithmetic (should only be used in tests, NOT PRODUCTION CODE!!)
-
-func sqr(_ x: half3x3) -> half3x3 {
-    return half3x3(sqr(float3x3(x)))
-}
-
-extension half3 {
-    static func -(left: half3, right: half3) -> half3 {
-        return half3(float3(left) - float3(right))
-    }
-
-    var crossMatrix: half3x3 {
-        return half3x3(float3(self).crossMatrix)
-    }
-}
-
-extension half3x3 {
-    static func *(left: half, right: half3x3) -> half3x3 {
-        return half3x3(float(left) * float3x3(right))
-    }
-
-    static func -(left: half3x3, right: half3x3) -> half3x3 {
-        return half3x3(float3x3(left) - float3x3(right))
-    }
-}
-
-extension half3x3: Equatable {
-    public static func == (lhs: matrix_half3x3, rhs: matrix_half3x3) -> Bool {
-        return lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2]
-    }
-}
-
 class SharedBuffersMTLDevice: MTLDeviceProxy {
     override func makeBuffer(length: Int, options: MTLResourceOptions = []) -> MTLBuffer? {
         return underlying.makeBuffer(length: length, options: changeStorageMode(of: options))
@@ -166,7 +134,7 @@ class SharedBuffersMTLDevice: MTLDeviceProxy {
 
 extension Internode {
     func add(_ child: Internode) -> Joint {
-        return add(child, at: simd_quatf(angle: -.pi/4, axis: float3(0,0,1)))
+        return add(child, rotation: simd_quatf(angle: -.pi/4, axis: float3(0,0,1)), position: float3(0,length/2,0))
     }
 
     // FIXME is this necessary?

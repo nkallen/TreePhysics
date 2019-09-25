@@ -21,7 +21,8 @@ class CPUSimulatorTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
 
-        simulator = CPUSimulator(root: root)
+        simulator = CPUSimulator()
+        simulator.add(rigidBody: root)
 
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
         self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))

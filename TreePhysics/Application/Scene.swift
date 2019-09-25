@@ -46,7 +46,7 @@ class Scene: NSObject {
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
 
-        let configuration = Interpreter<SkinningPen>.Configuration(
+        let configuration = InterpreterConfiguration(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,

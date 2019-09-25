@@ -22,42 +22,40 @@ enum Command {
 
 fileprivate let initialOrientation: float3x3 = float3x3(columns: (.y, -.x, .z))
 
-public class Interpreter<P> where P: Pen {
-    // FIXME make InterpreterConfiguraiton and indep of type
-    public struct Configuration {
-        public init(
-            randomScale: Float = 0,
-            randomSeed: Float = 0,
-            angle: Float = .pi/8,
-            thickness: Float = 0.1,
-            thicknessScale: Float = 0.9,
-            stepSize: Float = 0.1,
-            stepSizeScale: Float = 0.9,
-            tropism: float3 = float3.zero,
-            elasticity: Float = 0.1
-            ) {
-            self.randomScale = randomScale
-            self.randomSeed = randomSeed
-            self.angle = angle
-            self.thickness = thickness
-            self.thicknessScale = thicknessScale
-            self.stepSize = stepSize
-            self.stepSizeScale = stepSizeScale
-            self.tropism = tropism
-            self.elasticity = elasticity
-        }
-
-        let randomScale: Float
-        let randomSeed: Float
-        let angle: Float
-        let thickness: Float
-        let thicknessScale: Float
-        let stepSize: Float
-        let stepSizeScale: Float
-        let tropism: float3
-        let elasticity: Float
+public struct InterpreterConfiguration {
+    public init(
+        randomScale: Float = 0,
+        randomSeed: Float = 0,
+        angle: Float = .pi/8,
+        thickness: Float = 0.1,
+        thicknessScale: Float = 0.9,
+        stepSize: Float = 0.1,
+        stepSizeScale: Float = 0.9,
+        tropism: float3 = float3.zero,
+        elasticity: Float = 0.1) {
+        self.randomScale = randomScale
+        self.randomSeed = randomSeed
+        self.angle = angle
+        self.thickness = thickness
+        self.thicknessScale = thicknessScale
+        self.stepSize = stepSize
+        self.stepSizeScale = stepSizeScale
+        self.tropism = tropism
+        self.elasticity = elasticity
     }
 
+    let randomScale: Float
+    let randomSeed: Float
+    let angle: Float
+    let thickness: Float
+    let thicknessScale: Float
+    let stepSize: Float
+    let stepSizeScale: Float
+    let tropism: float3
+    let elasticity: Float
+}
+
+public class Interpreter<P> where P: Pen {
     struct State {
         var position: float3
         var orientation: float3x3 // FIXME make a quat?
@@ -70,7 +68,7 @@ public class Interpreter<P> where P: Pen {
         }
     }
 
-    let configuration: Configuration
+    let configuration: InterpreterConfiguration
     var stack: [State] = []
 
     static func parse(_ s: String) -> [Command] {
@@ -104,7 +102,7 @@ public class Interpreter<P> where P: Pen {
         return result
     }
 
-    public init(configuration: Configuration = Configuration(), pen: P) {
+    public init(configuration: InterpreterConfiguration = InterpreterConfiguration(), pen: P) {
         self.configuration = configuration
         stack.append(
             State(position: float3.zero, orientation: initialOrientation, stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))

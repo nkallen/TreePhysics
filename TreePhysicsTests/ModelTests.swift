@@ -16,9 +16,9 @@ class ModelTests: XCTestCase {
      * in the xy plane, but using an inertia tensor and generalized eigendecomposition.
      */
     func test2DCaseIsSameAsPlanar3DCase() {
-        let root = Internode(length: 0, radius: 0, density: 0, kind: .static)
+        let root = RigidBody.static()
         let rigidBody = Internode(length: 1, radius: 1, density: 1)
-        let parentJoint = root.add(rigidBody, at: simd_quatf.identity)
+        let parentJoint = root.add(rigidBody, rotation: simd_quatf.identity, position: float3.zero)
 
         // 1. The 2D setup:
         let momentOfInertia_jointSpace = rigidBody.momentOfInertia + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, parentJoint.position))

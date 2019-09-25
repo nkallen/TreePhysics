@@ -304,7 +304,8 @@ class AdvancedMetalTests: XCTestCase {
 
         b9.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
 
-        self.cpuSimulator = CPUSimulator(root: root)
+        self.cpuSimulator = CPUSimulator()
+        cpuSimulator.add(rigidBody: root)
         self.metalSimulator = MetalSimulator(device: device, root: root)
     }
 
@@ -359,11 +360,11 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        let root = Internode(length: 0, radius: 0, density: 0, kind: .static)
+        let root = RigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
-        let configuration = Interpreter<RigidBodyPen>.Configuration(
+        let configuration = InterpreterConfiguration(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,
@@ -376,7 +377,8 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         // FIXME
         (root.flattened().last! as! Internode).apply(force: force, at: 1)
 
-        self.cpuSimulator = CPUSimulator(root: root)
+        self.cpuSimulator = CPUSimulator()
+        cpuSimulator.add(rigidBody: root)
         self.metalSimulator = MetalSimulator(device: device, root: root)
     }
 
