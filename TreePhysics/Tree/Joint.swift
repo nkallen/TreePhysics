@@ -31,6 +31,7 @@ public final class Joint {
         updateTransform()
     }
 
+    // FIXME pivot/position
     var position: float3 {
         return translation
     }

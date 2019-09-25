@@ -35,7 +35,8 @@ interpreter.interpret("F+F+F+F+F+F+F+F+J")
 
 let windField = WindField()
 
-let simulator = CPUSimulator(root: root)
+let simulator = CPUSimulator()
+simulator.add(rigidBody: root)
 simulator.add(field: windField)
 let scene = Scene(simulator: simulator)
 

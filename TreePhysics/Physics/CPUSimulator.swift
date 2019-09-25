@@ -178,6 +178,8 @@ public final class CPUSimulator {
         guard let parentJoint = rigidBody.parentJoint else { return }
         let parentRigidBody = parentJoint.parentRigidBody
 
+        rigidBody.updateTransform()
+
         rigidBody.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation.act(parentJoint.θ[1])
         rigidBody.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.crossMatrix * rigidBody.angularVelocity
 
@@ -185,8 +187,6 @@ public final class CPUSimulator {
         rigidBody.velocity += parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.translation_local)
         rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(-rigidBody.centerOfMass_local)
         rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(-rigidBody.centerOfMass_local)
-
-        rigidBody.updateTransform()
     }
 
     private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {
@@ -199,6 +199,9 @@ public final class CPUSimulator {
     }
 
     private func updateFreeBody(rigidBody: RigidBody, at time: Float) {
+        guard rigidBody.kind != .static else { return } // FIXME use composite?
+        guard rigidBody.parentJoint == nil else { return }
+
         rigidBody.acceleration = rigidBody.force / rigidBody.mass
         rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque
 
