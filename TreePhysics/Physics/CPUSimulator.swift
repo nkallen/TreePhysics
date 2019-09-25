@@ -140,7 +140,7 @@ public final class CPUSimulator {
 
                 // 1.b. the generalized eigenvalue problem A * X = X * Λ
                 // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
-                let A = L_inverse * (parentJoint.k * matrix_identity_float3x3) * L_transpose_inverse
+                let A = L_inverse * (parentJoint.stiffness * matrix_identity_float3x3) * L_transpose_inverse
                 let (Λ, X) = A.eigen_analytical!
 
                 // 2. Now we can restate the differential equation in terms of other (diagonal)

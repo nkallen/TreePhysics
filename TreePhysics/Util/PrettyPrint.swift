@@ -4,7 +4,7 @@ import ShaderTypes
 
 extension Joint: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "Joint \(parentRigidBody.name): k=\(k), θ=\(θ)"
+        return "Joint \(parentRigidBody.name): k=\(stiffness), θ=\(θ)"
     }
 }
 
