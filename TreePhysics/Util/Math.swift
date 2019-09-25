@@ -118,11 +118,6 @@ extension float3 {
     static let y = float3(0,1,0)
     static let z = float3(0,0,1)
 
-    // FIXME remove
-    static let i = float3(1,0,0)
-    static let j = float3(0,1,0)
-    static let k = float3(0,0,1)
-
     init(_ double3: double3) {
         self = float3(Float(double3.x), Float(double3.y), Float(double3.z))
     }

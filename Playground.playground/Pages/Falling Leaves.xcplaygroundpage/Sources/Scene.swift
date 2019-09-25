@@ -3,7 +3,7 @@ import SceneKit
 import simd
 @testable import TreePhysics
 
-let delta: Float = 1/100
+let delta: Float = 1/60
 
 public class Scene: SCNScene, SCNSceneRendererDelegate {
     let simulator: CPUSimulator

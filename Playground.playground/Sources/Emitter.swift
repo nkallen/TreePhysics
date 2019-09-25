@@ -21,11 +21,12 @@ public class Emitter {
         guard count + 1 < particles.count else { return nil }
 
         let leaf = Leaf(length: 1, density: 500)
-        let seed = total
+        let seed = 1 + total
         leaf.rotation =
             simd_quatf(angle: noise.random(seed + 0) * 2 * .pi, axis: .x) *
             simd_quatf(angle: noise.random(seed + 1) * 2 * .pi, axis: .y) *
             simd_quatf(angle: noise.random(seed + 2) * 2 * .pi, axis: .z)
+
         leaf.rotation = leaf.rotation.normalized
         leaf.node.simdOrientation = leaf.rotation
 

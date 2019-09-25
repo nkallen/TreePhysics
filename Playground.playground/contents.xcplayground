@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<playground version='6.0' target-platform='macos' display-mode='raw' executeOnSourceChanges='true'>
+<playground version='6.0' target-platform='macos' executeOnSourceChanges='true'>
     <pages>
         <page name='L-Systems'/>
         <page name='Falling Leaves'/>

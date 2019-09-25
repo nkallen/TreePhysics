@@ -162,8 +162,20 @@ class SharedBuffersMTLDevice: MTLDeviceProxy {
     }
 }
 
+// FIXME check all these guys for necessity
+
 extension Internode {
     func add(_ child: Internode) -> Joint {
         return add(child, at: simd_quatf(angle: -.pi/4, axis: float3(0,0,1)))
+    }
+
+    // FIXME is this necessary?
+    // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
+    // distance is in normalize [0..1] coordinates
+    func apply(force: float3, at distance: Float) {
+        guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
+
+        let torque = cross(rotation.act(float3(0, distance * length, 0)), force)
+        apply(force: force, torque: torque)
     }
 }

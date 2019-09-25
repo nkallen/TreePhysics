@@ -5,8 +5,8 @@ import ShaderTypes
 public final class WindField: PhysicsField {
     let windVelocity: float3
 
-    public var airResistanceMultiplier: Float = 1
-    public var phi: Float = .pi/4
+    public var airResistanceMultiplier: Float = 4
+    public var phi: Float = .pi/8
     let leafScale: Float = 1
     let airDensity: Float = 0.1
     let normal2tangentialDragCoefficientRatio: Float = 100

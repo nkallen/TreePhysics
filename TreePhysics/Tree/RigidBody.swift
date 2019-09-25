@@ -171,6 +171,7 @@ extension RigidBody {
 
 // MARK: Flattening & Leveling
 
+// FIXME no longer necessary
 class HashRigidBody: Hashable {
     let underlying: RigidBody
 
