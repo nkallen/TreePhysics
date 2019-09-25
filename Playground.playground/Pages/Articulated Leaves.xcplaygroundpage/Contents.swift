@@ -29,15 +29,22 @@ let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyP
 let configuration = Interpreter<SkinningPen>.Configuration(
     angle: .pi / 8,
     thickness: 0.002*0.002*Float.pi,
-    stepSize: 0.4)
-let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
-interpreter.interpret("F+F+F+F+F+F+////J")
+    stepSize: 0.4,
+    stepSizeScale: 0.8)
 
-let windField = WindField(windVelocity: float3(8.5,0,5))
+let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA&&J]////[!"&FFFFFFFA&&J]////[!"&FFFFFFFA&&J]"#)
+let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 2)
+
+let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
+interpreter.interpret(lSystem)
+
+let windField = WindField(windVelocity: float3(1,0,1)*15)
+let gravityField = GravityField(float3(0, -9.81, 0))
 
 let simulator = CPUSimulator()
 simulator.add(rigidBody: root)
 simulator.add(field: windField)
+simulator.add(field: gravityField)
 let scene = Scene(simulator: simulator)
 
 let view = SCNView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
@@ -46,11 +53,12 @@ let cameraNode = SCNNode()
 let camera = SCNCamera()
 cameraNode.camera = camera
 camera.zNear = 0
-camera.zFar = 10
+camera.zFar = 30
 
 cameraNode.camera = camera
 scene.rootNode.addChildNode(cameraNode)
-cameraNode.position = SCNVector3(x: -1, y: 0.75, z: 4)
+cameraNode.position = SCNVector3(x: 5, y: 1, z: 10)
+cameraNode.look(at: SCNVector3Zero)
 
 scene.rootNode.addChildNode(skinningPen.node)
 scene.rootNode.addChildNode(cameraNode)

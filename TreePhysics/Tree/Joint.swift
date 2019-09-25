@@ -24,8 +24,8 @@ public final class Joint {
         self.rotation_local = rotation
         switch child {
         case is Leaf:
-            self.k = 1
-            self.torqueThreshold = 0.4
+            self.k = 0.2
+            self.torqueThreshold = 0.2
         default:
             self.k = Internode.K
             self.torqueThreshold = Float.infinity

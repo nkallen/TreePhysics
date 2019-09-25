@@ -12,6 +12,8 @@ public final class WindField: PhysicsField {
     let normal2tangentialDragCoefficientRatio: Float = 100
     let branchScale: Float = 1
 
+    let noise = Noise()
+
     public init(windVelocity: float3 = float3(2,0,7)) {
         self.windVelocity = windVelocity
     }
@@ -32,8 +34,9 @@ public final class WindField: PhysicsField {
     }
 
     func force(internode: Internode, time: TimeInterval) -> float3 {
+        let windVelocity = self.windVelocity(for: internode, at: time)
         let relativeVelocity = windVelocity - internode.velocity
-        let relativeVelocity_normal = dot(relativeVelocity, internode.normal) * internode.normal
+        let relativeVelocity_normal = relativeVelocity - dot(relativeVelocity, internode.axis) * internode.axis
         let result = branchScale * airDensity * internode.area * length(relativeVelocity_normal) * relativeVelocity_normal
         return result
     }
@@ -49,6 +52,7 @@ public final class WindField: PhysicsField {
     }
 
     func force(leaf: Leaf, time: TimeInterval) -> float3 {
+        let windVelocity = self.windVelocity(for: leaf, at: time)
         let relativeVelocity: float3 = windVelocity - leaf.velocity
         let relativeVelocity_normal: float3 = dot(relativeVelocity, leaf.normal) * leaf.normal
         let relativeVelocity_tangential: float3 = relativeVelocity - relativeVelocity_normal
@@ -59,10 +63,18 @@ public final class WindField: PhysicsField {
     }
 
     func torque(leaf: Leaf, time: TimeInterval) -> float3 {
+        let windVelocity = self.windVelocity(for: leaf, at: time)
         let relativeVelocity: float3 = windVelocity - leaf.velocity
-        let k: Float = leafScale * airDensity * leaf.area / 2 * dot(relativeVelocity, leaf.normal)
+        let k: Float = leafScale * airDensity * leaf.area / 2 * sqrt(leaf.area / .pi) * dot(relativeVelocity, leaf.normal)
         var torque: float3 = k * cross(leaf.normal, relativeVelocity * cos(phi) + cross(leaf.normal, relativeVelocity * sin(phi)))
         torque -= airResistanceMultiplier * leaf.inertiaTensor * leaf.angularVelocity
+
         return torque
+    }
+
+    func windVelocity(for rigidBody: RigidBody, at time: TimeInterval) -> float3 {
+        guard length(self.windVelocity) > 10e-10 else { return float3.zero }
+        let r = abs(noise.fbm(rigidBody.centerOfMass.xy + Float(time), amplitude: length(self.windVelocity))) * normalize(self.windVelocity)
+        return r
     }
 }

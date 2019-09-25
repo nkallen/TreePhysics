@@ -36,7 +36,7 @@ class Noise {
             (d - b) * u.x * u.y;
     }
 
-    let octaves = 3
+    let octaves = 4
     let lacunarity: Float = 1.5
     let gain: Float = 0.75
     func fbm(_ st: float2, amplitude: Float) -> Float {

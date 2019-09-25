@@ -3,7 +3,7 @@ import SceneKit
 import PlaygroundSupport
 @testable import TreePhysics
 
-let windField = WindField(windVelocity: float3.zero)
+let windField = WindField(windVelocity: float3(5, 0, -1))
 let gravityField = GravityField(float3(0,-9.81,0))
 
 let simulator = CPUSimulator()

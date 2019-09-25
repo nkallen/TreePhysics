@@ -15,7 +15,7 @@ public class Internode: RigidBody {
     let radius: Float
 
     // FIXME think about these whether they should be stored properties or what
-    var normal: float3 {
+    var axis: float3 {
         return rotation.act(.y)
     }
 
