@@ -1,7 +1,6 @@
 import Foundation
 import SceneKit
 
-
 extension Internode {
     static let K: Float = 200
     static let β: Float = 0.01
@@ -9,7 +8,7 @@ extension Internode {
     static let minAngle: Float = -Float.pi / 3
 }
 
-public class Internode: RigidBody {
+public class Internode: ArticulatedRigidBody {
     let area: Float
     let length: Float
     let radius: Float
@@ -20,7 +19,6 @@ public class Internode: RigidBody {
     }
 
     public init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi) {
-
         self.area = .pi * radius * length
         self.length = length
         self.radius = radius

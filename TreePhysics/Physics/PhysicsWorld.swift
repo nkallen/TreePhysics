@@ -9,7 +9,11 @@ public class PhysicsWorld {
 
     func add(rigidBody: RigidBody) {
         rigidBodies.insert(rigidBody)
-        self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
+        switch rigidBody {
+        case let rigidBody as ArticulatedRigidBody:
+            self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
+        default: ()
+        }
     }
 
     public func add(field: PhysicsField) {

@@ -4,12 +4,12 @@ import simd
 // FIXME: we need a unit test to ensure rigidbody pen and cylinderpen are consistent
 
 public final class RigidBodyPen: Pen {
-    public typealias T = RigidBody
+    public typealias T = ArticulatedRigidBody
 
-    private var parentBranch: RigidBody
+    private var parentBranch: ArticulatedRigidBody
     private var start: float3? = nil
 
-    public init(parent: RigidBody) {
+    public init(parent: ArticulatedRigidBody) {
         self.parentBranch = parent
     }
 
@@ -18,7 +18,7 @@ public final class RigidBodyPen: Pen {
     }
 
     // FIXME replace tangent with orientation
-    public func cont(distance: Float, tangent: float3, thickness: Float) -> RigidBody {
+    public func cont(distance: Float, tangent: float3, thickness: Float) -> ArticulatedRigidBody {
         guard let start = start else { fatalError() }
 
         let newBranch = Internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
@@ -36,9 +36,10 @@ public final class RigidBodyPen: Pen {
         return newBranch
     }
 
-    public func copy(scale: Float, orientation: simd_quatf) -> RigidBody {
+    public func copy(scale: Float, orientation: simd_quatf) -> ArticulatedRigidBody {
         guard let start = start else { fatalError() }
 
+        print("there")
         let newLeaf = Leaf(length: scale, density: 500)
 
         let worldPosition = start - parentBranch.translation

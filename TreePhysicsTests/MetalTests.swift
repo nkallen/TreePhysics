@@ -360,7 +360,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        let root = RigidBody.static()
+        let root = ArticulatedRigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)

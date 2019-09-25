@@ -6,7 +6,7 @@ extension Leaf {
     static let thickness: Float = 0.001
 }
 
-final class Leaf: RigidBody {
+final class Leaf: ArticulatedRigidBody {
     let area: Float
 
     // FIXME

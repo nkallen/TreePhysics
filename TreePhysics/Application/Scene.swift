@@ -8,7 +8,7 @@ class Scene: NSObject {
 //    let gravityField: GravityField
 //    let attractorField: AttractorField
 //    let attractor: SCNNode
-    let root: RigidBody
+    let root: ArticulatedRigidBody
 
 //    private let metalSimulator: MetalSimulator
     private let cpuSimulator: CPUSimulator
@@ -38,7 +38,7 @@ class Scene: NSObject {
         
         // Tree:
         
-        self.root = RigidBody.static()
+        self.root = ArticulatedRigidBody.static()
         let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)

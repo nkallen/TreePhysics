@@ -7,17 +7,22 @@ let torqueFictitiousMultiplier_iii: Float = 0.0
 
 // FIXME extract a World object that has add/remove methods and so forth.
 public final class CPUSimulator {
-    var rigidBodiesLevelOrder: [RigidBody] = []
+    var rigidBodiesLevelOrder: [ArticulatedRigidBody] = []
     private var fields: [PhysicsField] = []
 
     public init() {}
 
-    var rigidBodiesUnordered: [RigidBody] {
+    var rigidBodiesUnordered: [ArticulatedRigidBody] {
         return rigidBodiesLevelOrder
     }
 
     public func add(rigidBody: RigidBody) {
-        self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
+        switch rigidBody {
+        case let rigidBody as ArticulatedRigidBody:
+            self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
+        default: ()
+//            self.rigidBodiesLevelOrder.append(rigidBody) FIXME
+        }
     }
 
     public func add(field: PhysicsField) {
@@ -182,7 +187,7 @@ public final class CPUSimulator {
         }
     }
 
-    private func updateArticulatedBody(rigidBody: RigidBody) {
+    private func updateArticulatedBody(rigidBody: ArticulatedRigidBody) {
         guard let parentJoint = rigidBody.parentJoint else { return }
         let parentRigidBody = parentJoint.parentRigidBody
 
@@ -193,8 +198,8 @@ public final class CPUSimulator {
 
         rigidBody.velocity = parentRigidBody.velocity
         rigidBody.velocity += parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.translation_local)
-        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(-rigidBody.centerOfMass_local)
-        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(-rigidBody.centerOfMass_local)
+        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(-rigidBody.localCenterOfMass)
+        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(-rigidBody.localCenterOfMass)
     }
 
     private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {
@@ -208,7 +213,6 @@ public final class CPUSimulator {
 
     private func updateFreeBody(rigidBody: RigidBody, at time: Float) {
         guard rigidBody.kind != .static else { return } // FIXME use composite for force?
-        guard rigidBody.parentJoint == nil else { return }
 
         rigidBody.acceleration = rigidBody.force / rigidBody.mass
         rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque
@@ -221,7 +225,7 @@ public final class CPUSimulator {
         rigidBody.rotation = rigidBody.rotation + time/2 * angularVelocityQuat * rigidBody.rotation
         rigidBody.rotation = rigidBody.rotation.normalized
 
-        rigidBody.inertiaTensor = float3x3(rigidBody.rotation) * rigidBody.inertiaTensor_local * float3x3(rigidBody.rotation).transpose
+        rigidBody.inertiaTensor = float3x3(rigidBody.rotation) * rigidBody.localInertiaTensor * float3x3(rigidBody.rotation).transpose
 
         rigidBody.node.simdPosition = rigidBody.translation
         rigidBody.node.simdOrientation = rigidBody.rotation

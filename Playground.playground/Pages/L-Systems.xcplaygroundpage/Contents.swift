@@ -3,12 +3,12 @@ import SceneKit
 import PlaygroundSupport
 @testable import TreePhysics
 
-let root = RigidBody.static()
+let root = ArticulatedRigidBody.static()
 let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
 let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]"#)
 let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
-let configuration = Interpreter<CylinderPen>.Configuration(
+let configuration = InterpreterConfiguration(
     randomScale: 0.4,
     angle: 18 * .pi / 180,
     thickness: 0.002*0.002*Float.pi,

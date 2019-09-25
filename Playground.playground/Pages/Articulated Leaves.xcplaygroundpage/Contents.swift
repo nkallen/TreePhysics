@@ -22,11 +22,11 @@ public class Scene: SCNScene, SCNSceneRendererDelegate {
     }
 }
 
-let root = RigidBody.static()
+let root = ArticulatedRigidBody.static()
 let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
 let rigidBodyPen = RigidBodyPen(parent: root)
 let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
-let configuration = Interpreter<SkinningPen>.Configuration(
+let configuration = InterpreterConfiguration(
     angle: .pi / 8,
     thickness: 0.002*0.002*Float.pi,
     stepSize: 0.4,
@@ -38,7 +38,7 @@ let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 2)
 let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
 interpreter.interpret(lSystem)
 
-let windField = WindField(windVelocity: float3(1,0,1)*15)
+let windField = WindField(windVelocity: float3(1,0,1)*14)
 let gravityField = GravityField(float3(0, -9.81, 0))
 
 let simulator = CPUSimulator()
