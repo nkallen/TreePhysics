@@ -16,7 +16,7 @@ public final class CPUSimulator {
         return rigidBodiesLevelOrder
     }
 
-    func add(rigidBody: RigidBody) {
+    public func add(rigidBody: RigidBody) {
         self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
     }
 
@@ -41,9 +41,7 @@ public final class CPUSimulator {
             for field in fields {
                 if field.applies(to: rigidBody.centerOfMass) {
                     let time = Date().timeIntervalSince(start)
-                    let force = field.force(rigidBody: rigidBody, time: time)
-                    let torque = field.torque(rigidBody: rigidBody, time: time)
-                    rigidBody.apply(force: force, torque: torque)
+                    field.apply(rigidBody: rigidBody, time: time)
                 }
             }
         }

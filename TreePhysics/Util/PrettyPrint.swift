@@ -14,9 +14,9 @@ extension JointStruct: CustomDebugStringConvertible {
     }
 }
 
-extension Internode: CustomDebugStringConvertible {
+extension RigidBody: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "RigidBody \(name): translation=\(translation), rotation=\(rotation), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
+        return "RigidBody \(name): kind=\(kind), translation=\(translation), rotation=\(rotation), mass=\(mass), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
     }
 }
 

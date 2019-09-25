@@ -2,48 +2,109 @@ import Foundation
 import simd
 import SceneKit
 
-// FIXME remove
+fileprivate var i = 0
+
 public enum Kind {
     case `static`
     case `dynamic`
 }
 
-// FIXME distinguish articulated from rigid
+public class RigidBody {
+    let name: String
+    var kind: Kind = .dynamic
 
-public protocol RigidBody: class {
-    var kind: Kind { get }
+    let mass: Float
+    var inertiaTensor: float3x3
+    let inertiaTensor_local: float3x3
+    let centerOfMass_local: float3
 
-    var parentJoint: Joint? { get set }
-    var childJoints: [Joint] { get } // FIXME make set
-    var composite: CompositeBody { get }
-
-    var mass: Float { get }
-    var inertiaTensor: float3x3 { get set }
-    var inertiaTensor_local: float3x3 { get }
-
-    var force: float3 { get }
-    var torque: float3 { get }
+    var force: float3 = float3.zero
+    var torque: float3 = float3.zero
 
     // FIXME /position/
-    var translation: float3 { get set }
-    var rotation: simd_quatf { get set}
+    var rotation: simd_quatf = simd_quatf.identity
+    var translation: float3 = float3.zero
+    // FIXME is this necessary?
 
-    var centerOfMass: float3 { get set }
-    var centerOfMass_local: float3 { get }
+    var centerOfMass: float3 = float3.zero
+    var angularVelocity: float3 = float3.zero
+    var angularAcceleration: float3 = float3.zero
+    var angularMomentum: float3 = float3.zero // FIXME acc and momentum are used Either/or
+    var velocity: float3 = float3.zero
+    var acceleration: float3 = float3.zero
 
-    var angularVelocity: float3 { get set }
-    var angularAcceleration: float3 { get set }
-    var angularMomentum: float3 { get set } // FIXME acc and momentum are used Either/or
-    var velocity: float3 { get set }
-    var acceleration: float3 { get set }
+    var node: SCNNode
 
-    func removeFromParent()
+    public class func `static`() -> RigidBody {
+        let rigidBody = RigidBody(mass: 0, inertiaTensor: float3x3(0), centerOfMass: float3.zero, node: SCNNode())
+        rigidBody.kind = .static
+        return rigidBody
+    }
 
-    func apply(force: float3, torque: float3?)
-    func updateTransform()
-    func resetForces()
+    init(mass: Float, inertiaTensor: float3x3, centerOfMass: float3, node: SCNNode) {
+        self.name = "RigidBody[\(i)]"
+        i += 1
 
-    var node: SCNNode { get }
+        self.mass = mass
+        self.inertiaTensor_local = inertiaTensor
+        self.inertiaTensor = inertiaTensor_local
+        self.centerOfMass_local = centerOfMass
+        self.node = node
+    }
+
+    func apply(force: float3, torque: float3? = nil) {
+        // FIXME: This torque seems wrong
+        let torque = torque ?? cross(rotation.act(centerOfMass_local), force)
+        self.force += force
+        self.torque += torque
+    }
+
+    func resetForces() {
+        self.force = float3.zero
+        self.torque = float3.zero
+    }
+
+    // MARK: Articulated FIXME separate class
+
+    weak var parentJoint: Joint? = nil
+    var childJoints: [Joint] = []  // FIXME make set
+    let composite = CompositeBody()
+
+    func add(_ child: RigidBody, rotation: simd_quatf, position: float3) -> Joint {
+        let joint = Joint(parent: self, child: child, rotation: rotation, position: position)
+        childJoints.append(joint)
+        child.parentJoint = joint
+        child.updateTransform()
+        return joint
+    }
+
+    func updateTransform() {
+        guard let parentJoint = parentJoint else { return }
+
+        let sora = parentJoint.θ[0]
+        let rotation_local = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
+
+        self.rotation = (parentJoint.rotation * rotation_local).normalized
+        self.translation = parentJoint.translation
+
+        self.inertiaTensor = float3x3(rotation) * inertiaTensor_local * float3x3(rotation).transpose
+
+        self.centerOfMass = translation + rotation.act(centerOfMass_local)
+
+        node.simdPosition = self.translation
+        node.simdOrientation = self.rotation
+    }
+
+    func removeFromParent() {
+        guard let parentJoint = parentJoint else { return }
+        let parentRigidBody = parentJoint.parentRigidBody
+
+        self.parentJoint = nil
+        parentRigidBody.childJoints.removeAll { (joint: Joint) -> Bool in
+            return joint === parentJoint
+        }
+    }
+
 }
 
 // FIXME think of isolating the articulatedness
@@ -108,6 +169,8 @@ extension RigidBody {
     }
 }
 
+// MARK: Flattening & Leveling
+
 class HashRigidBody: Hashable {
     let underlying: RigidBody
 
@@ -134,5 +197,53 @@ class RigidBodyDict<Value> {
         set(newValue) {
             dict[HashRigidBody(index)] = newValue
         }
+    }
+}
+
+struct UnitOfWork {
+    let rigidBody: RigidBody
+    let climbers: [RigidBody]
+}
+typealias Level = [UnitOfWork]
+
+extension RigidBody {
+    func levels() -> [Level] {
+        var result: [Level] = []
+        var visited = Set<HashRigidBody>()
+
+        var remaining = self.leaves
+        repeat {
+            var level: Level = []
+            var nextRemaining: [RigidBody] = []
+            while var n = remaining.popLast() {
+                if n.childJoints.allSatisfy({ visited.contains(HashRigidBody($0.childRigidBody)) }) && !visited.contains(HashRigidBody(n)) {
+                    var climbers: [RigidBody] = []
+                    let beforeClimb = n
+                    while let parentRigidBody = n.parentRigidBody, parentRigidBody.hasOneChild {
+                        n = parentRigidBody
+                        if !visited.contains(HashRigidBody(n)) {
+                            visited.insert(HashRigidBody(n))
+                            if !n.isRoot {
+                                climbers.append(n)
+                            }
+                        }
+                    }
+                    if !beforeClimb.isRoot {
+                        level.append(
+                            UnitOfWork(rigidBody: beforeClimb, climbers: climbers))
+                    }
+                    if let parentJoint = n.parentJoint {
+                        nextRemaining.append(parentJoint.parentRigidBody)
+                    }
+                }
+            }
+            if !level.isEmpty {
+                result.append(level)
+            }
+            let beforeClimbs = level.map { HashRigidBody($0.rigidBody) }
+            visited.formUnion(beforeClimbs)
+            remaining = Array(Set(nextRemaining.map { HashRigidBody($0) })).map { $0.underlying }
+        } while !remaining.isEmpty
+        return result
     }
 }

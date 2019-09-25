@@ -3,7 +3,7 @@ import SceneKit
 import PlaygroundSupport
 @testable import TreePhysics
 
-let root = Internode(length: 0, radius: 0, density: 0, kind: .static)
+let root = RigidBody.static()
 let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
 let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]"#)
 let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)

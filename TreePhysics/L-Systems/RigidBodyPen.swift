@@ -1,13 +1,15 @@
 import Foundation
 import simd
 
+// FIXME: we need a unit test to ensure rigidbody pen and cylinderpen are consistent
+
 public final class RigidBodyPen: Pen {
     public typealias T = RigidBody
 
-    private var parentBranch: Internode
+    private var parentBranch: RigidBody
     private var start: float3? = nil
 
-    public init(parent: Internode) {
+    public init(parent: RigidBody) {
         self.parentBranch = parent
     }
 
@@ -24,7 +26,9 @@ public final class RigidBodyPen: Pen {
         let parentTangent = parentBranch.rotation.act(float3(0,1,0))
         let rotation = simd_quatf(from: parentTangent, to: tangent).normalized
 
-        _ = parentBranch.add(newBranch, at: rotation)
+        let worldPosition = start - parentBranch.translation
+        let localPosition = parentBranch.rotation.inverse.act(worldPosition)
+        _ = parentBranch.add(newBranch, rotation: rotation, position: localPosition)
 
         self.start = start + distance * tangent
         self.parentBranch = newBranch
@@ -33,11 +37,14 @@ public final class RigidBodyPen: Pen {
     }
 
     public func copy(scale: Float, orientation: simd_quatf) -> RigidBody {
-        guard let _ = start else { fatalError() }
+        guard let start = start else { fatalError() }
 
         let newLeaf = Leaf(length: scale, density: 500)
 
-        _ = parentBranch.add(newLeaf, at: orientation)
+        let worldPosition = start - parentBranch.translation
+        let localPosition = parentBranch.rotation.inverse.act(worldPosition)
+        let localOrientation = parentBranch.rotation.inverse * orientation
+        _ = parentBranch.add(newLeaf, rotation: localOrientation, position: localPosition)
 
         return newLeaf
     }

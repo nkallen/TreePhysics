@@ -61,7 +61,7 @@ public final class CylinderPen: Pen {
     public func copy(scale: Float, orientation: simd_quatf) -> Indices {
         guard let start = start else { fatalError() }
 
-        let plane = MDLMesh.newPlane(withDimensions: float2(repeating: scale), segments: uint2(1,1), geometryType: .triangles, allocator: nil)
+        let plane = MDLMesh.newBox(withDimensions: float3(scale, scale, 0), segments: uint3(1,1,1), geometryType: .triangles, inwardNormals: false, allocator: nil)
 
         let descriptor = MDLVertexDescriptor()
         let attribute = MDLVertexAttribute()

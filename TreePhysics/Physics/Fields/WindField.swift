@@ -16,7 +16,7 @@ public final class WindField: PhysicsField {
         self.windVelocity = windVelocity
     }
 
-    public override func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
+    override func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         switch rigidBody {
         case let internode as Internode:
             return force(internode: internode, time: time)
@@ -24,14 +24,17 @@ public final class WindField: PhysicsField {
         case let leaf as Leaf:
             return force(leaf: leaf, time: time)
         default:
-            fatalError()
+            print(Thread.callStackSymbols)
+
+            fatalError("Invalid rigidBody: \(rigidBody)")
+
         }
     }
 
     func force(internode: Internode, time: TimeInterval) -> float3 {
         let relativeVelocity = windVelocity - internode.velocity
         let relativeVelocity_normal = dot(relativeVelocity, internode.normal) * internode.normal
-        let result = branchScale * airDensity * internode.crossSectionalArea * length(relativeVelocity_normal) * relativeVelocity_normal
+        let result = branchScale * airDensity * internode.area * length(relativeVelocity_normal) * relativeVelocity_normal
         return result
     }
 

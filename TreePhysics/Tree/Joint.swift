@@ -3,7 +3,7 @@ import simd
 import SceneKit
 
 public final class Joint {
-    unowned let parentRigidBody: Internode
+    unowned let parentRigidBody: RigidBody
     let childRigidBody: RigidBody
 
     var rotation_local: simd_quatf = simd_quatf.identity
@@ -18,7 +18,7 @@ public final class Joint {
     let k: Float // FIXME rename stiffness
     let torqueThreshold: Float
 
-    init(parent: Internode, child: RigidBody, at rotation: simd_quatf) {
+    init(parent: RigidBody, child: RigidBody, rotation: simd_quatf, position: float3) {
         self.parentRigidBody = parent
         self.childRigidBody = child
         self.rotation_local = rotation
@@ -30,7 +30,7 @@ public final class Joint {
             self.k = Internode.K
             self.torqueThreshold = Float.infinity
         }
-        self.translation_local = float3(0, parentRigidBody.length, 0)
+        self.translation_local = position
         updateTransform()
     }
 

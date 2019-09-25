@@ -5,6 +5,8 @@ import SceneKit
 
 public typealias Indices = [UInt16]
 
+// FIXME remove all these publics
+
 public final class SkinningPen: Pen {
     public typealias T = (Indices, RigidBody)
 
@@ -50,6 +52,15 @@ public final class SkinningPen: Pen {
         let parent = SCNNode()
         let branches = branchBones.node(for: cylinderPen.branchGeometry)
         let leaves = leafBones.node(for: cylinderPen.leafGeometry)
+        parent.addChildNode(branches)
+        parent.addChildNode(leaves)
+        return parent
+    }
+
+    public var skeleton: SCNNode {
+        let parent = SCNNode()
+        let branches = branchBones.skeleton
+        let leaves = leafBones.skeleton
         parent.addChildNode(branches)
         parent.addChildNode(leaves)
         return parent

@@ -5,3 +5,6 @@ metal:
 debugging:
 
 allow step forward/backward
+
+0. finish rigidbody refactoring
+1. finish world refactoring - remove nodes from world

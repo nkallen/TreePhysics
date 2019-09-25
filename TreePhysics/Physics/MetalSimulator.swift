@@ -21,7 +21,7 @@ class MetalSimulator {
         fields.append(field)
     }
 
-    init(device: MTLDevice, root: Internode) {
+    init(device: MTLDevice, root: RigidBody) {
         self.device = device
 
         // Initialize buffers:

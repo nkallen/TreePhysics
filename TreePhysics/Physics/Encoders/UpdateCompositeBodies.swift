@@ -47,7 +47,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         commandEncoder.endEncoding()
     }
 
-    static func rigidBodiesBuffer(root: Internode, device: MTLDevice) -> ([RigidBody], MTLBuffer, [Range<Int>]) {
+    static func rigidBodiesBuffer(root: RigidBody, device: MTLDevice) -> ([RigidBody], MTLBuffer, [Range<Int>]) {
         var rangesOfWork: [Range<Int>] = []
         let levels = root.levels()
         var offset = 0

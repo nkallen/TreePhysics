@@ -8,7 +8,7 @@ class Scene: NSObject {
 //    let gravityField: GravityField
 //    let attractorField: AttractorField
 //    let attractor: SCNNode
-    let root: Internode
+    let root: RigidBody
 
 //    private let metalSimulator: MetalSimulator
     private let cpuSimulator: CPUSimulator
@@ -38,7 +38,7 @@ class Scene: NSObject {
         
         // Tree:
         
-        self.root = Internode(length: 0, radius: 0, density: 0, kind: .static)
+        self.root = RigidBody.static()
         let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
@@ -55,7 +55,8 @@ class Scene: NSObject {
             stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
-        self.cpuSimulator = CPUSimulator(root: root)
+        self.cpuSimulator = CPUSimulator()
+        self.cpuSimulator.add(rigidBody: root)
         
         scene.rootNode.addChildNode(skinningPen.node)
 //        scene.rootNode.addChildNode(skinningPen.skeleton)

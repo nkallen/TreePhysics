@@ -422,6 +422,7 @@
 		9EE7EB9522DDDC6C00535997 = {
 			isa = PBXGroup;
 			children = (
+				9E4C09FE230F11D900F1DD6B /* TODO */,
 				9EBEB1CF2329052A0073E5D9 /* Playground.playground */,
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
 				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
@@ -457,7 +458,6 @@
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
 				9EE7EBA722DDDC6E00535997 /* Assets.xcassets */,
-				9E4C09FE230F11D900F1DD6B /* TODO */,
 			);
 			path = TreePhysics;
 			sourceTree = "<group>";

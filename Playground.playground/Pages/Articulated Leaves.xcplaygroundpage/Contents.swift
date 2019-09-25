@@ -22,18 +22,18 @@ public class Scene: SCNScene, SCNSceneRendererDelegate {
     }
 }
 
-let root = Internode(length: 0, radius: 0, density: 0, kind: .static)
+let root = RigidBody.static()
 let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
 let rigidBodyPen = RigidBodyPen(parent: root)
 let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 let configuration = Interpreter<SkinningPen>.Configuration(
-    angle: .pi / 10,
+    angle: .pi / 8,
     thickness: 0.002*0.002*Float.pi,
     stepSize: 0.4)
 let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
-interpreter.interpret("F+F+F+F+F+F+F+F+J")
+interpreter.interpret("F+F+F+F+F+F+////J")
 
-let windField = WindField(windVelocity: float3(8.6,0,5))
+let windField = WindField(windVelocity: float3(8.5,0,5))
 
 let simulator = CPUSimulator()
 simulator.add(rigidBody: root)
