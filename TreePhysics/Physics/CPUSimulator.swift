@@ -90,7 +90,7 @@ public final class CPUSimulator {
         for rigidBody in world.rigidBodiesUnordered {
             if let parentJoint = rigidBody.parentJoint {
                 if length(rigidBody.torque) > parentJoint.torqueThreshold {
-                    rigidBody.removeFromParent()
+                    world.free(articulatedBody: rigidBody)
                 }
             }
         }

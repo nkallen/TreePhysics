@@ -30,8 +30,9 @@ public class PhysicsWorld {
         rigidBodies.remove(rigidBody)
     }
 
-    func free(articulatedBody: RigidBody) {
-        // FIXME
+    func free(articulatedBody: ArticulatedRigidBody) {
+        articulatedBody.removeFromParent()
+        rigidBodies.insert(articulatedBody)
     }
 }
 

@@ -3,25 +3,6 @@ import SceneKit
 import PlaygroundSupport
 @testable import TreePhysics
 
-let delta: Double = 1/60
-
-public class Scene: SCNScene, SCNSceneRendererDelegate {
-    let simulator: CPUSimulator
-
-    public init(simulator: CPUSimulator) {
-        self.simulator = simulator
-        super.init()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    public func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        simulator.update(at: delta)
-    }
-}
-
 let root = ArticulatedRigidBody.static()
 let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
 let rigidBodyPen = RigidBodyPen(parent: root)
@@ -41,11 +22,15 @@ interpreter.interpret(lSystem)
 let windField = WindField(windVelocity: float3(1,0,1)*14)
 let gravityField = GravityField(float3(0, -9.81, 0))
 
-let simulator = CPUSimulator()
-simulator.add(rigidBody: root)
-simulator.add(field: windField)
-simulator.add(field: gravityField)
-let scene = Scene(simulator: simulator)
+let world = PhysicsWorld()
+let simulator = CPUSimulator(world: world)
+world.add(rigidBody: root)
+world.add(field: windField)
+world.add(field: gravityField)
+let scene = Scene()
+scene.add { time in
+    simulator.update(at: 1.0/60)
+}
 
 let view = SCNView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
 
