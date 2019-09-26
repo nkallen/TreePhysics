@@ -5,19 +5,28 @@ import simd
 public class Emitter {
     let maxAge: TimeInterval
     let simulator: CPUSimulator
+    let birthRate: Float
+
+    var bucket: (Float, Int)? = nil
 
     public var count = 0
     public var particles: [(Leaf, Date)?]
+    public var ticks = 0
     let noise = Noise()
     var total = 0
 
-    public init(max: Int, maxAge: TimeInterval, simulator: CPUSimulator) {
+    public init(birthRate: Float, max: Int, maxAge: TimeInterval, simulator: CPUSimulator) {
+        precondition(birthRate <= 1)
+        
+        self.birthRate = birthRate
         self.maxAge = maxAge
         self.particles = [(Leaf, Date)?](repeating: nil, count: max)
         self.simulator = simulator
     }
 
     public func emit() -> Leaf? {
+        ticks += 1
+        guard ticks % Int(1/birthRate) == 0 else { return nil }
         guard count + 1 < particles.count else { return nil }
 
         let leaf = Leaf(length: 1, density: 500)

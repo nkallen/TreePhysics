@@ -7,21 +7,29 @@ let windField = WindField(windVelocity: float3(5, 0, -1))
 let gravityField = GravityField(float3(0,-9.81,0))
 
 let simulator = CPUSimulator()
-let emitter = Emitter(max: 1000, maxAge: 20, simulator: simulator)
-let scene = Scene(simulator: simulator, emitter: emitter, windField: windField)
+let emitter = Emitter(birthRate: 1/5, max: 500, maxAge: 20, simulator: simulator)
+let scene = Scene()
+scene.add { time in
+    emitter.update()
+    simulator.update(at: 1.0/60)
+    if let leaf = emitter.emit() {
+        scene.rootNode.addChildNode(leaf.node)
+    }
+}
 
 simulator.add(field: windField)
 simulator.add(field: gravityField)
 
 let scnView = SCNView(frame: CGRect(x: 0, y: 0, width: 640, height: 480))
 
-let settings: Settings = [
-    ("Phi", windField.phi, 0, 2 * Float.pi, scene,  #selector(scene.phiSliderDidChange(sender:))),
-    ("airResistanceMultiplier", windField.airResistanceMultiplier, 0, 50, scene,  #selector(scene.airResistanceMultiplierSliderDidChange(sender:)))
-]
-
-let view = SettingsView(settings: settings,
-                        frame: CGRect(x: 0, y: 0, width: 640, height: 480 + 100))
+let view = SettingsView(
+    frame: CGRect(x: 0, y: 0, width: 640, height: 480 + 100))
+view.add("Phi", windField.phi, 0, 2 * .pi) { phi in
+    windField.phi = phi
+}
+view.add("airResistanceMultiplier", windField.airResistanceMultiplier, 0, 50) { airResistanceMultiplier in
+    windField.airResistanceMultiplier = airResistanceMultiplier
+}
 
 view.addArrangedSubview(scnView)
 

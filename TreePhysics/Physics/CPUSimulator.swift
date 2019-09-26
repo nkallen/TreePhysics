@@ -231,6 +231,7 @@ public final class CPUSimulator {
         guard rigidBody.parentJoint == nil else { return } // FIXME
 
         rigidBody.acceleration = rigidBody.force / rigidBody.mass
+
         rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque
 
         rigidBody.velocity = rigidBody.velocity + time * rigidBody.acceleration

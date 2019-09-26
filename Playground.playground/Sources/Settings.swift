@@ -1,33 +1,43 @@
 import Foundation
 import Cocoa
 
-public typealias Settings = [(String, Float, Float, Float, Any?, Selector)]
+public typealias SettingChangedCallback = (Float) -> ()
 
 public class SettingsView: NSStackView {
-    public init(settings: Settings, frame: CGRect) {
+    var callbacks: [NSSlider:SettingChangedCallback] = [:]
+
+    public override init(frame: CGRect) {
         super.init(frame: frame)
 
         self.orientation = .vertical
 //        self.translatesAutoresizingMaskIntoConstraints = false
         self.distribution = .fill
+    }
 
-        for (stringValue, floatValue, min, max, target, selector) in settings {
-            let stackView = NSStackView()
-            stackView.translatesAutoresizingMaskIntoConstraints = false
-            stackView.distribution = .fill
+    public func add(_ name: String, _ value: Float, _ min: Float, _ max: Float, cb: @escaping SettingChangedCallback) {
+        let stackView = NSStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fill
 
-            let label = NSTextField()
-            label.stringValue = stringValue
-            label.isEditable = false
-            label.isBezeled = false
+        let label = NSTextField()
+        label.stringValue = name
+        label.isEditable = false
+        label.isBezeled = false
 
-            let slider = NSSlider(value: Double(floatValue), minValue: Double(min), maxValue: Double(max), target: target, action: selector)
+        let slider = NSSlider(value: Double(value), minValue: Double(min), maxValue: Double(max), target: self, action: #selector(settingDidChange))
 
-            stackView.addArrangedSubview(label)
-            stackView.addArrangedSubview(slider)
+        stackView.addArrangedSubview(label)
+        stackView.addArrangedSubview(slider)
 
-            addArrangedSubview(stackView)
-        }
+        addArrangedSubview(stackView)
+
+        callbacks[slider] = cb
+    }
+
+    @objc func settingDidChange(sender: NSSlider) {
+        let callback = callbacks[sender]!
+        print(sender.floatValue)
+        callback(sender.floatValue)
     }
 
     required init?(coder decoder: NSCoder) {
