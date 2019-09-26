@@ -6,8 +6,9 @@ import PlaygroundSupport
 let windField = WindField(windVelocity: float3(5, 0, -1))
 let gravityField = GravityField(float3(0,-9.81,0))
 
-let simulator = CPUSimulator()
-let emitter = Emitter(birthRate: 1/5, max: 500, maxAge: 20, simulator: simulator)
+let world = PhysicsWorld()
+let simulator = CPUSimulator(world: world)
+let emitter = Emitter(birthRate: 1/5, max: 50, maxAge: 20, world: world)
 let scene = Scene()
 scene.add { time in
     emitter.update()
@@ -17,8 +18,8 @@ scene.add { time in
     }
 }
 
-simulator.add(field: windField)
-simulator.add(field: gravityField)
+world.add(field: windField)
+world.add(field: gravityField)
 
 let scnView = SCNView(frame: CGRect(x: 0, y: 0, width: 640, height: 480))
 

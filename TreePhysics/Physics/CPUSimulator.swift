@@ -18,30 +18,12 @@ public struct SimulatorConfig {
 
 // FIXME extract a World object that has add/remove methods and so forth.
 public final class CPUSimulator {
-    var rigidBodiesLevelOrder: [ArticulatedRigidBody] = []
-    private var fields: [PhysicsField] = []
-
     let configuration: SimulatorConfig
+    let world: PhysicsWorld
 
-    public init(configuration: SimulatorConfig = SimulatorConfig()) {
+    public init(configuration: SimulatorConfig = SimulatorConfig(), world: PhysicsWorld) {
         self.configuration = configuration
-    }
-
-    var rigidBodiesUnordered: [ArticulatedRigidBody] {
-        return rigidBodiesLevelOrder
-    }
-
-    public func add(rigidBody: RigidBody) {
-        switch rigidBody {
-        case let rigidBody as ArticulatedRigidBody:
-            self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
-        default: ()
-            //            self.rigidBodiesLevelOrder.append(rigidBody) FIXME
-        }
-    }
-
-    public func add(field: PhysicsField) {
-        fields.append(field)
+        self.world = world
     }
 
     public func update(at time: TimeInterval) {
@@ -57,8 +39,8 @@ public final class CPUSimulator {
     let start = Date()
 
     func updateFields(at time: TimeInterval) {
-        for rigidBody in rigidBodiesUnordered {
-            for field in fields {
+        for rigidBody in world.rigidBodiesUnordered {
+            for field in world.fields {
                 if field.applies(to: rigidBody.centerOfMass) {
                     let time = Date().timeIntervalSince(start)
                     field.apply(rigidBody: rigidBody, time: time)
@@ -68,7 +50,7 @@ public final class CPUSimulator {
     }
 
     func updateCompositeBodies() {
-        for rigidBody in rigidBodiesLevelOrder.reversed() {
+        for rigidBody in world.rigidBodiesLevelOrderReversed {
             let composite = rigidBody.composite
 
             composite.mass = rigidBody.mass
@@ -106,7 +88,7 @@ public final class CPUSimulator {
     }
 
     func deArticulateBodies() {
-        for rigidBody in rigidBodiesUnordered {
+        for rigidBody in world.rigidBodiesUnordered {
             if let parentJoint = rigidBody.parentJoint {
                 if length(rigidBody.torque) > parentJoint.torqueThreshold {
                     rigidBody.removeFromParent()
@@ -117,7 +99,7 @@ public final class CPUSimulator {
 
     func updateJoints(at time: TimeInterval) {
         let time = Float(time)
-        for rigidBody in rigidBodiesUnordered {
+        for rigidBody in world.rigidBodiesUnordered {
             if let parentJoint = rigidBody.parentJoint {
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
 
@@ -181,7 +163,7 @@ public final class CPUSimulator {
     }
 
     func updateArticulatedBodies() {
-        for rigidBody in rigidBodiesLevelOrder {
+        for rigidBody in world.rigidBodiesLevelOrder {
             updateArticulatedBody(rigidBody: rigidBody)
             for joint in rigidBody.childJoints {
                 updateArticulatedBody(joint: joint, parentRigidBody: rigidBody)
@@ -191,13 +173,13 @@ public final class CPUSimulator {
 
     func updateFreeBodies(at time: TimeInterval) {
         let time = Float(time)
-        for rigidBody in rigidBodiesUnordered {
+        for rigidBody in world.rigidBodies {
             updateFreeBody(rigidBody: rigidBody, at: time)
         }
     }
 
     func resetForces() {
-        for rigidBody in rigidBodiesLevelOrder {
+        for rigidBody in world.rigidBodiesLevelOrder {
             rigidBody.resetForces()
         }
     }
@@ -226,9 +208,8 @@ public final class CPUSimulator {
         assert(joint.isFinite)
     }
 
-    private func updateFreeBody(rigidBody: ArticulatedRigidBody, at time: Float) {
+    private func updateFreeBody(rigidBody: RigidBody, at time: Float) {
         guard rigidBody.kind != .static else { return } // FIXME use composite for force?
-        guard rigidBody.parentJoint == nil else { return } // FIXME
 
         rigidBody.acceleration = rigidBody.force / rigidBody.mass
 

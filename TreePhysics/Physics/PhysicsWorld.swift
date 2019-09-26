@@ -4,10 +4,12 @@ public class PhysicsWorld {
     public init() {}
 
     private(set) var rigidBodies: Set<RigidBody> = []
-    private(set) var rigidBodiesLevelOrder: [RigidBody] = []
+    private(set) var rigidBodiesLevelOrder: [ArticulatedRigidBody] = []
     private(set) var fields: Set<PhysicsField> = []
+    var rigidBodiesUnordered: [ArticulatedRigidBody] { return rigidBodiesLevelOrder }
+    var rigidBodiesLevelOrderReversed: [ArticulatedRigidBody] { return rigidBodiesLevelOrder.reversed() } // FIXME
 
-    func add(rigidBody: RigidBody) {
+    public func add(rigidBody: RigidBody) {
         rigidBodies.insert(rigidBody)
         switch rigidBody {
         case let rigidBody as ArticulatedRigidBody:
@@ -29,7 +31,7 @@ public class PhysicsWorld {
     }
 
     func free(articulatedBody: RigidBody) {
-
+        // FIXME
     }
 }
 

@@ -4,7 +4,7 @@ import simd
 
 public class Emitter {
     let maxAge: TimeInterval
-    let simulator: CPUSimulator
+    let world: PhysicsWorld
     let birthRate: Float
 
     var bucket: (Float, Int)? = nil
@@ -15,13 +15,13 @@ public class Emitter {
     let noise = Noise()
     var total = 0
 
-    public init(birthRate: Float, max: Int, maxAge: TimeInterval, simulator: CPUSimulator) {
+    public init(birthRate: Float, max: Int, maxAge: TimeInterval, world: PhysicsWorld) {
         precondition(birthRate <= 1)
         
         self.birthRate = birthRate
         self.maxAge = maxAge
         self.particles = [(Leaf, Date)?](repeating: nil, count: max)
-        self.simulator = simulator
+        self.world = world
     }
 
     public func emit() -> Leaf? {
@@ -40,7 +40,7 @@ public class Emitter {
         leaf.node.simdOrientation = leaf.rotation
 
         particles[count] = (leaf, Date())
-        simulator.add(rigidBody: leaf)
+        world.add(rigidBody: leaf)
 
         count += 1
         count %= particles.count
@@ -55,6 +55,7 @@ public class Emitter {
             let (leaf, createdAt) = particles[i]!
             if abs(createdAt.timeIntervalSince(now)) > maxAge {
                 leaf.node.removeFromParentNode()
+                world.remove(rigidBody: leaf)
                 particles[i] = particles[count - 1]
                 count -= 1
             }

@@ -55,8 +55,9 @@ class Scene: NSObject {
             stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
-        self.cpuSimulator = CPUSimulator()
-        self.cpuSimulator.add(rigidBody: root)
+        let world = PhysicsWorld()
+        self.cpuSimulator = CPUSimulator(world: world)
+        world.add(rigidBody: root)
         
         scene.rootNode.addChildNode(skinningPen.node)
 //        scene.rootNode.addChildNode(skinningPen.skeleton)
@@ -81,8 +82,8 @@ class Scene: NSObject {
 //        metalSimulator.add(field: attractorField)
 
         let windField = WindField(windVelocity: float3(1,0,1)*1)
-        cpuSimulator.add(field: windField)
-        cpuSimulator.add(field: gravityField)
+        world.add(field: windField)
+        world.add(field: gravityField)
     }
 }
 
