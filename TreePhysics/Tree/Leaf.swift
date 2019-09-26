@@ -6,7 +6,7 @@ extension Leaf {
     static let thickness: Float = 0.001
 }
 
-final class Leaf: ArticulatedRigidBody {
+public final class Leaf: ArticulatedRigidBody {
     let area: Float
 
     // FIXME
@@ -14,7 +14,7 @@ final class Leaf: ArticulatedRigidBody {
         return rotation.act(float3.z)
     }
 
-    init(length: Float = 1.0, density: Float = 1.0) {
+    public init(length: Float = 1.0, density: Float = 1.0) {
         self.area = sqr(length)
         // Inertia tensor for rectangular plate:
         let mass = density * area * Leaf.thickness

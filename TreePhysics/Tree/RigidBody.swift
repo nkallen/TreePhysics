@@ -22,8 +22,8 @@ public class RigidBody {
     var torque: float3 = float3.zero
 
     // FIXME /position/
-    var rotation: simd_quatf = simd_quatf.identity
-    var translation: float3 = float3.zero
+    public var rotation: simd_quatf = simd_quatf.identity
+    public var translation: float3 = float3.zero
     // FIXME is this necessary?
 
     var centerOfMass: float3 = float3.zero

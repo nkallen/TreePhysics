@@ -1,16 +1,18 @@
 import Foundation
 import simd
 
-class Noise {
-    func random(_ x: Int) -> Float {
+public class Noise {
+    public init() {}
+
+    public func random(_ x: Int) -> Float {
         return random(Float(x))
     }
 
-    func random(_ x: Float) -> Float {
+    public func random(_ x: Float) -> Float {
         return modf(sin(x)*1.0).1
     }
 
-    func random(_ st: float2) -> Float {
+    public func random(_ st: float2) -> Float {
         return modf(sin(dot(st,
                             float2(12.9898,78.233))) *
             43758.5453123).1
@@ -39,7 +41,7 @@ class Noise {
     let octaves = 4
     let lacunarity: Float = 1.5
     let gain: Float = 0.75
-    func fbm(_ st: float2, amplitude: Float) -> Float {
+    public func fbm(_ st: float2, amplitude: Float) -> Float {
         var st = st
         var amplitude = amplitude
         var value: Float = 0.0
