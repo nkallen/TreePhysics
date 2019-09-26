@@ -13,6 +13,12 @@ public class ArticulatedRigidBody: RigidBody {
         return rigidBody
     }
 
+    public class func dynamic() -> ArticulatedRigidBody {
+        let rigidBody = ArticulatedRigidBody(mass: 0, inertiaTensor: float3x3(0), centerOfMass: float3.zero, node: SCNNode())
+        rigidBody.kind = .dynamic
+        return rigidBody
+    }
+
     func add(_ child: ArticulatedRigidBody, rotation: simd_quatf, position: float3) -> Joint {
         let joint = Joint(parent: self, child: child, rotation: rotation, position: position)
         childJoints.append(joint)

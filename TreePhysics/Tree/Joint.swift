@@ -25,7 +25,7 @@ public final class Joint {
         switch child {
         case is Leaf:
             self.stiffness = 0.2
-            self.torqueThreshold = 0.2
+            self.torqueThreshold = 0.10
         default:
             self.stiffness = Internode.K
             self.torqueThreshold = Float.infinity

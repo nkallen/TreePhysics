@@ -26,10 +26,7 @@ public final class WindField: PhysicsField {
         case let leaf as Leaf:
             return force(leaf: leaf, time: time)
         default:
-            print(Thread.callStackSymbols)
-
-            fatalError("Invalid rigidBody: \(rigidBody)")
-
+            return float3.zero
         }
     }
 
@@ -47,7 +44,8 @@ public final class WindField: PhysicsField {
             return float3.zero
         case let leaf as Leaf:
             return torque(leaf: leaf, time: time)
-        default: fatalError()
+        default:
+            return float3.zero
         }
     }
 

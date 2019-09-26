@@ -14,12 +14,12 @@ let configuration = InterpreterConfig(
     stepSizeScale: 0.8)
 
 let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA&&J]////[!"&FFFFFFFA&&J]////[!"&FFFFFFFA&&J]"#)
-let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 2)
+let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
 
 let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
 interpreter.interpret(lSystem)
 
-let windField = WindField(windVelocity: float3(1,0,1)*14)
+let windField = WindField(windVelocity: float3(1,0,1)*16)
 let gravityField = GravityField(float3(0, -9.81, 0))
 
 let world = PhysicsWorld()

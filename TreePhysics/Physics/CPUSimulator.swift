@@ -208,14 +208,31 @@ public final class CPUSimulator {
     }
 
     private func updateFreeBody(rigidBody: RigidBody, at time: Float) {
-        guard rigidBody.kind != .static else { return } // FIXME use composite for force?
+        guard rigidBody.kind != .static else { return }
 
-        rigidBody.acceleration = rigidBody.force / rigidBody.mass
+        // FIXME untested
+        let force, torque: float3
+        let mass: Float
+        let inertiaTensor: float3x3
+        switch rigidBody {
+        case let rigidBody as ArticulatedRigidBody:
+            force = rigidBody.composite.force
+            torque = rigidBody.composite.torque
+            mass = rigidBody.composite.mass
+            inertiaTensor = rigidBody.composite.inertiaTensor
+        default:
+            force = rigidBody.force
+            torque = rigidBody.torque
+            mass = rigidBody.mass
+            inertiaTensor = rigidBody.inertiaTensor
+        }
 
-        rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque
+        rigidBody.acceleration = force / mass
+
+        rigidBody.angularMomentum = rigidBody.angularMomentum + time * torque
 
         rigidBody.velocity = rigidBody.velocity + time * rigidBody.acceleration
-        rigidBody.angularVelocity = rigidBody.inertiaTensor.inverse * rigidBody.angularMomentum
+        rigidBody.angularVelocity = inertiaTensor.inverse * rigidBody.angularMomentum
 
         rigidBody.translation = rigidBody.translation + time * rigidBody.velocity
         let angularVelocityQuat = simd_quatf(real: 0, imag: rigidBody.angularVelocity)
