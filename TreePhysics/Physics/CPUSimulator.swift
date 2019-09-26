@@ -16,7 +16,6 @@ public struct SimulatorConfig {
     }
 }
 
-// FIXME extract a World object that has add/remove methods and so forth.
 public final class CPUSimulator {
     let configuration: SimulatorConfig
     let world: PhysicsWorld

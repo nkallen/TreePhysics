@@ -8,7 +8,7 @@ let gravityField = GravityField(float3(0,-9.81,0))
 
 let world = PhysicsWorld()
 let simulator = CPUSimulator(world: world)
-let emitter = Emitter(birthRate: 1/5, max: 50, maxAge: 20, world: world)
+let emitter = Emitter(birthRate: 1/5, max: 50, maxAge: 15, world: world)
 let scene = Scene()
 scene.add { time in
     emitter.update()

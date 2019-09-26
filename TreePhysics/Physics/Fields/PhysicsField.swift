@@ -7,7 +7,6 @@ public class PhysicsField {
     var position: float3 = float3.zero
     var halfExtent: float3 = float3(.infinity, .infinity, .infinity)
 
-    // FIXME merge these two fns
     func force(rigidBody: RigidBody, time: TimeInterval) -> float3 {
         return float3.zero
     }
