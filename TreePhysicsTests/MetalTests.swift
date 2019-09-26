@@ -364,7 +364,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]/////[!"&FA]/////[!"&FA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
-        let configuration = InterpreterConfiguration(
+        let configuration = InterpreterConfig(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,

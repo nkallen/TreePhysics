@@ -11,7 +11,7 @@ extension Internode {
 public class Internode: ArticulatedRigidBody {
     let area: Float
     let length: Float
-    let radius: Float
+    let radius: Float // FIXME extract Shape class
 
     // FIXME think about these whether they should be stored properties or what
     var axis: float3 {

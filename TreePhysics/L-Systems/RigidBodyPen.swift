@@ -39,7 +39,6 @@ public final class RigidBodyPen: Pen {
     public func copy(scale: Float, orientation: simd_quatf) -> ArticulatedRigidBody {
         guard let start = start else { fatalError() }
 
-        print("there")
         let newLeaf = Leaf(length: scale, density: 500)
 
         let worldPosition = start - parentBranch.translation

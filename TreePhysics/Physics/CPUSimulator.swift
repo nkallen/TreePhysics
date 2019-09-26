@@ -1,16 +1,31 @@
 import Foundation
 import simd
 
-let torqueFictitiousMultiplier_i: Float = 0.0
-let torqueFictitiousMultiplier_ii: Float = 0.0
-let torqueFictitiousMultiplier_iii: Float = 0.0
+public struct SimulatorConfig {
+    let torqueFictitiousMultiplier_i: Float
+    let torqueFictitiousMultiplier_ii: Float
+    let torqueFictitiousMultiplier_iii: Float
+
+    public init(
+        torqueFictitiousMultiplier_i: Float = 0.0,
+        torqueFictitiousMultiplier_ii: Float = 0.0,
+        torqueFictitiousMultiplier_iii: Float = 0.0) {
+        self.torqueFictitiousMultiplier_i = torqueFictitiousMultiplier_i
+        self.torqueFictitiousMultiplier_ii = torqueFictitiousMultiplier_ii
+        self.torqueFictitiousMultiplier_iii = torqueFictitiousMultiplier_iii
+    }
+}
 
 // FIXME extract a World object that has add/remove methods and so forth.
 public final class CPUSimulator {
     var rigidBodiesLevelOrder: [ArticulatedRigidBody] = []
     private var fields: [PhysicsField] = []
 
-    public init() {}
+    let configuration: SimulatorConfig
+
+    public init(configuration: SimulatorConfig = SimulatorConfig()) {
+        self.configuration = configuration
+    }
 
     var rigidBodiesUnordered: [ArticulatedRigidBody] {
         return rigidBodiesLevelOrder
@@ -21,7 +36,7 @@ public final class CPUSimulator {
         case let rigidBody as ArticulatedRigidBody:
             self.rigidBodiesLevelOrder.append(contentsOf: rigidBody.flattened())
         default: ()
-//            self.rigidBodiesLevelOrder.append(rigidBody) FIXME
+            //            self.rigidBodiesLevelOrder.append(rigidBody) FIXME
         }
     }
 
@@ -116,11 +131,11 @@ public final class CPUSimulator {
                 let parentAngularVelocity_jointSpace = parentJoint.rotate(vector: parentJoint.parentRigidBody.angularVelocity)
                 let childAngularVelocity_jointSpace = parentJoint.rotate(vector: rigidBody.angularVelocity)
 
-                let torqueFictitious_jointSpace_i: float3 = torqueFictitiousMultiplier_i *
+                let torqueFictitious_jointSpace_i: float3 = configuration.torqueFictitiousMultiplier_i *
                     -rigidBody.composite.mass * pr.crossMatrix * parentJoint.rotate(vector: parentJoint.acceleration)
-                let torqueFictitious_jointSpace_ii: float3 = torqueFictitiousMultiplier_ii *
+                let torqueFictitious_jointSpace_ii: float3 = configuration.torqueFictitiousMultiplier_ii *
                     -inertiaTensor_jointSpace * (parentAngularAcceleration_jointSpace + parentAngularVelocity_jointSpace.crossMatrix * childAngularVelocity_jointSpace)
-                let torqueFictitious_jointSpace_iii: float3 = torqueFictitiousMultiplier_ii *
+                let torqueFictitious_jointSpace_iii: float3 = configuration.torqueFictitiousMultiplier_ii *
                     -childAngularVelocity_jointSpace.crossMatrix * inertiaTensor_jointSpace * childAngularVelocity_jointSpace
 
                 let torqueFictitious_jointSpace = torqueFictitious_jointSpace_i + torqueFictitious_jointSpace_ii + torqueFictitious_jointSpace_iii
@@ -211,8 +226,9 @@ public final class CPUSimulator {
         assert(joint.isFinite)
     }
 
-    private func updateFreeBody(rigidBody: RigidBody, at time: Float) {
+    private func updateFreeBody(rigidBody: ArticulatedRigidBody, at time: Float) {
         guard rigidBody.kind != .static else { return } // FIXME use composite for force?
+        guard rigidBody.parentJoint == nil else { return } // FIXME
 
         rigidBody.acceleration = rigidBody.force / rigidBody.mass
         rigidBody.angularMomentum = rigidBody.angularMomentum + time * rigidBody.torque

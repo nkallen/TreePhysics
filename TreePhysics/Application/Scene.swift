@@ -24,7 +24,7 @@ class Scene: NSObject {
         let cameraNode = SCNNode()
         let camera = SCNCamera()
         camera.zNear = 0
-        camera.zFar = 10
+        camera.zFar = 100
         cameraNode.camera = camera
         scene.rootNode.addChildNode(cameraNode)
         cameraNode.position = SCNVector3(x: 0, y: 0.75, z: 5.5)
@@ -43,15 +43,15 @@ class Scene: NSObject {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFF&JA]/////[!"&FFFFFFF&JA]/////[!"&FFFFFFF&JA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
 
-        let configuration = InterpreterConfiguration(
+        let configuration = InterpreterConfig(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,
             thicknessScale: 0.7,
-            stepSize: 0.1,
+            stepSize: 0.3,
             stepSizeScale: 0.9)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
@@ -64,7 +64,7 @@ class Scene: NSObject {
         scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.25))
 
         // Forces:
-//        let gravityField = GravityField(float3.zero)
+        let gravityField = GravityField(float3.zero)
 //        let attractorField = AttractorField()
 
 //        let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
@@ -80,8 +80,9 @@ class Scene: NSObject {
 //        cpuSimulator.add(field: attractorField)
 //        metalSimulator.add(field: attractorField)
 
-        let windField = WindField()
+        let windField = WindField(windVelocity: float3(1,0,1)*1)
         cpuSimulator.add(field: windField)
+        cpuSimulator.add(field: gravityField)
     }
 }
 
@@ -99,7 +100,7 @@ extension Scene: SCNSceneRendererDelegate {
 //            radius * cosf(Float(start.timeIntervalSinceNow)))
 //        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
 
-        cpuSimulator.update(at: 1.0 / 60)
+        cpuSimulator.update(at: 1/600)
         renderer.isPlaying = true
 
 //        return ()

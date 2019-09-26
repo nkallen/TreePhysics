@@ -22,7 +22,7 @@ enum Command {
 
 fileprivate let initialOrientation: float3x3 = float3x3(columns: (.y, -.x, .z))
 
-public struct InterpreterConfiguration {
+public struct InterpreterConfig {
     public init(
         randomScale: Float = 0,
         randomSeed: Float = 0,
@@ -68,7 +68,7 @@ public class Interpreter<P> where P: Pen {
         }
     }
 
-    let configuration: InterpreterConfiguration
+    let configuration: InterpreterConfig
     var stack: [State] = []
 
     static func parse(_ s: String) -> [Command] {
@@ -102,7 +102,7 @@ public class Interpreter<P> where P: Pen {
         return result
     }
 
-    public init(configuration: InterpreterConfiguration = InterpreterConfiguration(), pen: P) {
+    public init(configuration: InterpreterConfig = InterpreterConfig(), pen: P) {
         self.configuration = configuration
         stack.append(
             State(position: float3.zero, orientation: initialOrientation, stepSize: configuration.stepSize, thickness: configuration.thickness, pen: pen))
