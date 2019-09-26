@@ -26,7 +26,7 @@ let root = ArticulatedRigidBody.static()
 let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
 let rigidBodyPen = RigidBodyPen(parent: root)
 let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
-let configuration = InterpreterConfiguration(
+let configuration = InterpreterConfig(
     angle: .pi / 8,
     thickness: 0.002*0.002*Float.pi,
     stepSize: 0.4,

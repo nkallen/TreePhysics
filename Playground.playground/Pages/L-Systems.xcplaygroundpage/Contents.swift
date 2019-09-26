@@ -8,7 +8,7 @@ let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
 let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]/////[!"&FFFFFFFJA]"#)
 let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
-let configuration = InterpreterConfiguration(
+let configuration = InterpreterConfig(
     randomScale: 0.4,
     angle: 18 * .pi / 180,
     thickness: 0.002*0.002*Float.pi,
