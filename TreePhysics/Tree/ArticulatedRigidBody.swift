@@ -4,8 +4,11 @@ import SceneKit
 
 public class ArticulatedRigidBody: RigidBody {
     weak var parentJoint: Joint? = nil
-    var childJoints: [Joint] = []  // FIXME make set
+    public var childJoints: [Joint] = []  // FIXME make set
     let composite = CompositeBody()
+
+    let localPivot: float3
+    var pivot: float3 // The `pivot` is the point at which the object connects to its parent, relative to the center of mass.
 
     public class func `static`() -> ArticulatedRigidBody {
         let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: float3.zero, node: SCNNode())
@@ -19,6 +22,13 @@ public class ArticulatedRigidBody: RigidBody {
         return rigidBody
     }
 
+    public init(mass: Float, localInertiaTensor: float3x3, localPivot: float3, node: SCNNode) {
+        self.localPivot = localPivot
+        self.pivot = localPivot
+
+        super.init(mass: mass, localInertiaTensor: localInertiaTensor, node: node)
+    }
+
     func add(_ child: ArticulatedRigidBody, rotation: simd_quatf, position: float3) -> Joint {
         let joint = Joint(parent: self, child: child, rotation: rotation, position: position)
         childJoints.append(joint)
@@ -27,11 +37,21 @@ public class ArticulatedRigidBody: RigidBody {
         return joint
     }
 
+    override func apply(force: float3, torque: float3 = float3.zero) {
+        var torque = torque
+        if parentJoint != nil {
+            torque += cross(rotation.act(-localPivot), force)
+        }
+
+        super.apply(force: force, torque: torque)
+    }
+
     override func updateTransform() {
         if let parentJoint = parentJoint {
             let sora = parentJoint.θ[0]
             let rotation_local = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
-            
+
+            // FIXME rename all _local
             self.rotation = (parentJoint.rotation * rotation_local).normalized
             self.pivot = parentJoint.position
             
@@ -39,6 +59,8 @@ public class ArticulatedRigidBody: RigidBody {
             
             self.centerOfMass = self.pivot + rotation.act(-localPivot)
         }
+
+        self.pivot = centerOfMass + rotation.act(localPivot)
 
         super.updateTransform()
     }
@@ -139,6 +161,9 @@ public class ArticulatedRigidBody: RigidBody {
         return result
     }
 
+    override var isFinite: Bool {
+        return super.isFinite && pivot.isFinite
+    }
 }
 
 struct UnitOfWork {

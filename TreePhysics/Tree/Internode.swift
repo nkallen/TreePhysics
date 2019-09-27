@@ -43,7 +43,7 @@ public class Internode: ArticulatedRigidBody {
         super.init(mass: mass, localInertiaTensor: localInertiaTensor, localPivot: localPivot, node: node)
     }
 
-    override func updateTransform() {
+    public override func updateTransform() {
         super.updateTransform()
         self.axis = rotation.act(.y)
     }

@@ -6,10 +6,10 @@ import SceneKit
 
 public final class Joint {
     unowned let parentRigidBody: ArticulatedRigidBody
-    let childRigidBody: ArticulatedRigidBody
+    public let childRigidBody: ArticulatedRigidBody
 
     var localRotation: simd_quatf = simd_quatf.identity
-    var rotation: simd_quatf = simd_quatf.identity
+    public var rotation: simd_quatf = simd_quatf.identity
     var position: float3 = float3.zero
     var acceleration: float3 = float3.zero
     // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
@@ -26,8 +26,8 @@ public final class Joint {
         self.localRotation = rotation
         switch child {
         case is Leaf:
-            self.stiffness = 0.2
-            self.torqueThreshold = 0.10
+            self.stiffness = 0.1
+            self.torqueThreshold = 0.30
         default:
             self.stiffness = Internode.K
             self.torqueThreshold = Float.infinity

@@ -13,13 +13,13 @@ let configuration = InterpreterConfig(
     stepSize: 0.4,
     stepSizeScale: 0.8)
 
-let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA&&J]////[!"&FFFFFFFA&&J]////[!"&FFFFFFFA&&J]"#)
+let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFA&&J]////[!"&FFFFFA&&J]////[!"&FFFFFA&&J]"#)
 let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
 
 let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
 interpreter.interpret(lSystem)
 
-let windField = WindField(windVelocity: float3(1,0,1)*16)
+let windField = WindField(windVelocity: float3(1,0,1)*10)
 let gravityField = GravityField(float3(0, -9.81, 0))
 
 let world = PhysicsWorld()
@@ -46,6 +46,7 @@ cameraNode.position = SCNVector3(x: 5, y: 1, z: 10)
 cameraNode.look(at: SCNVector3Zero)
 
 scene.rootNode.addChildNode(skinningPen.node)
+//scene.rootNode.addChildNode(skinningPen.skeleton)
 scene.rootNode.addChildNode(cameraNode)
 
 view.delegate = scene

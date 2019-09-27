@@ -43,8 +43,8 @@ class Scene: NSObject {
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFF&JA]/////[!"&FFFFFFF&JA]/////[!"&FFFFFFF&JA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFA&&J]////[!"&FFFFFA&&J]////[!"&FFFFFA&&J]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 
         let configuration = InterpreterConfig(
             randomScale: 0.4,
@@ -81,7 +81,7 @@ class Scene: NSObject {
 //        cpuSimulator.add(field: attractorField)
 //        metalSimulator.add(field: attractorField)
 
-        let windField = WindField(windVelocity: float3(1,0,1)*1)
+        let windField = WindField(windVelocity: float3(1,0,1)*15)
         world.add(field: windField)
         world.add(field: gravityField)
     }
@@ -101,7 +101,7 @@ extension Scene: SCNSceneRendererDelegate {
 //            radius * cosf(Float(start.timeIntervalSinceNow)))
 //        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
 
-        cpuSimulator.update(at: 1/600)
+        cpuSimulator.update(at: 1/60)
         renderer.isPlaying = true
 
 //        return ()
