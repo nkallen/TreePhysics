@@ -37,7 +37,7 @@ public class Emitter {
             simd_quatf(angle: noise.random(seed + 2) * 2 * .pi, axis: .z)
 
         leaf.rotation = leaf.rotation.normalized
-        leaf.node.simdOrientation = leaf.rotation
+        leaf.updateTransform()
 
         particles[count] = (leaf, Date())
         world.add(rigidBody: leaf)

@@ -13,42 +13,51 @@ public class RigidBody {
     let name: String
     var kind: Kind = .dynamic
 
+    // Invariant attributes
     let mass: Float
-    var inertiaTensor: float3x3
-    let localInertiaTensor: float3x3
-    let localCenterOfMass: float3
+    let localInertiaTensor: float3x3 // relative to the center of mass
+    let localPivot: float3
 
     var force: float3 = float3.zero
     var torque: float3 = float3.zero
 
-    // FIXME /position/
-    public var rotation: simd_quatf = simd_quatf.identity
-    public var translation: float3 = float3.zero
-    // FIXME is this necessary?
-
-    var centerOfMass: float3 = float3.zero
-    var angularVelocity: float3 = float3.zero
-    var angularAcceleration: float3 = float3.zero
-    var angularMomentum: float3 = float3.zero // FIXME acc and momentum are used Either/or
-    var velocity: float3 = float3.zero
-    var acceleration: float3 = float3.zero
+    // State attributes that vary as a function of the simulation
+    var centerOfMass: float3
+    var rotation: simd_quatf = simd_quatf.identity
+    var pivot: float3 // The `pivot` is the point at which the object connects to its parent, relative to the center of mass.
+    var velocity: float3
+    var acceleration: float3
+    var inertiaTensor: float3x3
+    var angularVelocity: float3
+    var angularAcceleration: float3
+    var angularMomentum: float3
 
     var node: SCNNode
 
-    public init(mass: Float, inertiaTensor: float3x3, centerOfMass: float3, node: SCNNode) {
+    public init(mass: Float, localInertiaTensor: float3x3, localPivot: float3, node: SCNNode) {
         self.name = "RigidBody[\(i)]"
         i += 1
 
         self.mass = mass
-        self.localInertiaTensor = inertiaTensor
+        self.localInertiaTensor = localInertiaTensor
+        self.localPivot = localPivot
+
+        self.centerOfMass = float3.zero
+        self.velocity = float3.zero
+        self.acceleration = float3.zero
+        self.angularVelocity = float3.zero
+        self.angularAcceleration = float3.zero
+        self.angularMomentum = float3.zero
         self.inertiaTensor = localInertiaTensor
-        self.localCenterOfMass = centerOfMass
+
+        self.rotation = simd_quatf.identity
+        self.pivot = localPivot
+
         self.node = node
     }
 
     func apply(force: float3, torque: float3? = nil) {
-        // FIXME: This torque seems wrong
-        let torque = torque ?? cross(rotation.act(localCenterOfMass), force)
+        let torque = torque ?? cross(rotation.act(-localPivot), force)
         self.force += force
         self.torque += torque
     }
@@ -57,11 +66,17 @@ public class RigidBody {
         self.force = float3.zero
         self.torque = float3.zero
     }
+
+    func updateTransform() {
+        node.simdPosition = self.centerOfMass
+        node.simdOrientation = self.rotation
+    }
 }
 
 extension RigidBody {
     var isFinite: Bool {
-        return translation.isFinite &&
+        return centerOfMass.isFinite &&
+            pivot.isFinite &&
             rotation.isFinite &&
             inertiaTensor.isFinite &&
             angularVelocity.isFinite &&

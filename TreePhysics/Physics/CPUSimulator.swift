@@ -66,7 +66,7 @@ public final class CPUSimulator {
 
                 // this is due to distributivity of cross product
                 composite.torque +=
-                    cross(childJoint.position - rigidBody.translation, childComposite.force) + childComposite.torque
+                    cross(childJoint.position - rigidBody.pivot, childComposite.force) + childComposite.torque
 
                 composite.centerOfMass += childComposite.mass * childComposite.centerOfMass
             }
@@ -193,16 +193,16 @@ public final class CPUSimulator {
         rigidBody.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.crossMatrix * rigidBody.angularVelocity
 
         rigidBody.velocity = parentRigidBody.velocity
-        rigidBody.velocity += parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.translation_local)
-        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(-rigidBody.localCenterOfMass)
-        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(-rigidBody.localCenterOfMass)
+        rigidBody.velocity += parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.localPosition)
+        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(rigidBody.pivot)
+        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(rigidBody.pivot)
     }
 
     private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {
         joint.updateTransform()
 
         joint.acceleration = parentRigidBody.acceleration +
-            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(joint.translation_local)
+            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(joint.localPosition)
 
         assert(joint.isFinite)
     }
@@ -234,16 +234,15 @@ public final class CPUSimulator {
         rigidBody.velocity = rigidBody.velocity + time * rigidBody.acceleration
         rigidBody.angularVelocity = inertiaTensor.inverse * rigidBody.angularMomentum
 
-        rigidBody.translation = rigidBody.translation + time * rigidBody.velocity
+        rigidBody.centerOfMass = rigidBody.centerOfMass + time * rigidBody.velocity
         let angularVelocityQuat = simd_quatf(real: 0, imag: rigidBody.angularVelocity)
         rigidBody.rotation = rigidBody.rotation + time/2 * angularVelocityQuat * rigidBody.rotation
         rigidBody.rotation = rigidBody.rotation.normalized
 
         rigidBody.inertiaTensor = float3x3(rigidBody.rotation) * rigidBody.localInertiaTensor * float3x3(rigidBody.rotation).transpose
 
-        rigidBody.node.simdPosition = rigidBody.translation
-        rigidBody.node.simdOrientation = rigidBody.rotation
-
+        rigidBody.updateTransform()
+        
         assert(rigidBody.isFinite)
     }
 }

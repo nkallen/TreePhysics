@@ -26,7 +26,7 @@ public final class RigidBodyPen: Pen {
         let parentTangent = parentBranch.rotation.act(float3(0,1,0))
         let rotation = simd_quatf(from: parentTangent, to: tangent).normalized
 
-        let worldPosition = start - parentBranch.translation
+        let worldPosition = start - parentBranch.pivot
         let localPosition = parentBranch.rotation.inverse.act(worldPosition)
         _ = parentBranch.add(newBranch, rotation: rotation, position: localPosition)
 
@@ -41,7 +41,7 @@ public final class RigidBodyPen: Pen {
 
         let newLeaf = Leaf(length: scale, density: 500)
 
-        let worldPosition = start - parentBranch.translation
+        let worldPosition = start - parentBranch.pivot
         let localPosition = parentBranch.rotation.inverse.act(worldPosition)
         let localOrientation = parentBranch.rotation.inverse * orientation
         _ = parentBranch.add(newLeaf, rotation: localOrientation, position: localPosition)

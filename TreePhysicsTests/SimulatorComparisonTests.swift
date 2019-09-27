@@ -72,7 +72,7 @@ class SimulatorComparisonTests: XCTestCase {
                 XCTAssertEqual(joints[i].θ[1],  metalSimulator.rigidBodies[i].parentJoint!.θ[1], accuracy: 0.0001, message)
                 XCTAssertEqual(joints[i].θ[2],  metalSimulator.rigidBodies[i].parentJoint!.θ[2], accuracy: 0.01, message)
 
-                XCTAssertEqual(rigidBodies[i].position, metalSimulator.rigidBodies[i].translation, accuracy: 0.0001, message)
+                XCTAssertEqual(rigidBodies[i].position, metalSimulator.rigidBodies[i].position, accuracy: 0.0001, message)
                 XCTAssertEqual(rigidBodies[i].centerOfMass, metalSimulator.rigidBodies[i].centerOfMass, accuracy: 0.0001, message)
                 XCTAssertEqual(rigidBodies[i].inertiaTensor, metalSimulator.rigidBodies[i].inertiaTensor, accuracy: 0.00001, message)
             }

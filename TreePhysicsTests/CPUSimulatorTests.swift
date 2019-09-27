@@ -25,7 +25,7 @@ class CPUSimulatorTests: XCTestCase {
         simulator.add(rigidBody: root)
 
         b2.apply(force: force, at: 1) // ie at float3(0, 1, 0) in local coordinates
-        self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
+        self.forceAppliedPosition = b2.position + b2.rotation.act(float3(0, 1, 0))
     }
 
     func testApplyForce() {
@@ -34,7 +34,7 @@ class CPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b2.length, 1)
         XCTAssertEqual(b2.radius, 1)
 
-        XCTAssertEqual(b2.torque, cross(forceAppliedPosition - b2.translation, force))
+        XCTAssertEqual(b2.torque, cross(forceAppliedPosition - b2.position, force))
 
         XCTAssertEqual(float3x3(b2.rotation.normalized) * b2.inertiaTensor * float3x3(b2.rotation.normalized).transpose,
                        float3x3(diagonal: float3(
@@ -43,15 +43,15 @@ class CPUSimulatorTests: XCTestCase {
                         1.0/4 + 1.0/12
                        )), accuracy: 0.0001)
 
-        XCTAssertEqual(root.translation, float3.zero)
-        XCTAssertEqual(b1.parentJoint!.translation, float3(0,1,0))
-        XCTAssertEqual(b1.translation, float3(0,1,0))
+        XCTAssertEqual(root.position, float3.zero)
+        XCTAssertEqual(b1.parentJoint!.position, float3(0,1,0))
+        XCTAssertEqual(b1.position, float3(0,1,0))
 
         XCTAssertEqual(b2.centerOfMass, float3(0.5 + 1/sqrt2, 1 + 1/sqrt2, 0), accuracy: 0.0001)
         XCTAssertEqual(b1.centerOfMass, float3(0.5/sqrt2, 1 + 0.5/sqrt2, 0), accuracy: 0.0001)
 
-        XCTAssertEqual(b2.parentJoint!.translation, float3(1/sqrt2, 1 + 1/sqrt2, 0), accuracy: 0.0001)
-        XCTAssertEqual(b1.parentJoint!.translation, float3(0,1, 0))
+        XCTAssertEqual(b2.parentJoint!.position, float3(1/sqrt2, 1 + 1/sqrt2, 0), accuracy: 0.0001)
+        XCTAssertEqual(b1.parentJoint!.position, float3(0,1, 0))
     }
 
     func testComposite() {
@@ -69,9 +69,9 @@ class CPUSimulatorTests: XCTestCase {
 
         // torque
         XCTAssertEqual(b2.composite.torque, b2.torque)
-        let r_b1 = forceAppliedPosition - b1.parentJoint!.translation
+        let r_b1 = forceAppliedPosition - b1.parentJoint!.position
         XCTAssertEqual(b1.composite.torque, cross(r_b1, force))
-        let r_root = forceAppliedPosition - root.translation
+        let r_root = forceAppliedPosition - root.position
         XCTAssertEqual(root.composite.torque, cross(r_root, force))
 
         // center of mass
@@ -113,14 +113,14 @@ class CPUSimulatorTests: XCTestCase {
     func testUpdateRigidBodies() {
         XCTAssertEqual(
             float3(1/sqrt2, 1+1/sqrt2, 0),
-            b2.translation, accuracy: 0.0001)
+            b2.position, accuracy: 0.0001)
         XCTAssertEqual(
             simd_quatf(angle: .pi/2, axis: float3(0,0,-1)),
             b2.rotation, accuracy: 0.0001)
 
         XCTAssertEqual(
             float3(0, 1, 0),
-            b1.translation)
+            b1.position)
         XCTAssertEqual(
             simd_quatf(angle: .pi/4, axis: float3(0,0,-1)),
             b1.rotation, accuracy: 0.0001)
@@ -129,14 +129,14 @@ class CPUSimulatorTests: XCTestCase {
 
         XCTAssertEqual(
             float3(0.70687836, 1.7073351, 0),
-            b2.translation, accuracy: 0.0001)
+            b2.position, accuracy: 0.0001)
         XCTAssertEqual(
             simd_quatf(angle: 1.5696167, axis: float3(0,0,-1)),
             b2.rotation, accuracy: 0.0001)
 
         XCTAssertEqual(
             float3(0, 1, 0),
-            b1.translation)
+            b1.position)
         XCTAssertEqual(
             simd_quatf(angle: 0.78507507, axis: float3(0,0,-1)),
             b1.rotation, accuracy: 0.0001)

@@ -21,12 +21,13 @@ do {
     interpreter.interpret(lSystem)
 }
 
+let world = PhysicsWorld()
 let configuration = SimulatorConfig(
     torqueFictitiousMultiplier_i: 1,
     torqueFictitiousMultiplier_ii: 1,
     torqueFictitiousMultiplier_iii: 1)
-let simulator = CPUSimulator(configuration: configuration)
-simulator.add(rigidBody: root)
+let simulator = CPUSimulator(configuration: configuration, world: world)
+world.add(rigidBody: root)
 let scene = Scene()
 scene.add { time in
     simulator.update(at: 1/60)

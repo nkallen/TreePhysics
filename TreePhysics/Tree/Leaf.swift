@@ -2,23 +2,24 @@ import Foundation
 import SceneKit
 import simd
 
+/**
+ A `Leaf` represents a physical leaf in a physical tree (i.e., the plant) as opposed to a node in a datastructure with no children. It's shape is a very thin flat plate where (0,0,0) is the stem-end of the leaf. When interacting with the wind it is subject to lift forces and so on.
+ */
 extension Leaf {
     static let thickness: Float = 0.001
 }
 
 public final class Leaf: ArticulatedRigidBody {
     let area: Float
-
-    // FIXME
-    var normal: float3 {
-        return rotation.act(float3.z)
-    }
+    var normal: float3
 
     public init(length: Float = 1.0, density: Float = 1.0) {
         self.area = sqr(length)
+        self.normal = .z
+
         // Inertia tensor for rectangular plate:
         let mass = density * area * Leaf.thickness
-        let inertiaTensor = float3x3(diagonal:
+        let localInertiaTensor = float3x3(diagonal:
             float3(1/12 * mass * sqr(length),
                    1/12 * mass * sqr(length),
                    1/6  * mass * sqr(length)))
@@ -29,8 +30,13 @@ public final class Leaf: ArticulatedRigidBody {
 
         super.init(
             mass: mass,
-            inertiaTensor: inertiaTensor,
-            centerOfMass: float3(length/2, length/2, 0),
+            localInertiaTensor: localInertiaTensor,
+            localPivot: float3(0, -length/2, 0),
             node: node)
+    }
+
+    override func updateTransform() {
+        super.updateTransform()
+        self.normal = rotation.act(.z)
     }
 }

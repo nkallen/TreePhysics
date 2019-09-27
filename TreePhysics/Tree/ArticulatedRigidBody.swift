@@ -8,13 +8,13 @@ public class ArticulatedRigidBody: RigidBody {
     let composite = CompositeBody()
 
     public class func `static`() -> ArticulatedRigidBody {
-        let rigidBody = ArticulatedRigidBody(mass: 0, inertiaTensor: float3x3(0), centerOfMass: float3.zero, node: SCNNode())
+        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: float3.zero, node: SCNNode())
         rigidBody.kind = .static
         return rigidBody
     }
 
     public class func dynamic() -> ArticulatedRigidBody {
-        let rigidBody = ArticulatedRigidBody(mass: 0, inertiaTensor: float3x3(0), centerOfMass: float3.zero, node: SCNNode())
+        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: float3.zero, node: SCNNode())
         rigidBody.kind = .dynamic
         return rigidBody
     }
@@ -27,21 +27,20 @@ public class ArticulatedRigidBody: RigidBody {
         return joint
     }
 
-    func updateTransform() {
-        guard let parentJoint = parentJoint else { return }
+    override func updateTransform() {
+        if let parentJoint = parentJoint {
+            let sora = parentJoint.θ[0]
+            let rotation_local = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
+            
+            self.rotation = (parentJoint.rotation * rotation_local).normalized
+            self.pivot = parentJoint.position
+            
+            self.inertiaTensor = float3x3(rotation) * localInertiaTensor * float3x3(rotation).transpose
+            
+            self.centerOfMass = self.pivot + rotation.act(-localPivot)
+        }
 
-        let sora = parentJoint.θ[0]
-        let rotation_local = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
-
-        self.rotation = (parentJoint.rotation * rotation_local).normalized
-        self.translation = parentJoint.translation
-
-        self.inertiaTensor = float3x3(rotation) * localInertiaTensor * float3x3(rotation).transpose
-
-        self.centerOfMass = translation + rotation.act(localCenterOfMass)
-
-        node.simdPosition = self.translation
-        node.simdOrientation = self.rotation
+        super.updateTransform()
     }
 
     func removeFromParent() {
@@ -77,6 +76,16 @@ public class ArticulatedRigidBody: RigidBody {
         return result
     }
 
+    private func searchBreadthFirst(queue: inout [ArticulatedRigidBody], result: inout [ArticulatedRigidBody]) {
+        while !queue.isEmpty {
+            let start = queue.removeFirst()
+            result.append(start)
+            for childJoint in start.childJoints {
+                queue.append(childJoint.childRigidBody)
+            }
+        }
+    }
+
     var leaves: [ArticulatedRigidBody] {
         var result: [ArticulatedRigidBody] = []
         for childJoint in childJoints {
@@ -88,16 +97,6 @@ public class ArticulatedRigidBody: RigidBody {
             }
         }
         return result
-    }
-
-    private func searchBreadthFirst(queue: inout [ArticulatedRigidBody], result: inout [ArticulatedRigidBody]) {
-        while !queue.isEmpty {
-            let start = queue.removeFirst()
-            result.append(start)
-            for childJoint in start.childJoints {
-                queue.append(childJoint.childRigidBody)
-            }
-        }
     }
 
     func levels() -> [Level] {

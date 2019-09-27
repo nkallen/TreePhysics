@@ -2,10 +2,6 @@ import Foundation
 import SceneKit
 import ModelIO
 
-// NOTE: We need to keep all the vertices to gether in one array; however, we can keep the
-// indices separate so that there are distinct SCNGeometryElement objects. It's unclear how this
-// affects rendering performance however.
-
 public final class CylinderPen: Pen {
     public typealias T = Indices
 
@@ -61,28 +57,14 @@ public final class CylinderPen: Pen {
     public func copy(scale: Float, orientation: simd_quatf) -> Indices {
         guard let start = start else { fatalError() }
 
-        let plane = MDLMesh.newBox(withDimensions: float3(scale, scale, 0), segments: uint3(1,1,1), geometryType: .triangles, inwardNormals: false, allocator: nil)
-
-        let descriptor = MDLVertexDescriptor()
-        let attribute = MDLVertexAttribute()
-        attribute.name = "position"
-        attribute.format = .float3
-        descriptor.addOrReplaceAttribute(attribute)
-        let layout = MDLVertexBufferLayout(stride: MemoryLayout<float3>.stride)
-        descriptor.layouts = [layout]
-        plane.vertexDescriptor = descriptor
-
-        let submesh = plane.submeshes?.firstObject! as! MDLSubmesh
-        let verticesPointer = plane.vertexAttributeData(forAttributeNamed: "position")!.map.bytes.bindMemory(to: float3.self, capacity: plane.vertexCount)
-
-        let indicesPointer = submesh.indexBuffer.map().bytes.bindMemory(to: UInt16.self, capacity: submesh.indexCount)
-
-        let vertices = Array(UnsafeBufferPointer(start: verticesPointer, count: plane.vertexCount))
-        let indices = Array(UnsafeBufferPointer(start: indicesPointer, count: submesh.indexCount))
+        let vertices = [float3(0, -0.5, 0), float3(1, -0.5, 0),
+                        float3(1, 0.5, 0), float3(0, 0.5, 0)]
+        let indices: [UInt16] = [0,1,2, 0,2,3,
+                                 2,1,0, 3,2,0]
 
         let rotatedVertices: [float3]
         rotatedVertices = vertices.map { vertex in
-            start + orientation.act(vertex)
+            start + orientation.act(scale * vertex)
         }
 
         return leafGeometry.addSegment(rotatedVertices, indices)

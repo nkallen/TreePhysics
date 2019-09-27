@@ -76,7 +76,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     }
 
     func testUpdateCompositeBodies() {
-        let forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
+        let forceAppliedPosition = b2.position + b2.rotation.act(float3(0, 1, 0))
 
         let expect = expectation(description: "wait")
 
@@ -140,7 +140,7 @@ class UpdateJointsTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
-        self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
+        self.forceAppliedPosition = b2.position + b2.rotation.act(float3(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
@@ -209,7 +209,7 @@ class UpdateRigidBodiesTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force, at: 1) // ie at float3(0, 1,  0) in local coordinates
-        self.forceAppliedPosition = b2.translation + b2.rotation.act(float3(0, 1, 0))
+        self.forceAppliedPosition = b2.position + b2.rotation.act(float3(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer

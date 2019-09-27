@@ -2,18 +2,20 @@ import Foundation
 import simd
 import SceneKit
 
+// FIXME audit / rename
+
 public final class Joint {
     unowned let parentRigidBody: ArticulatedRigidBody
     let childRigidBody: ArticulatedRigidBody
 
-    var rotation_local: simd_quatf = simd_quatf.identity
+    var localRotation: simd_quatf = simd_quatf.identity
     var rotation: simd_quatf = simd_quatf.identity
-    var translation: float3 = float3.zero
+    var position: float3 = float3.zero
     var acceleration: float3 = float3.zero
     // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3 = float3x3(0)
     var rotation_world2local: simd_quatf = simd_quatf.identity
-    let translation_local: float3
+    let localPosition: float3
 
     let stiffness: Float
     let torqueThreshold: Float
@@ -21,7 +23,7 @@ public final class Joint {
     init(parent: ArticulatedRigidBody, child: ArticulatedRigidBody, rotation: simd_quatf, position: float3) {
         self.parentRigidBody = parent
         self.childRigidBody = child
-        self.rotation_local = rotation
+        self.localRotation = rotation
         switch child {
         case is Leaf:
             self.stiffness = 0.2
@@ -30,18 +32,13 @@ public final class Joint {
             self.stiffness = Internode.K
             self.torqueThreshold = Float.infinity
         }
-        self.translation_local = position
+        self.localPosition = position
         updateTransform()
     }
 
-    // FIXME pivot/position
-    var position: float3 {
-        return translation
-    }
-
     func updateTransform() {
-        self.rotation = (parentRigidBody.rotation * rotation_local).normalized
-        self.translation = parentRigidBody.translation + parentRigidBody.rotation.act(translation_local)
+        self.rotation = (parentRigidBody.rotation * localRotation).normalized
+        self.position = parentRigidBody.pivot + parentRigidBody.rotation.act(localPosition)
         self.rotation_world2local = rotation.inverse.normalized
     }
 
@@ -58,6 +55,6 @@ public final class Joint {
     }
 
     var isFinite: Bool {
-        return rotation.isFinite && translation.isFinite && acceleration.isFinite
+        return rotation.isFinite && position.isFinite && acceleration.isFinite
     }
 }
