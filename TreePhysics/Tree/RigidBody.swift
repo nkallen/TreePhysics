@@ -51,7 +51,7 @@ public class RigidBody {
         self.inertiaTensor = localInertiaTensor
 
         self.rotation = simd_quatf.identity
-        self.pivot = localPivot
+        self.pivot = centerOfMass + localPivot
 
         self.node = node
     }
@@ -68,6 +68,7 @@ public class RigidBody {
     }
 
     func updateTransform() {
+        self.pivot = centerOfMass + localPivot
         node.simdPosition = self.centerOfMass
         node.simdOrientation = self.rotation
     }
@@ -75,7 +76,7 @@ public class RigidBody {
 
 extension RigidBody {
     var isFinite: Bool {
-        return centerOfMass.isFinite &&
+        return
             pivot.isFinite &&
             rotation.isFinite &&
             inertiaTensor.isFinite &&

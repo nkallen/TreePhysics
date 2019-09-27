@@ -64,7 +64,6 @@ public final class CPUSimulator {
                 composite.mass += childComposite.mass
                 composite.force += childComposite.force
 
-                // this is due to distributivity of cross product
                 composite.torque +=
                     cross(childJoint.position - rigidBody.pivot, childComposite.force) + childComposite.torque
 
@@ -194,13 +193,14 @@ public final class CPUSimulator {
 
         rigidBody.velocity = parentRigidBody.velocity
         rigidBody.velocity += parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.localPosition)
-        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(rigidBody.pivot)
-        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(rigidBody.pivot)
+        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(rigidBody.localPivot)
+        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(rigidBody.localPivot)
     }
 
     private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {
         joint.updateTransform()
 
+        // FIXME move into joint
         joint.acceleration = parentRigidBody.acceleration +
             (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(joint.localPosition)
 
