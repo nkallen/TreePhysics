@@ -72,7 +72,7 @@ public final class CPUSimulator {
             composite.centerOfMass /= composite.mass
 
             composite.inertiaTensor = rigidBody.inertiaTensor -
-                rigidBody.mass * sqr((rigidBody.centerOfMass - composite.centerOfMass).crossMatrix)
+                rigidBody.mass * sqr((rigidBody.centerOfMass - composite.centerOfMass).skew)
 
             for childJoint in rigidBody.childJoints {
                 let childRigidBody = childJoint.childRigidBody
@@ -80,7 +80,7 @@ public final class CPUSimulator {
 
                 // using the parallel axis theorem I' = I + md^2, but with tensors:
                 composite.inertiaTensor += childComposite.inertiaTensor -
-                    childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).crossMatrix)
+                    childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).skew)
             }
         }
     }
@@ -102,7 +102,7 @@ public final class CPUSimulator {
                 let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
 
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
-                    rigidBody.composite.mass * sqr(pr.crossMatrix)
+                    rigidBody.composite.mass * sqr(pr.skew)
 
                 let torque_jointSpace = parentJoint.rotate(vector: rigidBody.composite.torque)
 
@@ -112,11 +112,11 @@ public final class CPUSimulator {
                 let childAngularVelocity_jointSpace = parentJoint.rotate(vector: rigidBody.angularVelocity)
 
                 let torqueFictitious_jointSpace_i: float3 = configuration.torqueFictitiousMultiplier_i *
-                    -rigidBody.composite.mass * pr.crossMatrix * parentJoint.rotate(vector: parentJoint.acceleration)
+                    -rigidBody.composite.mass * pr.skew * parentJoint.rotate(vector: parentJoint.acceleration)
                 let torqueFictitious_jointSpace_ii: float3 = configuration.torqueFictitiousMultiplier_ii *
-                    -inertiaTensor_jointSpace * (parentAngularAcceleration_jointSpace + parentAngularVelocity_jointSpace.crossMatrix * childAngularVelocity_jointSpace)
+                    -inertiaTensor_jointSpace * (parentAngularAcceleration_jointSpace + parentAngularVelocity_jointSpace.skew * childAngularVelocity_jointSpace)
                 let torqueFictitious_jointSpace_iii: float3 = configuration.torqueFictitiousMultiplier_ii *
-                    -childAngularVelocity_jointSpace.crossMatrix * inertiaTensor_jointSpace * childAngularVelocity_jointSpace
+                    -childAngularVelocity_jointSpace.skew * inertiaTensor_jointSpace * childAngularVelocity_jointSpace
 
                 let torqueFictitious_jointSpace = torqueFictitious_jointSpace_i + torqueFictitious_jointSpace_ii + torqueFictitious_jointSpace_iii
 
@@ -189,12 +189,12 @@ public final class CPUSimulator {
         rigidBody.updateTransform()
 
         rigidBody.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation.act(parentJoint.θ[1])
-        rigidBody.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.crossMatrix * rigidBody.angularVelocity
+        rigidBody.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.skew * rigidBody.angularVelocity
 
         rigidBody.velocity = parentRigidBody.velocity
-        rigidBody.velocity += parentRigidBody.angularVelocity.crossMatrix * parentRigidBody.rotation.act(parentJoint.localPosition)
-        rigidBody.velocity -= rigidBody.angularVelocity.crossMatrix * rigidBody.rotation.act(rigidBody.localPivot)
-        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.crossMatrix + sqr(rigidBody.angularVelocity.crossMatrix)) * rigidBody.rotation.act(rigidBody.localPivot)
+        rigidBody.velocity += parentRigidBody.angularVelocity.skew * parentRigidBody.rotation.act(parentJoint.localPosition)
+        rigidBody.velocity -= rigidBody.angularVelocity.skew * rigidBody.rotation.act(rigidBody.localPivot)
+        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.skew + sqr(rigidBody.angularVelocity.skew)) * rigidBody.rotation.act(rigidBody.localPivot)
     }
 
     private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {

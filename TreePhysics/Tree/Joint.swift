@@ -49,7 +49,7 @@ public final class Joint {
         self.inverseRotation = rotation.inverse.normalized
 
         self.acceleration = parentRigidBody.acceleration +
-            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(localPosition)
+            (parentRigidBody.angularAcceleration.skew + sqr(parentRigidBody.angularVelocity.skew)) * parentRigidBody.rotation.act(localPosition)
     }
 
     func rotate(tensor: float3x3) -> float3x3 {

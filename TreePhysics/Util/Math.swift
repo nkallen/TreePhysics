@@ -134,8 +134,7 @@ extension float3 {
         return float2(x, z)
     }
 
-    // FIXME rename skew
-    var crossMatrix: float3x3 {
+    var skew: float3x3 {
         return float3x3(columns:
             (float3(0, self.z, -self.y),
              float3(-self.z, 0, self.x),

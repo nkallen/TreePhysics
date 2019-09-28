@@ -37,7 +37,7 @@ class ModelTests: XCTestCase {
         // 2. A 3D setup, with everything in one 2D plane.
         let pr = parentJoint.rotate(vector: rigidBody.centerOfMass - parentJoint.position)
         let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.inertiaTensor) -
-            rigidBody.mass * sqr(pr.crossMatrix)
+            rigidBody.mass * sqr(pr.skew)
 
         let L = inertiaTensor_jointSpace.cholesky
         let L_inverse = L.inverse, L_transpose_inverse = L_inverse.transpose
