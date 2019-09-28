@@ -22,7 +22,6 @@ public final class WindField: PhysicsField {
         switch rigidBody {
         case let internode as Internode:
             return force(internode: internode, time: time)
-        // FIXME this subclass relation is lame; add some sort of mask of kind
         case let leaf as Leaf:
             return force(leaf: leaf, time: time)
         default:
