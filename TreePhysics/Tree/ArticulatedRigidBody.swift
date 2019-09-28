@@ -4,7 +4,7 @@ import SceneKit
 
 public class ArticulatedRigidBody: RigidBody {
     weak var parentJoint: Joint? = nil
-    public var childJoints: [Joint] = []  // FIXME make set
+    public var childJoints: Set<Joint> = []
     let composite = CompositeBody()
 
     let localPivot: float3
@@ -31,7 +31,7 @@ public class ArticulatedRigidBody: RigidBody {
 
     func add(_ child: ArticulatedRigidBody, rotation: simd_quatf, position: float3) -> Joint {
         let joint = Joint(parent: self, child: child, localRotation: rotation, localPosition: position)
-        childJoints.append(joint)
+        childJoints.insert(joint)
         child.parentJoint = joint
         joint.updateTransform()
         child.updateTransform()
@@ -71,9 +71,7 @@ public class ArticulatedRigidBody: RigidBody {
         let parentRigidBody = parentJoint.parentRigidBody
 
         self.parentJoint = nil
-        parentRigidBody.childJoints.removeAll { (joint: Joint) -> Bool in
-            return joint === parentJoint
-        }
+        parentRigidBody.childJoints.remove(parentJoint)
     }
 
     var isRoot: Bool {
