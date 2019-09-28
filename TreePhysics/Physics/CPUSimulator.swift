@@ -200,10 +200,6 @@ public final class CPUSimulator {
     private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {
         joint.updateTransform()
 
-        // FIXME move into joint
-        joint.acceleration = parentRigidBody.acceleration +
-            (parentRigidBody.angularAcceleration.crossMatrix + sqr(parentRigidBody.angularVelocity.crossMatrix)) * parentRigidBody.rotation.act(joint.localPosition)
-
         assert(joint.isFinite)
     }
 
