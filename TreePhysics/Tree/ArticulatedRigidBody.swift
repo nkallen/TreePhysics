@@ -30,9 +30,10 @@ public class ArticulatedRigidBody: RigidBody {
     }
 
     func add(_ child: ArticulatedRigidBody, rotation: simd_quatf, position: float3) -> Joint {
-        let joint = Joint(parent: self, child: child, rotation: rotation, position: position)
+        let joint = Joint(parent: self, child: child, localRotation: rotation, localPosition: position)
         childJoints.append(joint)
         child.parentJoint = joint
+        joint.updateTransform()
         child.updateTransform()
         return joint
     }

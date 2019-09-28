@@ -22,7 +22,7 @@ public class RigidBody {
 
     // State attributes that vary as a function of the simulation
     public var centerOfMass: float3
-    public var rotation: simd_quatf = simd_quatf.identity
+    public var rotation: simd_quatf
     var velocity: float3
     var acceleration: float3
     var inertiaTensor: float3x3
@@ -40,6 +40,7 @@ public class RigidBody {
         self.localInertiaTensor = localInertiaTensor
 
         self.centerOfMass = float3.zero
+        self.rotation = simd_quatf.identity
         self.velocity = float3.zero
         self.acceleration = float3.zero
         self.angularVelocity = float3.zero
