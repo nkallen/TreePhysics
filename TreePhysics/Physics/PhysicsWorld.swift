@@ -7,7 +7,7 @@ public class PhysicsWorld {
     private(set) var rigidBodiesLevelOrder: [ArticulatedRigidBody] = []
     private(set) var fields: Set<PhysicsField> = []
     var rigidBodiesUnordered: [ArticulatedRigidBody] { return rigidBodiesLevelOrder }
-    var rigidBodiesLevelOrderReversed: [ArticulatedRigidBody] { return rigidBodiesLevelOrder.reversed() } // FIXME
+    var rigidBodiesLevelOrderReversed: [ArticulatedRigidBody] { return rigidBodiesLevelOrder.reversed() }
 
     public func add(rigidBody: RigidBody) {
         rigidBodies.insert(rigidBody)
