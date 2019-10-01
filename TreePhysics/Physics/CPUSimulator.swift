@@ -146,7 +146,7 @@ public final class CPUSimulator {
                 let torque_diagonal = U_transpose * torqueTotal_jointSpace
                 let θ_diagonal_0 = U_inverse * parentJoint.θ[0]
                 let θ_ddt_diagonal_0 = U_inverse * parentJoint.θ[1]
-                let βΛ = Internode.β * Λ
+                let βΛ = parentJoint.damping * Λ
 
                 // 2.a. thanks to diagonalization, we now have three independent 2nd-order
                 // differential equations, θ'' + bθ' + kθ = f

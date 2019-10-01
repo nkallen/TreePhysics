@@ -477,9 +477,9 @@
 				9EEC11DF22EA23000078BBFD /* MathTests.swift */,
 				9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */,
 				9E27B86022FA39920030664E /* RigidBodyTests.swift */,
-				9EE801A122FC44AC00198166 /* TestHelper.swift */,
 				9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */,
 				9EC88E24231989930049737D /* ModelTests.swift */,
+				9EE801A122FC44AC00198166 /* TestHelper.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -600,7 +600,6 @@
 					};
 					9EE7EBB822DE1AD100535997 = {
 						CreatedOnToolsVersion = 10.2.1;
-						TestTargetID = 9EE7EB9D22DDDC6C00535997;
 					};
 				};
 			};
@@ -1103,7 +1102,6 @@
 		9EE7EBC122DE1AD100535997 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G3GUW83N5R;
@@ -1117,14 +1115,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreePhysics_macOS.app/Contents/MacOS/TreePhysics_macOS";
 			};
 			name = Debug;
 		};
 		9EE7EBC222DE1AD100535997 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G3GUW83N5R;
@@ -1138,7 +1134,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreePhysics_macOS.app/Contents/MacOS/TreePhysics_macOS";
 			};
 			name = Release;
 		};

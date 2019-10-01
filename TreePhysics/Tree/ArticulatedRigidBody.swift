@@ -50,10 +50,10 @@ public class ArticulatedRigidBody: RigidBody {
     override func updateTransform() {
         if let parentJoint = parentJoint {
             let sora = parentJoint.θ[0]
-            let rotation_local = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
+            let localRotation = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
 
-            // FIXME rename all _local
-            self.rotation = (parentJoint.rotation * rotation_local).normalized
+            self.rotation = (parentJoint.rotation * localRotation).normalized
+            print(parentJoint.rotation, localRotation)
             self.pivot = parentJoint.position
             
             self.inertiaTensor = float3x3(rotation) * localInertiaTensor * float3x3(rotation).transpose

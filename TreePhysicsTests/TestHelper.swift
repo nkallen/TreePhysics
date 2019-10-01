@@ -105,7 +105,7 @@ func XCTAssertEqual(_ a: Internode, _ b: RigidBodyStruct, accuracy: Float, _ mes
     XCTAssertEqual(a.centerOfMass, b.centerOfMass, accuracy: accuracy, "center of mass", file: file, line: line)
     XCTAssertEqual(a.inertiaTensor, b.inertiaTensor, accuracy: accuracy, "inertia tensor", file: file, line: line)
 
-    XCTAssertEqual(a.position, b.position, accuracy: accuracy, "position", file: file, line: line)
+    XCTAssertEqual(a.pivot, b.position, accuracy: accuracy, "pivot", file: file, line: line)
     XCTAssertEqual(float3x3(a.rotation), b.rotation, accuracy: accuracy, "rotation", file: file, line: line)
 }
 
@@ -130,20 +130,21 @@ class SharedBuffersMTLDevice: MTLDeviceProxy {
     }
 }
 
-// FIXME check all these guys for necessity
-
-extension Internode {
+extension ArticulatedRigidBody {
     func add(_ child: Internode) -> Joint {
-        return add(child, rotation: simd_quatf(angle: -.pi/4, axis: float3(0,0,1)), position: float3(0,length/2,0))
-    }
-
-    // FIXME is this necessary?
-    // NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
-    // distance is in normalize [0..1] coordinates
-    func apply(force: float3, at distance: Float) {
-        guard distance >= 0 && distance <= 1 else { fatalError("Force must be applied between 0 and 1") }
-
-        let torque = cross(rotation.act(float3(0, distance * length, 0)), force)
-        apply(force: force, torque: torque)
+        switch self {
+        case is Internode:
+            let joint = add(child, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: float3(0,1,0))
+            joint.stiffness = 1
+            joint.torqueThreshold = .infinity
+            joint.damping = 1
+            return joint
+        default:
+            let joint = add(child, rotation: .identity, position: .zero)
+            joint.stiffness = 1
+            joint.torqueThreshold = .infinity
+            joint.damping = 1
+            return joint
+        }
     }
 }

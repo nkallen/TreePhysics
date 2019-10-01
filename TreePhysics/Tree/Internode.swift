@@ -2,7 +2,7 @@ import Foundation
 import SceneKit
 
 /**
- An `Internode` is a branch in a tree, or a segment of a branch if the branch is divided into multiple pieces. Its shape is a cylinder where (0,0,0) is the end of the cylinder where it connects to its parent `Joint`. An `Internode` always branches off from its parent joint at a rotation of (0,0,0); the rotation of the `Joint` encodes the resting state branch angle.
+ An `Internode` is a branch in a tree, or a segment of a branch if the branch is divided into multiple pieces. Its shape is a cylinder where its pivot is the end of the cylinder where it connects to its parent `Joint`. An `Internode` always branches off from its parent joint at a rotation of (0,0,0); the rotation of the `Joint` encodes the resting state branch angle.
  */
 
 extension Internode {

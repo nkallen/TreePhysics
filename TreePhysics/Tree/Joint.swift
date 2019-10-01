@@ -16,8 +16,9 @@ public final class Joint {
     // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3
 
-    let stiffness: Float
-    let torqueThreshold: Float
+    var stiffness: Float
+    var torqueThreshold: Float
+    var damping: Float
 
     init(parent: ArticulatedRigidBody, child: ArticulatedRigidBody, localRotation: simd_quatf, localPosition: float3) {
         self.parentRigidBody = parent
@@ -37,9 +38,11 @@ public final class Joint {
         case is Leaf:
             self.stiffness = 0.1
             self.torqueThreshold = 0.30
+            self.damping = Internode.β
         default:
             self.stiffness = Internode.K
             self.torqueThreshold = Float.infinity
+            self.damping = Internode.β
         }
     }
 
