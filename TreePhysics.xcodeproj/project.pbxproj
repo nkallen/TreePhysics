@@ -39,6 +39,8 @@
 		9E34C494232912F3008C7353 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
 		9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39374A233B803100AE1897 /* PhysicsWorld.swift */; };
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
+		9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */; };
+		9E4946C42344A10E0036B7EC /* LocalitySensitiveHashTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */; };
 		9E4C09FD230ED50F00F1DD6B /* hanan.dis1992.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */; };
 		9E4C09FF230F11D900F1DD6B /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FE230F11D900F1DD6B /* TODO */; };
 		9E51B02422FF23660081CA4C /* UpdateRigidBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */; };
@@ -167,6 +169,8 @@
 		9E461B3222E5E025008AB788 /* Pen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pen.swift; sourceTree = "<group>"; };
 		9E461B3422E7017F008AB788 /* CylinderPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderPen.swift; sourceTree = "<group>"; };
 		9E461B3622E704BD008AB788 /* CylinderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderTest.swift; sourceTree = "<group>"; };
+		9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHash.swift; sourceTree = "<group>"; };
+		9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHashTests.swift; sourceTree = "<group>"; };
 		9E4C09F9230ED46D00F1DD6B /* 606_delivering_optimized_metal_apps_and_games.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = 606_delivering_optimized_metal_apps_and_games.pdf; sourceTree = "<group>"; };
 		9E4C09FB230ED4B300F1DD6B /* stanford2017-01.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "stanford2017-01.pdf"; sourceTree = "<group>"; };
 		9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = hanan.dis1992.pdf; sourceTree = "<group>"; };
@@ -480,6 +484,7 @@
 				9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */,
 				9EC88E24231989930049737D /* ModelTests.swift */,
 				9EE801A122FC44AC00198166 /* TestHelper.swift */,
+				9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -493,6 +498,7 @@
 				9EA619CB230AE78400BE2213 /* PrettyPrint.swift */,
 				9E57566823184C9C0036F68B /* Visualization.swift */,
 				9E1490CA2334E49500FED681 /* Noise.swift */,
+				9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -710,6 +716,7 @@
 				9EAE8631232A67270037EA92 /* Math.metal in Sources */,
 				9EAE8632232A672A0037EA92 /* Print.metal in Sources */,
 				9E34C48823291201008C7353 /* Turtle.swift in Sources */,
+				9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */,
 				9E34C48923291204008C7353 /* Pen.swift in Sources */,
 				9EAA8C0D23292401002E9260 /* ResetForces.swift in Sources */,
 				9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */,
@@ -785,6 +792,7 @@
 			files = (
 				9E3351C122F83DDF00FDC3D6 /* MetalTests.swift in Sources */,
 				9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */,
+				9E4946C42344A10E0036B7EC /* LocalitySensitiveHashTests.swift in Sources */,
 				9EE7EBBC22DE1AD100535997 /* CPUSimulatorTests.swift in Sources */,
 				9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */,
 				9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */,
