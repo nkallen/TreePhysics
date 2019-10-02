@@ -22,7 +22,7 @@ class LocalitySensitiveHashTests: XCTestCase {
     func testElementsNear() {
         let position = float3(5,5,5)
         let nearby = h.elements(near: position)
-        XCTAssertEqual(3 * 3 * 3 * 2, nearby.count)
+        XCTAssertEqual(3 * 3 * 3 * 2, nearby.count) // all adjacent cells have 2 items
         let maxDistance = distance(float3.zero, float3(3,3,3))
         for o in nearby {
             XCTAssertLessThanOrEqual(distance(o.position, position), maxDistance)
@@ -42,7 +42,7 @@ class LocalitySensitiveHashTests: XCTestCase {
     func testElementsNearWithAllEmptyCells() {
         let position = float3(100,100,100)
         let nearby = h.elements(near: position)
-        XCTAssertEqual(0, nearby.count) // there are only elements in non-negative cells
+        XCTAssertEqual(0, nearby.count)
     }
 }
 

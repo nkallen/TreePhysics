@@ -357,7 +357,7 @@
 			path = References;
 			sourceTree = "<group>";
 		};
-		9E56C94322E78FA90095C8AC /* Tree */ = {
+		9E56C94322E78FA90095C8AC /* ArticulatedRigidBodies */ = {
 			isa = PBXGroup;
 			children = (
 				9E56C94422E78FCF0095C8AC /* Joint.swift */,
@@ -367,7 +367,7 @@
 				9EAE863D232A69F40037EA92 /* Leaf.swift */,
 				9EF3361E233C1AEF005F0C29 /* ArticulatedRigidBody.swift */,
 			);
-			path = Tree;
+			path = ArticulatedRigidBodies;
 			sourceTree = "<group>";
 		};
 		9E9D4B6422F313BD007DCF49 /* Physics */ = {
@@ -460,7 +460,7 @@
 				9E9D4B6922F36FFC007DCF49 /* Application */,
 				9E9D4B6422F313BD007DCF49 /* Physics */,
 				9EEC11E322F0E3D20078BBFD /* Util */,
-				9E56C94322E78FA90095C8AC /* Tree */,
+				9E56C94322E78FA90095C8AC /* ArticulatedRigidBodies */,
 				9E036B1D22E4F57900229235 /* L-Systems */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
