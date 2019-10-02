@@ -42,7 +42,6 @@ class LocalitySensitiveHash<T> where T: HasPosition {
 
     private func key(for position: float3, offset: int3 = int3.zero) -> int3 {
         let cell = int3(position / gridSize)
-        print(cell &+ offset)
         return cell &+ offset
     }
 }
