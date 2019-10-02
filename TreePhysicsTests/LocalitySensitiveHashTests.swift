@@ -7,6 +7,7 @@ class LocalitySensitiveHashTests: XCTestCase {
     var h: LocalitySensitiveHash<float3>!
 
     override func setUp() {
+        super.setUp()
         self.h = LocalitySensitiveHash<float3>(gridSize: 1)
         for i in 0...10 {
             for j in 0...10 {

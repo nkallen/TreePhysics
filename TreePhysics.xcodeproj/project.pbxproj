@@ -41,6 +41,9 @@
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
 		9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */; };
 		9E4946C42344A10E0036B7EC /* LocalitySensitiveHashTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */; };
+		9E4946C72344AB080036B7EC /* AutoTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C62344AB080036B7EC /* AutoTree.swift */; };
+		9E4946C92344AB230036B7EC /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C82344AB230036B7EC /* Node.swift */; };
+		9E4946CB2344B7240036B7EC /* AutoTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946CA2344B7240036B7EC /* AutoTreeTests.swift */; };
 		9E4C09FD230ED50F00F1DD6B /* hanan.dis1992.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */; };
 		9E4C09FF230F11D900F1DD6B /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FE230F11D900F1DD6B /* TODO */; };
 		9E51B02422FF23660081CA4C /* UpdateRigidBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */; };
@@ -171,6 +174,9 @@
 		9E461B3622E704BD008AB788 /* CylinderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderTest.swift; sourceTree = "<group>"; };
 		9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHash.swift; sourceTree = "<group>"; };
 		9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHashTests.swift; sourceTree = "<group>"; };
+		9E4946C62344AB080036B7EC /* AutoTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoTree.swift; sourceTree = "<group>"; };
+		9E4946C82344AB230036B7EC /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		9E4946CA2344B7240036B7EC /* AutoTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoTreeTests.swift; sourceTree = "<group>"; };
 		9E4C09F9230ED46D00F1DD6B /* 606_delivering_optimized_metal_apps_and_games.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = 606_delivering_optimized_metal_apps_and_games.pdf; sourceTree = "<group>"; };
 		9E4C09FB230ED4B300F1DD6B /* stanford2017-01.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "stanford2017-01.pdf"; sourceTree = "<group>"; };
 		9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = hanan.dis1992.pdf; sourceTree = "<group>"; };
@@ -339,6 +345,15 @@
 			path = TreePhysics;
 			sourceTree = "<group>";
 		};
+		9E4946C52344A9B60036B7EC /* AutoTree */ = {
+			isa = PBXGroup;
+			children = (
+				9E4946C62344AB080036B7EC /* AutoTree.swift */,
+				9E4946C82344AB230036B7EC /* Node.swift */,
+			);
+			path = AutoTree;
+			sourceTree = "<group>";
+		};
 		9E4C09F8230ED45700F1DD6B /* References */ = {
 			isa = PBXGroup;
 			children = (
@@ -462,6 +477,7 @@
 				9E9D4B6422F313BD007DCF49 /* Physics */,
 				9EEC11E322F0E3D20078BBFD /* Util */,
 				9E036B1D22E4F57900229235 /* L-Systems */,
+				9E4946C52344A9B60036B7EC /* AutoTree */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
 				9EE7EBA722DDDC6E00535997 /* Assets.xcassets */,
@@ -485,6 +501,7 @@
 				9EC88E24231989930049737D /* ModelTests.swift */,
 				9EE801A122FC44AC00198166 /* TestHelper.swift */,
 				9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */,
+				9E4946CA2344B7240036B7EC /* AutoTreeTests.swift */,
 			);
 			path = TreePhysicsTests;
 			sourceTree = "<group>";
@@ -715,7 +732,9 @@
 				9EAE863E232A69F40037EA92 /* Leaf.swift in Sources */,
 				9EAE8631232A67270037EA92 /* Math.metal in Sources */,
 				9EAE8632232A672A0037EA92 /* Print.metal in Sources */,
+				9E4946C92344AB230036B7EC /* Node.swift in Sources */,
 				9E34C48823291201008C7353 /* Turtle.swift in Sources */,
+				9E4946C72344AB080036B7EC /* AutoTree.swift in Sources */,
 				9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */,
 				9E34C48923291204008C7353 /* Pen.swift in Sources */,
 				9EAA8C0D23292401002E9260 /* ResetForces.swift in Sources */,
@@ -794,6 +813,7 @@
 				9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */,
 				9E4946C42344A10E0036B7EC /* LocalitySensitiveHashTests.swift in Sources */,
 				9EE7EBBC22DE1AD100535997 /* CPUSimulatorTests.swift in Sources */,
+				9E4946CB2344B7240036B7EC /* AutoTreeTests.swift in Sources */,
 				9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */,
 				9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */,
 				9EEC11E022EA23000078BBFD /* MathTests.swift in Sources */,
