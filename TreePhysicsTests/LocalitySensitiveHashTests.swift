@@ -33,7 +33,7 @@ class LocalitySensitiveHashTests: XCTestCase {
         let position = float3(0,0,0)
         let nearby = h.elements(near: position)
         XCTAssertEqual(2 * 2 * 2 * 2, nearby.count) // there are only elements in non-negative cells
-        let maxDistance = distance(float3.zero, float3(3,3,3))
+        let maxDistance = distance(.zero, float3(3,3,3))
         for o in nearby {
             XCTAssertLessThanOrEqual(distance(o.position, position), maxDistance)
         }

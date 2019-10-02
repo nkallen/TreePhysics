@@ -373,6 +373,7 @@
 		9E9D4B6422F313BD007DCF49 /* Physics */ = {
 			isa = PBXGroup;
 			children = (
+				9E56C94322E78FA90095C8AC /* ArticulatedRigidBodies */,
 				9EAE8640233271690037EA92 /* Fields */,
 				9E0674EB230AD8440044C3C4 /* Encoders */,
 				9E0674DC230ACFC90044C3C4 /* Kernels */,
@@ -460,7 +461,6 @@
 				9E9D4B6922F36FFC007DCF49 /* Application */,
 				9E9D4B6422F313BD007DCF49 /* Physics */,
 				9EEC11E322F0E3D20078BBFD /* Util */,
-				9E56C94322E78FA90095C8AC /* ArticulatedRigidBodies */,
 				9E036B1D22E4F57900229235 /* L-Systems */,
 				9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */,
 				9EE7EBA522DDDC6C00535997 /* art.scnassets */,
