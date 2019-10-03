@@ -5,7 +5,7 @@ import simd
 // https://www.sidefx.com/docs/houdini/nodes/sop/lsystem.html
 // Actual drawing happens by means of a `Pen`
 
-enum Command {
+enum TurtleCommand {
     case forward(distance: Float?, width: Float?)
     case tropism(force: float3?)
     case turnLeft(radians: Float?)
@@ -71,8 +71,8 @@ public class Interpreter<P> where P: Pen {
     let configuration: InterpreterConfig
     var stack: [State] = []
 
-    static func parse(_ s: String) -> [Command] {
-        var result: [Command] = []
+    static func parse(_ s: String) -> [TurtleCommand] {
+        var result: [TurtleCommand] = []
         for char in s {
             switch char {
             case "F":
@@ -112,7 +112,7 @@ public class Interpreter<P> where P: Pen {
         interpret(Interpreter.parse(string))
     }
 
-    func interpret(_ commands: [Command]) {
+    func interpret(_ commands: [TurtleCommand]) {
         var state = self.stack.removeLast()
         state.pen.start(at: state.position, thickness: state.thickness)
 

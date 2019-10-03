@@ -23,4 +23,8 @@ class AutoTreeTests: XCTestCase {
         XCTAssertNil(node.lateralBud!.grow(towards: [float3(0,2,0)]).lateralBud)
         XCTAssertNotNil(node.terminalBud!.grow(towards: [float3(0,2,0)]).lateralBud)
     }
+
+    func testFoo() {
+        // when a bud grows, it inserts a node into its parent, replacing itself
+    }
 }

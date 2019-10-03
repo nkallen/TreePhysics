@@ -6,12 +6,12 @@ protocol HasPosition {
 }
 
 class LocalitySensitiveHash<T> where T: HasPosition {
-    let gridSize: Float
+    let cellSize: Float
 
     private var storage: [int3:NSMutableSet] = [:]
 
-    init(gridSize: Float) {
-        self.gridSize = gridSize
+    init(cellSize: Float) {
+        self.cellSize = cellSize
     }
 
     func add(_ t: T) {
@@ -20,6 +20,12 @@ class LocalitySensitiveHash<T> where T: HasPosition {
         } else {
             let set = NSMutableSet(array: [t])
             storage[key(for: t.position)] = set
+        }
+    }
+
+    func remove(_ t: T) {
+        if let set = storage[key(for: t.position)] {
+            set.remove(t)
         }
     }
 
@@ -41,7 +47,7 @@ class LocalitySensitiveHash<T> where T: HasPosition {
     }
 
     private func key(for position: float3, offset: int3 = int3.zero) -> int3 {
-        let cell = int3(position / gridSize)
+        let cell = int3(position / cellSize)
         return cell &+ offset
     }
 }
