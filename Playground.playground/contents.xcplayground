@@ -5,5 +5,6 @@
         <page name='Falling Leaves'/>
         <page name='Articulated Leaves'/>
         <page name='Fictitious Forces'/>
+        <page name='Autonomous Generated Trees'/>
     </pages>
 </playground>

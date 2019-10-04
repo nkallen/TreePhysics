@@ -35,21 +35,19 @@ public final class CylinderPen: Pen {
         start = at
     }
 
-    public func cont(distance: Float, tangent: float3, thickness: Float) -> Indices {
-        precondition(length(tangent) > 0)
+    public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> Indices {
         guard let start = start else { fatalError() }
 
         let radius = sqrt(thickness / .pi)
 
         let (vertices, indices) = makeSegment(radius: radius, height: distance)
 
-        let rotation = simd_quatf(from: float3(0,1,0), to: tangent)
         let rotatedVertices: [float3]
         rotatedVertices = vertices.map { vertex in
-            start + rotation.act(vertex)
+            start + orientation.act(vertex)
         }
 
-        self.start = start + distance * tangent
+        self.start = start + distance * orientation.heading
 
         return branchGeometry.addSegment(rotatedVertices, indices)
     }
@@ -57,8 +55,8 @@ public final class CylinderPen: Pen {
     public func copy(scale: Float, orientation: simd_quatf) -> Indices {
         guard let start = start else { fatalError() }
 
-        let vertices = [float3(0, -0.5, 0), float3(1, -0.5, 0),
-                        float3(1, 0.5, 0), float3(0, 0.5, 0)]
+        let vertices = [float3(-0.5, 0, 0), float3(-0.5, 1, 0),
+                        float3(0.5, 1, 0), float3(0.5, 0, 0)]
         let indices: [UInt16] = [0,1,2, 0,2,3,
                                  2,1,0, 3,2,0]
 
@@ -67,10 +65,12 @@ public final class CylinderPen: Pen {
             start + orientation.act(scale * vertex)
         }
 
+        print("\(ObjectIdentifier(self)) copying to \(start) with \(rotatedVertices)")
+
         return leafGeometry.addSegment(rotatedVertices, indices)
     }
 
-    public var branch: CylinderPen {
+    public func branch() -> CylinderPen {
         guard let start = start else { fatalError() }
         let pen = CylinderPen(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
         pen.start(at: start, thickness: 1)

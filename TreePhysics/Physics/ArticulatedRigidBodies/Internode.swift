@@ -16,7 +16,7 @@ public class Internode: ArticulatedRigidBody {
     let area: Float
     let length: Float
     let radius: Float
-    var axis: float3
+    var axis: float3 // FIXME rename heading
 
     public init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi) {
         self.area = .pi * radius * length

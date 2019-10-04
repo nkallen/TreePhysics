@@ -24,7 +24,7 @@ final class FakePen: Pen {
     func copy(scale: Float, orientation: simd_quatf) -> () {
     }
 
-    var branch: FakePen { return _branch! }
+    func branch() -> FakePen { return _branch! }
 }
 
 class TurtleTests: XCTestCase {

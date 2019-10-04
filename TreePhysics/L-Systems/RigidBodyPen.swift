@@ -17,20 +17,16 @@ public final class RigidBodyPen: Pen {
         start = at
     }
 
-    // FIXME replace tangent with orientation
-    public func cont(distance: Float, tangent: float3, thickness: Float) -> ArticulatedRigidBody {
+    public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> ArticulatedRigidBody {
         guard let start = start else { fatalError() }
 
         let newBranch = Internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
-        let parentTangent = parentBranch.rotation.act(float3(0,1,0))
-        let rotation = simd_quatf(from: parentTangent, to: tangent).normalized
-
         let worldPosition = start - parentBranch.pivot
         let localPosition = parentBranch.rotation.inverse.act(worldPosition)
-        _ = parentBranch.add(newBranch, rotation: rotation, position: localPosition)
+        _ = parentBranch.add(newBranch, rotation: parentBranch.rotation.inverse * orientation, position: localPosition)
 
-        self.start = start + distance * tangent
+        self.start = start + distance * orientation.heading
         self.parentBranch = newBranch
 
         return newBranch
@@ -49,7 +45,7 @@ public final class RigidBodyPen: Pen {
         return newLeaf
     }
 
-    public var branch: RigidBodyPen {
+    public func branch() -> RigidBodyPen {
         return RigidBodyPen(parent: parentBranch)
     }
 }

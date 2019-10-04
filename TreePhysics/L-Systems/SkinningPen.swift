@@ -36,9 +36,9 @@ public final class SkinningPen: Pen {
         rigidBodyPen.start(at: at, thickness: thickness)
     }
 
-    public func cont(distance: Float, tangent: float3, thickness: Float) -> T {
-        let vertices = cylinderPen.cont(distance: distance, tangent: tangent, thickness: thickness)
-        let rigidBody = rigidBodyPen.cont(distance: distance, tangent: tangent, thickness: thickness)
+    public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T {
+        let vertices = cylinderPen.cont(distance: distance, orientation: orientation, thickness: thickness)
+        let rigidBody = rigidBodyPen.cont(distance: distance, orientation: orientation, thickness: thickness)
         return branchBones.add(bone: (vertices, rigidBody))
     }
 
@@ -66,8 +66,8 @@ public final class SkinningPen: Pen {
         return parent
     }
 
-    public var branch: SkinningPen {
-        return SkinningPen(cylinderPen: cylinderPen.branch, rigidBodyPen: rigidBodyPen.branch, parent: self)
+    public func branch() -> SkinningPen {
+        return SkinningPen(cylinderPen: cylinderPen.branch(), rigidBodyPen: rigidBodyPen.branch(), parent: self)
     }
 }
 

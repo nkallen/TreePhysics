@@ -20,7 +20,7 @@ enum TurtleCommand {
     case copy(scale: Float?)
 }
 
-fileprivate let initialOrientation: float3x3 = float3x3(columns: (.y, -.x, .z))
+fileprivate let initialOrientation = simd_quatf.identity
 
 public struct InterpreterConfig {
     public init(
@@ -58,14 +58,10 @@ public struct InterpreterConfig {
 public class Interpreter<P> where P: Pen {
     struct State {
         var position: float3
-        var orientation: float3x3 // FIXME make a quat?
+        var orientation: simd_quatf
         var stepSize: Float // meters
         var thickness: Float // meters^2
         let pen: P
-
-        var heading: float3 {
-            return orientation.columns.0
-        }
     }
 
     let configuration: InterpreterConfig
@@ -131,9 +127,9 @@ public class Interpreter<P> where P: Pen {
                     distanceScaled = distance
                     thicknessScaled = thickness
                 }
-                state.position += state.heading * distanceScaled
+                state.position += state.orientation.heading * distanceScaled
                 state.thickness = thicknessScaled
-                _ = state.pen.cont(distance: distanceScaled, tangent: state.heading, thickness: state.thickness)
+                _ = state.pen.cont(distance: distanceScaled, orientation: state.orientation, thickness: state.thickness)
             case .tropism(_): ()
 //                let force = force ?? configuration.force
 //                let angle = configuration.elasticity *
@@ -141,29 +137,33 @@ public class Interpreter<P> where P: Pen {
 //                state.heading = rotate(state.heading, by: angle, axis: state.up)
             case let .turnLeft(radians):
                 let radians = abs(radians ?? configuration.angle)
-                state.orientation *= matrix3x3_rotation_up(radians: radians)
+                state.orientation = simd_quatf(angle: radians, axis: state.orientation.up) * state.orientation
+                state.orientation = state.orientation.normalized
             case let .turnRight(radians):
                 let radians = -abs(radians ?? configuration.angle)
-                state.orientation *= matrix3x3_rotation_up(radians: radians)
+                state.orientation = simd_quatf(angle: radians, axis: state.orientation.up) * state.orientation
+                state.orientation = state.orientation.normalized
             case let .turnRandom(upToRadians):
                 _ = upToRadians ?? configuration.angle
 //                state.heading = rotate(state.heading, by: Float.random(in: -upTo...upTo), axis: state.up)
             case let .rollRight(radians):
                 let radians = -abs(radians ?? configuration.angle)
-                state.orientation *= matrix3x3_rotation_heading(radians: radians)
+                state.orientation = simd_quatf(angle: radians, axis: state.orientation.heading) * state.orientation
+                state.orientation = state.orientation.normalized
             case let .pitchDown(radians):
                 let radians = abs(radians ?? configuration.angle)
-                state.orientation *= matrix3x3_rotation_left(radians: radians)
+                state.orientation = simd_quatf(angle: radians, axis: state.orientation.left) * state.orientation
+                state.orientation = state.orientation.normalized
             case let .multiplyStepSize(stepSizeScale):
                 state.stepSize *= stepSizeScale ?? configuration.stepSizeScale
             case let .multiplyThickness(thicknessScale):
                 state.thickness *= thicknessScale ?? configuration.thicknessScale
             case let .copy(scale):
                 let scale = scale ?? state.stepSize
-                _ = state.pen.copy(scale: scale, orientation: simd_quatf(state.orientation))
+                _ = state.pen.copy(scale: scale, orientation: state.orientation)
             case .push:
                 self.stack.append(state)
-                let pen = state.pen.branch
+                let pen = state.pen.branch()
                 pen.start(at: state.position, thickness: state.thickness)
                 state = State(position: state.position, orientation: state.orientation, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
             case .pop:
@@ -172,33 +172,4 @@ public class Interpreter<P> where P: Pen {
         }
         stack.append(state)
     }
-}
-
-// cf http://algorithmicbotany.org/papers/hanan.dis1992.pdf
-
-fileprivate func matrix3x3_rotation_up(radians: Float) -> float3x3 {
-    let cs = cosf(radians)
-    let sn = sinf(radians)
-    return float3x3(columns:
-        (float3(cs, -sn, 0),
-         float3(sn, cs, 0),
-         float3(0, 0, 1)))
-}
-
-fileprivate func matrix3x3_rotation_left(radians: Float) -> float3x3 {
-    let cs = cosf(radians)
-    let sn = sinf(radians)
-    return float3x3(columns:
-        (float3(cs, 0, sn),
-         float3(0, 1, 0),
-         float3(-sn, 0, cs)))
-}
-
-fileprivate func matrix3x3_rotation_heading(radians: Float) -> float3x3 {
-    let cs = cosf(radians)
-    let sn = sinf(radians)
-    return float3x3(columns:
-        (float3(1, 0, 0),
-         float3(0, cs, sn),
-         float3(0, -sn, cs)))
 }

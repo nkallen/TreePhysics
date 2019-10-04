@@ -9,19 +9,10 @@ class AutoTreeTests: XCTestCase {
     }
 
     func testGrowOrientsInAverageDirection() {
-        let bud = AutoTree.Bud(position: .zero, orientation: .identity, producesLateralBud: true)
-        let node = bud.grow(towards: [float3(1,1,0), float3(1,-1,0)])
-        XCTAssertEqual(bud.position, node.position)
-        XCTAssertEqual(simd_quatf(angle: -.pi/2, axis: .z).normalized, node.orientation)
-    }
-
-    func testGrowProducesBuds() {
-        let bud = AutoTree.Bud(position: .zero, orientation: .identity, producesLateralBud: true)
-        let node = bud.grow(towards: [float3(0,1,0)])
-        XCTAssertNotNil(node.lateralBud)
-        XCTAssertNotNil(node.terminalBud)
-        XCTAssertNil(node.lateralBud!.grow(towards: [float3(0,2,0)]).lateralBud)
-        XCTAssertNotNil(node.terminalBud!.grow(towards: [float3(0,2,0)]).lateralBud)
+        let bud = AutoTree.Bud(parent: nil, position: .zero, orientation: .identity)
+        let (internode, buds) = bud.grow(towards: [float3(1,1,0), float3(1,-1,0)])
+        XCTAssertEqual(internode.position, internode.position)
+        XCTAssertEqual(simd_quatf(angle: -.pi/2, axis: .z).normalized, internode.orientation)
     }
 
     func testFoo() {

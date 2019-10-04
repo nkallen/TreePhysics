@@ -10,35 +10,71 @@ fileprivate let occupationRadius: Float = 1
 fileprivate let perceptionAngle: Float = 1
 fileprivate let perceptionRadius: Float = 1
 
-extension AutoTree.Bud: HasPosition {}
-extension AutoTree.Bud: Hashable {
+extension AutoTree.Node: HasPosition {}
+
+extension AutoTree.Node: Equatable, Hashable {
+    static func == (lhs: AutoTree.Node, rhs: AutoTree.Node) -> Bool {
+        return lhs === rhs
+    }
+
     func hash(into hasher: inout Hasher) {
-        fatalError()
+        hasher.combine(ObjectIdentifier(self))
     }
 }
 
 extension AutoTree {
-    enum Kind {
-        case bud(position: float3, orientation: simd_quatf)
-        case internode(position: float3, orientation: simd_quatf)
+    static func root() -> Node {
+        return Node(position: .zero, orientation: .identity)
     }
 
-    struct Bud {
+    class Node {
+        weak var parent: Node? = nil
+        var children: Set<Node> = []
         let position: float3
         let orientation: simd_quatf
-        let producesLateralBud: Bool
 
-        func grow(towards points: [float3]) -> Node {
+        init(position: float3, orientation: simd_quatf) {
+            self.position = position
+            self.orientation = orientation
+        }
+
+        func removeFromParent() {
+            parent?.children.remove(self)
+            parent = nil
+        }
+
+        func addChild(_ node: Node) {
+            children.insert(node)
+            node.parent = self
+        }
+    }
+
+    class Bud: Node {
+        func grow(towards points: [float3]) -> (Internode, [Bud]) {
+            guard let parent = parent else { fatalError() }
+
             var newDirection = float3.zero
             for point in points {
                 let directionToAttractionPoint = point - self.position
                 newDirection += normalize(directionToAttractionPoint)
             }
-            let rotation = simd_quatf(from: orientation.heading, to: normalize(newDirection))
-            return Node(
-                position: self.position,
-                orientation: (rotation * self.orientation).normalized,
-                hasLateralBud: producesLateralBud)
+
+            let newOrientation = simd_quatf(from: orientation.heading, to: normalize(newDirection))
+            let branchingRotation = simd_quatf(angle: branchingAngle, axis: newOrientation.up)
+            let phyllotacticRotation = simd_quatf(angle: phyllotacticAngle, axis: newOrientation.heading)
+
+            let lateralBud  = Bud(position: position, orientation: branchingRotation * newOrientation)
+            parent.addChild(lateralBud)
+            let internode = Internode(position: position, orientation: newOrientation, length: length, radius: radius)
+            parent.addChild(internode)
+            let terminalBud = Bud(position: position + internode.length, orientation: phyllotacticRotation * newOrientation)
+            internode.addChild(terminalBud)
+
+            let buds = [lateralBud, terminalBud]
+
+            self.removeFromParent()
+
+            return (internode, buds)
         }
 
         func occupies(point: float3) -> Bool {
@@ -53,33 +89,14 @@ extension AutoTree {
         }
     }
 
-    struct Node {
-        let position: float3
-        let orientation: simd_quatf
+    class Internode: Node {
+        let length: Float
+        let radius: Float
 
-        var lateralBud: Bud?
-        var terminalBud: Bud?
-
-        init(position: float3, orientation: simd_quatf, hasLateralBud: Bool) {
-            self.position = position
-            self.orientation = orientation
-
-            let branchingRotation = simd_quatf(angle: branchingAngle, axis: orientation.up)
-            let phyllotacticRotation = simd_quatf(angle: phyllotacticAngle, axis: orientation.heading)
-
-            if hasLateralBud {
-                self.lateralBud = Bud(
-                    position: self.position + phyllotacticRotation.act(orientation.left) * radius,
-                    orientation: (phyllotacticRotation * branchingRotation * orientation).normalized,
-                    producesLateralBud: false)
-            } else {
-                self.lateralBud = nil
-            }
-
-            self.terminalBud = Bud(
-                position: position + orientation.heading * length,
-                orientation: orientation,
-                producesLateralBud: true)
+        init(position: float3, orientation: simd_quatf, length: Float, radius: Float) {
+            self.length = length
+            self.radius = radius
+            super.init(position: position, orientation: orientation)
         }
     }
 
@@ -88,9 +105,10 @@ extension AutoTree {
         let hash = LocalitySensitiveHash<Bud>(cellSize: perceptionRadius)
 
         func update() {
-            var selectedBuds: [Bud:NSMutableSet] = [:]
+            var selectedBuds: [Bud:Set<float3>] = [:]
 
             for point in attractionPoints {
+                print(point)
                 var closestBud: Bud?
                 var closestDistance = Float.infinity
                 let nearbyBuds = hash.elements(near: point)
@@ -100,6 +118,9 @@ extension AutoTree {
                         closestBud = nil
                         break
                     } else if bud.perceives(point: point) {
+                        var attractionPointsForBud = selectedBuds[bud] ?? []
+                        attractionPointsForBud.insert(point)
+                        selectedBuds[bud] = attractionPointsForBud
                         let dist = distance(bud.position, point)
                         if dist < closestDistance {
                             closestBud = bud
@@ -108,17 +129,11 @@ extension AutoTree {
                     }
                 }
                 if let closestBud = closestBud {
-                    let attractionPointsForBud: NSMutableSet
-                    if let ps = selectedBuds[closestBud] {
-                        attractionPointsForBud = ps
-                    } else {
-                        attractionPointsForBud = NSMutableSet()
-                        selectedBuds[closestBud] = attractionPointsForBud
-                    }
-                    let node = closestBud.grow(towards: attractionPointsForBud.allObjects as! [float3])
+                    let attractionPointsForBud = selectedBuds[closestBud]!
+
+                    let (_, buds) = closestBud.grow(towards: Array(attractionPointsForBud))
                     hash.remove(closestBud)
-                    hash.add(node.terminalBud!)
-                    if let lateralBud = node.lateralBud { hash.add(lateralBud) }
+                    for bud in buds { hash.add(bud) }
                 }
             }
         }
