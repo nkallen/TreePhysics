@@ -1,25 +1,35 @@
 import AppKit
 import SceneKit
 import PlaygroundSupport
+import SceneKit.ModelIO
 @testable import TreePhysics
 
 let root = AutoTree.root()
-let bud = AutoTree.Bud(position: .zero, orientation: .identity)
+let bud = AutoTree.TerminalBud(position: .zero, orientation: .identity)
 root.addChild(bud)
 
 let simulator = AutoTree.GrowthSimulator()
 simulator.hash.add(bud) // FIXME
 
-simulator.attractionPoints.insert(float3(0,1.1,0))
+let url = Bundle.main.url(forResource: "ARFaceGeometry", withExtension: "obj", subdirectory: "art.scnassets")!
+let asset = MDLAsset(url: url)
+let mdlMesh = asset.object(at: 0) as! MDLMesh
 
-simulator.update()
+let face = SCNNode(mdlObject: mdlMesh)
+face.simdScale = float3(0.005, 0.005, 0.005)
+face.simdPosition = float3(0,0.5,0)
 
-let pen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1, parent: nil)
+simulator.attractionPoints.formUnion(mdlMesh.vertices.map { $0 * 0.005 + float3(0,0.5,0) })
 
-func draw(node: AutoTree.Node, pen: CylinderPen) {
+
+for i in 0...15 { simulator.update() }
+
+let pen = CylinderPen<UInt16>(radialSegmentCount: 3, heightSegmentCount: 1, parent: nil)
+
+func draw<I>(node: AutoTree.Node, pen: CylinderPen<I>) {
     switch node {
-    case let bud as AutoTree.Bud:
-        pen.copy(scale: 0.1, orientation: bud.orientation)
+    case let bud as AutoTree.Bud: ()
+//        pen.copy(scale: 0.01, orientation: bud.orientation)
     case let internode as AutoTree.Internode:
         pen.cont(distance: internode.length, orientation: internode.orientation, thickness: sqr(internode.radius) * .pi)
     default:
@@ -55,27 +65,19 @@ fileprivate extension Set where Element == AutoTree.Node {
     }
 }
 
-
 draw(node: root, pen: pen)
+
+
+///////////
 
 let view = SCNView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
 let scene = SCNScene()
 
-let cameraNode = SCNNode()
-let camera = SCNCamera()
-cameraNode.camera = camera
-camera.zNear = 0
-camera.zFar = 10
-
-cameraNode.camera = camera
-scene.rootNode.addChildNode(cameraNode)
-cameraNode.position = SCNVector3(x: 0, y: 0.75, z: 4)
-
 scene.rootNode.addChildNode(pen.node)
-scene.rootNode.addChildNode(cameraNode)
+scene.rootNode.addChildNode(face)
 
 view.scene = scene
-view.backgroundColor = .black
+view.backgroundColor = .gray
 view.showsStatistics = true
 view.allowsCameraControl = true
 PlaygroundPage.current.liveView = view

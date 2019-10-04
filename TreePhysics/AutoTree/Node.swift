@@ -3,12 +3,12 @@ import simd
 
 fileprivate let branchingAngle: Float = .pi/4
 fileprivate let phyllotacticAngle: Float = .pi/4
-fileprivate let length: Float = 1
-fileprivate let radius: Float = 1
+fileprivate let length: Float = 0.05
+fileprivate let radius: Float = 0.01
 
-fileprivate let occupationRadius: Float = 1
-fileprivate let perceptionAngle: Float = 1
-fileprivate let perceptionRadius: Float = 1
+fileprivate let occupationRadius: Float = length
+fileprivate let perceptionAngle: Float = .pi/4
+fileprivate let perceptionRadius: Float = 0.2
 
 extension AutoTree.Node: HasPosition {}
 
@@ -50,31 +50,42 @@ extension AutoTree {
     }
 
     class Bud: Node {
-        func grow(towards points: [float3]) -> (Internode, [Bud]) {
-            guard let parent = parent else { fatalError() }
+        func grow(towards points: [float3], produceLateralBud: Bool) -> (Internode, [Bud]) {
+            guard let parent = parent else { fatalError("\(self) has no parent") }
 
             var newDirection = float3.zero
             for point in points {
                 let directionToAttractionPoint = point - self.position
                 newDirection += normalize(directionToAttractionPoint)
             }
+            newDirection = normalize(newDirection)
 
-            let newOrientation = simd_quatf(from: orientation.heading, to: normalize(newDirection))
+            let newOrientation = simd_quatf(from: orientation.heading, to: newDirection)
             let branchingRotation = simd_quatf(angle: branchingAngle, axis: newOrientation.up)
             let phyllotacticRotation = simd_quatf(angle: phyllotacticAngle, axis: newOrientation.heading)
 
-            let lateralBud  = Bud(position: position, orientation: branchingRotation * newOrientation)
-            parent.addChild(lateralBud)
+            var buds: [Bud] = []
+
+            if produceLateralBud {
+                let lateralBud = LateralBud(position: position, orientation: branchingRotation * newOrientation)
+                parent.addChild(lateralBud)
+                buds.append(lateralBud)
+            }
+
             let internode = Internode(position: position, orientation: newOrientation, length: length, radius: radius)
             parent.addChild(internode)
-            let terminalBud = Bud(position: position + internode.length, orientation: phyllotacticRotation * newOrientation)
-            internode.addChild(terminalBud)
 
-            let buds = [lateralBud, terminalBud]
+            let terminalBud = TerminalBud(position: position + internode.length * newOrientation.heading, orientation: phyllotacticRotation * newOrientation)
+            buds.append(terminalBud)
+            internode.addChild(terminalBud)
 
             self.removeFromParent()
 
             return (internode, buds)
+        }
+
+        func grow(towards points: [float3]) -> (AutoTree.Internode, [AutoTree.Bud]) {
+            fatalError("Abstract method")
         }
 
         func occupies(point: float3) -> Bool {
@@ -86,6 +97,18 @@ extension AutoTree {
             let dist = simd_length(direction)
             if dist > perceptionRadius + occupationRadius { return false }
             return simd_quatf(from: orientation.heading, to: direction).angle <= perceptionAngle
+        }
+    }
+
+    final class TerminalBud: Bud {
+        override func grow(towards points: [float3]) -> (AutoTree.Internode, [AutoTree.Bud]) {
+            return grow(towards: points, produceLateralBud: parent is Internode)
+        }
+    }
+
+    final class LateralBud: Bud {
+        override func grow(towards points: [float3]) -> (AutoTree.Internode, [AutoTree.Bud]) {
+            return grow(towards: points, produceLateralBud: false)
         }
     }
 
@@ -108,33 +131,33 @@ extension AutoTree {
             var selectedBuds: [Bud:Set<float3>] = [:]
 
             for point in attractionPoints {
-                print(point)
                 var closestBud: Bud?
                 var closestDistance = Float.infinity
                 let nearbyBuds = hash.elements(near: point)
                 for bud in nearbyBuds {
                     if bud.occupies(point: point) {
                         attractionPoints.remove(point)
+                        print("removing attraction point \(point); now \(attractionPoints.count)")
                         closestBud = nil
                         break
                     } else if bud.perceives(point: point) {
-                        var attractionPointsForBud = selectedBuds[bud] ?? []
-                        attractionPointsForBud.insert(point)
-                        selectedBuds[bud] = attractionPointsForBud
                         let dist = distance(bud.position, point)
                         if dist < closestDistance {
                             closestBud = bud
                             closestDistance = dist
                         }
-                    }
+                    } else {}
                 }
                 if let closestBud = closestBud {
-                    let attractionPointsForBud = selectedBuds[closestBud]!
-
-                    let (_, buds) = closestBud.grow(towards: Array(attractionPointsForBud))
-                    hash.remove(closestBud)
-                    for bud in buds { hash.add(bud) }
+                    var attractionPointsForBud = selectedBuds[closestBud] ?? []
+                    attractionPointsForBud.insert(point)
+                    selectedBuds[closestBud] = attractionPointsForBud
                 }
+            }
+            for (bud, points) in selectedBuds {
+                let (_, buds) = bud.grow(towards: Array(points))
+                hash.remove(bud)
+                for bud in buds { hash.add(bud) }
             }
         }
     }

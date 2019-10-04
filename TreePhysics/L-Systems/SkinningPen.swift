@@ -3,21 +3,17 @@ import SceneKit
 
 // A composite pen that "draws" cylinders and rigid bodies simultaneously.
 
-public typealias Indices = [UInt16]
+public final class SkinningPen<I>: Pen where I: FixedWidthInteger {
+    public typealias T = ([I], RigidBody)
 
-// FIXME remove all these publics
+    let branchBones: BoneBuilder<I>
+    let leafBones: BoneBuilder<I>
 
-public final class SkinningPen: Pen {
-    public typealias T = (Indices, RigidBody)
-
-    let branchBones: BoneBuilder
-    let leafBones: BoneBuilder
-
-    let cylinderPen: CylinderPen
+    let cylinderPen: CylinderPen<I>
     let rigidBodyPen: RigidBodyPen
     weak var parent: SkinningPen?
 
-    public init(cylinderPen: CylinderPen, rigidBodyPen: RigidBodyPen, parent: SkinningPen? = nil) {
+    public init(cylinderPen: CylinderPen<I>, rigidBodyPen: RigidBodyPen, parent: SkinningPen? = nil) {
         self.cylinderPen = cylinderPen
         self.rigidBodyPen = rigidBodyPen
         self.parent = parent
@@ -71,8 +67,8 @@ public final class SkinningPen: Pen {
     }
 }
 
-final class BoneBuilder {
-    typealias T = (Indices, RigidBody)
+final class BoneBuilder<I> where I: FixedWidthInteger {
+    typealias T = ([I], RigidBody)
     private(set) var bones: [T] = []
 
     func add(bone: T) -> T {
@@ -80,14 +76,14 @@ final class BoneBuilder {
         return bone
     }
 
-    func node(for builder: GeometryBuilder) -> SCNNode {
+    func node(for builder: GeometryBuilder<I>) -> SCNNode {
         guard !bones.isEmpty else { return SCNNode() }
 
         var boneNodes: [SCNNode] = []
         var boneInverseBindTransforms: [NSValue] = []
         let vectorCount = builder.source.vectorCount
         var boneWeights: [Float] = Array(repeating: 1.0, count: vectorCount)
-        var boneIndices: Indices = Array(repeating: 0, count: vectorCount)
+        var boneIndices: [I] = Array(repeating: 0, count: vectorCount)
 
         for (boneIndex, bone) in bones.enumerated() {
             let (vertexIndices, rigidBody) = bone
@@ -95,15 +91,15 @@ final class BoneBuilder {
             boneNodes.append(node)
             boneInverseBindTransforms.append(NSValue(scnMatrix4: SCNMatrix4Invert(node.worldTransform)))
             for vertexIndex in vertexIndices {
-                boneIndices[Int(vertexIndex)] = UInt16(boneIndex)
+                boneIndices[Int(vertexIndex)] = I(boneIndex)
             }
         }
 
         let boneWeightsData = Data(bytesNoCopy: &boneWeights, count: boneWeights.count * MemoryLayout<Float>.size, deallocator: .none)
-        let boneIndicesData = Data(bytesNoCopy: &boneIndices, count: boneWeights.count * MemoryLayout<UInt16>.size, deallocator: .none)
+        let boneIndicesData = Data(bytesNoCopy: &boneIndices, count: boneWeights.count * MemoryLayout<I>.size, deallocator: .none)
 
         let boneWeightsGeometrySource = SCNGeometrySource(data: boneWeightsData, semantic: .boneWeights, vectorCount: boneWeights.count, usesFloatComponents: true, componentsPerVector: 1, bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0, dataStride: MemoryLayout<Float>.size)
-        let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<UInt16>.size, dataOffset: 0, dataStride: MemoryLayout<UInt16>.size)
+        let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<I>.size, dataOffset: 0, dataStride: MemoryLayout<I>.size)
 
         let skinner = SCNSkinner(baseGeometry: builder.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
 

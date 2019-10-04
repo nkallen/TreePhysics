@@ -9,7 +9,7 @@ class CylinderPenTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        self.pen = CylinderPen(radialSegmentCount: 3)
+        self.pen = CylinderPen<UInt16>(radialSegmentCount: 3)
         self.arcLength = 2.0 * .pi / 3
 
         pen.start(at: float3.zero, thickness: 1)

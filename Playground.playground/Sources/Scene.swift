@@ -1,7 +1,7 @@
 import Foundation
 import SceneKit
 import simd
-@testable import TreePhysics
+//@testable import TreePhysics
 
 public typealias UpdateAtCallback = (TimeInterval) -> ()
 

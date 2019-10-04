@@ -4,7 +4,7 @@ import PlaygroundSupport
 @testable import TreePhysics
 
 let root = ArticulatedRigidBody.static()
-let cylinderPen = CylinderPen(radialSegmentCount: 3, heightSegmentCount: 1)
+let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3, heightSegmentCount: 1)
 let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFF[&&J]A]/////[!"&FFFFFFF[&&J]A]/////[!"&FFFFFFF[&&J]A]"#)
 let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
 

@@ -17,8 +17,8 @@ final class FakePen: Pen {
         points.append(at)
     }
 
-    func cont(distance: Float, tangent: float3, thickness: Float) -> () {
-        points.append(points.last! + distance * tangent)
+    func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> () {
+        points.append(points.last! + distance * orientation.heading)
     }
 
     func copy(scale: Float, orientation: simd_quatf) -> () {
@@ -64,7 +64,7 @@ class TurtleTests: XCTestCase {
         XCTAssertEqual([
             float3(0, stepSize, 0),
             float3(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
-                       pen.branch.points,
+                       pen.branch().points,
                        accuracy: 0.0001)
 
     }

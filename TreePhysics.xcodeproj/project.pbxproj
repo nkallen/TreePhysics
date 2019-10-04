@@ -51,6 +51,7 @@
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
 		9E8024B8230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */; };
 		9E80B3E6231FF74F00A700CF /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
+		9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */; };
 		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
 		9E8F7120230D87C200583AAE /* MetalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711E230D87C200583AAE /* MetalSimulator.swift */; };
 		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
@@ -195,6 +196,7 @@
 		9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT16_07F09_Lec26.pdf; sourceTree = "<group>"; };
 		9E8024B6230FD2BF0019B482 /* selforg.sig2009.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = selforg.sig2009.pdf; sourceTree = "<group>"; };
 		9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Metal-Shading-Language-Specification.pdf"; sourceTree = "<group>"; };
+		9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MDLMesh+Vertices.swift"; sourceTree = "<group>"; };
 		9E8E27BE2307335300652DAC /* Print.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Print.metal; sourceTree = "<group>"; };
 		9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorComparisonTests.swift; sourceTree = "<group>"; };
 		9E8F711E230D87C200583AAE /* MetalSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalSimulator.swift; sourceTree = "<group>"; };
@@ -516,6 +518,7 @@
 				9E57566823184C9C0036F68B /* Visualization.swift */,
 				9E1490CA2334E49500FED681 /* Noise.swift */,
 				9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */,
+				9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -742,6 +745,7 @@
 				9EAA8C1423292430002E9260 /* PhysicsField.swift in Sources */,
 				9EAA8C1023292411002E9260 /* UpdateJoints.swift in Sources */,
 				9EAA8C1723292440002E9260 /* PrettyPrint.swift in Sources */,
+				9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

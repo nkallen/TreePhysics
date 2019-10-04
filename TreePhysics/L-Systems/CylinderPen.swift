@@ -2,11 +2,11 @@ import Foundation
 import SceneKit
 import ModelIO
 
-public final class CylinderPen: Pen {
-    public typealias T = Indices
+public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
+    public typealias T = [I]
 
-    let branchGeometry: GeometryBuilder
-    let leafGeometry: GeometryBuilder
+    let branchGeometry: GeometryBuilder<I>
+    let leafGeometry: GeometryBuilder<I>
 
     weak var parent: CylinderPen?
 
@@ -35,7 +35,7 @@ public final class CylinderPen: Pen {
         start = at
     }
 
-    public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> Indices {
+    public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T {
         guard let start = start else { fatalError() }
 
         let radius = sqrt(thickness / .pi)
@@ -52,36 +52,33 @@ public final class CylinderPen: Pen {
         return branchGeometry.addSegment(rotatedVertices, indices)
     }
 
-    public func copy(scale: Float, orientation: simd_quatf) -> Indices {
+    public func copy(scale: Float, orientation: simd_quatf) -> T {
         guard let start = start else { fatalError() }
 
         let vertices = [float3(-0.5, 0, 0), float3(-0.5, 1, 0),
                         float3(0.5, 1, 0), float3(0.5, 0, 0)]
-        let indices: [UInt16] = [0,1,2, 0,2,3,
-                                 2,1,0, 3,2,0]
+        let indices: T = [0,1,2, 0,2,3,
+                            2,1,0, 3,2,0]
 
         let rotatedVertices: [float3]
         rotatedVertices = vertices.map { vertex in
             start + orientation.act(scale * vertex)
         }
 
-        print("\(ObjectIdentifier(self)) copying to \(start) with \(rotatedVertices)")
-
         return leafGeometry.addSegment(rotatedVertices, indices)
     }
 
-    public func branch() -> CylinderPen {
+    public func branch() -> CylinderPen<I> {
         guard let start = start else { fatalError() }
-        let pen = CylinderPen(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
+        let pen = CylinderPen<I>(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
         pen.start(at: start, thickness: 1)
         return pen
     }
 
-    private func makeSegment(radius: Float, height: Float) -> ([float3], Indices) {
+    private func makeSegment(radius: Float, height: Float) -> ([float3], T) {
         var vertices: [float3] = []
-        let radialSegmentCountUInt16 = UInt16(radialSegmentCount)
         let arcLength: Float = 2.0 * .pi / Float(radialSegmentCount)
-        for j in 0..<radialSegmentCountUInt16 {
+        for j in 0..<radialSegmentCount {
             let theta = arcLength*Float(j)
             let rCosTheta = radius*cos(theta)
             let rSinTheta = radius*sin(theta)
@@ -89,7 +86,7 @@ public final class CylinderPen: Pen {
             vertices.append(float3(rCosTheta, 0, rSinTheta)) // FIXME can skip in subsequent
             vertices.append(float3(rCosTheta, height, rSinTheta))
         }
-        let indices = Array(0..<(radialSegmentCountUInt16*2)) + [0,1]
+        let indices = Array(0..<(I(radialSegmentCount*2))) + [0,1]
         return (vertices, indices)
     }
 
@@ -104,17 +101,17 @@ public final class CylinderPen: Pen {
     }
 }
 
-final class GeometryBuilder {
+final class GeometryBuilder<I> where I: FixedWidthInteger {
     private let primitiveType: SCNGeometryPrimitiveType
     var vertices: [float3] = []
-    var indices: Indices = []
+    var indices: [I] = []
 
     init(primitiveType: SCNGeometryPrimitiveType) {
         self.primitiveType = primitiveType
     }
 
-    func addSegment(_ vertices: [float3], _ indices: Indices) -> Indices {
-        let offset = UInt16(self.vertices.count)
+    func addSegment(_ vertices: [float3], _ indices: [I]) -> [I] {
+        let offset = I(self.vertices.count)
         let offsetIndices = indices.map { offset + $0 }
 
         if primitiveType == .triangleStrip, let last = self.indices.last {
