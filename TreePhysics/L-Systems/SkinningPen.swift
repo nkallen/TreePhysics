@@ -27,9 +27,9 @@ public final class SkinningPen<I>: Pen where I: FixedWidthInteger {
         }
     }
 
-    public func start(at: float3, thickness: Float) {
-        cylinderPen.start(at: at, thickness: thickness)
-        rigidBodyPen.start(at: at, thickness: thickness)
+    public func start(at: float3, orientation: simd_quatf, thickness: Float) {
+        cylinderPen.start(at: at, orientation: orientation, thickness: thickness)
+        rigidBodyPen.start(at: at, orientation: orientation, thickness: thickness)
     }
 
     public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T {

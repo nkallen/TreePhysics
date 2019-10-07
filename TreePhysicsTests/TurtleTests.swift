@@ -13,7 +13,7 @@ final class FakePen: Pen {
         self._branch = branch
     }
 
-    func start(at: float3, thickness: Float) {
+    func start(at: float3, orientation: simd_quatf, thickness: Float) {
         points.append(at)
     }
 

@@ -4,13 +4,18 @@ import ModelIO
 
 public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     public typealias T = [I]
+    private struct State {
+        let position: float3
+        let orientation: simd_quatf
+        let thickness: Float
+    }
 
     let branchGeometry: GeometryBuilder<I>
     let leafGeometry: GeometryBuilder<I>
 
     weak var parent: CylinderPen?
 
-    private var start: float3? = nil
+    private var state: State? = nil
 
     let radialSegmentCount: Int
     let heightSegmentCount: Int
@@ -31,51 +36,50 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         }
     }
 
-    public func start(at: float3, thickness: Float) {
-        start = at
+    public func start(at: float3, orientation: simd_quatf, thickness: Float) {
+        state = State(position: at, orientation: orientation, thickness: thickness)
     }
 
     public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T {
-        guard let start = start else { fatalError() }
+        guard let state = state else { fatalError() }
 
-        let radius = sqrt(thickness / .pi)
-
-        let (vertices, indices) = makeSegment(radius: radius, height: distance)
-
-        let rotatedVertices: [float3]
-        rotatedVertices = vertices.map { vertex in
-            start + orientation.act(vertex)
+        let bottom = makeCircle(radius: sqrt(state.thickness / .pi)).map {
+            state.position + state.orientation.act($0)
         }
 
-        self.start = start + distance * orientation.heading
+        let top = makeCircle(radius: sqrt(thickness / .pi)).map {
+            state.position + orientation.act(distance * .y + $0)
+        }
 
-        return branchGeometry.addSegment(rotatedVertices, indices)
+        self.state = State(position: state.position + distance * orientation.heading, orientation: orientation, thickness: thickness)
+
+        return branchGeometry.addSegment(bottom + top, [0,3,1,4,2,5,0,3])
     }
 
     public func copy(scale: Float, orientation: simd_quatf) -> T {
-        guard let start = start else { fatalError() }
+        guard let state = state else { fatalError() }
 
-        let vertices = [float3(-0.1, 0, 0), float3(-0.5, 1, 0),
-                        float3(0.5, 1, 0), float3(0.1, 0, 0)]
+        let vertices = [float3(-0.5, 0, 0), float3(0, 1, 0),
+                        float3(0, 1, 0), float3(0.5, 0, 0)]
         let indices: T = [0,1,2, 0,2,3,
                             2,1,0, 3,2,0]
 
         let rotatedVertices: [float3]
         rotatedVertices = vertices.map { vertex in
-            start + orientation.act(scale * vertex)
+            state.position + orientation.act(scale * vertex)
         }
 
         return leafGeometry.addSegment(rotatedVertices, indices)
     }
 
     public func branch() -> CylinderPen<I> {
-        guard let start = start else { fatalError() }
+        guard let state = state else { fatalError() }
         let pen = CylinderPen<I>(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
-        pen.start(at: start, thickness: 1)
+        pen.start(at: state.position, orientation: state.orientation, thickness: state.thickness)
         return pen
     }
 
-    private func makeSegment(radius: Float, height: Float) -> ([float3], T) {
+    private func makeCircle(radius: Float) -> [float3] {
         var vertices: [float3] = []
         let arcLength: Float = 2.0 * .pi / Float(radialSegmentCount)
         for j in 0..<radialSegmentCount {
@@ -83,11 +87,9 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
             let rCosTheta = radius*cos(theta)
             let rSinTheta = radius*sin(theta)
 
-            vertices.append(float3(rCosTheta, 0, rSinTheta)) // FIXME can skip in subsequent
-            vertices.append(float3(rCosTheta, height, rSinTheta))
+            vertices.append(float3(rCosTheta, 0, rSinTheta))
         }
-        let indices = Array(0..<(I(radialSegmentCount*2))) + [0,1]
-        return (vertices, indices)
+        return vertices
     }
 
     func node() -> SCNNode {
@@ -105,13 +107,13 @@ final class GeometryBuilder<I> where I: FixedWidthInteger {
     private let primitiveType: SCNGeometryPrimitiveType
     var vertices: [float3] = []
     var indices: [I] = []
+    var offset: I = 0
 
     init(primitiveType: SCNGeometryPrimitiveType) {
         self.primitiveType = primitiveType
     }
 
     func addSegment(_ vertices: [float3], _ indices: [I]) -> [I] {
-        let offset = I(self.vertices.count)
         let offsetIndices = indices.map { offset + $0 }
 
         if primitiveType == .triangleStrip, let last = self.indices.last {
@@ -121,6 +123,7 @@ final class GeometryBuilder<I> where I: FixedWidthInteger {
 
         self.vertices.append(contentsOf: vertices)
         self.indices.append(contentsOf: offsetIndices)
+        self.offset += I(vertices.count)
 
         return Array(Set(offsetIndices))
     }

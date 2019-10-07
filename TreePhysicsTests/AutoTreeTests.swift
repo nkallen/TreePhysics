@@ -12,7 +12,7 @@ class AutoTreeTests: XCTestCase {
     override func setUp() {
         super.setUp()
         self.config = AutoTreeConfig()
-        self.autoTree = AutoTree(config: config)
+        self.autoTree = AutoTree(config)
         self.root = autoTree.root()
         self.terminalBud = autoTree.terminalBud(position: .zero, orientation: .identity)
         root.addChild(terminalBud)

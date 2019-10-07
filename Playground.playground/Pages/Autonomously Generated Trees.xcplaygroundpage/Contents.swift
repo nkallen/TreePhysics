@@ -22,19 +22,17 @@ face.simdPosition = offset
 
 simulator.attractionPoints.formUnion(mdlMesh.vertices.map { $0 * scale + offset })
 
-for _ in 0...50 { simulator.update() }
+for _ in 0...35 { simulator.update() }
 
 let pen = CylinderPen<UInt16>(radialSegmentCount: 3, heightSegmentCount: 1, parent: nil)
 
 autoTree.draw(root, pen: pen)
 
-///////////
-
 let view = SCNView(frame: CGRect(x:0 , y:0, width: 640, height: 480))
 let scene = SCNScene()
 
 scene.rootNode.addChildNode(pen.node())
-scene.rootNode.addChildNode(face)
+//scene.rootNode.addChildNode(face)
 
 view.scene = scene
 view.backgroundColor = .gray

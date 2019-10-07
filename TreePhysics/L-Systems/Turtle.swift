@@ -110,7 +110,7 @@ public class Interpreter<P> where P: Pen {
 
     func interpret(_ commands: [TurtleCommand]) {
         var state = self.stack.removeLast()
-        state.pen.start(at: state.position, thickness: state.thickness)
+        state.pen.start(at: state.position, orientation: state.orientation, thickness: state.thickness)
 
         for command in commands {
             switch command {
@@ -164,7 +164,7 @@ public class Interpreter<P> where P: Pen {
             case .push:
                 self.stack.append(state)
                 let pen = state.pen.branch()
-                pen.start(at: state.position, thickness: state.thickness)
+                pen.start(at: state.position, orientation: state.orientation, thickness: state.thickness)
                 state = State(position: state.position, orientation: state.orientation, stepSize: state.stepSize, thickness: state.thickness, pen: pen)
             case .pop:
                 state = self.stack.removeLast()

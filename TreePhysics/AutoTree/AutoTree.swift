@@ -41,7 +41,7 @@ struct AutoTree {
         case let internode as AutoTree.Internode:
             _ = pen.cont(distance: internode.length, orientation: internode.orientation, thickness: sqr(internode.radius) * .pi)
         default:
-            pen.start(at: node.position, thickness: 1)
+            pen.start(at: node.position, orientation: node.orientation, thickness: sqr(config.radius) * .pi)
         }
 
         // Reorganize branching structure following thickest path topology,

@@ -13,7 +13,7 @@ public final class RigidBodyPen: Pen {
         self.parentBranch = parent
     }
 
-    public func start(at: float3, thickness: Float) {
+    public func start(at: float3, orientation: simd_quatf, thickness: Float) {
         start = at
     }
 

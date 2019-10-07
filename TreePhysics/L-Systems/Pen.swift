@@ -7,8 +7,9 @@ import simd
 public protocol Pen {
     associatedtype T
 
-    func start(at: float3, thickness: Float)
+    func start(at: float3, orientation: simd_quatf, thickness: Float)
     func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T
     func copy(scale: Float, orientation: simd_quatf) -> T
     func branch() -> Self
 }
+
