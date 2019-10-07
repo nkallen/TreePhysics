@@ -28,7 +28,7 @@ class AutoTreeTests: XCTestCase {
         XCTAssertEqual(1, buds.count)
 
         var terminalBud = buds.first! as! AutoTree.TerminalBud
-        XCTAssertEqual(.x * config.length, terminalBud.position, accuracy: 0.0001)
+        XCTAssertEqual(.x * config.internodeLength, terminalBud.position, accuracy: 0.0001)
         XCTAssertEqual(simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation, terminalBud.orientation)
 
         // transition to root -> internode -> [lateralBud] internode -> terminalBud
@@ -37,7 +37,7 @@ class AutoTreeTests: XCTestCase {
         terminalBud = buds.first(where: { $0 is AutoTree.TerminalBud }) as! AutoTree.TerminalBud
         let lateralBud = buds.first(where: { $0 is AutoTree.LateralBud }) as! AutoTree.LateralBud
 
-        XCTAssertEqual(.x * config.length * 2, terminalBud.position, accuracy: 0.0001)
+        XCTAssertEqual(.x * config.internodeLength * 2, terminalBud.position, accuracy: 0.0001)
         XCTAssertEqual(
             (simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation).normalized,
             terminalBud.orientation)
@@ -46,5 +46,18 @@ class AutoTreeTests: XCTestCase {
         XCTAssertEqual(
             (simd_quatf(angle: config.branchingAngle, axis: internode.orientation.up) * internode.orientation).normalized,
             lateralBud.orientation)
+    }
+
+    func testTerminalBranchCount() {
+        XCTAssertEqual(0, root.terminalBranchCount)
+        let (_, buds) = terminalBud.grow(towards: [])
+        XCTAssertEqual(1, root.terminalBranchCount)
+        for bud in buds {
+            let (_, buds) = bud.grow(towards: [])
+            for bud in buds {
+                _ = bud.grow(towards: [])
+            }
+        }
+        XCTAssertEqual(2, root.terminalBranchCount)
     }
 }

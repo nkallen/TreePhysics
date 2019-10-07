@@ -4,12 +4,16 @@ import simd
 struct AutoTreeConfig {
     let branchingAngle: Float = .pi/4
     let phyllotacticAngle: Float = .pi/4
-    let length: Float = 0.05
+    let internodeLength: Float = 0.05
     let radius: Float = 0.01
 
     let occupationRadius: Float = 0.05
     let perceptionAngle: Float = .pi/4
     let perceptionRadius: Float = 1
+
+    let n: Float = 1.2
+    let extremityRadius: Float = 0.001
+    let baseRadius: Float = 0.05
 }
 
 extension AutoTree {

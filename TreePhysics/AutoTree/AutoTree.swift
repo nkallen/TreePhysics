@@ -34,24 +34,38 @@ struct AutoTree {
         return GrowthSimulator(config)
     }
 
-    func draw(_ node: Node, pen: CylinderPen<UInt16>, level: Int = 0) {
+    func draw(_ node: Node, pen: CylinderPen<UInt16>) {
+        let diameterExponent = log(Float(node.terminalBranchCount)) / (log(2*config.baseRadius) - log(2*config.extremityRadius))
+        draw(node, pen: pen, diameterExponent: diameterExponent)
+    }
+
+    func draw(_ node: Node, pen: CylinderPen<UInt16>, diameterExponent: Float) {
         switch node {
-        case let bud as AutoTree.Bud:
+        case let bud as Bud:
             _ = pen.copy(scale: 0.01, orientation: bud.orientation)
-        case let internode as AutoTree.Internode:
-            _ = pen.cont(distance: internode.length, orientation: internode.orientation, thickness: sqr(internode.radius) * .pi)
+        case let internode as Internode:
+            let diameter = internode.diameter(exponent: diameterExponent)
+            let thickness = sqr(diameter / 2) * .pi
+            _ = pen.cont(distance: config.internodeLength, orientation: internode.orientation, thickness: thickness)
         default:
-            pen.start(at: node.position, orientation: node.orientation, thickness: sqr(config.radius) * .pi)
+            pen.start(at: node.position, orientation: node.orientation, thickness: sqr(config.baseRadius) * .pi)
         }
 
         // Reorganize branching structure following thickest path topology,
         // cf, [Longay 2014], appendix C.3
         let (thickest, rest) = node.children.thickest
         for child in rest {
-            let branch = pen.branch()
-            _ = draw(child, pen: branch, level: level + 1)
+            let radialSegmentCount: Int?
+            if case let internode as Internode = child {
+                radialSegmentCount = Int(3 * pow(internode.diameter(exponent: diameterExponent), config.n) / config.extremityRadius)
+            } else {
+                radialSegmentCount = nil
+            }
+
+            let branch = pen.branch(radialSegmentCount: max(3, radialSegmentCount ?? 3))
+            _ = draw(child, pen: branch, diameterExponent: diameterExponent)
         }
-        if let thickest = thickest { _ = draw(thickest, pen: pen) }
+        if let thickest = thickest { _ = draw(thickest, pen: pen, diameterExponent: diameterExponent) }
     }
 }
 
@@ -63,7 +77,7 @@ fileprivate extension Set where Element == AutoTree.Node {
             switch (thickest, node) {
             case let (nil, internode as AutoTree.Internode):
                 thickest = internode
-            case let (.some(last), internode as AutoTree.Internode) where internode.radius > last.radius:
+            case let (.some(last), internode as AutoTree.Internode) where internode.terminalBranchCount > last.terminalBranchCount:
                 rest.insert(last)
                 thickest = internode
             default:
