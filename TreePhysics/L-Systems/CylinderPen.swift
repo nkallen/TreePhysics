@@ -8,24 +8,20 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         let position: float3
         let orientation: simd_quatf
         let thickness: Float
+        let vertexId: I
     }
+    private var state: State? = nil
+
+    let radialSegmentCount: Int
 
     let branchGeometry: GeometryBuilder<I>
     let leafGeometry: GeometryBuilder<I>
 
     weak var parent: CylinderPen?
 
-    private var state: State? = nil
-
-    let radialSegmentCount: Int
-    let heightSegmentCount: Int
-
-    public init(radialSegmentCount: Int = 48, heightSegmentCount: Int = 1, parent: CylinderPen? = nil) {
-        guard radialSegmentCount >= 3 else { fatalError() }
-
-        self.radialSegmentCount = radialSegmentCount
-        self.heightSegmentCount = heightSegmentCount
+    public init(radialSegmentCount: Int = 3, parent: CylinderPen? = nil) {
         self.parent = parent
+        self.radialSegmentCount = radialSegmentCount
 
         if let parent = parent {
             self.branchGeometry = parent.branchGeometry
@@ -36,24 +32,30 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         }
     }
 
-    public func start(at: float3, orientation: simd_quatf, thickness: Float) {
-        state = State(position: at, orientation: orientation, thickness: thickness)
+    public func start(at position: float3, orientation: simd_quatf, thickness: Float) {
+        let bottom = makeCircle(radius: sqrt(thickness / .pi)).map {
+            position + orientation.act($0)
+        }
+        let vertexId = branchGeometry.addVertices(bottom)
+
+        state = State(position: position, orientation: orientation, thickness: thickness, vertexId: vertexId)
     }
 
     public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T {
         guard let state = state else { fatalError() }
 
-        let bottom = makeCircle(radius: sqrt(state.thickness / .pi)).map {
-            state.position + state.orientation.act($0)
-        }
-
-        let top = makeCircle(radius: sqrt(thickness / .pi)).map {
+        let top: [float3] = makeCircle(radius: sqrt(thickness / .pi)).map {
             state.position + orientation.act(distance * .y + $0)
         }
 
-        self.state = State(position: state.position + distance * orientation.heading, orientation: orientation, thickness: thickness)
+        let topVertexId = branchGeometry.addVertices(top)
 
-        return branchGeometry.addSegment(bottom + top, [0,3,1,4,2,5,0,3])
+        var indices: [I] = (0..<I(radialSegmentCount)).flatMap { [state.vertexId + $0, topVertexId + $0] }
+        indices += [state.vertexId, topVertexId]
+        branchGeometry.addIndices(indices)
+
+        self.state = State(position: state.position + distance * orientation.heading, orientation: orientation, thickness: thickness, vertexId: topVertexId)
+        return Array(Set(indices))
     }
 
     public func copy(scale: Float, orientation: simd_quatf) -> T {
@@ -61,7 +63,7 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
 
         let vertices = [float3(-0.5, 0, 0), float3(0, 1, 0),
                         float3(0, 1, 0), float3(0.5, 0, 0)]
-        let indices: T = [0,1,2, 0,2,3,
+        let indices: [I] = [0,1,2, 0,2,3,
                             2,1,0, 3,2,0]
 
         let rotatedVertices: [float3]
@@ -73,8 +75,12 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     }
 
     public func branch() -> CylinderPen<I> {
+        return branch(radialSegmentCount: nil)
+    }
+
+    public func branch(radialSegmentCount: Int? = nil) -> CylinderPen<I> {
         guard let state = state else { fatalError() }
-        let pen = CylinderPen<I>(radialSegmentCount: radialSegmentCount, heightSegmentCount: heightSegmentCount, parent: self)
+        let pen = CylinderPen<I>(radialSegmentCount: radialSegmentCount ?? self.radialSegmentCount, parent: self)
         pen.start(at: state.position, orientation: state.orientation, thickness: state.thickness)
         return pen
     }
@@ -107,23 +113,31 @@ final class GeometryBuilder<I> where I: FixedWidthInteger {
     private let primitiveType: SCNGeometryPrimitiveType
     var vertices: [float3] = []
     var indices: [I] = []
-    var offset: I = 0
 
     init(primitiveType: SCNGeometryPrimitiveType) {
         self.primitiveType = primitiveType
     }
 
-    func addSegment(_ vertices: [float3], _ indices: [I]) -> [I] {
-        let offsetIndices = indices.map { offset + $0 }
+    func addVertices(_ vertices: [float3]) -> I {
+        let minVertexId = self.vertices.count
+        self.vertices.append(contentsOf: vertices)
+        return I(minVertexId)
+    }
 
+    func addIndices(_ indices: [I]) {
         if primitiveType == .triangleStrip, let last = self.indices.last {
-            let degenerate = [last, offsetIndices.first!]
+            let degenerate = [last, indices.first!]
             self.indices.append(contentsOf: degenerate)
         }
 
-        self.vertices.append(contentsOf: vertices)
-        self.indices.append(contentsOf: offsetIndices)
-        self.offset += I(vertices.count)
+        self.indices.append(contentsOf: indices)
+    }
+
+    func addSegment(_ vertices: [float3], _ indices: [I]) -> [I] {
+        let offsetIndices = indices.map { I(vertices.count) + $0 }
+
+        _ = addVertices(vertices)
+        addIndices(offsetIndices)
 
         return Array(Set(offsetIndices))
     }

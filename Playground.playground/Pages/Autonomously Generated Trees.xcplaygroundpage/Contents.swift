@@ -24,7 +24,7 @@ simulator.attractionPoints.formUnion(mdlMesh.vertices.map { $0 * scale + offset 
 
 for _ in 0...35 { simulator.update() }
 
-let pen = CylinderPen<UInt16>(radialSegmentCount: 3, heightSegmentCount: 1, parent: nil)
+let pen = CylinderPen<UInt16>(radialSegmentCount: 15, parent: nil)
 
 autoTree.draw(root, pen: pen)
 

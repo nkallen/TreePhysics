@@ -36,7 +36,7 @@ class CylinderPenTests: XCTestCase {
             2,
             5,
             0,
-            3
+            3,
             ], pen.branchGeometry.indices)
     }
 }

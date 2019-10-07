@@ -39,7 +39,7 @@ class Scene: NSObject {
         // Tree:
         
         self.root = ArticulatedRigidBody.static()
-        let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3, heightSegmentCount: 1)
+        let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3)
         let rigidBodyPen = RigidBodyPen(parent: root)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
