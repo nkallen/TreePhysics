@@ -59,7 +59,7 @@ class Scene: NSObject {
         self.cpuSimulator = CPUSimulator(world: world)
         world.add(rigidBody: root)
         
-        scene.rootNode.addChildNode(skinningPen.node)
+        scene.rootNode.addChildNode(skinningPen.node())
 //        scene.rootNode.addChildNode(skinningPen.skeleton)
 
         scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.25))

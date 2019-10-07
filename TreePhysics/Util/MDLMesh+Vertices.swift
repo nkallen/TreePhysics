@@ -11,7 +11,6 @@ extension MDLMesh {
         var result: [float3] = []
         let stride = attributeData.stride / MemoryLayout<Float>.stride
         for i in 0..<self.vertexCount {
-            if i % 3 == 0 { continue }
             let x = verticesPointer[i * stride + 0]
             let y = verticesPointer[i * stride + 1]
             let z = verticesPointer[i * stride + 2]

@@ -55,8 +55,8 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     public func copy(scale: Float, orientation: simd_quatf) -> T {
         guard let start = start else { fatalError() }
 
-        let vertices = [float3(-0.5, 0, 0), float3(-0.5, 1, 0),
-                        float3(0.5, 1, 0), float3(0.5, 0, 0)]
+        let vertices = [float3(-0.1, 0, 0), float3(-0.5, 1, 0),
+                        float3(0.5, 1, 0), float3(0.1, 0, 0)]
         let indices: T = [0,1,2, 0,2,3,
                             2,1,0, 3,2,0]
 
@@ -90,7 +90,7 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         return (vertices, indices)
     }
 
-    var node: SCNNode {
+    func node() -> SCNNode {
         let parent = SCNNode()
         let leaves = SCNNode(geometry: leafGeometry.geometry)
         leaves.geometry?.firstMaterial!.diffuse.contents = NSColor(red: 1, green: 0.718, blue: 0.773, alpha: 0.9)

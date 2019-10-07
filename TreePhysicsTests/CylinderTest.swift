@@ -4,7 +4,7 @@ import XCTest
 import simd
 
 class CylinderPenTests: XCTestCase {
-    var pen: CylinderPen!
+    var pen: CylinderPen<UInt16>!
     var arcLength: Float!
 
     override func setUp() {
@@ -13,7 +13,7 @@ class CylinderPenTests: XCTestCase {
         self.arcLength = 2.0 * .pi / 3
 
         pen.start(at: float3.zero, thickness: 1)
-        _ = pen.cont(distance: 1, tangent: float3(0,1,0), thickness: .pi)
+        _ = pen.cont(distance: 1, orientation: .identity, thickness: .pi)
     }
 
     func testVertices() {

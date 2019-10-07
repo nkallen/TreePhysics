@@ -335,6 +335,18 @@ extension simd_quatf {
     var isFinite: Bool {
         return real.isFinite && imag.isFinite
     }
+
+    var left: float3 {
+        return act(.x)
+    }
+
+    var up: float3 {
+        return act(.z)
+    }
+
+    var heading: float3 {
+        return act(.y)
+    }
 }
 
 func simd_bezier(_ v0: float3, _ v1: float3, _ v2: float3, _ v3: float3, t: Float) -> float3 {

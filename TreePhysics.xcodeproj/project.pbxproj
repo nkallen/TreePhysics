@@ -91,6 +91,7 @@
 		9EAA8C1723292440002E9260 /* PrettyPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA619CB230AE78400BE2213 /* PrettyPrint.swift */; };
 		9EAA8C1823292444002E9260 /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9EAA8C19232925E3002E9260 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9322F438FA007DCF49 /* Scene.swift */; };
+		9EAAAB65234B448B00157B45 /* GrowthSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAAAB64234B448B00157B45 /* GrowthSimulator.swift */; };
 		9EAE862C232A67170037EA92 /* ResetForces.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DA230ACFB10044C3C4 /* ResetForces.metal */; };
 		9EAE862D232A671B0037EA92 /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
 		9EAE862E232A671E0037EA92 /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
@@ -212,6 +213,7 @@
 		9EA619CB230AE78400BE2213 /* PrettyPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrettyPrint.swift; sourceTree = "<group>"; };
 		9EA7010B231064F3009077A0 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT18_03SCF11_s13_2text.pdf; sourceTree = "<group>"; };
+		9EAAAB64234B448B00157B45 /* GrowthSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSimulator.swift; sourceTree = "<group>"; };
 		9EAE863D232A69F40037EA92 /* Leaf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Leaf.swift; sourceTree = "<group>"; };
 		9EAE863F232BCBB10037EA92 /* tanabe94.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = tanabe94.pdf; sourceTree = "<group>"; };
 		9EAE86412332717C0037EA92 /* GravityField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityField.swift; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 			children = (
 				9E4946C62344AB080036B7EC /* AutoTree.swift */,
 				9E4946C82344AB230036B7EC /* Node.swift */,
+				9EAAAB64234B448B00157B45 /* GrowthSimulator.swift */,
 			);
 			path = AutoTree;
 			sourceTree = "<group>";
@@ -723,6 +726,7 @@
 				9EAE862D232A671B0037EA92 /* ApplyPhysicsFields.metal in Sources */,
 				9EAE8633232A67330037EA92 /* Debug.metal in Sources */,
 				9EF3361F233C1AEF005F0C29 /* ArticulatedRigidBody.swift in Sources */,
+				9EAAAB65234B448B00157B45 /* GrowthSimulator.swift in Sources */,
 				9E34C48C2329120F008C7353 /* SkinningPen.swift in Sources */,
 				9E34C48D23291213008C7353 /* Rewriter.swift in Sources */,
 				9EAA8C0F2329240C002E9260 /* UpdateRigidBodies.swift in Sources */,

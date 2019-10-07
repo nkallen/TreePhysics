@@ -44,7 +44,7 @@ public final class SkinningPen<I>: Pen where I: FixedWidthInteger {
         return leafBones.add(bone: (vertices, rigidBody))
     }
 
-    public var node: SCNNode {
+    public func node() -> SCNNode {
         let parent = SCNNode()
         let branches = branchBones.node(for: cylinderPen.branchGeometry)
         let leaves = leafBones.node(for: cylinderPen.leafGeometry)
