@@ -4,7 +4,7 @@ import PlaygroundSupport
 @testable import TreePhysics
 
 let root = ArticulatedRigidBody.static()
-let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3, heightSegmentCount: 1)
+let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3)
 let rigidBodyPen = RigidBodyPen(parent: root)
 let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 let configuration = InterpreterConfig(
@@ -45,7 +45,7 @@ scene.rootNode.addChildNode(cameraNode)
 cameraNode.position = SCNVector3(x: 5, y: 1, z: 10)
 cameraNode.look(at: SCNVector3Zero)
 
-scene.rootNode.addChildNode(skinningPen.node)
+scene.rootNode.addChildNode(skinningPen.node())
 //scene.rootNode.addChildNode(skinningPen.skeleton)
 scene.rootNode.addChildNode(cameraNode)
 

@@ -8,7 +8,7 @@ extension AutoTree {
         let shadowDepth: Int = 2 // 4..8
     }
 
-    class ShadowGrid {
+    final class ShadowGrid {
         let config: ShadowGridConfig
         private var storage: [int3:Float] = [:]
 

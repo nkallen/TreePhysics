@@ -123,7 +123,16 @@ extension AutoTree {
         }
     }
 
-    class Internode: Node {
+    final class Internode: Node {
+        var lightExposure: Float = 0 {
+            didSet {
+                let delta = lightExposure - oldValue
+                if let internode = parent as? Internode {
+                    internode.lightExposure += delta
+                }
+            }
+        }
+
         func diameter(exponent: Float) -> Float {
             return pow(Float(terminalBranchCount) * pow(2*config.extremityRadius, exponent), 1/exponent)
         }

@@ -23,6 +23,10 @@ struct AutoTree {
         return TerminalBud(config: config, position: position, orientation: orientation)
     }
 
+    func internode(position: float3, orientation: simd_quatf) -> Internode {
+        return Internode(config: config, position: position, orientation: orientation)
+    }
+
     func seedling(position: float3 = .zero, orientation: simd_quatf = .identity) -> Node {
         let root = self.root()
         let bud = self.terminalBud(position: .zero, orientation: .identity)

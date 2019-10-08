@@ -92,4 +92,38 @@ class AutoTreeTests: XCTestCase {
             }
         }
     }
+
+    func testLightExposureSimple() {
+        let root = autoTree.root()
+        let internode = autoTree.internode(position: .zero, orientation: .identity)
+        let bud = autoTree.terminalBud(position: .y * 1, orientation: .identity)
+
+        let simulator = autoTree.growthSimulator()
+        simulator.add(root)
+        simulator.updateVigor()
+        XCTAssertEqual(config.fullExposure, internode.lightExposure)
+    }
+
+    func testLightExposureBranch() {
+        let root = autoTree.root()
+        let internode0 = autoTree.internode(position: .zero, orientation: .identity)
+        let internode1 = autoTree.internode(position: .y * 1, orientation: .identity)
+        let internode2 = autoTree.internode(position: .y * 1, orientation: simd_quatf(angle: .pi/4, axis: .z))
+        let bud1 = autoTree.terminalBud(position: internode1.position + internode1.orientation.heading * 1, orientation: .identity)
+        let bud2 = autoTree.terminalBud(position: internode2.position + internode2.orientation.heading * 1, orientation: .identity)
+
+        root.addChild(internode0)
+        internode0.addChild(internode1)
+        internode0.addChild(internode2)
+        internode1.addChild(bud1)
+        internode2.addChild(bud2)
+
+        let simulator = autoTree.growthSimulator()
+        simulator.add(root)
+        simulator.updateVigor()
+
+        XCTAssertEqual(config.fullExposure, internode1.lightExposure)
+        XCTAssertEqual(config.fullExposure, internode2.lightExposure)
+        XCTAssertEqual(internode1.lightExposure + internode2.lightExposure, internode0.lightExposure)
+    }
 }

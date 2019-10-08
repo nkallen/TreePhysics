@@ -47,23 +47,27 @@ class MTLCommandBufferProxy: NSObject, MTLCommandBuffer {
     func present(_ drawable: MTLDrawable, afterMinimumDuration presentationTime: CFTimeInterval) {
         underlying.present(drawable, afterMinimumDuration: presentationTime)
     }
+    #endif
 
+    @available(OSX 10.15, *)
     var kernelStartTime: CFTimeInterval {
         return underlying.kernelStartTime
     }
 
+    @available(OSX 10.15, *)
     var kernelEndTime: CFTimeInterval {
         return underlying.kernelEndTime
     }
 
+    @available(OSX 10.15, *)
     var gpuStartTime: CFTimeInterval {
         return underlying.gpuStartTime
     }
 
+    @available(OSX 10.15, *)
     var gpuEndTime: CFTimeInterval {
         return underlying.gpuEndTime
     }
-    #endif
 
     func waitUntilScheduled() {
         underlying.waitUntilScheduled()
@@ -254,6 +258,11 @@ class MTLComputeCommandEncoderProxy: NSObject, MTLComputeCommandEncoder {
 
     func popDebugGroup() {
         underlying.popDebugGroup()
+    }
+
+    @available(OSX 10.15, *)
+    func sampleCounters(sampleBuffer: MTLCounterSampleBuffer, sampleIndex: Int, barrier: Bool) {
+        underlying.sampleCounters(sampleBuffer: sampleBuffer, sampleIndex: sampleIndex, barrier: barrier)
     }
 
     #if os(iOS)
@@ -468,10 +477,52 @@ class MTLDeviceProxy: NSObject, MTLDevice {
         return underlying.makeSharedTexture(handle: sharedHandle)
     }
 
-    #if os(iOS)
-
+    @available(OSX 10.15, *)
     var hasUnifiedMemory: Bool { return underlying.hasUnifiedMemory }
 
+    @available(OSX 10.15, *)
+    var location: MTLDeviceLocation { return underlying.location}
+
+    @available(OSX 10.15, *)
+    var locationNumber: Int { return underlying.locationNumber }
+
+    @available(OSX 10.15, *)
+    var maxTransferRate: UInt64 { return underlying.maxTransferRate }
+
+    @available(OSX 10.15, *)
+    var areBarycentricCoordsSupported: Bool { return underlying.areBarycentricCoordsSupported }
+
+    @available(OSX 10.15, *)
+    var supportsShaderBarycentricCoordinates: Bool { return underlying.supportsShaderBarycentricCoordinates }
+
+    @available(OSX 10.15, *)
+    func supportsFamily(_ gpuFamily: MTLGPUFamily) -> Bool {
+        return underlying.supportsFamily(gpuFamily)
+    }
+
+    @available(OSX 10.15, *)
+    var peerGroupID: UInt64 { return underlying.peerGroupID }
+
+    @available(OSX 10.15, *)
+    var peerIndex: UInt32 { return underlying.peerIndex }
+
+    @available(OSX 10.15, *)
+    var peerCount: UInt32 { return underlying.peerCount }
+
+    @available(OSX 10.15, *)
+    var counterSets: [MTLCounterSet]? { return underlying.counterSets }
+
+    @available(OSX 10.15, *)
+    func makeCounterSampleBuffer(descriptor: MTLCounterSampleBufferDescriptor) throws -> MTLCounterSampleBuffer {
+        return try underlying.makeCounterSampleBuffer(descriptor: descriptor)
+    }
+
+    @available(OSX 10.15, *)
+    func __sampleTimestamps(_ cpuTimestamp: UnsafeMutablePointer<Int>, gpuTimestamp: UnsafeMutablePointer<Int>) {
+        underlying.__sampleTimestamps(cpuTimestamp, gpuTimestamp: gpuTimestamp)
+    }
+
+    #if os(iOS)
     func supportsFamily(_ gpuFamily: MTLGPUFamily) -> Bool {
         return underlying.supportsFamily(gpuFamily)
     }
