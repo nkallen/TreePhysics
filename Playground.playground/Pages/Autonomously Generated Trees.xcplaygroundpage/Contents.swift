@@ -15,14 +15,14 @@ let asset = MDLAsset(url: url)
 let mdlMesh = asset.object(at: 0) as! MDLMesh
 
 let face = SCNNode(mdlObject: mdlMesh)
-let scale: Float = 0.008
+let scale: Float = 0.01
 let offset = float3(0,0.5,0)
 face.simdScale = float3(repeating: 1) * scale
 face.simdPosition = offset
 
 simulator.attractionPoints.formUnion(mdlMesh.vertices.map { $0 * scale + offset })
 
-for _ in 0...45 { simulator.update() }
+for _ in 0...75 { simulator.update() }
 
 let pen = CylinderPen<UInt16>(radialSegmentCount: 15, parent: nil)
 

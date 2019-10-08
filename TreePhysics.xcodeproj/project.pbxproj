@@ -114,6 +114,7 @@
 		9EAE8644233271910037EA92 /* AttractorField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE8643233271910037EA92 /* AttractorField.swift */; };
 		9EAE8646233271BF0037EA92 /* WindField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE8645233271BF0037EA92 /* WindField.swift */; };
 		9EBEB1CD2327B3EF0073E5D9 /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */; };
+		9EC6A4E8234C9B4900E43FE9 /* ShadowGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */; };
 		9EC88E25231989930049737D /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC88E24231989930049737D /* ModelTests.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
@@ -222,6 +223,8 @@
 		9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSimulator.swift; sourceTree = "<group>"; };
 		9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidBody.swift; sourceTree = "<group>"; };
 		9EBEB1CF2329052A0073E5D9 /* Playground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Playground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		9EC6A4E6234C999100E43FE9 /* TreeSketch.SBM2012.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = TreeSketch.SBM2012.pdf; sourceTree = "<group>"; };
+		9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowGrid.swift; sourceTree = "<group>"; };
 		9EC88E24231989930049737D /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodies.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics_macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics_macOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -355,6 +358,7 @@
 				9E4946C62344AB080036B7EC /* AutoTree.swift */,
 				9E4946C82344AB230036B7EC /* Node.swift */,
 				9EAAAB64234B448B00157B45 /* GrowthSimulator.swift */,
+				9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */,
 			);
 			path = AutoTree;
 			sourceTree = "<group>";
@@ -368,8 +372,9 @@
 				9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */,
 				9E8024B4230FD2BE0019B482 /* colonization.egwnp2007.large.pdf */,
 				9E8024B3230FD2BD0019B482 /* longay.th2014.pdf */,
-				9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */,
+				9EC6A4E6234C999100E43FE9 /* TreeSketch.SBM2012.pdf */,
 				9E8024B6230FD2BF0019B482 /* selforg.sig2009.pdf */,
+				9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */,
 				9E4C09F9230ED46D00F1DD6B /* 606_delivering_optimized_metal_apps_and_games.pdf */,
 				9E4C09FB230ED4B300F1DD6B /* stanford2017-01.pdf */,
 				9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */,
@@ -714,6 +719,7 @@
 				9EAA8C0A232923D2002E9260 /* ApplyPhysicsFields.swift in Sources */,
 				9EAE8644233271910037EA92 /* AttractorField.swift in Sources */,
 				9E34C48A23291207008C7353 /* CylinderPen.swift in Sources */,
+				9EC6A4E8234C9B4900E43FE9 /* ShadowGrid.swift in Sources */,
 				9EAE862C232A67170037EA92 /* ResetForces.metal in Sources */,
 				9EAE862E232A671E0037EA92 /* UpdateCompositeBodies.metal in Sources */,
 				9EAE862F232A67210037EA92 /* UpdateJoints.metal in Sources */,

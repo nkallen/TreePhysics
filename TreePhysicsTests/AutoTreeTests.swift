@@ -60,4 +60,36 @@ class AutoTreeTests: XCTestCase {
         }
         XCTAssertEqual(2, root.terminalBranchCount)
     }
+
+    func testShadowGrid() {
+        let config = AutoTree.ShadowGridConfig(cellSize: 1)
+        let grid = AutoTree.ShadowGrid(config)
+        grid[float3(3,3,3)] += 1
+        for i in 0..<8 {
+            for k in 0..<7 {
+                XCTAssertEqual(0, grid[float3(Float(i), 4, Float(k))]) // top slice all 0s
+
+                if i == 3 && k == 3 { // next is all zeros except i,k=0
+                    XCTAssertEqual(1, grid[float3(Float(i), 3, Float(k))])
+                } else {
+                    XCTAssertEqual(0, grid[float3(Float(i), 3, Float(k))])
+                }
+
+                // the rest decays like a pyramid:
+                if (2...4).contains(i) && (2...4).contains(k) {
+                    XCTAssertEqual(1/2, grid[float3(Float(i), 2, Float(k))])
+                } else {
+                    XCTAssertEqual(0, grid[float3(Float(i), 2, Float(k))])
+                }
+
+                if (1...5).contains(i) && (1...5).contains(k) {
+                    XCTAssertEqual(1/4, grid[float3(Float(i), 1, Float(k))])
+                } else {
+                    XCTAssertEqual(0, grid[float3(Float(i), 1, Float(k))])
+                }
+
+                XCTAssertEqual(0, grid[float3(Float(i), 0, Float(k))])
+            }
+        }
+    }
 }
