@@ -37,3 +37,9 @@ extension CompositeBodyStruct: CustomDebugStringConvertible {
         return "CompositeBodyStruct(position: \(float3(position)), mass: \(mass), inertiaTensor: \(inertiaTensor), force: \(float3(force)), torque: \(float3(torque)), centerOfMass: \(float3(centerOfMass)))"
     }
 }
+
+extension AutoTree.Node: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "AutoTree.\(type(of: self))(generation: \(generation ?? -1) position: \(position) orientation: \(orientation))"
+    }
+}

@@ -4,6 +4,7 @@ import simd
 extension AutoTree {
     class Node {
         let config: AutoTreeConfig
+        var generation: Int?
 
         weak var parent: Parent? = nil
 
@@ -81,7 +82,7 @@ extension AutoTree {
     }
 
     class Bud: Node {
-        func grow(towards points: [float3], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
+        fileprivate func grow(towards points: [float3], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
             var newDirection = float3.zero

@@ -131,11 +131,11 @@ class AutoTreeTests: XCTestCase {
         let qm = pow(exposure1, config.sensitivityOfBudsToLight)
         let ql = pow(exposure2, config.sensitivityOfBudsToLight)
 
-        let denominator: Float = (config.lambda * qm + (1 - config.lambda) * ql) / v
+        let denominator: Float = (config.vigorBias * qm + (1 - config.vigorBias) * ql) / v
 
         XCTAssertEqual(v, vigors[internode0])
-        XCTAssertEqual(config.lambda * qm / denominator, vigors[internode1])
-        XCTAssertEqual((1-config.lambda) * ql / denominator, vigors[internode2])
+        XCTAssertEqual(config.vigorBias * qm / denominator, vigors[internode1])
+        XCTAssertEqual((1-config.vigorBias) * ql / denominator, vigors[internode2])
     }
 }
 
@@ -144,7 +144,6 @@ class FakeShadowGrid: AutoTree.ShadowGrid {
 
     subscript(position: float3) -> Float {
         get {
-            print("asked about \(position) and returned \(data[position] ?? 0)")
             return data[position] ?? 0
         }
         set(newValue) {

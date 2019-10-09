@@ -134,7 +134,8 @@ final class GeometryBuilder<I> where I: FixedWidthInteger {
     }
 
     func addSegment(_ vertices: [float3], _ indices: [I]) -> [I] {
-        let offsetIndices = indices.map { I(vertices.count) + $0 }
+        let offset = I(self.vertices.count)
+        let offsetIndices = indices.map { offset + $0 }
 
         _ = addVertices(vertices)
         addIndices(offsetIndices)
