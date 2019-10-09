@@ -16,6 +16,7 @@ struct AutoTreeConfig {
 
     let fullExposure: Float = 10
     let shadowIntensity: Float = 1
+    let k: Float = 1.1 // FIXME rename bud sensitivy to light >= 0
 }
 
 extension AutoTree {
@@ -26,10 +27,10 @@ extension AutoTree {
         let shadowGrid: ShadowGrid
         var buds: Set<Bud> = []
 
-        init(_ config: AutoTreeConfig) {
+        init(_ config: AutoTreeConfig, shadowGrid: ShadowGrid) {
             self.config = config
             self.hash = LocalitySensitiveHash<Bud>(cellSize: config.occupationRadius + config.perceptionRadius)
-            self.shadowGrid = ShadowGrid(ShadowGridConfig(cellSize: config.internodeLength))
+            self.shadowGrid = shadowGrid
         }
 
         func add(_ node: Node) {
@@ -43,24 +44,52 @@ extension AutoTree {
             default: ()
             }
 
-            for child in node.children {
-                add(child)
+            if let mainChild = node.mainChild {
+                add(mainChild)
+            }
+            if let lateralChild = node.lateralChild {
+                add(lateralChild)
             }
         }
 
-        internal func updateVigor() {
+        internal func updateLightExposure() -> [Internode:Float] {
+            var lightExposures: [Internode:Float] = [:]
             let start = Date()
+            print("====", buds.count)
             for bud in buds {
                 let lightExposure = self.lightExposure(of: bud)
-                if let internode = bud.parent as? Internode {
-                    internode.lightExposure += lightExposure
+                var node: Node = bud
+                while let internode = node.parent as? Internode {
+                    lightExposures[internode] = lightExposures[internode, default: 0] + lightExposure
+                    print("setting to \(lightExposures[internode])) given \(lightExposure)")
+                    node = internode
                 }
             }
             print("finishsed in ", Date().timeIntervalSince(start))
+            return lightExposures
         }
 
+//        internal func updateVigor(exposures: [Internode:Float]) -> [Internode:Float] {
+//            let main: Internode = ()
+//            let lateral: Internode = ()
+//
+//            let baseVigor = vigor(for: root, given: exposures)
+//            let mainQ = vigor(for: main, given: exposures)
+//            let lateralQ = vigor(for: lateral, given: exposures)
+//
+//            let denominator = (config.lambda * mainQ + (1 - config.lambda) * lateralQ) / baseVigor
+//            let mainVigor = config.lambda * mainQ / denominator
+//            let lateralVigor = (1 - config.lambda) * lateralQ / denominator
+//        }
+//
+//        private func vigor(for internode: Internode, given exposures: [Internode:Float]) -> Float {
+//            let l = exposures[root]
+//            return pow(l, config.k)
+//        }
+
         func update() {
-            updateVigor()
+            let exposures = updateLightExposure()
+//            _ = updateVigor(exposures: exposures)
 
             var selectedBuds: [Bud:Set<float3>] = [:]
             for point in attractionPoints {
@@ -87,13 +116,13 @@ extension AutoTree {
                 }
             }
             for (bud, points) in selectedBuds {
-                let (internode, buds) = bud.grow(towards: Array(points))
+                let (internode, (lateralBud, terminalBud)) = bud.grow(towards: Array(points))
                 hash.remove(bud)
                 self.buds.remove(bud)
                 shadowGrid[bud.position] -= config.shadowIntensity
                 shadowGrid[internode.position] += config.shadowIntensity
 
-                for bud in buds {
+                for bud in [lateralBud, terminalBud].compactMap({ $0 }) {
                     hash.add(bud)
                     self.buds.insert(bud)
                     shadowGrid[bud.position] += config.shadowIntensity
@@ -101,7 +130,7 @@ extension AutoTree {
             }
         }
 
-        func lightExposure(of bud: Bud) -> Float {
+        private func lightExposure(of bud: Bud) -> Float {
             return max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
         }
     }

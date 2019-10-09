@@ -1,6 +1,10 @@
 import Foundation
 import simd
 
+protocol AutoTreeShadowGrid: class {
+    subscript(position: float3) -> Float { get set }
+}
+
 extension AutoTree {
     struct ShadowGridConfig {
         let cellSize: Float
@@ -8,7 +12,9 @@ extension AutoTree {
         let shadowDepth: Int = 2 // 4..8
     }
 
-    final class ShadowGrid {
+    typealias ShadowGrid = AutoTreeShadowGrid
+
+    final class HashingShadowGrid: ShadowGrid {
         let config: ShadowGridConfig
         private var storage: [int3:Float] = [:]
 

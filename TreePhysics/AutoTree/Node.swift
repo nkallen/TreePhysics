@@ -6,7 +6,9 @@ extension AutoTree {
         let config: AutoTreeConfig
 
         weak var parent: Node? = nil
-        private(set) var children: Set<Node> = []
+        private(set) var lateralChild: Node? = nil
+        private(set) var mainChild: Node? = nil
+
         let position: float3
         let orientation: simd_quatf
 
@@ -17,30 +19,56 @@ extension AutoTree {
             }
         }
 
+        var thickestChild: (Internode?, Set<Node>) {
+            var rest: Set<Node> = Set([mainChild, lateralChild].compactMap { $0 })
+            var thickest: Internode? = nil
+            if case let internode as Internode = lateralChild {
+                thickest = internode
+                rest.remove(internode)
+            }
+            if case let internode as Internode = mainChild {
+                if let thickest_ = thickest {
+                    if internode.terminalBranchCount < thickest_.terminalBranchCount {
+                        thickest = internode
+                        rest.remove(internode)
+                    }
+                } else {
+                    thickest = internode
+                    rest.remove(internode)
+                }
+            }
+            return (thickest, rest)
+        }
+
         init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
             self.config = config
             self.position = position
             self.orientation = orientation
         }
 
-        func removeFromParent() {
-            guard let parent = parent else { return }
-
-            parent.children.remove(self)
-            if self is TerminalBud && parent is Internode {
-                parent.terminalBranchCount -= 1
+        func replaceBud(_ bud: Bud, with internode: Internode) {
+            switch bud {
+            case let bud as TerminalBud where mainChild == bud:
+                mainChild = internode
+            case let bud as LateralBud where lateralChild == bud:
+                terminalBranchCount += internode.terminalBranchCount
+                lateralChild = internode
+            default: fatalError()
             }
-
-            self.parent = nil
+            internode.parent = self
+            bud.parent = nil
         }
 
-        func addChild(_ node: Node) {
-            children.insert(node)
-            node.parent = self
-
-            if self is Internode && node is TerminalBud {
+        func addBud(_ bud: Bud) {
+            switch bud {
+            case let bud as TerminalBud where mainChild == nil:
+                self.mainChild = bud
                 terminalBranchCount += 1
+            case let bud as LateralBud where lateralChild == nil:
+                self.lateralChild = bud
+            default: fatalError()
             }
+            bud.parent = self
         }
     }
 
@@ -49,7 +77,7 @@ extension AutoTree {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        func grow(towards points: [float3], produceLateralBud: Bool) -> (Internode, [Bud]) {
+        func grow(towards points: [float3], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
             var newDirection = float3.zero
@@ -57,33 +85,32 @@ extension AutoTree {
                 let directionToAttractionPoint = point - self.position
                 newDirection += normalize(directionToAttractionPoint)
             }
+            if newDirection == .zero {
+                newDirection = orientation.heading
+            }
             newDirection = normalize(newDirection)
 
             let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized
             let branchingRotation = simd_quatf(angle: config.branchingAngle, axis: newOrientation.up)
             let phyllotacticRotation = simd_quatf(angle: config.phyllotacticAngle, axis: newOrientation.heading)
 
-            var buds: [Bud] = []
-
+            var lateralBud: LateralBud? = nil
             if produceLateralBud {
-                let lateralBud = LateralBud(config: config, position: position, orientation: (branchingRotation * newOrientation).normalized)
-                parent.addChild(lateralBud)
-                buds.append(lateralBud)
+                lateralBud = LateralBud(config: config, position: position, orientation: (branchingRotation * newOrientation).normalized)
+                parent.addBud(lateralBud!)
             }
 
             let internode = Internode(config: config, position: position, orientation: newOrientation)
-            parent.addChild(internode)
 
             let terminalBud = TerminalBud(config: config, position: position + config.internodeLength * newOrientation.heading, orientation: (phyllotacticRotation * newOrientation).normalized)
-            buds.append(terminalBud)
-            internode.addChild(terminalBud)
+            internode.addBud(terminalBud)
 
-            self.removeFromParent()
+            parent.replaceBud(self, with: internode)
 
-            return (internode, buds)
+            return (internode, (terminalBud, lateralBud))
         }
 
-        func grow(towards points: [float3]) -> (AutoTree.Internode, [AutoTree.Bud]) {
+        func grow(towards points: [float3] = []) -> (Internode, (TerminalBud, LateralBud?)) {
             fatalError("Abstract method")
         }
 
@@ -98,8 +125,12 @@ extension AutoTree {
             return simd_quatf(from: orientation.heading, to: direction).angle <= config.perceptionAngle
         }
 
-        override func addChild(_ node: AutoTree.Node) {
-            fatalError("Nodes cannot have children")
+        override func addBud(_ bud: Bud) {
+            fatalError("Buds cannot have children")
+        }
+
+        override func replaceBud(_ bud: Bud, with internode: Internode) {
+            fatalError("Buds cannot have children")
         }
     }
 
@@ -108,7 +139,7 @@ extension AutoTree {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(towards points: [float3]) -> (AutoTree.Internode, [AutoTree.Bud]) {
+        override func grow(towards points: [float3] = []) -> (Internode, (TerminalBud, LateralBud?)) {
             return grow(towards: points, produceLateralBud: parent is Internode)
         }
     }
@@ -118,21 +149,12 @@ extension AutoTree {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(towards points: [float3]) -> (AutoTree.Internode, [AutoTree.Bud]) {
+        override func grow(towards points: [float3] = []) -> (Internode, (TerminalBud, LateralBud?)) {
             return grow(towards: points, produceLateralBud: false)
         }
     }
 
     final class Internode: Node {
-        var lightExposure: Float = 0 {
-            didSet {
-                let delta = lightExposure - oldValue
-                if let internode = parent as? Internode {
-                    internode.lightExposure += delta
-                }
-            }
-        }
-
         func diameter(exponent: Float) -> Float {
             return pow(Float(terminalBranchCount) * pow(2*config.extremityRadius, exponent), 1/exponent)
         }

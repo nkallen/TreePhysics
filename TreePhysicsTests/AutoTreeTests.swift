@@ -7,63 +7,59 @@ class AutoTreeTests: XCTestCase {
     var config: AutoTreeConfig!
     var autoTree: AutoTree!
     var root: AutoTree.Node!
-    var terminalBud: AutoTree.TerminalBud!
+    var firstBud: AutoTree.TerminalBud!
 
     override func setUp() {
         super.setUp()
         self.config = AutoTreeConfig()
         self.autoTree = AutoTree(config)
-        self.root = autoTree.root()
-        self.terminalBud = autoTree.terminalBud(position: .zero, orientation: .identity)
-        root.addChild(terminalBud)
+        let (root, firstBud) = autoTree.seedling()
+        self.root = root
+        self.firstBud = firstBud
     }
 
-    func testGrow() {
+    func testGrow() throws {
         // start with root -> terminalBud
         // transition to root -> internode -> terminalBud
-        var (internode, buds) = terminalBud.grow(towards: [float3(1,1,0), float3(1,-1,0)])
+        var (internode, (terminalBud, lateralBud)) = firstBud.grow(towards: [float3(1,1,0), float3(1,-1,0)])
 
-        XCTAssertEqual(internode.position, terminalBud.position)
+        XCTAssertEqual(internode.position, firstBud.position)
         XCTAssertEqual(simd_quatf(angle: -.pi/2, axis: .z), internode.orientation, accuracy: 0.0001)
-        XCTAssertEqual(1, buds.count)
+        XCTAssertNil(lateralBud)
 
-        var terminalBud = buds.first! as! AutoTree.TerminalBud
         XCTAssertEqual(.x * config.internodeLength, terminalBud.position, accuracy: 0.0001)
         XCTAssertEqual(simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation, terminalBud.orientation)
 
         // transition to root -> internode -> [lateralBud] internode -> terminalBud
-        (internode, buds) = terminalBud.grow(towards: [float3(10,0,0)])
-        XCTAssertEqual(2, buds.count)
-        terminalBud = buds.first(where: { $0 is AutoTree.TerminalBud }) as! AutoTree.TerminalBud
-        let lateralBud = buds.first(where: { $0 is AutoTree.LateralBud }) as! AutoTree.LateralBud
+        (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [float3(10,0,0)])
+        let lateralBud_ = try XCTUnwrap(lateralBud)
 
         XCTAssertEqual(.x * config.internodeLength * 2, terminalBud.position, accuracy: 0.0001)
         XCTAssertEqual(
             (simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation).normalized,
             terminalBud.orientation)
 
-        XCTAssertEqual(internode.position, lateralBud.position)
+        XCTAssertEqual(internode.position, lateralBud_.position)
         XCTAssertEqual(
             (simd_quatf(angle: config.branchingAngle, axis: internode.orientation.up) * internode.orientation).normalized,
-            lateralBud.orientation)
+            lateralBud_.orientation)
     }
 
-    func testTerminalBranchCount() {
-        XCTAssertEqual(0, root.terminalBranchCount)
-        let (_, buds) = terminalBud.grow(towards: [])
+    // FIXME rename terminalBudCount
+    func testTerminalBranchCount() throws {
         XCTAssertEqual(1, root.terminalBranchCount)
-        for bud in buds {
-            let (_, buds) = bud.grow(towards: [])
-            for bud in buds {
-                _ = bud.grow(towards: [])
-            }
-        }
+        let (_, (terminalBud0, _)) = firstBud.grow()
+        XCTAssertEqual(1, root.terminalBranchCount)
+        let (_, (terminalBud1, lateralBud_)) = terminalBud0.grow()
+        let lateralBud = try XCTUnwrap(lateralBud_)
+        _ = terminalBud1.grow()
+        _ = lateralBud.grow()
         XCTAssertEqual(2, root.terminalBranchCount)
     }
 
     func testShadowGrid() {
         let config = AutoTree.ShadowGridConfig(cellSize: 1)
-        let grid = AutoTree.ShadowGrid(config)
+        let grid = AutoTree.HashingShadowGrid(config)
         grid[float3(3,3,3)] += 1
         for i in 0..<8 {
             for k in 0..<7 {
@@ -94,36 +90,54 @@ class AutoTreeTests: XCTestCase {
     }
 
     func testLightExposureSimple() {
-        let root = autoTree.root()
-        let internode = autoTree.internode(position: .zero, orientation: .identity)
-        let bud = autoTree.terminalBud(position: .y * 1, orientation: .identity)
+        let (internode, (terminalBud, _)) = firstBud.grow()
 
-        let simulator = autoTree.growthSimulator()
+        let fakeShadowGrid = FakeShadowGrid()
+        let simulator = autoTree.growthSimulator(shadowGrid: fakeShadowGrid)
         simulator.add(root)
-        simulator.updateVigor()
-        XCTAssertEqual(config.fullExposure, internode.lightExposure)
+
+        fakeShadowGrid[terminalBud.position] = config.shadowIntensity
+        let exposures = simulator.updateLightExposure()
+        XCTAssertEqual(config.fullExposure, exposures[internode])
     }
 
-    func testLightExposureBranch() {
-        let root = autoTree.root()
-        let internode0 = autoTree.internode(position: .zero, orientation: .identity)
-        let internode1 = autoTree.internode(position: .y * 1, orientation: .identity)
-        let internode2 = autoTree.internode(position: .y * 1, orientation: simd_quatf(angle: .pi/4, axis: .z))
-        let bud1 = autoTree.terminalBud(position: internode1.position + internode1.orientation.heading * 1, orientation: .identity)
-        let bud2 = autoTree.terminalBud(position: internode2.position + internode2.orientation.heading * 1, orientation: .identity)
+    func testLightExposureBranch() throws {
+        let (internode0, (terminalBud0, _)) = firstBud.grow()
+        let (internode1, (terminalBud1, lateralBud1_)) = terminalBud0.grow()
+        let lateralBud1 = try XCTUnwrap(lateralBud1_)
+        let (internode2, (terminalBud2, _)) = lateralBud1.grow()
 
-        root.addChild(internode0)
-        internode0.addChild(internode1)
-        internode0.addChild(internode2)
-        internode1.addChild(bud1)
-        internode2.addChild(bud2)
-
-        let simulator = autoTree.growthSimulator()
+        let fakeShadowGrid = FakeShadowGrid()
+        let simulator = autoTree.growthSimulator(shadowGrid: fakeShadowGrid)
         simulator.add(root)
-        simulator.updateVigor()
 
-        XCTAssertEqual(config.fullExposure, internode1.lightExposure)
-        XCTAssertEqual(config.fullExposure, internode2.lightExposure)
-        XCTAssertEqual(internode1.lightExposure + internode2.lightExposure, internode0.lightExposure)
+        fakeShadowGrid[terminalBud1.position] = config.shadowIntensity
+        fakeShadowGrid[terminalBud2.position] = config.shadowIntensity * 3
+
+        let exposures = simulator.updateLightExposure()
+
+        let exposure0 = try XCTUnwrap(exposures[internode0])
+        let exposure1 = try XCTUnwrap(exposures[internode1])
+        let exposure2 = try XCTUnwrap(exposures[internode2])
+
+        XCTAssertEqual(config.fullExposure, exposure1)
+        XCTAssertEqual(config.fullExposure - config.shadowIntensity * 2, exposure2)
+        XCTAssertEqual(exposure1 + exposure2, exposure0)
     }
+}
+
+class FakeShadowGrid: AutoTree.ShadowGrid {
+    var data: [float3:Float] = [:]
+
+    subscript(position: float3) -> Float {
+        get {
+            print("asked about \(position) and returned \(data[position] ?? 0)")
+            return data[position] ?? 0
+        }
+        set(newValue) {
+            data[position] = newValue
+        }
+    }
+
+
 }

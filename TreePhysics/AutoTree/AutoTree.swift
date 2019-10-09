@@ -4,11 +4,9 @@ import SceneKit
 
 struct AutoTree {
     let config: AutoTreeConfig
-    let simulator: GrowthSimulator
 
     init(_ config: AutoTreeConfig = AutoTreeConfig()) {
         self.config = config
-        self.simulator = GrowthSimulator(config)
     }
 
     func root() -> Node {
@@ -27,15 +25,16 @@ struct AutoTree {
         return Internode(config: config, position: position, orientation: orientation)
     }
 
-    func seedling(position: float3 = .zero, orientation: simd_quatf = .identity) -> Node {
+    func seedling(position: float3 = .zero, orientation: simd_quatf = .identity) -> (Node, TerminalBud) {
         let root = self.root()
         let bud = self.terminalBud(position: .zero, orientation: .identity)
-        root.addChild(bud)
-        return root
+        root.addBud(bud)
+        return (root, bud)
     }
 
-    func growthSimulator() -> GrowthSimulator {
-        return GrowthSimulator(config)
+    func growthSimulator(shadowGrid: ShadowGrid? = nil) -> GrowthSimulator {
+        let shadowGrid = shadowGrid ?? HashingShadowGrid(ShadowGridConfig(cellSize: config.internodeLength))
+        return GrowthSimulator(config, shadowGrid: shadowGrid)
     }
 
     func draw(_ node: Node, pen: CylinderPen<UInt16>) {
@@ -57,7 +56,7 @@ struct AutoTree {
 
         // Reorganize branching structure following thickest path topology,
         // cf, [Longay 2014], appendix C.3
-        let (thickest, rest) = node.children.thickest
+        let (thickest, rest) = node.thickestChild
         for child in rest {
             let radialSegmentCount: Int?
             if case let internode as Internode = child {

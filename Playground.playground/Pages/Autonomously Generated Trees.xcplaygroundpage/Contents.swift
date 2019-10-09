@@ -6,7 +6,7 @@ import SceneKit.ModelIO
 
 let autoTree = AutoTree()
 
-let root = autoTree.seedling()
+let (root, _) = autoTree.seedling()
 let simulator = autoTree.growthSimulator()
 simulator.add(root)
 
