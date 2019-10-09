@@ -61,7 +61,7 @@ struct AutoTree {
         for child in rest {
             let radialSegmentCount: Int?
             if case let internode as Internode = child {
-                radialSegmentCount = Int(3 * pow(internode.diameter(exponent: diameterExponent), config.n) / config.extremityRadius)
+                radialSegmentCount = Int(3 * pow(internode.diameter(exponent: diameterExponent), config.meshDetail) / config.extremityRadius)
             } else {
                 radialSegmentCount = nil
             }

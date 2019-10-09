@@ -10,14 +10,14 @@ struct AutoTreeConfig {
     let perceptionAngle: Float = .pi/4
     let perceptionRadius: Float = 0.05 * 12
 
-    let n: Float = 1.1 // FIXME rename
+    let meshDetail: Float = 1.1 //  >= 1
     let extremityRadius: Float = 0.001
     let baseRadius: Float = 0.05
 
-    let fullExposure: Float = 10
-    let shadowIntensity: Float = 1
-    let k: Float = 1.1 // FIXME rename bud sensitivy to light >= 0
-    let lambda: Float = 0.5 // 0..1
+    let fullExposure: Float = 10 // > 0
+    let shadowIntensity: Float = 1 // > 0
+    let sensitivityOfBudsToLight: Float = 1.1 // >= 0
+    let vigorBias: Float = 0.5 // 0..1 // higher is main branch, lower is lateral
 }
 
 extension AutoTree {
@@ -80,7 +80,7 @@ extension AutoTree {
 
             func unbiasedVigor(for parent: Parent) -> Float {
                 let l = exposures[parent]!
-                return pow(l, config.k)
+                return pow(l, config.sensitivityOfBudsToLight)
             }
 
             func recurse(_ parent: Parent) {
@@ -90,10 +90,10 @@ extension AutoTree {
                     let unbiasedMainVigor = unbiasedVigor(for: main)
                     let unbiasedLateralVigor = unbiasedVigor(for: lateral)
 
-                    let denominator: Float = (config.lambda * unbiasedMainVigor + (1 - config.lambda) * unbiasedLateralVigor) / baseVigor
+                    let denominator: Float = (config.vigorBias * unbiasedMainVigor + (1 - config.vigorBias) * unbiasedLateralVigor) / baseVigor
                     print("denominator", denominator)
-                    vigors[main] = config.lambda * unbiasedMainVigor / denominator
-                    vigors[lateral] = (1 - config.lambda) * unbiasedLateralVigor / denominator
+                    vigors[main] = config.vigorBias * unbiasedMainVigor / denominator
+                    vigors[lateral] = (1 - config.vigorBias) * unbiasedLateralVigor / denominator
                     recurse(main)
                     recurse(lateral)
                 } else if let node = (parent.mainChild ?? parent.lateralChild) as? Internode {

@@ -100,7 +100,7 @@ class AutoTreeTests: XCTestCase {
         let exposures = simulator.updateLightExposure()
         XCTAssertEqual(config.fullExposure, exposures[internode])
         let vigors = simulator.updateVigor(exposures: exposures)
-        XCTAssertEqual(pow(config.fullExposure, config.k), vigors[internode])
+        XCTAssertEqual(pow(config.fullExposure, config.sensitivityOfBudsToLight), vigors[internode])
     }
 
     func testVigorBranch() throws {
@@ -127,9 +127,9 @@ class AutoTreeTests: XCTestCase {
         XCTAssertEqual(exposure1 + exposure2, exposure0)
 
         let vigors = simulator.updateVigor(exposures: exposures)
-        let v = pow(exposure0, config.k)
-        let qm = pow(exposure1, config.k)
-        let ql = pow(exposure2, config.k)
+        let v = pow(exposure0, config.sensitivityOfBudsToLight)
+        let qm = pow(exposure1, config.sensitivityOfBudsToLight)
+        let ql = pow(exposure2, config.sensitivityOfBudsToLight)
 
         let denominator: Float = (config.lambda * qm + (1 - config.lambda) * ql) / v
 
