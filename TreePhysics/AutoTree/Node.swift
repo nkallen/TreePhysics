@@ -5,12 +5,22 @@ extension AutoTree {
     class Node {
         let config: AutoTreeConfig
 
-        weak var parent: Node? = nil
-        private(set) var lateralChild: Node? = nil
-        private(set) var mainChild: Node? = nil
+        weak var parent: Parent? = nil
 
         let position: float3
         let orientation: simd_quatf
+
+        fileprivate init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
+            self.config = config
+            self.position = position
+            self.orientation = orientation
+        }
+
+    }
+
+    class Parent: Node {
+        private(set) var lateralChild: Node? = nil
+        private(set) var mainChild: Node? = nil
 
         private(set) var terminalBranchCount: Int = 0 {
             didSet {
@@ -40,10 +50,8 @@ extension AutoTree {
             return (thickest, rest)
         }
 
-        init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
-            self.config = config
-            self.position = position
-            self.orientation = orientation
+        public override init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
+            super.init(config: config, position: position, orientation: orientation)
         }
 
         func replaceBud(_ bud: Bud, with internode: Internode) {
@@ -73,10 +81,6 @@ extension AutoTree {
     }
 
     class Bud: Node {
-        fileprivate override init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
-            super.init(config: config, position: position, orientation: orientation)
-        }
-
         func grow(towards points: [float3], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
@@ -124,14 +128,6 @@ extension AutoTree {
             if dist > config.perceptionRadius + config.occupationRadius { return false }
             return simd_quatf(from: orientation.heading, to: direction).angle <= config.perceptionAngle
         }
-
-        override func addBud(_ bud: Bud) {
-            fatalError("Buds cannot have children")
-        }
-
-        override func replaceBud(_ bud: Bud, with internode: Internode) {
-            fatalError("Buds cannot have children")
-        }
     }
 
     final class TerminalBud: Bud {
@@ -154,7 +150,7 @@ extension AutoTree {
         }
     }
 
-    final class Internode: Node {
+    final class Internode: Parent {
         func diameter(exponent: Float) -> Float {
             return pow(Float(terminalBranchCount) * pow(2*config.extremityRadius, exponent), 1/exponent)
         }

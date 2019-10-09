@@ -9,8 +9,8 @@ struct AutoTree {
         self.config = config
     }
 
-    func root() -> Node {
-        return Node(config: config, position: .zero, orientation: .identity)
+    func root() -> Parent {
+        return Parent(config: config, position: .zero, orientation: .identity)
     }
 
     func lateralBud(position: float3, orientation: simd_quatf) -> LateralBud {
@@ -25,7 +25,7 @@ struct AutoTree {
         return Internode(config: config, position: position, orientation: orientation)
     }
 
-    func seedling(position: float3 = .zero, orientation: simd_quatf = .identity) -> (Node, TerminalBud) {
+    func seedling(position: float3 = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
         let root = self.root()
         let bud = self.terminalBud(position: .zero, orientation: .identity)
         root.addBud(bud)
@@ -37,9 +37,9 @@ struct AutoTree {
         return GrowthSimulator(config, shadowGrid: shadowGrid)
     }
 
-    func draw(_ node: Node, pen: CylinderPen<UInt16>) {
-        let diameterExponent = log(Float(node.terminalBranchCount)) / (log(2*config.baseRadius) - log(2*config.extremityRadius))
-        draw(node, pen: pen, diameterExponent: diameterExponent)
+    func draw(_ parent: Parent, pen: CylinderPen<UInt16>) {
+        let diameterExponent = log(Float(parent.terminalBranchCount)) / (log(2*config.baseRadius) - log(2*config.extremityRadius))
+        draw(parent, pen: pen, diameterExponent: diameterExponent)
     }
 
     func draw(_ node: Node, pen: CylinderPen<UInt16>, diameterExponent: Float) {
@@ -54,9 +54,10 @@ struct AutoTree {
             pen.start(at: node.position, orientation: node.orientation, thickness: sqr(config.baseRadius) * .pi)
         }
 
+        guard let parent = node as? Parent else { return }
         // Reorganize branching structure following thickest path topology,
         // cf, [Longay 2014], appendix C.3
-        let (thickest, rest) = node.thickestChild
+        let (thickest, rest) = parent.thickestChild
         for child in rest {
             let radialSegmentCount: Int?
             if case let internode as Internode = child {

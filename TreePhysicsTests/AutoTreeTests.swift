@@ -6,7 +6,7 @@ import simd
 class AutoTreeTests: XCTestCase {
     var config: AutoTreeConfig!
     var autoTree: AutoTree!
-    var root: AutoTree.Node!
+    var root: AutoTree.Parent!
     var firstBud: AutoTree.TerminalBud!
 
     override func setUp() {
@@ -89,7 +89,7 @@ class AutoTreeTests: XCTestCase {
         }
     }
 
-    func testLightExposureSimple() {
+    func testVigorSimple() {
         let (internode, (terminalBud, _)) = firstBud.grow()
 
         let fakeShadowGrid = FakeShadowGrid()
@@ -99,9 +99,11 @@ class AutoTreeTests: XCTestCase {
         fakeShadowGrid[terminalBud.position] = config.shadowIntensity
         let exposures = simulator.updateLightExposure()
         XCTAssertEqual(config.fullExposure, exposures[internode])
+        let vigors = simulator.updateVigor(exposures: exposures)
+        XCTAssertEqual(pow(config.fullExposure, config.k), vigors[internode])
     }
 
-    func testLightExposureBranch() throws {
+    func testVigorBranch() throws {
         let (internode0, (terminalBud0, _)) = firstBud.grow()
         let (internode1, (terminalBud1, lateralBud1_)) = terminalBud0.grow()
         let lateralBud1 = try XCTUnwrap(lateralBud1_)
@@ -112,7 +114,7 @@ class AutoTreeTests: XCTestCase {
         simulator.add(root)
 
         fakeShadowGrid[terminalBud1.position] = config.shadowIntensity
-        fakeShadowGrid[terminalBud2.position] = config.shadowIntensity * 3
+        fakeShadowGrid[terminalBud2.position] = config.shadowIntensity * 4
 
         let exposures = simulator.updateLightExposure()
 
@@ -121,8 +123,19 @@ class AutoTreeTests: XCTestCase {
         let exposure2 = try XCTUnwrap(exposures[internode2])
 
         XCTAssertEqual(config.fullExposure, exposure1)
-        XCTAssertEqual(config.fullExposure - config.shadowIntensity * 2, exposure2)
+        XCTAssertEqual(config.fullExposure - config.shadowIntensity * 3, exposure2)
         XCTAssertEqual(exposure1 + exposure2, exposure0)
+
+        let vigors = simulator.updateVigor(exposures: exposures)
+        let v = pow(exposure0, config.k)
+        let qm = pow(exposure1, config.k)
+        let ql = pow(exposure2, config.k)
+
+        let denominator: Float = (config.lambda * qm + (1 - config.lambda) * ql) / v
+
+        XCTAssertEqual(v, vigors[internode0])
+        XCTAssertEqual(config.lambda * qm / denominator, vigors[internode1])
+        XCTAssertEqual((1-config.lambda) * ql / denominator, vigors[internode2])
     }
 }
 

@@ -17,6 +17,7 @@ struct AutoTreeConfig {
     let fullExposure: Float = 10
     let shadowIntensity: Float = 1
     let k: Float = 1.1 // FIXME rename bud sensitivy to light >= 0
+    let lambda: Float = 0.5 // 0..1
 }
 
 extension AutoTree {
@@ -25,6 +26,7 @@ extension AutoTree {
         var attractionPoints: Set<float3> = []
         let hash: LocalitySensitiveHash<Bud>
         let shadowGrid: ShadowGrid
+        var root: Parent!
         var buds: Set<Bud> = []
 
         init(_ config: AutoTreeConfig, shadowGrid: ShadowGrid) {
@@ -33,63 +35,82 @@ extension AutoTree {
             self.shadowGrid = shadowGrid
         }
 
-        func add(_ node: Node) {
-            switch node {
-            case let bud as Bud:
-                hash.add(bud)
-                buds.insert(bud)
+        func add(_ parent: Parent) {
+            func add(_ node: Node) {
                 shadowGrid[node.position] += config.shadowIntensity
-            case is Internode:
-                shadowGrid[node.position] += config.shadowIntensity
-            default: ()
+
+                switch node {
+                case let bud as Bud:
+                    hash.add(bud)
+                    buds.insert(bud)
+                case let parent as Parent:
+                    if let mainChild = parent.mainChild {
+                        add(mainChild)
+                    }
+                    if let lateralChild = parent.lateralChild {
+                        add(lateralChild)
+                    }
+                default: ()
+                }
             }
 
-            if let mainChild = node.mainChild {
-                add(mainChild)
-            }
-            if let lateralChild = node.lateralChild {
-                add(lateralChild)
-            }
+            self.root = parent
+            add(parent as Node)
         }
 
-        internal func updateLightExposure() -> [Internode:Float] {
-            var lightExposures: [Internode:Float] = [:]
-            let start = Date()
-            print("====", buds.count)
+        internal func updateLightExposure() -> [Parent:Float] {
+            var lightExposures: [Parent:Float] = [:]
+            func lightExposure(of bud: Bud) -> Float {
+                return max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
+            }
+
             for bud in buds {
-                let lightExposure = self.lightExposure(of: bud)
+                let l = lightExposure(of: bud)
                 var node: Node = bud
-                while let internode = node.parent as? Internode {
-                    lightExposures[internode] = lightExposures[internode, default: 0] + lightExposure
-                    print("setting to \(lightExposures[internode])) given \(lightExposure)")
+                while let internode = node.parent {
+                    lightExposures[internode] = lightExposures[internode, default: 0] + l
                     node = internode
                 }
             }
-            print("finishsed in ", Date().timeIntervalSince(start))
             return lightExposures
         }
 
-//        internal func updateVigor(exposures: [Internode:Float]) -> [Internode:Float] {
-//            let main: Internode = ()
-//            let lateral: Internode = ()
-//
-//            let baseVigor = vigor(for: root, given: exposures)
-//            let mainQ = vigor(for: main, given: exposures)
-//            let lateralQ = vigor(for: lateral, given: exposures)
-//
-//            let denominator = (config.lambda * mainQ + (1 - config.lambda) * lateralQ) / baseVigor
-//            let mainVigor = config.lambda * mainQ / denominator
-//            let lateralVigor = (1 - config.lambda) * lateralQ / denominator
-//        }
-//
-//        private func vigor(for internode: Internode, given exposures: [Internode:Float]) -> Float {
-//            let l = exposures[root]
-//            return pow(l, config.k)
-//        }
+        func updateVigor(exposures: [Parent:Float]) -> [Parent:Float] {
+            var vigors: [Parent:Float] = [:]
+
+            func unbiasedVigor(for parent: Parent) -> Float {
+                let l = exposures[parent]!
+                return pow(l, config.k)
+            }
+
+            func recurse(_ parent: Parent) {
+                let baseVigor = vigors[parent]!
+
+                if let main = parent.mainChild as? Internode, let lateral = parent.lateralChild as? Internode {
+                    let unbiasedMainVigor = unbiasedVigor(for: main)
+                    let unbiasedLateralVigor = unbiasedVigor(for: lateral)
+
+                    let denominator: Float = (config.lambda * unbiasedMainVigor + (1 - config.lambda) * unbiasedLateralVigor) / baseVigor
+                    print("denominator", denominator)
+                    vigors[main] = config.lambda * unbiasedMainVigor / denominator
+                    vigors[lateral] = (1 - config.lambda) * unbiasedLateralVigor / denominator
+                    recurse(main)
+                    recurse(lateral)
+                } else if let node = (parent.mainChild ?? parent.lateralChild) as? Internode {
+                    vigors[node] = baseVigor
+                    recurse(node)
+                }
+            }
+
+            vigors[root] = unbiasedVigor(for: root)
+            recurse(root)
+
+            return vigors
+        }
 
         func update() {
             let exposures = updateLightExposure()
-//            _ = updateVigor(exposures: exposures)
+            _ = updateVigor(exposures: exposures)
 
             var selectedBuds: [Bud:Set<float3>] = [:]
             for point in attractionPoints {
@@ -128,10 +149,6 @@ extension AutoTree {
                     shadowGrid[bud.position] += config.shadowIntensity
                 }
             }
-        }
-
-        private func lightExposure(of bud: Bud) -> Float {
-            return max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
         }
     }
 }
