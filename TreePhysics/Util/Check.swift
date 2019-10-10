@@ -12,6 +12,10 @@ struct check {
         precondition(x > 0)
     }
 
+    static func positive(_ x: Int) {
+        precondition(x > 0)
+    }
+
     static func nonneg(_ x: Float) {
         precondition(x >= 0)
     }

@@ -95,7 +95,7 @@ class MathTests: XCTestCase {
             SIMD3<Double>(0,0.999979,0.006502)
         )), Q, accuracy: 0.001)
         XCTAssertEqual(SIMD3<Double>(1/3,0.349891,0.483442), d, accuracy: 0.0001)
-        XCTAssertEqual(SIMD3<Double>(0,-0.049855), e, accuracy: 0.0001)
+        XCTAssertEqual(SIMD2<Double>(0,-0.049855), e, accuracy: 0.0001)
         XCTAssertEqual(
             SIMD3<Float>(1/3,1/3,1/2),
             matrix.eigen_ql!.0, accuracy: 0.0001)

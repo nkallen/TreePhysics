@@ -7,8 +7,8 @@ import SceneKit.ModelIO
 var config = AutoTree.Config()
 config.internodeLength = 0.03
 config.occupationRadius = 0.03 * 1
-config.perceptionRadius = 0.03 * 6
-config.biasVigorTowardsMainAxis = 0.46
+config.perceptionRadius = 0.03 * 7
+config.biasVigorTowardsMainAxis = 0.5
 config.baseRadius = 0.01
 config.extremityRadius = 0.001
 config.sensitivityOfBudsToLight = 1
@@ -30,16 +30,18 @@ face.simdScale = float3(repeating: 1) * scale
 face.simdPosition = offset
 
 let vertices = mdlMesh.vertices.map { $0 * scale + offset }
-//simulator.addAttractionPoints(vertices)
+simulator.addAttractionPoints(vertices)
 
+var enableAllBuds = false
 for _ in 0...20 {
     print("iterating")
     do {
-        try simulator.update(enableAllBuds: true)
+        try simulator.update(enableAllBuds: enableAllBuds)
     } catch AutoTree.Error.noAttractionPoints {
         print("No attraction points")
+        enableAllBuds = true
     } catch AutoTree.Error.noSelectedBuds {
-        print("Try fiddling with the config.perceptionRadius and config.perceptionAngle")
+        print("No selected buds; Try fiddling with the config.perceptionRadius and config.perceptionAngle")
     } catch AutoTree.Error.noVigor {
         print("Try fiddling with config.fullExposure and config.shadowIntensity")
     }

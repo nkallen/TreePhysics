@@ -15,10 +15,13 @@ extension AutoTree {
         public var baseRadius: Float = 0.05
 
         public var fullExposure: Float = 10
-        public var shadowIntensity: Float = 0.1
         public var sensitivityOfBudsToLight: Float = 1.1
         public var biasVigorTowardsMainAxis: Float = 0.5
         public var maxShootLength: Int = 3
+
+        public var shadowIntensity: Float = 0.1
+        public var shadowDecayFactor: Float = 0.5
+        public var shadowDepth: Int = 5
 
         public init() {}
 
@@ -35,10 +38,13 @@ extension AutoTree {
             check.positive(baseRadius)
 
             check.positive(fullExposure)
-            check.positive(shadowIntensity)
             check.nonneg(sensitivityOfBudsToLight)
             check.normal(biasVigorTowardsMainAxis)
             check.assert(maxShootLength >= 1)
+
+            check.positive(shadowIntensity)
+            check.normal(shadowDecayFactor)
+            check.positive(shadowDepth)
         }
     }
 }

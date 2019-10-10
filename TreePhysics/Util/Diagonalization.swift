@@ -15,14 +15,14 @@ extension matrix_double3x3 {
     // The function accesses only the diagonal and upper triangular parts of
     // A. The access is read-only.
     // ---------------------------------------------------------------------------
-    var tridiagonal: (double3x3, SIMD3<Double>, SIMD3<Double>) {
+    var tridiagonal: (double3x3, SIMD3<Double>, SIMD2<Double>) {
         let  a0 = self[0],     a1 = self[1]
         let a00 = a0[0]
         let a01 = a0[1], a11 = a1[1]
         let a02 = a0[2], a12 = a1[2], a22 = self[2, 2]
 
         var d: SIMD3<Double> = .zero
-        var e: SIMD3<Double> = .zero
+        var e: SIMD2<Double> = .zero
         var u: SIMD3<Double> = .zero
         var q: SIMD3<Double> = .zero
 

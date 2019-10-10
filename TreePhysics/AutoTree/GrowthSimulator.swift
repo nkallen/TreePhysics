@@ -16,7 +16,7 @@ extension AutoTree {
         private(set) var generation = 0
         private(set) var attractionPoints: Set<SIMD3<Float>> = []
         let hash: LocalitySensitiveHash<Bud>
-        let shadowGrid: ShadowGrid // FIXME all wrong
+        let shadowGrid: ShadowGrid
         private(set) var root: Parent!
         private(set) var buds: Set<Bud> = []
 

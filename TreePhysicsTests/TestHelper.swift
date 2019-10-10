@@ -4,7 +4,7 @@ import XCTest
 import simd
 import ShaderTypes
 
-func XCTAssertEqual(_ a: SIMD3<Double>, _ b: SIMD3<Double>, accuracy: Double, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: SIMD2<Double>, _ b: SIMD2<Double>, accuracy: Double, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.x, b.x, accuracy: accuracy, message(), file: file, line: line)
     XCTAssertEqual(a.y, b.y, accuracy: accuracy, message(), file: file, line: line)
 }

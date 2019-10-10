@@ -69,7 +69,6 @@
 		9E9D4B7022F37244007DCF49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94822E78FFC0095C8AC /* CompositeBody.swift */; };
 		9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
-		9E9D4B7322F37244007DCF49 /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
 		9E9D4B7422F37244007DCF49 /* Joint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94422E78FCF0095C8AC /* Joint.swift */; };
 		9E9D4B7522F37244007DCF49 /* CPUSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */; };
 		9E9D4B7622F37244007DCF49 /* RigidBodyPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94A22E792820095C8AC /* RigidBodyPen.swift */; };
@@ -863,7 +862,6 @@
 				9E9D4B7122F37244007DCF49 /* CompositeBody.swift in Sources */,
 				9E1C70FA230C802700DA9929 /* ApplyPhysicsFields.metal in Sources */,
 				9E9D4B7222F37244007DCF49 /* Pen.swift in Sources */,
-				9E9D4B7322F37244007DCF49 /* Diagonalization.swift in Sources */,
 				9E9D4B7422F37244007DCF49 /* Joint.swift in Sources */,
 				9EE801A722FC459000198166 /* MetalKernalEncoder.swift in Sources */,
 				9E9D4B7522F37244007DCF49 /* CPUSimulator.swift in Sources */,

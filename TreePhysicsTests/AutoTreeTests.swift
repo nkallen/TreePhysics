@@ -58,7 +58,8 @@ class AutoTreeTests: XCTestCase {
     }
 
     func testShadowGrid() {
-        let config = AutoTree.ShadowGridConfig(cellSize: 1)
+        config.internodeLength = 1
+        config.shadowDepth = 2
         let grid = AutoTree.HashingShadowGrid(config)
         grid[SIMD3<Float>(3,3,3)] += 1
         for i in 0..<8 {

@@ -6,20 +6,13 @@ public protocol AutoTreeShadowGrid: class {
 }
 
 extension AutoTree {
-    // FIXME
-    struct ShadowGridConfig {
-        let cellSize: Float
-        let decayFactor: Float = 2
-        let shadowDepth: Int = 4 // 4..8
-    }
-
     public typealias ShadowGrid = AutoTreeShadowGrid
 
     final class HashingShadowGrid: ShadowGrid {
-        let config: ShadowGridConfig
+        let config: Config
         private var storage: [SIMD3<Int32>:Float] = [:]
 
-        init(_ config: ShadowGridConfig) {
+        init(_ config: Config) {
             self.config = config
         }
 
@@ -35,7 +28,7 @@ extension AutoTree {
                     for p: Int32 in -q...q {
                         for s: Int32 in -q...q {
                             let offset = SIMD3<Int32>(p,-q,s)
-                            let decayedDelta = delta * pow(config.decayFactor, -Float(q))
+                            let decayedDelta = delta * pow(config.shadowDecayFactor, Float(q))
                             let key = self.key(for: position, offset: offset)
                             storage[key, default: 0] += decayedDelta
                         }
@@ -45,7 +38,7 @@ extension AutoTree {
         }
 
         private func key(for position: SIMD3<Float>, offset: SIMD3<Int32> = SIMD3<Int32>.zero) -> SIMD3<Int32> {
-            let cell = SIMD3<Int32>(position / config.cellSize)
+            let cell = SIMD3<Int32>(position / config.internodeLength)
             return cell &+ offset
         }
     }
