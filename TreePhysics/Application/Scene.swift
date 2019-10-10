@@ -65,7 +65,7 @@ class Scene: NSObject {
         scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.25))
 
         // Forces:
-        let gravityField = GravityField(float3.zero)
+        let gravityField = GravityField(.zero)
 //        let attractorField = AttractorField()
 
 //        let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
@@ -81,7 +81,7 @@ class Scene: NSObject {
 //        cpuSimulator.add(field: attractorField)
 //        metalSimulator.add(field: attractorField)
 
-        let windField = WindField(windVelocity: float3(1,0,1)*15)
+        let windField = WindField(windVelocity: SIMD3<Float>(1,0,1)*15)
         world.add(field: windField)
         world.add(field: gravityField)
     }
@@ -95,7 +95,7 @@ var done: Bool = false
 extension Scene: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         //        let pov = renderer.pointOfView!
-//        pov.simdPosition = float3(
+//        pov.simdPosition = SIMD3<Float>(
 //            radius * sinf(Float(start.timeIntervalSinceNow)),
 //            1,
 //            radius * cosf(Float(start.timeIntervalSinceNow)))

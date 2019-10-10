@@ -8,10 +8,10 @@ extension AutoTree {
 
         weak var parent: Parent? = nil
 
-        let position: float3
+        let position: SIMD3<Float>
         let orientation: simd_quatf
 
-        fileprivate init(config: Config, position: float3, orientation: simd_quatf) {
+        fileprivate init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
             self.config = config
             self.position = position
             self.orientation = orientation
@@ -51,7 +51,7 @@ extension AutoTree {
             return (thickest, rest)
         }
 
-        public override init(config: Config, position: float3, orientation: simd_quatf) {
+        public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
@@ -82,10 +82,10 @@ extension AutoTree {
     }
 
     class Bud: Node {
-        fileprivate func grow(towards points: [float3], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
+        fileprivate func grow(towards points: [SIMD3<Float>], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
-            var newDirection = float3.zero
+            var newDirection: SIMD3<Float> = .zero
             for point in points {
                 let directionToAttractionPoint = point - self.position
                 newDirection += normalize(directionToAttractionPoint)
@@ -115,15 +115,15 @@ extension AutoTree {
             return (internode, (terminalBud, lateralBud))
         }
 
-        func grow(towards points: [float3] = []) -> (Internode, (TerminalBud, LateralBud?)) {
+        func grow(towards points: [SIMD3<Float>] = []) -> (Internode, (TerminalBud, LateralBud?)) {
             fatalError("Abstract method")
         }
 
-        func occupies(point: float3) -> Bool {
+        func occupies(point: SIMD3<Float>) -> Bool {
             return distance(position, point) < config.occupationRadius
         }
 
-        func perceives(point: float3) -> Bool {
+        func perceives(point: SIMD3<Float>) -> Bool {
             let direction = point - position
             let dist = simd_length(direction)
             if dist > config.perceptionRadius + config.occupationRadius { return false }
@@ -132,21 +132,21 @@ extension AutoTree {
     }
 
     final class TerminalBud: Bud {
-        public override init(config: Config, position: float3, orientation: simd_quatf) {
+        public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(towards points: [float3] = []) -> (Internode, (TerminalBud, LateralBud?)) {
+        override func grow(towards points: [SIMD3<Float>] = []) -> (Internode, (TerminalBud, LateralBud?)) {
             return grow(towards: points, produceLateralBud: parent is Internode)
         }
     }
 
     final class LateralBud: Bud {
-        public override init(config: Config, position: float3, orientation: simd_quatf) {
+        public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(towards points: [float3] = []) -> (Internode, (TerminalBud, LateralBud?)) {
+        override func grow(towards points: [SIMD3<Float>] = []) -> (Internode, (TerminalBud, LateralBud?)) {
             return grow(towards: points, produceLateralBud: false)
         }
     }

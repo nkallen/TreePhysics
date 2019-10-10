@@ -7,29 +7,29 @@ public class ArticulatedRigidBody: RigidBody {
     public var childJoints: Set<Joint> = []
     let composite = CompositeBody()
 
-    let localPivot: float3
-    var pivot: float3 // The `pivot` is the point at which the object connects to its parent, relative to the center of mass.
+    let localPivot: SIMD3<Float>
+    var pivot: SIMD3<Float> // The `pivot` is the point at which the object connects to its parent, relative to the center of mass.
 
     public class func `static`() -> ArticulatedRigidBody {
-        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: float3.zero, node: SCNNode())
+        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, node: SCNNode())
         rigidBody.kind = .static
         return rigidBody
     }
 
     public class func dynamic() -> ArticulatedRigidBody {
-        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: float3.zero, node: SCNNode())
+        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, node: SCNNode())
         rigidBody.kind = .dynamic
         return rigidBody
     }
 
-    public init(mass: Float, localInertiaTensor: float3x3, localPivot: float3, node: SCNNode) {
+    public init(mass: Float, localInertiaTensor: float3x3, localPivot: SIMD3<Float>, node: SCNNode) {
         self.localPivot = localPivot
         self.pivot = localPivot
 
         super.init(mass: mass, localInertiaTensor: localInertiaTensor, node: node)
     }
 
-    func add(_ child: ArticulatedRigidBody, rotation: simd_quatf, position: float3) -> Joint {
+    func add(_ child: ArticulatedRigidBody, rotation: simd_quatf, position: SIMD3<Float>) -> Joint {
         let joint = Joint(parent: self, child: child, localRotation: rotation, localPosition: position)
         childJoints.insert(joint)
         child.parentJoint = joint
@@ -38,7 +38,7 @@ public class ArticulatedRigidBody: RigidBody {
         return joint
     }
 
-    override func apply(force: float3, torque: float3 = float3.zero) {
+    override func apply(force: SIMD3<Float>, torque: SIMD3<Float> = .zero) {
         var torque = torque
         if parentJoint != nil {
             torque += cross(rotation.act(-localPivot), force)

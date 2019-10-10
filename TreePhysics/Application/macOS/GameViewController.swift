@@ -39,7 +39,7 @@ extension GameViewController {
     func handleClick(_ gestureRecognizer: NSGestureRecognizer) {
         toggle = !toggle
         print(scnView.hitTest(gestureRecognizer.location(in: scnView), options: nil))
-//        scene.gravityField.g = toggle ? float3.zero : float3(0, -9.81, 0)
+//        scene.gravityField.g = toggle ? .zero : SIMD3<Float>(0, -9.81, 0)
     }
 
 }
@@ -54,7 +54,7 @@ extension GameViewController: MySceneViewDelegate {
 
         let projectedOrigin = view.projectPoint(SCNVector3Zero)
         let vpWithZ = SCNVector3(x: nsPoint.x, y: nsPoint.y, z: projectedOrigin.z)
-        let worldPoint = float3(view.unprojectPoint(vpWithZ))
+        let worldPoint = SIMD3<Float>(view.unprojectPoint(vpWithZ))
 
 //        scene.attractorField.position = worldPoint
 //        scene.attractor.simdPosition = worldPoint

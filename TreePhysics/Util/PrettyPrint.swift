@@ -22,7 +22,7 @@ extension RigidBody: CustomDebugStringConvertible {
 
 extension RigidBodyStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "RigidBody: parentId=\(parentId) position=\(float3(position)), rotation=\(rotation), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(float3(centerOfMass)), force=\(float3(force)), torque=\(float3(torque)), inertiaTensor=\(inertiaTensor)"
+        return "RigidBody: parentId=\(parentId) position=\(position), rotation=\(rotation), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
     }
 }
 
@@ -34,7 +34,7 @@ extension CompositeBody: CustomDebugStringConvertible {
 
 extension CompositeBodyStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "CompositeBodyStruct(position: \(float3(position)), mass: \(mass), inertiaTensor: \(inertiaTensor), force: \(float3(force)), torque: \(float3(torque)), centerOfMass: \(float3(centerOfMass)))"
+        return "CompositeBodyStruct(position: \(position), mass: \(mass), inertiaTensor: \(inertiaTensor), force: \(force), torque: \(torque), centerOfMass: \(centerOfMass))"
     }
 }
 

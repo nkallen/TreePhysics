@@ -11,8 +11,7 @@ extension Leaf {
 
 public final class Leaf: ArticulatedRigidBody {
     let area: Float
-    var normal: float3
-
+    var normal: SIMD3<Float>
     public init(length: Float = 1.0, density: Float = 1.0) {
         self.area = sqr(length)
         self.normal = .z
@@ -20,7 +19,7 @@ public final class Leaf: ArticulatedRigidBody {
         // Inertia tensor for rectangular plate:
         let mass = density * area * Leaf.thickness
         let localInertiaTensor = float3x3(diagonal:
-            float3(1/12 * mass * sqr(length),
+            SIMD3<Float>(1/12 * mass * sqr(length),
                    1/12 * mass * sqr(length),
                    1/6  * mass * sqr(length)))
 
@@ -31,7 +30,7 @@ public final class Leaf: ArticulatedRigidBody {
         super.init(
             mass: mass,
             localInertiaTensor: localInertiaTensor,
-            localPivot: float3(0, -length/2, 0),
+            localPivot: SIMD3<Float>(0, -length/2, 0),
             node: node)
     }
 

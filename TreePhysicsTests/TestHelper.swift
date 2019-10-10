@@ -4,12 +4,12 @@ import XCTest
 import simd
 import ShaderTypes
 
-func XCTAssertEqual(_ a: double2, _ b: double2, accuracy: Double, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: SIMD3<Double>, _ b: SIMD3<Double>, accuracy: Double, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.x, b.x, accuracy: accuracy, message(), file: file, line: line)
     XCTAssertEqual(a.y, b.y, accuracy: accuracy, message(), file: file, line: line)
 }
 
-func XCTAssertEqual(_ a: float3, _ b: float3, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: SIMD3<Float>, _ b: SIMD3<Float>, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.x, b.x, accuracy: accuracy, message() + ".x", file: file, line: line)
     XCTAssertEqual(a.y, b.y, accuracy: accuracy, message() + ".y", file: file, line: line)
     XCTAssertEqual(a.z, b.z, accuracy: accuracy, message() + ".z", file: file, line: line)
@@ -22,7 +22,7 @@ func XCTAssertEqual(_ a: float4, _ b: float4, accuracy: Float, _ message: @autoc
     XCTAssertEqual(a.w, b.w, accuracy: accuracy, message(), file: file, line: line)
 }
 
-func XCTAssertEqual(_ a: double3, _ b: double3, accuracy: Double, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: SIMD3<Double>, _ b: SIMD3<Double>, accuracy: Double, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.x, b.x, accuracy: accuracy, message(), file: file, line: line)
     XCTAssertEqual(a.y, b.y, accuracy: accuracy, message(), file: file, line: line)
     XCTAssertEqual(a.z, b.z, accuracy: accuracy, message(), file: file, line: line)
@@ -52,7 +52,7 @@ func XCTAssertEqual(_ a: double3x3, _ b: double3x3, accuracy: Double, _ message:
     XCTAssertEqual(a.columns.2, b.columns.2, accuracy: accuracy, message(), file: file, line: line)
 }
 
-func XCTAssertEqual(_ a: [float3], _ b: [float3], accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: [SIMD3<Float>], _ b: [SIMD3<Float>], accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.count, b.count, file: file, line: line)
     for (left, right) in zip(a, b) {
         XCTAssertEqual(left, right, accuracy: accuracy, message(), file: file, line: line)
@@ -134,7 +134,7 @@ extension ArticulatedRigidBody {
     func add(_ child: Internode) -> Joint {
         switch self {
         case is Internode:
-            let joint = add(child, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: float3(0,1,0))
+            let joint = add(child, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: SIMD3<Float>(0,1,0))
             joint.stiffness = 1
             joint.torqueThreshold = .infinity
             joint.damping = 1

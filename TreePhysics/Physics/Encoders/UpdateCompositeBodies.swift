@@ -31,8 +31,8 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         commandEncoder.label  = "Update Composite Bodies"
         commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
         commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
-        var ranges = self.ranges.map { int2(Int32($0.lowerBound), Int32($0.upperBound)) }
-        commandEncoder.setBytes(&ranges, length: MemoryLayout<int2>.stride * ranges.count, index: BufferIndex.ranges.rawValue)
+        var ranges = self.ranges.map { SIMD2<Int32>(Int32($0.lowerBound), Int32($0.upperBound)) }
+        commandEncoder.setBytes(&ranges, length: MemoryLayout<SIMD2<Int32>>.stride * ranges.count, index: BufferIndex.ranges.rawValue)
 
         let maxWidth = self.ranges.first!.count
 

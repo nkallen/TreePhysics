@@ -54,7 +54,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     var compositeBodiesBuffer: MTLBuffer!
 
     var root, b1, b2: Internode!
-    let force: float3 = float3(0, 1, 0) // world coordinates
+    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
 
     override func setUp() {
         super.setUp()
@@ -76,7 +76,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     }
 
     func testUpdateCompositeBodies() {
-        let forceAppliedPosition = b2.pivot + b2.rotation.act(float3(0, 1, 0))
+        let forceAppliedPosition = b2.pivot + b2.rotation.act(SIMD3<Float>(0, 1, 0))
 
         let expect = expectation(description: "wait")
 
@@ -92,21 +92,21 @@ class UpdateCompositeBodiesTests: XCTestCase {
             XCTAssertEqual(b1_composite.mass, 2)
 
             // force
-            XCTAssertEqual(float3(b2_composite.force), self.force)
-            XCTAssertEqual(float3(b1_composite.force), self.force)
+            XCTAssertEqual(SIMD3<Float>(b2_composite.force), self.force)
+            XCTAssertEqual(SIMD3<Float>(b1_composite.force), self.force)
 
             // torque
-            XCTAssertEqual(float3(b2_composite.torque), self.b2.torque)
+            XCTAssertEqual(SIMD3<Float>(b2_composite.torque), self.b2.torque)
             let r_b1 = forceAppliedPosition - self.b1.parentJoint!.position
-            XCTAssertEqual(float3(b1_composite.torque), cross(r_b1, self.force), accuracy: 0.0001)
+            XCTAssertEqual(SIMD3<Float>(b1_composite.torque), cross(r_b1, self.force), accuracy: 0.0001)
 
             // center of mass
-            XCTAssertEqual(float3(b2_composite.centerOfMass), self.b2.centerOfMass, accuracy: 0.0001)
-            XCTAssertEqual(float3(b1_composite.centerOfMass), (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
+            XCTAssertEqual(SIMD3<Float>(b2_composite.centerOfMass), self.b2.centerOfMass, accuracy: 0.0001)
+            XCTAssertEqual(SIMD3<Float>(b1_composite.centerOfMass), (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
 
             // inertia tensor
             XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor, accuracy: 0.0001)
-            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - float3(b1_composite.centerOfMass)).skew)
+            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - SIMD3<Float>(b1_composite.centerOfMass)).skew)
             b1_inertiaTensor += b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).skew)
             XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
 
@@ -125,7 +125,7 @@ class UpdateJointsTests: XCTestCase {
     var compositeBodiesBuffer, jointsBuffer: MTLBuffer!
 
     var root, b1, b2: Internode!
-    let force: float3 = float3(0, 1, 0) // world coordinates
+    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
     override func setUp() {
@@ -140,7 +140,7 @@ class UpdateJointsTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force)
-        self.forceAppliedPosition = b2.pivot + b2.rotation.act(float3(0, 1, 0))
+        self.forceAppliedPosition = b2.pivot + b2.rotation.act(SIMD3<Float>(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
@@ -164,17 +164,17 @@ class UpdateJointsTests: XCTestCase {
 
             XCTAssertEqual(
                 float3x3(
-                    float3(0,0,0.00022747851), // i.e., a small rotation about the z axis
-                    float3(0,0,0.02657279),
-                    float3(0,0,1.4540789)
+                    SIMD3<Float>(0,0,0.00022747851), // i.e., a small rotation about the z axis
+                    SIMD3<Float>(0,0,0.02657279),
+                    SIMD3<Float>(0,0,1.4540789)
                 ),
                 b2_parentJoint.θ, accuracy: 0.0001)
 
             XCTAssertEqual(
                 float3x3(
-                    float3(0,0,8.1739134e-05), // a slightly larger torque and larger moment of inertia
-                    float3(0,0,0.009755036),
-                    float3(0,0,0.5747628)
+                    SIMD3<Float>(0,0,8.1739134e-05), // a slightly larger torque and larger moment of inertia
+                    SIMD3<Float>(0,0,0.009755036),
+                    SIMD3<Float>(0,0,0.5747628)
                 ),
                 b1_parentJoint.θ, accuracy: 0.0001)
 
@@ -194,7 +194,7 @@ class UpdateRigidBodiesTests: XCTestCase {
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
     var root, b1, b2: Internode!
-    let force: float3 = float3(0, 1, 0) // world coordinates
+    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
     override func setUp() {
@@ -209,7 +209,7 @@ class UpdateRigidBodiesTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force)
-        self.forceAppliedPosition = b2.pivot + b2.rotation.act(float3(0, 1, 0))
+        self.forceAppliedPosition = b2.pivot + b2.rotation.act(SIMD3<Float>(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
@@ -238,23 +238,23 @@ class UpdateRigidBodiesTests: XCTestCase {
             let b1 = rigidBodies[1]
 
             XCTAssertEqual(
-                float3(0.70687836, 1.7073351, 0),
-                float3(b2.position), accuracy: 0.001)
+                SIMD3<Float>(0.70687836, 1.7073351, 0),
+                SIMD3<Float>(b2.position), accuracy: 0.001)
             XCTAssertEqual(
                 float3x3(
-                    float3(0.0011795461,-1,0),
-                    float3(1,0.0011795461,0),
-                    float3(0,0,1)),
+                    SIMD3<Float>(0.0011795461,-1,0),
+                    SIMD3<Float>(1,0.0011795461,0),
+                    SIMD3<Float>(0,0,1)),
                 b2.rotation, accuracy: 0.001)
 
             XCTAssertEqual(
-                float3(0, 1, 0),
-                float3(b1.position))
+                SIMD3<Float>(0, 1, 0),
+                SIMD3<Float>(b1.position))
             XCTAssertEqual(
                 float3x3(
-                    float3(0.7073351,-0.70687836,0),
-                    float3(0.70687836,0.7073351,0),
-                    float3(0,0,1)),
+                    SIMD3<Float>(0.7073351,-0.70687836,0),
+                    SIMD3<Float>(0.70687836,0.7073351,0),
+                    SIMD3<Float>(0,0,1)),
                 b1.rotation, accuracy: 0.001)
 
             expect.fulfill()
@@ -268,7 +268,7 @@ class AdvancedMetalTests: XCTestCase {
     var device: MTLDevice!
     var commandQueue: MTLCommandQueue!
 
-    let force: float3 = float3(0, 1, 0) // world coordinates
+    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
 
     var cpuSimulator: CPUSimulator!
     var metalSimulator: MetalSimulator!
@@ -356,7 +356,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
     var cpuSimulator: CPUSimulator!
     var metalSimulator: MetalSimulator!
 
-    let force: float3 = float3(0, 1, 0) // world coordinates
+    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
 
     override func setUp() {
         super.setUp()

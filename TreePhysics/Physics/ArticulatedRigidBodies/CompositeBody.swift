@@ -4,11 +4,10 @@ import simd
 public final class CompositeBody {
     var mass: Float
     var inertiaTensor: float3x3
-    var force: float3
-    var torque: float3
-    var centerOfMass: float3
-
-    init(mass: Float = 0, inertiaTensor: float3x3 = matrix_identity_float3x3, force: float3 = float3.zero, torque: float3 = float3.zero, centerOfMass: float3 = float3.zero) {
+    var force: SIMD3<Float>
+    var torque: SIMD3<Float>
+    var centerOfMass: SIMD3<Float>
+    init(mass: Float = 0, inertiaTensor: float3x3 = matrix_identity_float3x3, force: SIMD3<Float> = .zero, torque: SIMD3<Float> = .zero, centerOfMass: SIMD3<Float> = .zero) {
         self.mass = mass
         self.inertiaTensor = inertiaTensor
         self.force = force

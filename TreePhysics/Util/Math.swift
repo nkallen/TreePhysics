@@ -45,18 +45,18 @@ func solve_differential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_dd
         let c2 = (y_ddt_0 - real * c1) / imaginary
         return .complex(c1: c1, c2: c2, λ: real, μ: imaginary, k: k)
     case let .real(r):
-        let system = float2x2(columns: (float2(1, r), float2(0, 1)))
-        let solution = system.inverse * float2(y_0_k, y_ddt_0)
+        let system = float2x2(columns: (SIMD2<Float>(1, r), SIMD2<Float>(0, 1)))
+        let solution = system.inverse * SIMD2<Float>(y_0_k, y_ddt_0)
         return .real(c1: solution.x, c2: solution.y, r: r, k: k)
     case let .realDistinct(r1, r2):
-        let system = float2x2(columns: (float2(1, r1), float2(1, r2)))
-        let solution = system.inverse * float2(y_0_k, y_ddt_0)
+        let system = float2x2(columns: (SIMD2<Float>(1, r1), SIMD2<Float>(1, r2)))
+        let solution = system.inverse * SIMD2<Float>(y_0_k, y_ddt_0)
         return .realDistinct(c1: solution.x, c2: solution.y, r1: r1, r2: r2, k: k)
     }
 }
 
 // Evaluate 2nd-order differential equation given its analytic solution
-func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
+func evaluate(differential: DifferentialSolution, at t: Float) -> SIMD3<Float> {
     switch differential {
     case let .complex(c1: c1, c2: c2, λ: λ, μ: μ, k: k):
         let y = c1*powf(.e,λ*t)*cos(μ*t) + c2*powf(.e,λ*t)*sin(μ*t) + k
@@ -66,7 +66,7 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
             (λ*μ*c1*powf(.e,λ*t)*sin(μ*t) + μ*μ*c1*powf(.e,λ*t)*cos(μ*t)) +
             λ*λ*c2*powf(.e,λ*t)*sin(μ*t) + μ*λ*c2*powf(.e,λ*t)*cos(μ*t) +
             λ*μ*c2*powf(.e,λ*t)*cos(μ*t) - μ*μ*c2*powf(.e,λ*t)*sin(μ*t)
-        return float3(y, y_ddt, y_d2dt)
+        return SIMD3<Float>(y, y_ddt, y_d2dt)
     case let .real(c1: c1, c2: c2, r: r, k: k):
         let y = c1*powf(.e,r*t) + c2*t*powf(.e,r*t) + k
         let y_ddt = r*c1*powf(.e,r*t) +
@@ -74,16 +74,16 @@ func evaluate(differential: DifferentialSolution, at t: Float) -> float3 {
         let y_d2dt = r*r*c1*powf(.e,r*t) +
             r*c2*powf(.e,r*t) +
             r*c2*powf(.e,r*t) + r*r*c2*t*powf(.e,r*t)
-        return float3(y, y_ddt, y_d2dt)
+        return SIMD3<Float>(y, y_ddt, y_d2dt)
     case let .realDistinct(c1: c1, c2: c2, r1: r1, r2: r2, k: k):
         let y = c1*powf(.e,r1*t) + c2*powf(.e,r2*t) + k
         let y_ddt = r1*c1*powf(.e,r1*t) + r2*c2*powf(.e,r2*t)
         let y_d2dt = r1*r1*c1 * powf(.e,r1*t) + r2*r2*c2 * powf(.e,r2*t)
-        return float3(y, y_ddt, y_d2dt)
+        return SIMD3<Float>(y, y_ddt, y_d2dt)
     }
 }
 
-func evaluateDifferential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_ddt_0: Float, at t: Float) -> float3 {
+func evaluateDifferential(a: Float, b: Float, c: Float, g: Float, y_0: Float, y_ddt_0: Float, at t: Float) -> SIMD3<Float> {
     let solution = solve_differential(a: a, b: b, c: c, g: g, y_0: y_0, y_ddt_0: y_ddt_0)
     return evaluate(differential: solution, at: t)
 }
@@ -94,58 +94,58 @@ extension Array where Element == Float {
     }
 }
 
-extension Array where Element == float2 {
-    var sum: float2 {
-        return reduce(float2.zero, +)
+extension Array where Element == SIMD2<Float> {
+    var sum: SIMD2<Float> {
+        return reduce(.zero, +)
     }
 }
 
-extension Array where Element == float3 {
-    var sum: float3 {
-        return reduce(float3.zero, +)
+extension Array where Element == SIMD3<Float> {
+    var sum: SIMD3<Float> {
+        return reduce(.zero, +)
     }
 }
 
-extension float2 {
-    init(_ double2: double2) {
-        self = float2(Float(double2.x), Float(double2.y))
+extension SIMD2 where Scalar == Float {
+    init(_ d: SIMD2<Double>) {
+        self = SIMD2<Float>(Float(d.x), Float(d.y))
     }
 
 }
 
-extension float3 {
-    static let x = float3(1,0,0)
-    static let y = float3(0,1,0)
-    static let z = float3(0,0,1)
+extension SIMD3 where Scalar == Float {
+    static let x = SIMD3<Float>(1,0,0)
+    static let y = SIMD3<Float>(0,1,0)
+    static let z = SIMD3<Float>(0,0,1)
 
-    init(_ double3: double3) {
-        self = float3(Float(double3.x), Float(double3.y), Float(double3.z))
+    init(_ double3: SIMD3<Double>) {
+        self = SIMD3<Float>(Float(double3.x), Float(double3.y), Float(double3.z))
     }
 
-    init(_ float2: float2, _ z: Float) {
-        self = float3(float2.x, float2.y, z)
+    init(_ float2: SIMD2<Float>, _ z: Float) {
+        self = SIMD3<Float>(float2.x, float2.y, z)
     }
 
-    var xy: float2 {
-        return float2(x, y)
+    var xy: SIMD2<Float> {
+        return SIMD2<Float>(x, y)
     }
 
-    var xz: float2 {
-        return float2(x, z)
+    var xz: SIMD2<Float> {
+        return SIMD2<Float>(x, z)
     }
 
     var skew: float3x3 {
         return float3x3(columns:
-            (float3(0, self.z, -self.y),
-             float3(-self.z, 0, self.x),
-             float3(self.y, -self.x, 0)))
+            (SIMD3<Float>(0, self.z, -self.y),
+             SIMD3<Float>(-self.z, 0, self.x),
+             SIMD3<Float>(self.y, -self.x, 0)))
     }
 
     var allPositive: Bool {
         return x >= 0 && y >= 0 && z >= 0
     }
 
-    func `in`(min: float3, max: float3) -> Bool {
+    func `in`(min: SIMD3<Float>, max: SIMD3<Float>) -> Bool {
         return self.x >= min.x && self.x <= max.x &&
             self.y >= min.y && self.y <= max.y &&
             self.z >= min.z && self.z <= max.z
@@ -156,28 +156,28 @@ extension float3 {
     }
 }
 
-extension float4 {
-    init(_ float3: float3, _ w: Float) {
-        self = float4(float3.x, float3.y, float3.z, w)
+extension SIMD4 where Scalar == Float {
+    init(_ float3: SIMD3<Float>, _ w: Float) {
+        self = SIMD4<Float>(float3.x, float3.y, float3.z, w)
     }
 
-    var xyz: float3 {
-        return float3(x, y, z)
+    var xyz: SIMD3<Float> {
+        return SIMD3<Float>(x, y, z)
     }
 }
 
-extension double3 {
-    init(_ float3: float3) {
-        self = double3(Double(float3.x), Double(float3.y), Double(float3.z))
+extension SIMD3 where Scalar == Double {
+    init(_ float3: SIMD3<Float>) {
+        self = SIMD3<Double>(Double(float3.x), Double(float3.y), Double(float3.z))
     }
 }
 
 extension double3x3 {
     init(_ float3x3: float3x3) {
         self = double3x3(columns: (
-            double3(float3x3[0]),
-            double3(float3x3[1]),
-            double3(float3x3[2])
+            SIMD3<Double>(float3x3[0]),
+            SIMD3<Double>(float3x3[1]),
+            SIMD3<Double>(float3x3[2])
         ))
     }
 }
@@ -204,9 +204,9 @@ extension Float {
 extension float3x3 {
     init(_ double3x3: double3x3) {
         self = float3x3(columns: (
-            float3(double3x3[0]),
-            float3(double3x3[1]),
-            float3(double3x3[2])
+            SIMD3<Float>(double3x3[0]),
+            SIMD3<Float>(double3x3[1]),
+            SIMD3<Float>(double3x3[2])
         ))
     }
 
@@ -222,7 +222,7 @@ extension float3x3 {
 
         // Factorize A
         let sqrt_a00 = sqrt(a00)
-        let l0 = float3(a00, a01, a02) / sqrt_a00
+        let l0 = SIMD3<Float>(a00, a01, a02) / sqrt_a00
         let l01 = l0.y, l02 = l0.z
 
         let l11 = sqrt(a11 - sqr(l01))
@@ -231,7 +231,7 @@ extension float3x3 {
         let l22 = sqrt(a22 - sqr(l02) - sqr(l12))
 
         result[0] = l0
-        result[1] = float3(0, l11, l12)
+        result[1] = SIMD3<Float>(0, l11, l12)
         result[2, 2] = l22
 
         return result
@@ -252,8 +252,8 @@ extension float3x3 {
     }
 
     @inline(__always)
-    func row(_ i: Int) -> float3 {
-        return float3(self[0, i], self[1, i], self[2, i])
+    func row(_ i: Int) -> SIMD3<Float> {
+        return SIMD3<Float>(self[0, i], self[1, i], self[2, i])
     }
 }
 
@@ -272,7 +272,7 @@ extension half3 {
         self.z = z
     }
 
-    init(_ vec: float3) {
+    init(_ vec: SIMD3<Float>) {
         self.init(half(vec.x), half(vec.y), half(vec.z))
     }
 }
@@ -330,26 +330,26 @@ extension half {
 }
 
 extension simd_quatf {
-    static let identity = simd_quatf(angle: 1, axis: float3.zero)
+    static let identity = simd_quatf(angle: 1, axis: .zero)
 
     var isFinite: Bool {
         return real.isFinite && imag.isFinite
     }
 
-    var left: float3 {
+    var left: SIMD3<Float> {
         return act(.x)
     }
 
-    var up: float3 {
+    var up: SIMD3<Float> {
         return act(.z)
     }
 
-    var heading: float3 {
+    var heading: SIMD3<Float> {
         return act(.y)
     }
 }
 
-func simd_bezier(_ v0: float3, _ v1: float3, _ v2: float3, _ v3: float3, t: Float) -> float3 {
+func simd_bezier(_ v0: SIMD3<Float>, _ v1: SIMD3<Float>, _ v2: SIMD3<Float>, _ v3: SIMD3<Float>, t: Float) -> SIMD3<Float> {
     let v01 = mix(v0, v1, t: t)
     let v12 = mix(v1, v2, t: t)
     let v23 = mix(v2, v3, t: t)

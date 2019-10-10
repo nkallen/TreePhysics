@@ -15,16 +15,16 @@ extension matrix_double3x3 {
     // The function accesses only the diagonal and upper triangular parts of
     // A. The access is read-only.
     // ---------------------------------------------------------------------------
-    var tridiagonal: (double3x3, double3, double2) {
+    var tridiagonal: (double3x3, SIMD3<Double>, SIMD3<Double>) {
         let  a0 = self[0],     a1 = self[1]
         let a00 = a0[0]
         let a01 = a0[1], a11 = a1[1]
         let a02 = a0[2], a12 = a1[2], a22 = self[2, 2]
 
-        var d = double3.zero
-        var e = double2.zero
-        var u = double3.zero
-        var q = double3.zero
+        var d: SIMD3<Double> = .zero
+        var e: SIMD3<Double> = .zero
+        var u: SIMD3<Double> = .zero
+        var q: SIMD3<Double> = .zero
 
         var Q = matrix_identity_double3x3
 
@@ -67,7 +67,7 @@ extension matrix_double3x3 {
             // Calculate updated A[1][2] and store it in e[1]
             e[1] = a12 - q[1]*u[2] - u[1]*q[2]
         } else {
-            d = double3(a00, a11, a22)
+            d = SIMD3<Double>(a00, a11, a22)
             e[1] = a12
         }
 
@@ -77,10 +77,10 @@ extension matrix_double3x3 {
     // Calculates the eigenvalues and normalized eigenvectors of a symmetric 3x3
     // matrix A using the QL algorithm with implicit shifts, preceded by a
     // Householder reduction to tridiagonal form.
-    var eigen_ql: (double3, double3x3)? {
+    var eigen_ql: (SIMD3<Double>, double3x3)? {
         var g, r, p, f, b, s, c: Double // Intermediate storage
         var (Q, w, e_) = self.tridiagonal
-        var e = double3(e_.x, e_.y, 0)
+        var e = SIMD3<Double>(e_.x, e_.y, 0)
 
         // Calculate eigensystem of the remaining real symmetric tridiagonal matrix
         // with the QL method
@@ -160,7 +160,7 @@ extension matrix_double3x3 {
         return (w, Q)
     }
 
-    var eigen_analytical: (double3, double3x3)? {
+    var eigen_analytical: (SIMD3<Double>, double3x3)? {
         var Q = double3x3.init(0)
         let w = self.eigenvalues_analytical
         let abs_w = abs(w)
@@ -183,7 +183,7 @@ extension matrix_double3x3 {
 
         // Calculate first eigenvector by the formula
         //   v[0] = (A - w[0]).e1 x (A - w[0]).e2
-        Q[0] = cross(self[0] - double3(w.x, 0, 0), self[1] - double3(0, w.x, 0))
+        Q[0] = cross(self[0] - SIMD3<Double>(w.x, 0, 0), self[1] - SIMD3<Double>(0, w.x, 0))
         var norm = dot(Q[0], Q[0])
 
         // If vectors are nearly linearly dependent, or if there might have
@@ -201,7 +201,7 @@ extension matrix_double3x3 {
 
         // Calculate second eigenvector by the formula
         //   v[1] = (A - w[1]).e1 x (A - w[1]).e2
-        Q[1] = cross(self[0] - double3(w.y, 0, 0), self[1] - double3(0, w.y, 0))
+        Q[1] = cross(self[0] - SIMD3<Double>(w.y, 0, 0), self[1] - SIMD3<Double>(0, w.y, 0))
 
         norm = dot(Q[1], Q[1])
         if norm <= error {
@@ -220,7 +220,7 @@ extension matrix_double3x3 {
 
     // Calculates the eigenvalues of a symmetric 3x3 matrix A using Cardano's
     // analytical algorithm.
-    var eigenvalues_analytical: double3 {
+    var eigenvalues_analytical: SIMD3<Double> {
         // Load A into registers
         let  a0 = self[0],     a1 = self[1]
         let a00 = a0[0]
@@ -258,24 +258,24 @@ extension matrix_double3x3 {
         let w0  = w1 + c
         w1 -= s
 
-        return double3(w0, w1, w2)
+        return SIMD3<Double>(w0, w1, w2)
     }
 
 }
 
 extension float3x3 {
-    var eigen_analytical: (float3, float3x3)? {
+    var eigen_analytical: (SIMD3<Float>, float3x3)? {
         guard let (eigenvalues, eigenvectors) = double3x3(self).eigen_analytical else {
             return nil
         }
-        return (float3(eigenvalues), float3x3(eigenvectors))
+        return (SIMD3<Float>(eigenvalues), float3x3(eigenvectors))
 
     }
 
-    var eigen_ql: (float3, float3x3)? {
+    var eigen_ql: (SIMD3<Float>, float3x3)? {
         guard let (eigenvalues, eigenvectors) = double3x3(self).eigen_ql else {
             return nil
         }
-        return (float3(eigenvalues), float3x3(eigenvectors))
+        return (SIMD3<Float>(eigenvalues), float3x3(eigenvectors))
     }
 }

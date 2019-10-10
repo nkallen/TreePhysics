@@ -14,17 +14,17 @@ public func createAxesNode(quiverLength: Float, quiverThickness: Float) -> SCNNo
     let xQuiverBox = SCNBox(width: CGFloat(quiverLength), height: CGFloat(quiverThickness), length: CGFloat(quiverThickness), chamferRadius: CGFloat(chamferRadius))
     xQuiverBox.firstMaterial?.diffuse.contents = Color.red
     let xQuiverNode = SCNNode(geometry: xQuiverBox)
-    xQuiverNode.simdPosition = float3(quiverLength / 2.0, 0.0, 0.0)
+    xQuiverNode.simdPosition = SIMD3<Float>(quiverLength / 2.0, 0.0, 0.0)
 
     let yQuiverBox = SCNBox(width: CGFloat(quiverThickness), height: CGFloat(quiverLength), length: CGFloat(quiverThickness), chamferRadius: CGFloat(chamferRadius))
     yQuiverBox.firstMaterial?.diffuse.contents = Color.green
     let yQuiverNode = SCNNode(geometry: yQuiverBox)
-    yQuiverNode.simdPosition = float3(0.0, quiverLength / 2.0, 0.0)
+    yQuiverNode.simdPosition = SIMD3<Float>(0.0, quiverLength / 2.0, 0.0)
 
     let zQuiverBox = SCNBox(width: CGFloat(quiverThickness), height: CGFloat(quiverThickness), length: CGFloat(quiverLength), chamferRadius: CGFloat(chamferRadius))
     zQuiverBox.firstMaterial?.diffuse.contents = Color.blue
     let zQuiverNode = SCNNode(geometry: zQuiverBox)
-    zQuiverNode.simdPosition = float3(0.0, 0.0, quiverLength / 2.0)
+    zQuiverNode.simdPosition = SIMD3<Float>(0.0, 0.0, quiverLength / 2.0)
 
     let quiverNode = SCNNode()
     quiverNode.addChildNode(xQuiverNode)

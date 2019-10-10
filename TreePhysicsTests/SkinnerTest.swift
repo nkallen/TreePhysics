@@ -13,9 +13,9 @@ F[-F]
 """)
 
         let bone1 = SCNNode()
-        bone1.simdPosition = float3(0,1,0)
+        bone1.simdPosition = SIMD3<Float>(0,1,0)
         let bone2 = SCNNode()
-        bone2.simdPosition = float3(0,1,0) + normalize(float3(-1,1,0))
+        bone2.simdPosition = SIMD3<Float>(0,1,0) + normalize(SIMD3<Float>(-1,1,0))
         let bones = [bone1, bone2]
 
         let boneInverseBindTransforms: [NSValue]? = bones.map { NSValue(scnMatrix4: SCNMatrix4Invert($0.transform)) }

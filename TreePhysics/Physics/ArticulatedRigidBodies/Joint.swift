@@ -7,20 +7,18 @@ public final class Joint {
     public let childRigidBody: ArticulatedRigidBody
 
     let localRotation: simd_quatf
-    let localPosition: float3
-
-    var position: float3
+    let localPosition: SIMD3<Float>
+    var position: SIMD3<Float>
     var rotation: simd_quatf
     var inverseRotation: simd_quatf
-    var acceleration: float3
-    // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
+    var acceleration: SIMD3<Float>    // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3
 
     var stiffness: Float
     var torqueThreshold: Float
     var damping: Float
 
-    init(parent: ArticulatedRigidBody, child: ArticulatedRigidBody, localRotation: simd_quatf, localPosition: float3) {
+    init(parent: ArticulatedRigidBody, child: ArticulatedRigidBody, localRotation: simd_quatf, localPosition: SIMD3<Float>) {
         self.parentRigidBody = parent
         self.childRigidBody = child
 
@@ -30,7 +28,7 @@ public final class Joint {
         self.position = localPosition
         self.rotation = localRotation
         self.inverseRotation = localRotation.inverse.normalized
-        self.acceleration = float3.zero
+        self.acceleration = .zero
         self.θ = float3x3(0)
 
         // FIXME
@@ -59,7 +57,7 @@ public final class Joint {
         return float3x3(inverseRotation) * tensor * float3x3(inverseRotation).transpose
     }
 
-    func rotate(vector: float3) -> float3 {
+    func rotate(vector: SIMD3<Float>) -> SIMD3<Float> {
         return inverseRotation.act(vector)
     }
 

@@ -27,7 +27,7 @@ public final class SkinningPen<I>: Pen where I: FixedWidthInteger {
         }
     }
 
-    public func start(at: float3, orientation: simd_quatf, thickness: Float) {
+    public func start(at: SIMD3<Float>, orientation: simd_quatf, thickness: Float) {
         cylinderPen.start(at: at, orientation: orientation, thickness: thickness)
         rigidBodyPen.start(at: at, orientation: orientation, thickness: thickness)
     }

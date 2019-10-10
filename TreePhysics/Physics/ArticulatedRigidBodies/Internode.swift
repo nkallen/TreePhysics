@@ -16,7 +16,7 @@ public class Internode: ArticulatedRigidBody {
     let area: Float
     let length: Float
     let radius: Float
-    var axis: float3 // FIXME rename heading
+    var axis: SIMD3<Float> // FIXME rename heading
 
     public init(length: Float = 1.0, radius: Float = 1.0, density: Float = 1.0/Float.pi) {
         self.area = .pi * radius * length
@@ -32,11 +32,11 @@ public class Internode: ArticulatedRigidBody {
         // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
         // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
         let localInertiaTensor = float3x3(diagonal:
-            float3(momentOfInertiaAboutY + momentOfInertiaAboutZ,
+            SIMD3<Float>(momentOfInertiaAboutY + momentOfInertiaAboutZ,
                    momentOfInertiaAboutZ + momentOfInertiaAboutX,
                    momentOfInertiaAboutX + momentOfInertiaAboutY))
 
-        let localPivot = float3(0, -length/2, 0)
+        let localPivot = SIMD3<Float>(0, -length/2, 0)
 
         let node = SCNNode(geometry: SCNSphere(radius: 0.01))
 

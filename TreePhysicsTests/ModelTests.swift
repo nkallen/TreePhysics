@@ -23,13 +23,13 @@ class ModelTests: XCTestCase {
         // 1. The 2D setup:
         let momentOfInertia_jointSpace = rigidBody.momentOfInertia + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, parentJoint.position))
 
-        let force = float3(-1, 0, 0)
-        let torque = cross(float3(0, 1, 0), force)
+        let force = SIMD3<Float>(-1, 0, 0)
+        let torque = cross(SIMD3<Float>(0, 1, 0), force)
         let torque_jointSpace = parentJoint.rotate(vector: torque)
         XCTAssertEqual(torque, torque_jointSpace)
 
         // angle, angular velocity, angular acceleration:
-        let expectedZ = float3(7.557869e-05, 0.009053111, 0.5406928)
+        let expectedZ = SIMD3<Float>(7.557869e-05, 0.009053111, 0.5406928)
         XCTAssertEqual(
             expectedZ,
             evaluateDifferential(a: momentOfInertia_jointSpace, b: β * k, c: k, g: torque_jointSpace.z, y_0: parentJoint.θ[0].z, y_ddt_0: parentJoint.θ[0].z, at: time))
@@ -55,8 +55,8 @@ class ModelTests: XCTestCase {
             evaluateDifferential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z, at: time)])
 
         let θ = U * θ_diagonal
-        XCTAssertEqual(float3.zero, θ.transpose[0])
-        XCTAssertEqual(float3.zero, θ.transpose[1])
+        XCTAssertEqual(.zero, θ.transpose[0])
+        XCTAssertEqual(.zero, θ.transpose[1])
         XCTAssertEqual(expectedZ, θ.transpose[2], accuracy: 0.0001)
     }
 }

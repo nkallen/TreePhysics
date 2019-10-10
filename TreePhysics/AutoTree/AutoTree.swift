@@ -14,19 +14,19 @@ struct AutoTree {
         return Parent(config: config, position: .zero, orientation: .identity)
     }
 
-    func lateralBud(position: float3, orientation: simd_quatf) -> LateralBud {
+    func lateralBud(position: SIMD3<Float>, orientation: simd_quatf) -> LateralBud {
         return LateralBud(config: config, position: position, orientation: orientation)
     }
 
-    func terminalBud(position: float3, orientation: simd_quatf) -> TerminalBud {
+    func terminalBud(position: SIMD3<Float>, orientation: simd_quatf) -> TerminalBud {
         return TerminalBud(config: config, position: position, orientation: orientation)
     }
 
-    func internode(position: float3, orientation: simd_quatf) -> Internode {
+    func internode(position: SIMD3<Float>, orientation: simd_quatf) -> Internode {
         return Internode(config: config, position: position, orientation: orientation)
     }
 
-    func seedling(position: float3 = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
+    func seedling(position: SIMD3<Float> = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
         let root = self.root()
         let bud = self.terminalBud(position: .zero, orientation: .identity)
         root.addBud(bud)

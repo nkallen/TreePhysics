@@ -6,7 +6,7 @@ extension AutoTree {
         let config: Config
 
         var generation = 0
-        var attractionPoints: Set<float3> = []
+        var attractionPoints: Set<SIMD3<Float>> = []
         let hash: LocalitySensitiveHash<Bud>
         let shadowGrid: ShadowGrid // FIXME all wrong
         var root: Parent!
@@ -98,8 +98,8 @@ extension AutoTree {
             return vigors
         }
 
-        internal func selectBudsWithSpace() -> [Bud:Set<float3>] {
-            var selectedBuds: [Bud:Set<float3>] = [:]
+        internal func selectBudsWithSpace() -> [Bud:Set<SIMD3<Float>>] {
+            var selectedBuds: [Bud:Set<SIMD3<Float>>] = [:]
             for point in attractionPoints {
                 var closestBud: Bud?
                 var closestDistance = Float.infinity
@@ -126,7 +126,7 @@ extension AutoTree {
             return selectedBuds
         }
 
-        internal func growShoots(selectedBuds: [Bud:Set<float3>], vigors: [Node:Float]) {
+        internal func growShoots(selectedBuds: [Bud:Set<SIMD3<Float>>], vigors: [Node:Float]) {
             guard selectedBuds.count > 0 else { return }
 
             var maxVigor: Float = 0
