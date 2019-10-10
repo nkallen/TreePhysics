@@ -4,14 +4,14 @@ import XCTest
 import simd
 
 class AutoTreeTests: XCTestCase {
-    var config: AutoTreeConfig!
+    var config: AutoTree.Config!
     var autoTree: AutoTree!
     var root: AutoTree.Parent!
     var firstBud: AutoTree.TerminalBud!
 
     override func setUp() {
         super.setUp()
-        self.config = AutoTreeConfig()
+        self.config = AutoTree.Config()
         self.autoTree = AutoTree(config)
         let (root, firstBud) = autoTree.seedling()
         self.root = root
@@ -123,7 +123,7 @@ class AutoTreeTests: XCTestCase {
         let exposure2 = try XCTUnwrap(exposures[internode2])
 
         XCTAssertEqual(config.fullExposure, exposure1)
-        XCTAssertEqual(config.fullExposure - config.shadowIntensity * 3, exposure2)
+        XCTAssertEqual(config.fullExposure - config.shadowIntensity * 3, exposure2, accuracy: 0.0001)
         XCTAssertEqual(exposure1 + exposure2, exposure0)
 
         let vigors = simulator.updateVigor(exposures: exposures)
@@ -131,11 +131,11 @@ class AutoTreeTests: XCTestCase {
         let qm = pow(exposure1, config.sensitivityOfBudsToLight)
         let ql = pow(exposure2, config.sensitivityOfBudsToLight)
 
-        let denominator: Float = (config.vigorBias * qm + (1 - config.vigorBias) * ql) / v
+        let denominator: Float = (config.biasVigorTowardsMainAxis * qm + (1 - config.biasVigorTowardsMainAxis) * ql) / v
 
         XCTAssertEqual(v, vigors[internode0])
-        XCTAssertEqual(config.vigorBias * qm / denominator, vigors[internode1])
-        XCTAssertEqual((1-config.vigorBias) * ql / denominator, vigors[internode2])
+        XCTAssertEqual(config.biasVigorTowardsMainAxis * qm / denominator, vigors[internode1])
+        XCTAssertEqual((1-config.biasVigorTowardsMainAxis) * ql / denominator, vigors[internode2])
     }
 }
 

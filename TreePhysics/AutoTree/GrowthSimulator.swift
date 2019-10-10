@@ -1,29 +1,9 @@
 import Foundation
 import simd
 
-struct AutoTreeConfig {
-    let branchingAngle: Float = .pi/4
-    let phyllotacticAngle: Float = .pi/4
-    let internodeLength: Float = 0.05
-
-    let occupationRadius: Float = 0.05 * 0.6
-    let perceptionAngle: Float = .pi/4
-    let perceptionRadius: Float = 0.05 * 12
-
-    let meshDetail: Float = 1.1 //  >= 1
-    let extremityRadius: Float = 0.001
-    let baseRadius: Float = 0.05
-
-    let fullExposure: Float = 10 // > 0
-    let shadowIntensity: Float = 0.1 // > 0
-    let sensitivityOfBudsToLight: Float = 1.1 // >= 0
-    let vigorBias: Float = 0.5 // 0..1 // higher is main branch, lower is lateral
-    let maxShootLength: Int = 3 // > 0
-}
-
 extension AutoTree {
     public final class GrowthSimulator {
-        let config: AutoTreeConfig
+        let config: Config
 
         var generation = 0
         var attractionPoints: Set<float3> = []
@@ -32,7 +12,7 @@ extension AutoTree {
         var root: Parent!
         var buds: Set<Bud> = []
 
-        init(_ config: AutoTreeConfig, shadowGrid: ShadowGrid) {
+        init(_ config: Config, shadowGrid: ShadowGrid) {
             self.config = config
             self.hash = LocalitySensitiveHash<Bud>(cellSize: config.occupationRadius + config.perceptionRadius)
             self.shadowGrid = shadowGrid
@@ -98,9 +78,9 @@ extension AutoTree {
                         let unbiasedMainVigor = unbiasedVigor(for: main)
                         let unbiasedLateralVigor = unbiasedVigor(for: lateral)
 
-                        let denominator: Float = (config.vigorBias * unbiasedMainVigor + (1 - config.vigorBias) * unbiasedLateralVigor) / baseVigor
-                        vigors[main] = config.vigorBias * unbiasedMainVigor / denominator
-                        vigors[lateral] = (1 - config.vigorBias) * unbiasedLateralVigor / denominator
+                        let denominator: Float = (config.biasVigorTowardsMainAxis * unbiasedMainVigor + (1 - config.biasVigorTowardsMainAxis) * unbiasedLateralVigor) / baseVigor
+                        vigors[main] = config.biasVigorTowardsMainAxis * unbiasedMainVigor / denominator
+                        vigors[lateral] = (1 - config.biasVigorTowardsMainAxis) * unbiasedLateralVigor / denominator
                     }
                     if let internode = main    as? Internode { recurse(internode) }
                     if let internode = lateral as? Internode { recurse(internode) }
@@ -119,7 +99,6 @@ extension AutoTree {
         }
 
         internal func selectBudsWithSpace() -> [Bud:Set<float3>] {
-            print("attraction points \(attractionPoints.count)")
             var selectedBuds: [Bud:Set<float3>] = [:]
             for point in attractionPoints {
                 var closestBud: Bud?
@@ -179,12 +158,17 @@ extension AutoTree {
 
         }
 
-        public func update() {
+        public func update() -> Bool {
+            guard attractionPoints.count > 0 else { return false }
+
+            let selectedBuds = selectBudsWithSpace()
+            guard selectedBuds.count > 0 else { return false }
+
             let exposures = updateLightExposure()
             let vigors = updateVigor(exposures: exposures)
-            let selectedBuds = selectBudsWithSpace()
             growShoots(selectedBuds: selectedBuds, vigors: vigors)
             generation += 1
+            return true
         }
     }
 }

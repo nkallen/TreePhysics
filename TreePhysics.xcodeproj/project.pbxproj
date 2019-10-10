@@ -77,6 +77,7 @@
 		9E9D4B9722F43D43007DCF49 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9522F43CAE007DCF49 /* GameViewController.swift */; };
 		9E9D4B9822F43D98007DCF49 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9322F438FA007DCF49 /* Scene.swift */; };
 		9E9D4B9A22F44123007DCF49 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9922F44123007DCF49 /* Info.plist */; };
+		9EA52EC5234F4A4200463E51 /* Check.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA52EC4234F4A4200463E51 /* Check.swift */; };
 		9EA7010E23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */; };
 		9EAA8C0A232923D2002E9260 /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
 		9EAA8C0C232923FD002E9260 /* MetalKernalEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernalEncoder.swift */; };
@@ -211,6 +212,7 @@
 		9E9D4B9322F438FA007DCF49 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
 		9E9D4B9522F43CAE007DCF49 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		9E9D4B9922F44123007DCF49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9EA52EC4234F4A4200463E51 /* Check.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Check.swift; sourceTree = "<group>"; };
 		9EA619CB230AE78400BE2213 /* PrettyPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrettyPrint.swift; sourceTree = "<group>"; };
 		9EA7010B231064F3009077A0 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT18_03SCF11_s13_2text.pdf; sourceTree = "<group>"; };
@@ -527,6 +529,7 @@
 				9E1490CA2334E49500FED681 /* Noise.swift */,
 				9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */,
 				9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */,
+				9EA52EC4234F4A4200463E51 /* Check.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -720,6 +723,7 @@
 				9EAE8644233271910037EA92 /* AttractorField.swift in Sources */,
 				9E34C48A23291207008C7353 /* CylinderPen.swift in Sources */,
 				9EC6A4E8234C9B4900E43FE9 /* ShadowGrid.swift in Sources */,
+				9EA52EC5234F4A4200463E51 /* Check.swift in Sources */,
 				9EAE862C232A67170037EA92 /* ResetForces.metal in Sources */,
 				9EAE862E232A671E0037EA92 /* UpdateCompositeBodies.metal in Sources */,
 				9EAE862F232A67210037EA92 /* UpdateJoints.metal in Sources */,

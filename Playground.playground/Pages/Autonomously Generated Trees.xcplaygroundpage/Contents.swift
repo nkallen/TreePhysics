@@ -4,7 +4,12 @@ import PlaygroundSupport
 import SceneKit.ModelIO
 @testable import TreePhysics
 
-let autoTree = AutoTree()
+var config = AutoTree.Config()
+config.internodeLength = 0.03
+config.occupationRadius = 0.03
+config.perceptionRadius = 0.3
+config.biasVigorTowardsMainAxis = 0.54
+let autoTree = AutoTree(config)
 
 let (root, _) = autoTree.seedling()
 let simulator = autoTree.growthSimulator()
@@ -16,15 +21,15 @@ let mdlMesh = asset.object(at: 0) as! MDLMesh
 
 let face = SCNNode(mdlObject: mdlMesh)
 let scale: Float = 0.01
-let offset = float3(0,0.5,0)
+let offset = float3(0,1,-0.1)
 face.simdScale = float3(repeating: 1) * scale
 face.simdPosition = offset
 
 simulator.attractionPoints.formUnion(mdlMesh.vertices.map { $0 * scale + offset })
 
-for _ in 0...75 { simulator.update() }
+for _ in 0...100 { simulator.update() }
 
-let pen = CylinderPen<UInt16>(radialSegmentCount: 15, parent: nil)
+let pen = CylinderPen<UInt32>(radialSegmentCount: 15, parent: nil)
 
 autoTree.draw(root, pen: pen)
 

@@ -3,7 +3,7 @@ import simd
 
 extension AutoTree {
     class Node {
-        let config: AutoTreeConfig
+        let config: Config
         var generation: Int?
 
         weak var parent: Parent? = nil
@@ -11,7 +11,7 @@ extension AutoTree {
         let position: float3
         let orientation: simd_quatf
 
-        fileprivate init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
+        fileprivate init(config: Config, position: float3, orientation: simd_quatf) {
             self.config = config
             self.position = position
             self.orientation = orientation
@@ -51,7 +51,7 @@ extension AutoTree {
             return (thickest, rest)
         }
 
-        public override init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
+        public override init(config: Config, position: float3, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
@@ -132,7 +132,7 @@ extension AutoTree {
     }
 
     final class TerminalBud: Bud {
-        public override init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
+        public override init(config: Config, position: float3, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
@@ -142,7 +142,7 @@ extension AutoTree {
     }
 
     final class LateralBud: Bud {
-        public override init(config: AutoTreeConfig, position: float3, orientation: simd_quatf) {
+        public override init(config: Config, position: float3, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 

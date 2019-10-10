@@ -3,9 +3,49 @@ import simd
 import SceneKit
 
 struct AutoTree {
-    let config: AutoTreeConfig
+    struct Config {
+        var branchingAngle: Float = .pi/4
+        var phyllotacticAngle: Float = .pi/4
+        var internodeLength: Float = 0.05
 
-    init(_ config: AutoTreeConfig = AutoTreeConfig()) {
+        var occupationRadius: Float = 0.05
+        var perceptionAngle: Float = .pi/4
+        var perceptionRadius: Float = 0.05 * 12
+
+        var meshDetail: Float = 1.1
+        var extremityRadius: Float = 0.001
+        var baseRadius: Float = 0.05
+
+        var fullExposure: Float = 10
+        var shadowIntensity: Float = 0.1
+        var sensitivityOfBudsToLight: Float = 1.1
+        var biasVigorTowardsMainAxis: Float = 0.5
+        var maxShootLength: Int = 3
+
+        func validate() {
+            check.angle(branchingAngle)
+            check.angle(phyllotacticAngle)
+            check.angle(perceptionAngle)
+
+            check.positive(internodeLength)
+            check.positive(occupationRadius)
+            check.positive(perceptionRadius)
+            check.assert(meshDetail > 1)
+            check.positive(extremityRadius)
+            check.positive(baseRadius)
+
+            check.positive(fullExposure)
+            check.positive(shadowIntensity)
+            check.nonneg(sensitivityOfBudsToLight)
+            check.normal(biasVigorTowardsMainAxis)
+            check.assert(maxShootLength >= 1)
+        }
+    }
+
+    let config: Config
+
+    init(_ config: Config = Config()) {
+        config.validate()
         self.config = config
     }
 
@@ -37,15 +77,15 @@ struct AutoTree {
         return GrowthSimulator(config, shadowGrid: shadowGrid)
     }
 
-    func draw(_ parent: Parent, pen: CylinderPen<UInt16>) {
+    func draw<I: FixedWidthInteger>(_ parent: Parent, pen: CylinderPen<I>) {
         let diameterExponent = log(Float(parent.terminalBranchCount)) / (log(2*config.baseRadius) - log(2*config.extremityRadius))
         draw(parent, pen: pen, diameterExponent: diameterExponent)
     }
 
-    func draw(_ node: Node, pen: CylinderPen<UInt16>, diameterExponent: Float) {
+    func draw<I: FixedWidthInteger>(_ node: Node, pen: CylinderPen<I>, diameterExponent: Float) {
         switch node {
-        case let bud as Bud:
-            _ = pen.copy(scale: 0.01, orientation: bud.orientation)
+        case let bud as Bud: ()
+//            _ = pen.copy(scale: config.occupationRadius, orientation: bud.orientation)
         case let internode as Internode:
             let diameter = internode.diameter(exponent: diameterExponent)
             let thickness = sqr(diameter / 2) * .pi
