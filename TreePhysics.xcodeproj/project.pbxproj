@@ -78,6 +78,7 @@
 		9E9D4B9822F43D98007DCF49 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9322F438FA007DCF49 /* Scene.swift */; };
 		9E9D4B9A22F44123007DCF49 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9922F44123007DCF49 /* Info.plist */; };
 		9EA52EC5234F4A4200463E51 /* Check.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA52EC4234F4A4200463E51 /* Check.swift */; };
+		9EA52EC7234F573000463E51 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA52EC6234F573000463E51 /* Config.swift */; };
 		9EA7010E23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */; };
 		9EAA8C0A232923D2002E9260 /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
 		9EAA8C0C232923FD002E9260 /* MetalKernalEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernalEncoder.swift */; };
@@ -213,6 +214,7 @@
 		9E9D4B9522F43CAE007DCF49 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		9E9D4B9922F44123007DCF49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9EA52EC4234F4A4200463E51 /* Check.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Check.swift; sourceTree = "<group>"; };
+		9EA52EC6234F573000463E51 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		9EA619CB230AE78400BE2213 /* PrettyPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrettyPrint.swift; sourceTree = "<group>"; };
 		9EA7010B231064F3009077A0 /* Debug.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Debug.metal; sourceTree = "<group>"; };
 		9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT18_03SCF11_s13_2text.pdf; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 				9E4946C82344AB230036B7EC /* Node.swift */,
 				9EAAAB64234B448B00157B45 /* GrowthSimulator.swift */,
 				9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */,
+				9EA52EC6234F573000463E51 /* Config.swift */,
 			);
 			path = AutoTree;
 			sourceTree = "<group>";
@@ -742,6 +745,7 @@
 				9EAA8C0F2329240C002E9260 /* UpdateRigidBodies.swift in Sources */,
 				9EAA8C162329243A002E9260 /* MetalProxy.swift in Sources */,
 				9EAE8630232A67240037EA92 /* UpdateRigidBodies.metal in Sources */,
+				9EA52EC7234F573000463E51 /* Config.swift in Sources */,
 				9EAA8C1523292434002E9260 /* MetalSimulator.swift in Sources */,
 				9E1490CB2334E49500FED681 /* Noise.swift in Sources */,
 				9EAA8C1823292444002E9260 /* Visualization.swift in Sources */,
