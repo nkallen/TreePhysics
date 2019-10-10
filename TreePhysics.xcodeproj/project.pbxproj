@@ -36,7 +36,6 @@
 		9E34C4912329125B008C7353 /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */; };
 		9E34C49223291277008C7353 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
 		9E34C4932329127C008C7353 /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
-		9E34C494232912F3008C7353 /* Half.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E0D67C7230962F9008912E7 /* Half.c */; };
 		9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39374A233B803100AE1897 /* PhysicsWorld.swift */; };
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
 		9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */; };
@@ -49,6 +48,18 @@
 		9E51B02422FF23660081CA4C /* UpdateRigidBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */; };
 		9E51B02522FF238A0081CA4C /* MetalProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6372A122FEC7AA001D4466 /* MetalProxy.swift */; };
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
+		9E656A07234F971C00818C32 /* hanan.dis1992.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FC230ED50E00F1DD6B /* hanan.dis1992.pdf */; };
+		9E656A08234F971C00818C32 /* Metal-Shading-Language-Specification.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */; };
+		9E656A09234F971C00818C32 /* sensors-11-08536.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E08F85F2316FEC700D48ADD /* sensors-11-08536.pdf */; };
+		9E656A0A234F971C00818C32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA922DDDC6E00535997 /* Main.storyboard */; };
+		9E656A0B234F971C00818C32 /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 9E4C09FE230F11D900F1DD6B /* TODO */; };
+		9E656A0C234F971C00818C32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
+		9E656A0D234F971C00818C32 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBCB22E1078200535997 /* NOTES */; };
+		9E656A0E234F971C00818C32 /* SCRATCH in Resources */ = {isa = PBXBuildFile; fileRef = 9E1C70F8230C6FB200DA9929 /* SCRATCH */; };
+		9E656A0F234F971C00818C32 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9922F44123007DCF49 /* Info.plist */; };
+		9E656A10234F971C00818C32 /* MIT18_03SCF11_s13_2text.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9EA7010D23121808009077A0 /* MIT18_03SCF11_s13_2text.pdf */; };
+		9E656A11234F971C00818C32 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA522DDDC6C00535997 /* art.scnassets */; };
+		9E656A1A234F974200818C32 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E656A18234F973C00818C32 /* main.swift */; };
 		9E8024B8230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9E8024B7230FEC1E0019B482 /* Metal-Shading-Language-Specification.pdf */; };
 		9E80B3E6231FF74F00A700CF /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */; };
@@ -134,6 +145,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		9E6569F7234F971C00818C32 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9EE7EB9622DDDC6C00535997 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9E34C47F232911C6008C7353;
+			remoteInfo = TreePhysics;
+		};
 		9E7687F5232922EE003C5A9C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9EE7EB9622DDDC6C00535997 /* Project object */;
@@ -195,6 +213,9 @@
 		9E57566823184C9C0036F68B /* Visualization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visualization.swift; sourceTree = "<group>"; };
 		9E62078322F8A7E6005E99C8 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		9E6372A122FEC7AA001D4466 /* MetalProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalProxy.swift; sourceTree = "<group>"; };
+		9E656A15234F971C00818C32 /* TreePhysics-benchmark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TreePhysics-benchmark.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E656A16234F971C00818C32 /* TreePhysics-macOS copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TreePhysics-macOS copy2-Info.plist"; path = "/Users/nickkallen/Documents/TreePhysics/TreePhysics-macOS copy2-Info.plist"; sourceTree = "<absolute>"; };
+		9E656A18234F973C00818C32 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		9E8024B3230FD2BD0019B482 /* longay.th2014.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = longay.th2014.pdf; sourceTree = "<group>"; };
 		9E8024B4230FD2BE0019B482 /* colonization.egwnp2007.large.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = colonization.egwnp2007.large.pdf; sourceTree = "<group>"; };
 		9E8024B5230FD2BE0019B482 /* MIT16_07F09_Lec26.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MIT16_07F09_Lec26.pdf; sourceTree = "<group>"; };
@@ -256,6 +277,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		9E34C47D232911C6008C7353 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9E656A05234F971C00818C32 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -400,6 +428,14 @@
 			path = ArticulatedRigidBodies;
 			sourceTree = "<group>";
 		};
+		9E656A17234F972D00818C32 /* benchmark */ = {
+			isa = PBXGroup;
+			children = (
+				9E656A18234F973C00818C32 /* main.swift */,
+			);
+			path = benchmark;
+			sourceTree = "<group>";
+		};
 		9E9D4B6422F313BD007DCF49 /* Physics */ = {
 			isa = PBXGroup;
 			children = (
@@ -417,6 +453,7 @@
 		9E9D4B6922F36FFC007DCF49 /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				9E656A17234F972D00818C32 /* benchmark */,
 				9EE7EBC922E0F27900535997 /* main.swift */,
 				9E9D4B6B22F37035007DCF49 /* iOS */,
 				9E9D4B6A22F3702F007DCF49 /* macOS */,
@@ -470,6 +507,7 @@
 				9E1F427E23290694009E0E52 /* TreePhysics */,
 				9E34C481232911C6008C7353 /* TreePhysics */,
 				9EE7EB9F22DDDC6C00535997 /* Products */,
+				9E656A16234F971C00818C32 /* TreePhysics-macOS copy2-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -480,6 +518,7 @@
 				9EE7EBB922DE1AD100535997 /* TreePhysicsTests.xctest */,
 				9E9D4B8922F37244007DCF49 /* TreePhysics_iOS.app */,
 				9E34C480232911C6008C7353 /* TreePhysics.framework */,
+				9E656A15234F971C00818C32 /* TreePhysics-benchmark.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -568,6 +607,24 @@
 			productName = TreePhysics;
 			productReference = 9E34C480232911C6008C7353 /* TreePhysics.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		9E6569F5234F971C00818C32 /* TreePhysics-benchmark */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9E656A12234F971C00818C32 /* Build configuration list for PBXNativeTarget "TreePhysics-benchmark" */;
+			buildPhases = (
+				9E6569F8234F971C00818C32 /* Sources */,
+				9E656A05234F971C00818C32 /* Frameworks */,
+				9E656A06234F971C00818C32 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9E6569F6234F971C00818C32 /* PBXTargetDependency */,
+			);
+			name = "TreePhysics-benchmark";
+			productName = TreePhysics;
+			productReference = 9E656A15234F971C00818C32 /* TreePhysics-benchmark.app */;
+			productType = "com.apple.product-type.application";
 		};
 		9E9D4B6C22F37244007DCF49 /* TreePhysics-iOS */ = {
 			isa = PBXNativeTarget;
@@ -660,6 +717,7 @@
 				9E9D4B6C22F37244007DCF49 /* TreePhysics-iOS */,
 				9EE7EBB822DE1AD100535997 /* TreePhysicsTests */,
 				9E34C47F232911C6008C7353 /* TreePhysics */,
+				9E6569F5234F971C00818C32 /* TreePhysics-benchmark */,
 			);
 		};
 /* End PBXProject section */
@@ -669,6 +727,24 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9E656A06234F971C00818C32 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9E656A07234F971C00818C32 /* hanan.dis1992.pdf in Resources */,
+				9E656A08234F971C00818C32 /* Metal-Shading-Language-Specification.pdf in Resources */,
+				9E656A09234F971C00818C32 /* sensors-11-08536.pdf in Resources */,
+				9E656A0A234F971C00818C32 /* Main.storyboard in Resources */,
+				9E656A0B234F971C00818C32 /* TODO in Resources */,
+				9E656A0C234F971C00818C32 /* Assets.xcassets in Resources */,
+				9E656A0D234F971C00818C32 /* NOTES in Resources */,
+				9E656A0E234F971C00818C32 /* SCRATCH in Resources */,
+				9E656A0F234F971C00818C32 /* Info.plist in Resources */,
+				9E656A10234F971C00818C32 /* MIT18_03SCF11_s13_2text.pdf in Resources */,
+				9E656A11234F971C00818C32 /* art.scnassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -717,7 +793,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9EAE86422332717C0037EA92 /* GravityField.swift in Sources */,
-				9E34C494232912F3008C7353 /* Half.c in Sources */,
 				9E34C48E23291252008C7353 /* Joint.swift in Sources */,
 				9EAA8C0C232923FD002E9260 /* MetalKernalEncoder.swift in Sources */,
 				9E34C4932329127C008C7353 /* Diagonalization.swift in Sources */,
@@ -764,6 +839,14 @@
 				9EAA8C1023292411002E9260 /* UpdateJoints.swift in Sources */,
 				9EAA8C1723292440002E9260 /* PrettyPrint.swift in Sources */,
 				9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9E6569F8234F971C00818C32 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9E656A1A234F974200818C32 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -850,6 +933,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9E6569F6234F971C00818C32 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9E34C47F232911C6008C7353 /* TreePhysics */;
+			targetProxy = 9E6569F7234F971C00818C32 /* PBXContainerItemProxy */;
+		};
 		9E7687F6232922EE003C5A9C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9E34C47F232911C6008C7353 /* TreePhysics */;
@@ -933,6 +1021,48 @@
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		9E656A13234F971C00818C32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = G3GUW83N5R;
+				INFOPLIST_FILE = "TreePhysics-macOS copy2-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9E656A14234F971C00818C32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = G3GUW83N5R;
+				INFOPLIST_FILE = "TreePhysics-macOS copy2-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1197,6 +1327,15 @@
 			buildConfigurations = (
 				9E34C486232911C6008C7353 /* Debug */,
 				9E34C487232911C6008C7353 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9E656A12234F971C00818C32 /* Build configuration list for PBXNativeTarget "TreePhysics-benchmark" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E656A13234F971C00818C32 /* Debug */,
+				9E656A14234F971C00818C32 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

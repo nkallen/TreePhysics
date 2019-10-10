@@ -2,10 +2,10 @@ import Foundation
 import simd
 import SceneKit
 
-struct AutoTree {
+public struct AutoTree {
     let config: Config
 
-    init(_ config: Config = Config()) {
+    public init(_ config: Config = Config()) {
         config.validate()
         self.config = config
     }
@@ -14,31 +14,31 @@ struct AutoTree {
         return Parent(config: config, position: .zero, orientation: .identity)
     }
 
-    func lateralBud(position: SIMD3<Float>, orientation: simd_quatf) -> LateralBud {
+    public func lateralBud(position: SIMD3<Float>, orientation: simd_quatf) -> LateralBud {
         return LateralBud(config: config, position: position, orientation: orientation)
     }
 
-    func terminalBud(position: SIMD3<Float>, orientation: simd_quatf) -> TerminalBud {
+    public func terminalBud(position: SIMD3<Float>, orientation: simd_quatf) -> TerminalBud {
         return TerminalBud(config: config, position: position, orientation: orientation)
     }
 
-    func internode(position: SIMD3<Float>, orientation: simd_quatf) -> Internode {
+    public func internode(position: SIMD3<Float>, orientation: simd_quatf) -> Internode {
         return Internode(config: config, position: position, orientation: orientation)
     }
 
-    func seedling(position: SIMD3<Float> = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
+    public func seedling(position: SIMD3<Float> = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
         let root = self.root()
         let bud = self.terminalBud(position: .zero, orientation: .identity)
         root.addBud(bud)
         return (root, bud)
     }
 
-    func growthSimulator(shadowGrid: ShadowGrid? = nil) -> GrowthSimulator {
+    public func growthSimulator(shadowGrid: ShadowGrid? = nil) -> GrowthSimulator {
         let shadowGrid = shadowGrid ?? HashingShadowGrid(ShadowGridConfig(cellSize: config.internodeLength))
         return GrowthSimulator(config, shadowGrid: shadowGrid)
     }
 
-    func draw<I: FixedWidthInteger>(_ parent: Parent, pen: CylinderPen<I>) {
+    public func draw<I: FixedWidthInteger>(_ parent: Parent, pen: CylinderPen<I>) {
         let diameterExponent = log(Float(parent.terminalBranchCount)) / (log(2*config.baseRadius) - log(2*config.extremityRadius))
         draw(parent, pen: pen, diameterExponent: diameterExponent)
     }
@@ -48,6 +48,7 @@ struct AutoTree {
         case let bud as Bud: ()
 //            _ = pen.copy(scale: config.occupationRadius, orientation: bud.orientation)
         case let internode as Internode:
+            // FIXME diameter math is wrong
             let diameter = internode.diameter(exponent: diameterExponent)
             let thickness = sqr(diameter / 2) * .pi
             _ = pen.cont(distance: config.internodeLength, orientation: internode.orientation, thickness: thickness)

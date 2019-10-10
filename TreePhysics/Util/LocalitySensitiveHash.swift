@@ -5,45 +5,44 @@ protocol HasPosition {
     var position: SIMD3<Float> { get }
 }
 
-class LocalitySensitiveHash<T> where T: HasPosition {
+final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
     let cellSize: Float
 
-    private var storage: [SIMD3<Int32>:NSMutableSet] = [:]
+    private var storage: [SIMD3<Int32>:Set<T>] = [:]
 
     init(cellSize: Float) {
         self.cellSize = cellSize
     }
 
     func add(_ t: T) {
-        if let set = storage[key(for: t.position)] {
-            set.add(t)
-        } else {
-            let set = NSMutableSet(array: [t])
-            storage[key(for: t.position)] = set
-        }
+        let key = self.key(for: t.position)
+        var set = storage[key, default: []]
+        set.insert(t)
+        storage[key] = set
     }
 
     func remove(_ t: T) {
-        if let set = storage[key(for: t.position)] {
+        let key = self.key(for: t.position)
+        if var set = storage[key] {
             set.remove(t)
+            storage[key] = set
         }
     }
 
-    func elements(near position: SIMD3<Float>) -> [T] {
-        var result: [T] = []
-        for i in -1...1 {
-            for j in -1...1 {
-                for k in -1...1 {
-                    let offset = SIMD3<Int32>(Int32(i), Int32(j), Int32(k))
+    // returns a FlattenedSequence since it can be constructed without copying (unlike an array)
+    func elements(near position: SIMD3<Float>) -> FlattenSequence<[Set<T>]> {
+        var result: [Set<T>] = []
+        for i: Int32 in -1...1 {
+            for j: Int32 in -1...1 {
+                for k: Int32 in -1...1 {
+                    let offset = SIMD3<Int32>(i, j, k)
                     if let set = storage[key(for: position, offset: offset)] {
-                        for object in set {
-                            result.append(object as! T)
-                        }
+                        result.append(set)
                     }
                 }
             }
         }
-        return result
+        return result.joined()
     }
 
     private func key(for position: SIMD3<Float>, offset: SIMD3<Int32> = SIMD3<Int32>.zero) -> SIMD3<Int32> {

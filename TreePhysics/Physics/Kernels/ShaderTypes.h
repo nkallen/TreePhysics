@@ -7,7 +7,6 @@
 
 #else
 #import <Foundation/Foundation.h>
-#import "Half.h"
 #endif
 
 #include <simd/simd.h>

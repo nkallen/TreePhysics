@@ -6,28 +6,44 @@ import SceneKit.ModelIO
 
 var config = AutoTree.Config()
 config.internodeLength = 0.03
-config.occupationRadius = 0.03
-config.perceptionRadius = 0.3
-config.biasVigorTowardsMainAxis = 0.54
+config.occupationRadius = 0.03 * 1
+config.perceptionRadius = 0.03 * 6
+config.biasVigorTowardsMainAxis = 0.46
+config.baseRadius = 0.01
+config.extremityRadius = 0.001
+config.sensitivityOfBudsToLight = 1
 let autoTree = AutoTree(config)
 
 let (root, _) = autoTree.seedling()
 let simulator = autoTree.growthSimulator()
-simulator.add(root)
+simulator.addRoot(root)
 
 let url = Bundle.main.url(forResource: "ARFaceGeometry", withExtension: "obj", subdirectory: "art.scnassets")!
 let asset = MDLAsset(url: url)
 let mdlMesh = asset.object(at: 0) as! MDLMesh
 
+
 let face = SCNNode(mdlObject: mdlMesh)
 let scale: Float = 0.01
-let offset = float3(0,1,-0.1)
+let offset = SIMD3<Float>(0,1,-0.1)
 face.simdScale = float3(repeating: 1) * scale
 face.simdPosition = offset
 
-simulator.attractionPoints.formUnion(mdlMesh.vertices.map { $0 * scale + offset })
+let vertices = mdlMesh.vertices.map { $0 * scale + offset }
+//simulator.addAttractionPoints(vertices)
 
-for _ in 0...100 { simulator.update() }
+for _ in 0...20 {
+    print("iterating")
+    do {
+        try simulator.update(enableAllBuds: true)
+    } catch AutoTree.Error.noAttractionPoints {
+        print("No attraction points")
+    } catch AutoTree.Error.noSelectedBuds {
+        print("Try fiddling with the config.perceptionRadius and config.perceptionAngle")
+    } catch AutoTree.Error.noVigor {
+        print("Try fiddling with config.fullExposure and config.shadowIntensity")
+    }
+}
 
 let pen = CylinderPen<UInt32>(radialSegmentCount: 15, parent: nil)
 

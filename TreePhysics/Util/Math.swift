@@ -3,8 +3,6 @@ import Darwin
 import simd
 import ShaderTypes
 
-typealias half3 = vector_half3
-
 enum QuadraticSolution: Equatable {
     case real(Float)
     case realDistinct(Float, Float)
@@ -257,80 +255,8 @@ extension float3x3 {
     }
 }
 
-extension half3 {
-    init(_ x: Float, _ y: Float, _ z: Float) {
-        self.init()
-        self.x = half(x)
-        self.y = half(y)
-        self.z = half(z)
-    }
-
-    init(_ x: half, _ y: half, _ z: half) {
-        self.init()
-        self.x = x
-        self.y = y
-        self.z = z
-    }
-
-    init(_ vec: SIMD3<Float>) {
-        self.init(half(vec.x), half(vec.y), half(vec.z))
-    }
-}
-
-extension half3: Equatable {
-    public static func == (lhs: vector_half3, rhs: vector_half3) -> Bool {
-        return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z
-    }
-}
-
-extension half3x3 {
-    init(_ scalar: half) {
-        self.init()
-        self.columns = (
-            half3(scalar, scalar, scalar),
-            half3(scalar, scalar, scalar),
-            half3(scalar, scalar, scalar)
-        )
-    }
-
-    init(_ mat: float3x3) {
-        self.init()
-        self.columns = (
-            half3(mat[0]),
-            half3(mat[1]),
-            half3(mat[2])
-        )
-    }
-
-    subscript(_ i: Int) -> half3 {
-        switch i {
-        case 0:
-            return columns.0
-        case 1:
-            return columns.1
-        case 2:
-            return columns.2
-        default: fatalError()
-        }
-    }
-}
-
-func half(_ x: Float) -> half {
-    return float16_from_float32(x)
-}
-
-func float(_ x: half) -> Float {
-    return float32_from_float16(x)
-}
-
-extension half {
-    init (_ x: Float) {
-        self = float16_from_float32(x)
-    }
-}
-
 extension simd_quatf {
-    static let identity = simd_quatf(angle: 1, axis: .zero)
+    public static let identity = simd_quatf(angle: 1, axis: .zero)
 
     var isFinite: Bool {
         return real.isFinite && imag.isFinite

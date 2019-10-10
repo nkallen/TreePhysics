@@ -39,7 +39,7 @@ extension CompositeBodyStruct: CustomDebugStringConvertible {
 }
 
 extension AutoTree.Node: CustomDebugStringConvertible {
-    var debugDescription: String {
+    public var debugDescription: String {
         return "AutoTree.\(type(of: self))(generation: \(generation ?? -1) position: \(position) orientation: \(orientation))"
     }
 }

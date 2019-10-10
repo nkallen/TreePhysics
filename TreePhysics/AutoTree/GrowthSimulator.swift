@@ -1,16 +1,24 @@
 import Foundation
 import simd
 
+fileprivate typealias GlobalError = Error
+
 extension AutoTree {
+    public enum Error: GlobalError {
+        case noAttractionPoints
+        case noSelectedBuds
+        case noVigor
+    }
+
     public final class GrowthSimulator {
         let config: Config
 
-        var generation = 0
-        var attractionPoints: Set<SIMD3<Float>> = []
+        private(set) var generation = 0
+        private(set) var attractionPoints: Set<SIMD3<Float>> = []
         let hash: LocalitySensitiveHash<Bud>
         let shadowGrid: ShadowGrid // FIXME all wrong
-        var root: Parent!
-        var buds: Set<Bud> = []
+        private(set) var root: Parent!
+        private(set) var buds: Set<Bud> = []
 
         init(_ config: Config, shadowGrid: ShadowGrid) {
             self.config = config
@@ -18,7 +26,7 @@ extension AutoTree {
             self.shadowGrid = shadowGrid
         }
 
-        public func add(_ parent: Parent) {
+        public func addRoot(_ parent: Parent) {
             func add(_ node: Node) {
                 shadowGrid[node.position] += config.shadowIntensity
 
@@ -39,6 +47,10 @@ extension AutoTree {
 
             self.root = parent
             add(parent as Node)
+        }
+
+        public func addAttractionPoints(_ points: [SIMD3<Float>]) {
+            self.attractionPoints.formUnion(points)
         }
 
         internal func updateLightExposure() -> [Node:Float] {
@@ -126,14 +138,8 @@ extension AutoTree {
             return selectedBuds
         }
 
-        internal func growShoots(selectedBuds: [Bud:Set<SIMD3<Float>>], vigors: [Node:Float]) {
+        internal func growShoots(selectedBuds: [Bud:Set<SIMD3<Float>>], vigors: [Node:Float], maxVigor: Float) {
             guard selectedBuds.count > 0 else { return }
-
-            var maxVigor: Float = 0
-            for (bud, _) in selectedBuds {
-                maxVigor = max(maxVigor, vigors[bud]!)
-            }
-            assert(maxVigor > 0)
 
             for (bud, points) in selectedBuds {
                 let shootLength = Int(Float(config.maxShootLength) * vigors[bud]! / maxVigor)
@@ -158,17 +164,33 @@ extension AutoTree {
 
         }
 
-        public func update() -> Bool {
-            guard attractionPoints.count > 0 else { return false }
+        public func update(enableAllBuds: Bool = false) throws {
+            let selectedBuds: [Bud:Set<SIMD3<Float>>]
+            if enableAllBuds {
+                var allBuds: [Bud:Set<SIMD3<Float>>] = [:]
+                for bud in buds {
+                    let point = bud.position + bud.orientation.heading * (config.occupationRadius + config.perceptionRadius)
 
-            let selectedBuds = selectBudsWithSpace()
-            guard selectedBuds.count > 0 else { return false }
+                    allBuds[bud] = [point]
+                }
+                selectedBuds = allBuds
+            } else {
+                selectedBuds = selectBudsWithSpace()
+            }
+            guard enableAllBuds || attractionPoints.count > 0 else { throw Error.noAttractionPoints }
+            guard selectedBuds.count > 0 else { throw Error.noSelectedBuds }
 
             let exposures = updateLightExposure()
+
             let vigors = updateVigor(exposures: exposures)
-            growShoots(selectedBuds: selectedBuds, vigors: vigors)
+            var maxVigor: Float = 0
+            for (bud, _) in selectedBuds {
+                maxVigor = max(maxVigor, vigors[bud]!)
+            }
+            guard maxVigor > 0 else { throw Error.noVigor }
+
+            growShoots(selectedBuds: selectedBuds, vigors: vigors, maxVigor: maxVigor)
             generation += 1
-            return true
         }
     }
 }

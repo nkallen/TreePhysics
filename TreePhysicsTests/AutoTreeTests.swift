@@ -94,7 +94,7 @@ class AutoTreeTests: XCTestCase {
 
         let fakeShadowGrid = FakeShadowGrid()
         let simulator = autoTree.growthSimulator(shadowGrid: fakeShadowGrid)
-        simulator.add(root)
+        simulator.addRoot(root)
 
         fakeShadowGrid[terminalBud.position] = config.shadowIntensity
         let exposures = simulator.updateLightExposure()
@@ -111,7 +111,7 @@ class AutoTreeTests: XCTestCase {
 
         let fakeShadowGrid = FakeShadowGrid()
         let simulator = autoTree.growthSimulator(shadowGrid: fakeShadowGrid)
-        simulator.add(root)
+        simulator.addRoot(root)
 
         fakeShadowGrid[terminalBud1.position] = config.shadowIntensity
         fakeShadowGrid[terminalBud2.position] = config.shadowIntensity * 4

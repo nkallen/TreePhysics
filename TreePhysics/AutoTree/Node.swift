@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 extension AutoTree {
-    class Node {
+    public class Node {
         let config: Config
         var generation: Int?
 
@@ -19,7 +19,7 @@ extension AutoTree {
 
     }
 
-    class Parent: Node {
+    public class Parent: Node {
         private(set) var lateralChild: Node? = nil
         private(set) var mainChild: Node? = nil
 
@@ -81,7 +81,7 @@ extension AutoTree {
         }
     }
 
-    class Bud: Node {
+    public class Bud: Node {
         fileprivate func grow(towards points: [SIMD3<Float>], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
@@ -120,7 +120,7 @@ extension AutoTree {
         }
 
         func occupies(point: SIMD3<Float>) -> Bool {
-            return distance(position, point) < config.occupationRadius
+            return distance(position, point) <= config.occupationRadius
         }
 
         func perceives(point: SIMD3<Float>) -> Bool {
@@ -131,7 +131,7 @@ extension AutoTree {
         }
     }
 
-    final class TerminalBud: Bud {
+    public final class TerminalBud: Bud {
         public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
@@ -141,7 +141,7 @@ extension AutoTree {
         }
     }
 
-    final class LateralBud: Bud {
+    public final class LateralBud: Bud {
         public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
@@ -151,7 +151,7 @@ extension AutoTree {
         }
     }
 
-    final class Internode: Parent {
+    public final class Internode: Parent {
         func diameter(exponent: Float) -> Float {
             return pow(Float(terminalBranchCount) * pow(2*config.extremityRadius, exponent), 1/exponent)
         }
@@ -161,11 +161,11 @@ extension AutoTree {
 extension AutoTree.Node: HasPosition {}
 
 extension AutoTree.Node: Equatable, Hashable {
-    static func == (lhs: AutoTree.Node, rhs: AutoTree.Node) -> Bool {
+    public static func == (lhs: AutoTree.Node, rhs: AutoTree.Node) -> Bool {
         return lhs === rhs
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
     }
 }
