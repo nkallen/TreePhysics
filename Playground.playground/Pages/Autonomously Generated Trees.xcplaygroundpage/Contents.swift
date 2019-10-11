@@ -39,7 +39,7 @@ while true {
         try simulator.update()
     } catch AutoTree.Error.noAttractionPoints {
         print("No attraction points")
-        for i in 0..<5 {
+        for i in 0..<10 {
             try! simulator.update(enableAllBuds: true)
         }
         break   

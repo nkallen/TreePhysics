@@ -152,7 +152,6 @@ extension AutoTree {
     }
 
     public final class Internode: Parent {
-        @inlinable
         func diameter(exponent: Float) -> Float {
             return pow(Float(terminalBudCount) * pow(2*config.extremityRadius, exponent), 1/exponent)
         }

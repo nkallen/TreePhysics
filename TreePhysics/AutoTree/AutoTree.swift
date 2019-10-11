@@ -34,7 +34,7 @@ public struct AutoTree {
     }
 
     public func growthSimulator(shadowGrid: ShadowGrid? = nil) -> GrowthSimulator {
-        let shadowGrid = shadowGrid ?? HashingShadowGrid(config)
+        let shadowGrid = shadowGrid ?? ArrayBackedShadowGrid(config)
         return GrowthSimulator(config, shadowGrid: shadowGrid)
     }
 

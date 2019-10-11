@@ -8,32 +8,41 @@ public protocol AutoTreeShadowGrid: class {
 extension AutoTree {
     public typealias ShadowGrid = AutoTreeShadowGrid
 
-    final class HashingShadowGrid: ShadowGrid {
+    final class ArrayBackedShadowGrid: ShadowGrid {
         let config: Config
-        private var storage: [SIMD3<Int32>:Float] = [:]
+        var size: Int
+        private var storage: [Float]
 
         init(_ config: Config) {
             self.config = config
+            self.size = config.initialShadowGridSize
+            self.storage = [Float](repeating: 0, count: size * size * size)
         }
 
         subscript(position: SIMD3<Float>) -> Float {
             get {
-                return storage[key(for: position), default: 0]
+                let key = self.key(for: position)
+                guard key.x < size && key.y < size && key.z < size else { return 0 }
+                return storage[key.x*size*size + key.y*size + key.z]
             }
 
             set {
+                while length(position / config.internodeLength) + sqrt(3*sqr(Float(config.shadowDepth))) > Float(size / 2) {
+                    resize()
+                }
                 let key = self.key(for: position)
-                let oldValue = storage[key, default: 0]
+                let oldValue = storage[key.x*size*size + key.y*size + key.z]
                 let delta = newValue - oldValue
-                var q: Int32 = 0
-                while q <= Int32(config.shadowDepth) {
+                var q = 0
+                while q <= config.shadowDepth {
                     var p = -q
                     while p <= q {
                         var s = -q
                         while s <= q {
-                            let offset = SIMD3<Int32>(p,-q,s)
+                            let offset = SIMD3<Int>(p,-q,s)
                             let decayedDelta = delta * pow(config.shadowDecayFactor, Float(q))
-                            storage[key &+ offset, default: 0] += decayedDelta
+                            let k = key &+ offset
+                            storage[k.x*size*size + k.y*size + k.z] += decayedDelta
                             s += 1
                         }
                         p += 1
@@ -43,9 +52,26 @@ extension AutoTree {
             }
         }
 
-        private func key(for position: SIMD3<Float>, offset: SIMD3<Int32> = SIMD3<Int32>.zero) -> SIMD3<Int32> {
-            let cell = SIMD3<Int32>(floor(position / config.internodeLength))
+        private func key(for position: SIMD3<Float>) -> SIMD3<Int> {
+            let cell = SIMD3<Int>(floor(position / config.internodeLength)) &+ size / 2
             return cell
+        }
+
+        private func resize() {
+            let oldStorage = storage
+            let oldSize = size
+            let newSize = oldSize * 2
+            var newStorage = [Float](repeating: 0, count: newSize*newSize*newSize)
+            for i in 0..<oldSize {
+                for j in 0..<oldSize {
+                    for k in 0..<oldSize {
+                        let value = oldStorage[i*oldSize*oldSize + j*oldSize + k]
+                        newStorage[i*newSize*newSize + j*newSize + k] = value
+                    }
+                }
+            }
+            self.size = newSize
+            self.storage = newStorage
         }
     }
 }

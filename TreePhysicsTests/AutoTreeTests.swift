@@ -59,7 +59,8 @@ class AutoTreeTests: XCTestCase {
     func testShadowGrid() {
         config.internodeLength = 1
         config.shadowDepth = 2
-        let grid = AutoTree.HashingShadowGrid(config)
+        config.initialShadowGridSize = 1 // This SHOULD trigger resizing
+        let grid = AutoTree.ArrayBackedShadowGrid(config)
         grid[SIMD3<Float>(3.1,3.1,3.1)] += 1
         for i in 0..<8 {
             for k in 0..<7 {
