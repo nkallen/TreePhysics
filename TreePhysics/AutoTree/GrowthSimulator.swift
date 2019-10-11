@@ -148,8 +148,9 @@ extension AutoTree {
                     let (internode, (terminalBud, lateralBud)) = currentBud.grow(towards: Array(points))
                     hash.remove(currentBud)
                     self.buds.remove(currentBud)
-                    shadowGrid[currentBud.position] -= config.shadowIntensity
-                    shadowGrid[internode.position] += config.shadowIntensity
+                    // NOTE: For now, the internode and bud it replaces are at the same location, so changing the shadow grid is a no-op
+//                    shadowGrid[currentBud.position] -= config.shadowIntensity
+//                    shadowGrid[internode.position] += config.shadowIntensity
                     internode.generation = generation
 
                     for bud in [terminalBud, lateralBud].compactMap({ $0 }) {

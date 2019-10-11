@@ -85,14 +85,16 @@ extension AutoTree {
         fileprivate func grow(towards points: [SIMD3<Float>], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
-            var newDirection: SIMD3<Float> = .zero
+            var environmentalDirection: SIMD3<Float> = .zero
             for point in points {
                 let directionToAttractionPoint = point - self.position
-                newDirection += normalize(directionToAttractionPoint)
+                environmentalDirection += normalize(directionToAttractionPoint)
             }
-            if newDirection == .zero {
-                newDirection = orientation.heading
-            }
+            environmentalDirection = normalize(environmentalDirection)
+
+            print(orientation.heading, environmentalDirection)
+
+            var newDirection = config.branchStraightnessBias * orientation.heading + config.branchEnvironmentalBias * environmentalDirection
             newDirection = normalize(newDirection)
 
             let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized

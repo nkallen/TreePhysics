@@ -2,9 +2,14 @@ import Foundation
 
 extension AutoTree {
     public struct Config {
+        public var internodeLength: Float = 0.05
+
+        public var branchStraightnessBias: Float = 0
+        public var branchGravitropismBias: Float = 0
+        public var branchEnvironmentalBias: Float { return 1 - branchStraightnessBias - branchGravitropismBias }
+
         public var branchingAngle: Float = .pi/8
         public var phyllotacticAngle: Float = .pi/4
-        public var internodeLength: Float = 0.05
 
         public var occupationRadius: Float = 0.05
         public var perceptionAngle: Float = .pi/4
@@ -27,11 +32,16 @@ extension AutoTree {
         public init() {}
 
         public func validate() {
+            check.positive(internodeLength)
+
+            check.normal(branchStraightnessBias)
+            check.normal(branchGravitropismBias)
+            check.normal(branchStraightnessBias + branchGravitropismBias)
+
             check.angle(branchingAngle)
             check.angle(phyllotacticAngle)
             check.angle(perceptionAngle)
 
-            check.positive(internodeLength)
             check.positive(occupationRadius)
             check.positive(perceptionRadius)
             check.assert(meshDetail > 1)

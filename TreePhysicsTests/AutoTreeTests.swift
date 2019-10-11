@@ -4,21 +4,12 @@ import XCTest
 import simd
 
 class AutoTreeTests: XCTestCase {
-    var config: AutoTree.Config!
-    var autoTree: AutoTree!
-    var root: AutoTree.Parent!
-    var firstBud: AutoTree.TerminalBud!
-
-    override func setUp() {
-        super.setUp()
-        self.config = AutoTree.Config()
-        self.autoTree = AutoTree(config)
-        let (root, firstBud) = autoTree.seedling()
-        self.root = root
-        self.firstBud = firstBud
-    }
-
     func testGrow() throws {
+        var config = AutoTree.Config()
+        config.branchStraightnessBias = 0
+        let autoTree = AutoTree(config)
+        let (root, firstBud) = autoTree.seedling()
+
         // start with root -> terminalBud
         // transition to root -> internode -> terminalBud
         var (internode, (terminalBud, lateralBud)) = firstBud.grow(towards: [SIMD3<Float>(1,1,0), SIMD3<Float>(1,-1,0)])
@@ -27,14 +18,14 @@ class AutoTreeTests: XCTestCase {
         XCTAssertEqual(simd_quatf(angle: -.pi/2, axis: .z), internode.orientation, accuracy: 0.0001)
         XCTAssertNil(lateralBud)
 
-        XCTAssertEqual(.x * config.internodeLength, terminalBud.position, accuracy: 0.0001)
+        XCTAssertEqual(internode.orientation.heading * config.internodeLength, terminalBud.position, accuracy: 0.0001)
         XCTAssertEqual(simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation, terminalBud.orientation)
 
         // transition to root -> internode -> [lateralBud] internode -> terminalBud
         (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [SIMD3<Float>(10,0,0)])
         let lateralBud_ = try XCTUnwrap(lateralBud)
 
-        XCTAssertEqual(.x * config.internodeLength * 2, terminalBud.position, accuracy: 0.0001)
+        XCTAssertEqual(internode.orientation.heading * config.internodeLength * 2, terminalBud.position, accuracy: 0.0001)
         XCTAssertEqual(
             (simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation).normalized,
             terminalBud.orientation)
@@ -45,7 +36,24 @@ class AutoTreeTests: XCTestCase {
             lateralBud_.orientation)
     }
 
+    func testGrowWithStraighness() {
+        var config = AutoTree.Config()
+        config.branchStraightnessBias = 0.5
+        let autoTree = AutoTree(config)
+        let (root, firstBud) = autoTree.seedling()
+
+        let (internode, (terminalBud, _)) = firstBud.grow(towards: [SIMD3<Float>(1,1,0), SIMD3<Float>(1,-1,0)])
+
+        XCTAssertEqual(simd_quatf(angle: -.pi/4, axis: .z), internode.orientation, accuracy: 0.0001)
+
+        XCTAssertEqual(internode.orientation.heading * config.internodeLength, terminalBud.position, accuracy: 0.0001)
+    }
+
     func testTerminalBudCount() throws {
+        let config = AutoTree.Config()
+        let autoTree = AutoTree(config)
+        let (root, firstBud) = autoTree.seedling()
+
         XCTAssertEqual(1, root.terminalBudCount)
         let (_, (terminalBud0, _)) = firstBud.grow()
         XCTAssertEqual(1, root.terminalBudCount)
@@ -57,6 +65,7 @@ class AutoTreeTests: XCTestCase {
     }
 
     func testShadowGrid() {
+        var config = AutoTree.Config()
         config.internodeLength = 1
         config.shadowDepth = 2
         config.initialShadowGridSize = 1 // This SHOULD trigger resizing
@@ -91,6 +100,10 @@ class AutoTreeTests: XCTestCase {
     }
 
     func testVigorSimple() {
+        let config = AutoTree.Config()
+        let autoTree = AutoTree(config)
+        let (root, firstBud) = autoTree.seedling()
+
         let (internode, (terminalBud, _)) = firstBud.grow()
 
         let fakeShadowGrid = FakeShadowGrid()
@@ -105,6 +118,10 @@ class AutoTreeTests: XCTestCase {
     }
 
     func testVigorBranch() throws {
+        let config = AutoTree.Config()
+        let autoTree = AutoTree(config)
+        let (root, firstBud) = autoTree.seedling()
+
         let (internode0, (terminalBud0, _)) = firstBud.grow()
         let (internode1, (terminalBud1, lateralBud1_)) = terminalBud0.grow()
         let lateralBud1 = try XCTUnwrap(lateralBud1_)

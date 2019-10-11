@@ -29,7 +29,8 @@ final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
         }
     }
 
-    // returns a FlattenedSequence since it can be constructed without copying (unlike an array)
+    // returns a FlattenedSequence for performance reasons (since it can be constructed without
+    // copying (unlike an array)
     func elements(near position: SIMD3<Float>) -> FlattenSequence<[Set<T>]> {
         var result: [Set<T>] = []
         for i: Int32 in -1...1 {
