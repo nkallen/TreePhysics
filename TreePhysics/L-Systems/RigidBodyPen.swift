@@ -1,8 +1,6 @@
 import Foundation
 import simd
 
-// FIXME: we need a unit test to ensure rigidbody pen and cylinderpen are consistent
-
 public final class RigidBodyPen: Pen {
     public typealias T = ArticulatedRigidBody
 

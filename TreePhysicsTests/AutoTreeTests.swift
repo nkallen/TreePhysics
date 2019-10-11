@@ -45,23 +45,22 @@ class AutoTreeTests: XCTestCase {
             lateralBud_.orientation)
     }
 
-    // FIXME rename terminalBudCount
-    func testTerminalBranchCount() throws {
-        XCTAssertEqual(1, root.terminalBranchCount)
+    func testTerminalBudCount() throws {
+        XCTAssertEqual(1, root.terminalBudCount)
         let (_, (terminalBud0, _)) = firstBud.grow()
-        XCTAssertEqual(1, root.terminalBranchCount)
+        XCTAssertEqual(1, root.terminalBudCount)
         let (_, (terminalBud1, lateralBud_)) = terminalBud0.grow()
         let lateralBud = try XCTUnwrap(lateralBud_)
         _ = terminalBud1.grow()
         _ = lateralBud.grow()
-        XCTAssertEqual(2, root.terminalBranchCount)
+        XCTAssertEqual(2, root.terminalBudCount)
     }
 
     func testShadowGrid() {
         config.internodeLength = 1
         config.shadowDepth = 2
         let grid = AutoTree.HashingShadowGrid(config)
-        grid[SIMD3<Float>(3,3,3)] += 1
+        grid[SIMD3<Float>(3.1,3.1,3.1)] += 1
         for i in 0..<8 {
             for k in 0..<7 {
                 XCTAssertEqual(0, grid[SIMD3<Float>(Float(i), 4, Float(k))]) // top slice all 0s

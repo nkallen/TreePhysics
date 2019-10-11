@@ -23,10 +23,10 @@ extension AutoTree {
         private(set) var lateralChild: Node? = nil
         private(set) var mainChild: Node? = nil
 
-        private(set) var terminalBranchCount: Int = 0 {
+        private(set) var terminalBudCount: Int = 0 {
             didSet {
-                let delta = terminalBranchCount - oldValue
-                parent?.terminalBranchCount += delta
+                let delta = terminalBudCount - oldValue
+                parent?.terminalBudCount += delta
             }
         }
 
@@ -39,7 +39,7 @@ extension AutoTree {
             }
             if case let internode as Internode = mainChild {
                 if let thickest_ = thickest {
-                    if internode.terminalBranchCount < thickest_.terminalBranchCount {
+                    if internode.terminalBudCount < thickest_.terminalBudCount {
                         thickest = internode
                         rest.remove(internode)
                     }
@@ -60,7 +60,7 @@ extension AutoTree {
             case let bud as TerminalBud where mainChild == bud:
                 mainChild = internode
             case let bud as LateralBud where lateralChild == bud:
-                terminalBranchCount += internode.terminalBranchCount
+                terminalBudCount += internode.terminalBudCount
                 lateralChild = internode
             default: fatalError()
             }
@@ -72,7 +72,7 @@ extension AutoTree {
             switch bud {
             case let bud as TerminalBud where mainChild == nil:
                 self.mainChild = bud
-                terminalBranchCount += 1
+                terminalBudCount += 1
             case let bud as LateralBud where lateralChild == nil:
                 self.lateralChild = bud
             default: fatalError()
@@ -152,8 +152,9 @@ extension AutoTree {
     }
 
     public final class Internode: Parent {
+        @inlinable
         func diameter(exponent: Float) -> Float {
-            return pow(Float(terminalBranchCount) * pow(2*config.extremityRadius, exponent), 1/exponent)
+            return pow(Float(terminalBudCount) * pow(2*config.extremityRadius, exponent), 1/exponent)
         }
     }
 }

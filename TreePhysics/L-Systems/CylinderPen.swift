@@ -44,7 +44,6 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T {
         guard let state = state else { fatalError() }
 
-        print("radius2", sqrt(thickness / .pi))
         let circle = makeCircle(radius: sqrt(thickness / .pi))
         let top: [SIMD3<Float>] = circle.map {
             state.position + orientation.act(distance * .y + $0)

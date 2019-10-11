@@ -39,7 +39,7 @@ public struct AutoTree {
     }
 
     public func draw<I: FixedWidthInteger>(_ parent: Parent, pen: CylinderPen<I>) {
-        let diameterExponent = log(Float(parent.terminalBranchCount)) / (log(2*config.baseRadius) - log(2*config.extremityRadius))
+        let diameterExponent = log(Float(parent.terminalBudCount)) / (log(2*config.baseRadius) - log(2*config.extremityRadius))
         draw(parent, pen: pen, diameterExponent: diameterExponent)
     }
 
@@ -83,7 +83,7 @@ fileprivate extension Set where Element == AutoTree.Node {
             switch (thickest, node) {
             case let (nil, internode as AutoTree.Internode):
                 thickest = internode
-            case let (.some(last), internode as AutoTree.Internode) where internode.terminalBranchCount > last.terminalBranchCount:
+            case let (.some(last), internode as AutoTree.Internode) where internode.terminalBudCount > last.terminalBudCount:
                 rest.insert(last)
                 thickest = internode
             default:
