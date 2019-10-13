@@ -8,7 +8,7 @@ protocol HasPosition {
 final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
     let cellSize: Float
 
-    private var storage: [SIMD3<Int32>:Set<T>] = [:]
+    private var storage: [SIMD3<Int>:Set<T>] = [:]
 
     init(cellSize: Float) {
         self.cellSize = cellSize
@@ -33,11 +33,12 @@ final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
     // copying (unlike an array)
     func elements(near position: SIMD3<Float>) -> FlattenSequence<[Set<T>]> {
         var result: [Set<T>] = []
-        for i: Int32 in -1...1 {
-            for j: Int32 in -1...1 {
-                for k: Int32 in -1...1 {
-                    let offset = SIMD3<Int32>(i, j, k)
-                    if let set = storage[key(for: position, offset: offset)] {
+        let key = self.key(for: position)
+        for i in -1...1 {
+            for j in -1...1 {
+                for k in -1...1 {
+                    let offset = SIMD3<Int>(i, j, k)
+                    if let set = storage[key &+ offset] {
                         result.append(set)
                     }
                 }
@@ -46,8 +47,7 @@ final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
         return result.joined()
     }
 
-    private func key(for position: SIMD3<Float>, offset: SIMD3<Int32> = SIMD3<Int32>.zero) -> SIMD3<Int32> {
-        let cell = SIMD3<Int32>(position / cellSize)
-        return cell &+ offset
+    private func key(for position: SIMD3<Float>) -> SIMD3<Int> {
+        return SIMD3<Int>(floor(position / cellSize))
     }
 }

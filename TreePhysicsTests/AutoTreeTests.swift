@@ -39,6 +39,21 @@ class AutoTreeTests: XCTestCase {
     func testGrowWithStraighness() {
         var config = AutoTree.Config()
         config.branchStraightnessBias = 0.5
+        config.branchGravitropismBias = 0
+        let autoTree = AutoTree(config)
+        let (root, firstBud) = autoTree.seedling()
+
+        let (internode, (terminalBud, _)) = firstBud.grow(towards: [SIMD3<Float>(1,1,0), SIMD3<Float>(1,-1,0)])
+
+        XCTAssertEqual(simd_quatf(angle: -.pi/4, axis: .z), internode.orientation, accuracy: 0.0001)
+
+        XCTAssertEqual(internode.orientation.heading * config.internodeLength, terminalBud.position, accuracy: 0.0001)
+    }
+
+    func testGrowthWithGravitropism() {
+        var config = AutoTree.Config()
+        config.branchStraightnessBias = 0
+        config.branchGravitropismBias = 0.5
         let autoTree = AutoTree(config)
         let (root, firstBud) = autoTree.seedling()
 
@@ -62,6 +77,10 @@ class AutoTreeTests: XCTestCase {
         _ = terminalBud1.grow()
         _ = lateralBud.grow()
         XCTAssertEqual(2, root.terminalBudCount)
+    }
+
+    func testInternodeDiameter() {
+        // FIXME
     }
 
     func testShadowGrid() {

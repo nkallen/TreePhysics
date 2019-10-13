@@ -45,8 +45,8 @@ public struct AutoTree {
 
     func draw<I: FixedWidthInteger>(_ node: Node, pen: CylinderPen<I>, diameterExponent: Float) {
         switch node {
-        case let bud as Bud: ()
-//            _ = pen.copy(scale: config.occupationRadius, orientation: bud.orientation)
+        case let bud as Bud:
+            _ = pen.copy(scale: config.internodeLength, orientation: bud.orientation)
         case let internode as Internode:
             // FIXME diameter math is wrong
             let diameter = internode.diameter(exponent: diameterExponent)
@@ -72,24 +72,5 @@ public struct AutoTree {
             _ = draw(child, pen: branch, diameterExponent: diameterExponent)
         }
         if let thickest = thickest { _ = draw(thickest, pen: pen, diameterExponent: diameterExponent) }
-    }
-}
-
-fileprivate extension Set where Element == AutoTree.Node {
-    var thickest: (AutoTree.Node?, Set<AutoTree.Node>) {
-        var rest: Set<AutoTree.Node> = []
-        var thickest: AutoTree.Internode? = nil
-        for node in self {
-            switch (thickest, node) {
-            case let (nil, internode as AutoTree.Internode):
-                thickest = internode
-            case let (.some(last), internode as AutoTree.Internode) where internode.terminalBudCount > last.terminalBudCount:
-                rest.insert(last)
-                thickest = internode
-            default:
-                rest.insert(node)
-            }
-        }
-        return (thickest, rest)
     }
 }

@@ -39,9 +39,10 @@ extension AutoTree {
             }
             if case let internode as Internode = mainChild {
                 if let thickest_ = thickest {
-                    if internode.terminalBudCount < thickest_.terminalBudCount {
+                    if internode.terminalBudCount > thickest_.terminalBudCount {
                         thickest = internode
                         rest.remove(internode)
+                        rest.insert(thickest_)
                     }
                 } else {
                     thickest = internode
@@ -85,17 +86,27 @@ extension AutoTree {
         fileprivate func grow(towards points: [SIMD3<Float>], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
+            let gravitropismDirection: SIMD3<Float> = simd_quatf(angle: config.gravitropismAngle, axis:  cross(.y, orientation.heading)).act(.y)
+
+            var newDirection: SIMD3<Float>
+
             var environmentalDirection: SIMD3<Float> = .zero
-            for point in points {
-                let directionToAttractionPoint = point - self.position
-                environmentalDirection += normalize(directionToAttractionPoint)
+            if points.count > 0 {
+                for point in points {
+                    let directionToAttractionPoint = point - self.position
+                    environmentalDirection += normalize(directionToAttractionPoint)
+                }
+                environmentalDirection = normalize(environmentalDirection)
+
+                newDirection = config.branchStraightnessBias * orientation.heading
+                newDirection += config.branchEnvironmentalBias * environmentalDirection
+                newDirection += config.branchGravitropismBias * gravitropismDirection
+            } else {
+                newDirection = (1 - config.branchGravitropismBias) * orientation.heading
+                newDirection += config.branchGravitropismBias * gravitropismDirection
             }
-            environmentalDirection = normalize(environmentalDirection)
-
-            print(orientation.heading, environmentalDirection)
-
-            var newDirection = config.branchStraightnessBias * orientation.heading + config.branchEnvironmentalBias * environmentalDirection
             newDirection = normalize(newDirection)
+            assert(newDirection.isFinite)
 
             let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized
             let branchingRotation = simd_quatf(angle: config.branchingAngle, axis: newOrientation.up)

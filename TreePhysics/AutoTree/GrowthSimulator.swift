@@ -165,33 +165,64 @@ extension AutoTree {
 
         }
 
-        public func update(enableAllBuds: Bool = false) throws {
-            let selectedBuds: [Bud:Set<SIMD3<Float>>]
+        public func update(enableAllBuds: Bool = false) throws -> [Bud] {
+            var start = Date()
+            var terminalBudCount = 0
+            var lateralBudCount = 0
+            for bud in buds {
+                if bud is TerminalBud {
+                    terminalBudCount += 1
+                } else if bud is LateralBud {
+                    lateralBudCount += 1
+                }
+            }
+            print("Starting with \(buds.count) buds of which there are \(terminalBudCount) terminal buds and \(lateralBudCount) lateral buds")
             if enableAllBuds {
-                var allBuds: [Bud:Set<SIMD3<Float>>] = [:]
+                self.attractionPoints = []
                 for bud in buds {
                     let point = bud.position + bud.orientation.heading * (config.occupationRadius + config.perceptionRadius)
-
-                    allBuds[bud] = [point]
+                    self.attractionPoints.insert(point)
                 }
-                selectedBuds = allBuds
-            } else {
-                selectedBuds = selectBudsWithSpace()
             }
-            guard enableAllBuds || attractionPoints.count > 0 else { throw Error.noAttractionPoints }
+            print("Enabled all buds in \(Date().timeIntervalSince(start))s")
+            start = Date()
+            let selectedBuds = selectBudsWithSpace()
+            print("Selected \(selectedBuds.count) (\(Float(selectedBuds.count) / Float(buds.count))%) buds in \(Date().timeIntervalSince(start))s")
+            terminalBudCount = 0
+            lateralBudCount = 0
+            var result: [Bud] = []
+            for (bud, _) in selectedBuds {
+                result.append(bud)
+                if bud is TerminalBud {
+                    terminalBudCount += 1
+                } else if bud is LateralBud {
+                    lateralBudCount += 1
+                }
+            }
+            print("Selected \(terminalBudCount) terminal buds and \(lateralBudCount) lateral buds")
+            start = Date()
+            guard attractionPoints.count > 0 else { throw Error.noAttractionPoints }
             guard selectedBuds.count > 0 else { throw Error.noSelectedBuds }
 
             let exposures = updateLightExposure()
+            print("Updated exposures in in \(Date().timeIntervalSince(start))s")
+            start = Date()
 
             let vigors = updateVigor(exposures: exposures)
+            print("Updated vigors in \(Date().timeIntervalSince(start))s")
+            start = Date()
             var maxVigor: Float = 0
             for (bud, _) in selectedBuds {
                 maxVigor = max(maxVigor, vigors[bud]!)
             }
             guard maxVigor > 0 else { throw Error.noVigor }
+            print("Calculated max shoots in \(Date().timeIntervalSince(start))s")
+            start = Date()
 
             growShoots(selectedBuds: selectedBuds, vigors: vigors, maxVigor: maxVigor)
+            print("Grew shoots in \(Date().timeIntervalSince(start))s")
             generation += 1
+            return result
         }
     }
 }

@@ -1,30 +1,405 @@
-
-vertices [
-SIMD3<Float>(0.5641896, 0.0, 0.0),
-SIMD3<Float>(-0.28209472, 0.0, 0.4886026),
-SIMD3<Float>(-0.282095, 0.0, -0.48860243),
-SIMD3<Float>(0.5641896, 1.0, 0.0),
-SIMD3<Float>(-0.28209472, 1.0, 0.4886026),
-SIMD3<Float>(-0.282095, 1.0, -0.48860243),
-
-SIMD3<Float>(0.5641896, 1.0, 0.0),
-SIMD3<Float>(-0.28209472, 1.0, 0.4886026),
-SIMD3<Float>(-0.282095, 1.0, -0.48860243),
-SIMD3<Float>(-0.5641896, 2.0, -8.5190266e-08),
-SIMD3<Float>(0.28209478, 2.0, -0.48860258),
-SIMD3<Float>(0.28209493, 2.0, 0.48860246)]
-indices [0, 3, 1, 4, 2, 5, 0, 3, 3, 3, 3, 6, 4, 7, 5, 8, 3, 6]
-
-
-vertices [
-SIMD3<Float>(0.5641896, 0.0, 0.0),
-SIMD3<Float>(-0.28209472, 0.0, 0.4886026),
-SIMD3<Float>(-0.282095, 0.0, -0.48860243),
-SIMD3<Float>(0.5641896, 1.0, 0.0),
-SIMD3<Float>(-0.28209472, 1.0, 0.4886026),
-SIMD3<Float>(-0.282095, 1.0, -0.48860243),
-
-SIMD3<Float>(-0.5641896, 2.0, -8.5190266e-08),
-SIMD3<Float>(0.28209478, 2.0, -0.48860258),
-SIMD3<Float>(0.28209493, 2.0, 0.48860246)]
-indices [0, 3, 1, 4, 2, 5, 0, 3, 3, 3, 3, 6, 4, 7, 5, 8, 3, 6]
+iterating
+Starting with 1 buds of which there are 1 terminal buds and 0 lateral buds
+Enabled all buds in 5.698204040527344e-05s
+Selected 1 (1.0%) buds in 0.09953904151916504s
+Selected 1 terminal buds and 0 lateral buds
+Updated exposures in in 6.306171417236328e-05s
+Updated vigors in 4.303455352783203e-05s
+Calculated max shoots in 1.2040138244628906e-05s
+Grew shoots in 0.001128077507019043s
+iterating
+Starting with 3 buds of which there are 1 terminal buds and 2 lateral buds
+Enabled all buds in 1.2993812561035156e-05s
+Selected 1 (0.33333334%) buds in 0.10707294940948486s
+Selected 1 terminal buds and 0 lateral buds
+Updated exposures in in 6.103515625e-05s
+Updated vigors in 4.398822784423828e-05s
+Calculated max shoots in 4.0531158447265625e-06s
+Grew shoots in 0.0009759664535522461s
+iterating
+Starting with 6 buds of which there are 1 terminal buds and 5 lateral buds
+Enabled all buds in 3.2901763916015625e-05s
+Selected 1 (0.16666667%) buds in 0.06775903701782227s
+Selected 1 terminal buds and 0 lateral buds
+Updated exposures in in 0.0001289844512939453s
+Updated vigors in 5.1975250244140625e-05s
+Calculated max shoots in 2.9802322387695312e-06s
+Grew shoots in 0.0006470680236816406s
+iterating
+Starting with 9 buds of which there are 1 terminal buds and 8 lateral buds
+Enabled all buds in 3.802776336669922e-05s
+Selected 4 (0.44444445%) buds in 0.06756293773651123s
+Selected 1 terminal buds and 3 lateral buds
+Updated exposures in in 0.00010406970977783203s
+Updated vigors in 4.8995018005371094e-05s
+Calculated max shoots in 2.9802322387695312e-06s
+Grew shoots in 0.0012019872665405273s
+iterating
+Starting with 15 buds of which there are 4 terminal buds and 11 lateral buds
+Enabled all buds in 6.306171417236328e-05s
+Selected 7 (0.46666667%) buds in 0.06870698928833008s
+Selected 4 terminal buds and 3 lateral buds
+Updated exposures in in 0.00019609928131103516s
+Updated vigors in 7.200241088867188e-05s
+Calculated max shoots in 3.933906555175781e-06s
+Grew shoots in 0.002071976661682129s
+iterating
+Starting with 27 buds of which there are 7 terminal buds and 20 lateral buds
+Enabled all buds in 1.990795135498047e-05s
+Selected 8 (0.2962963%) buds in 0.07330894470214844s
+Selected 6 terminal buds and 2 lateral buds
+Updated exposures in in 0.0005429983139038086s
+Updated vigors in 0.00013709068298339844s
+Calculated max shoots in 4.0531158447265625e-06s
+Grew shoots in 0.0026450157165527344s
+iterating
+Starting with 42 buds of which there are 9 terminal buds and 33 lateral buds
+Enabled all buds in 2.8967857360839844e-05s
+Selected 15 (0.35714287%) buds in 0.07941997051239014s
+Selected 8 terminal buds and 7 lateral buds
+Updated exposures in in 0.0008400678634643555s
+Updated vigors in 0.0002390146255493164s
+Calculated max shoots in 8.940696716308594e-06s
+Grew shoots in 0.004500031471252441s
+iterating
+Starting with 66 buds of which there are 16 terminal buds and 50 lateral buds
+Enabled all buds in 2.6941299438476562e-05s
+Selected 26 (0.3939394%) buds in 0.08610403537750244s
+Selected 13 terminal buds and 13 lateral buds
+Updated exposures in in 0.0014280080795288086s
+Updated vigors in 0.0003809928894042969s
+Calculated max shoots in 1.2993812561035156e-05s
+Grew shoots in 0.00805199146270752s
+iterating
+Starting with 106 buds of which there are 29 terminal buds and 77 lateral buds
+Enabled all buds in 7.30752944946289e-05s
+Selected 36 (0.33962265%) buds in 0.09535098075866699s
+Selected 17 terminal buds and 19 lateral buds
+Updated exposures in in 0.0024939775466918945s
+Updated vigors in 0.0005370378494262695s
+Calculated max shoots in 4.208087921142578e-05s
+Grew shoots in 0.010691046714782715s
+iterating
+Starting with 156 buds of which there are 48 terminal buds and 108 lateral buds
+Enabled all buds in 5.900859832763672e-05s
+Selected 58 (0.37179488%) buds in 0.10572993755340576s
+Selected 28 terminal buds and 30 lateral buds
+Updated exposures in in 0.0038889646530151367s
+Updated vigors in 0.0007600784301757812s
+Calculated max shoots in 3.695487976074219e-05s
+Grew shoots in 0.01602303981781006s
+iterating
+Starting with 235 buds of which there are 78 terminal buds and 157 lateral buds
+Enabled all buds in 8.90493392944336e-05s
+Selected 73 (0.3106383%) buds in 0.1246030330657959s
+Selected 44 terminal buds and 29 lateral buds
+Updated exposures in in 0.0061969757080078125s
+Updated vigors in 0.0011249780654907227s
+Calculated max shoots in 4.208087921142578e-05s
+Grew shoots in 0.0216519832611084s
+iterating
+Starting with 342 buds of which there are 107 terminal buds and 235 lateral buds
+Enabled all buds in 0.00012004375457763672s
+Selected 99 (0.28947368%) buds in 0.14572906494140625s
+Selected 56 terminal buds and 43 lateral buds
+Updated exposures in in 0.009734034538269043s
+Updated vigors in 0.0018720626831054688s
+Calculated max shoots in 4.398822784423828e-05s
+Grew shoots in 0.028506994247436523s
+iterating
+Starting with 480 buds of which there are 150 terminal buds and 330 lateral buds
+Enabled all buds in 0.00016605854034423828s
+Selected 113 (0.23541667%) buds in 0.16607701778411865s
+Selected 56 terminal buds and 57 lateral buds
+Updated exposures in in 0.01433706283569336s
+Updated vigors in 0.0022679567337036133s
+Calculated max shoots in 5.507469177246094e-05s
+Grew shoots in 0.03214907646179199s
+iterating
+Starting with 624 buds of which there are 207 terminal buds and 417 lateral buds
+Enabled all buds in 0.0001729726791381836s
+Selected 126 (0.20192307%) buds in 0.17596304416656494s
+Selected 59 terminal buds and 67 lateral buds
+Updated exposures in in 0.019299983978271484s
+Updated vigors in 0.0031470060348510742s
+Calculated max shoots in 8.308887481689453e-05s
+Grew shoots in 0.031751036643981934s
+iterating
+Starting with 765 buds of which there are 274 terminal buds and 491 lateral buds
+Enabled all buds in 0.00021195411682128906s
+Selected 142 (0.18562092%) buds in 0.18469703197479248s
+Selected 65 terminal buds and 77 lateral buds
+Updated exposures in in 0.025383949279785156s
+Updated vigors in 0.0040940046310424805s
+Calculated max shoots in 6.99758529663086e-05s
+Grew shoots in 0.03606903553009033s
+iterating
+Starting with 914 buds of which there are 351 terminal buds and 563 lateral buds
+Enabled all buds in 0.00028192996978759766s
+Selected 148 (0.1619256%) buds in 0.1912609338760376s
+Selected 72 terminal buds and 76 lateral buds
+Updated exposures in in 0.030910015106201172s
+Updated vigors in 0.004860997200012207s
+Calculated max shoots in 7.998943328857422e-05s
+Grew shoots in 0.03539407253265381s
+iterating
+Starting with 1064 buds of which there are 425 terminal buds and 639 lateral buds
+Enabled all buds in 0.00038802623748779297s
+Selected 161 (0.1513158%) buds in 0.21883893013000488s
+Selected 76 terminal buds and 85 lateral buds
+Updated exposures in in 0.03797793388366699s
+Updated vigors in 0.0055370330810546875s
+Calculated max shoots in 0.00010001659393310547s
+Grew shoots in 0.03973102569580078s
+iterating
+Starting with 1222 buds of which there are 508 terminal buds and 714 lateral buds
+Enabled all buds in 0.0002919435501098633s
+Selected 180 (0.14729951%) buds in 0.22026801109313965s
+Selected 90 terminal buds and 90 lateral buds
+Updated exposures in in 0.04506099224090576s
+Updated vigors in 0.006789088249206543s
+Calculated max shoots in 0.00011789798736572266s
+Grew shoots in 0.040760040283203125s
+iterating
+Starting with 1389 buds of which there are 595 terminal buds and 794 lateral buds
+Enabled all buds in 0.00038909912109375s
+Selected 196 (0.1411087%) buds in 0.21939396858215332s
+Selected 100 terminal buds and 96 lateral buds
+Updated exposures in in 0.05566096305847168s
+Updated vigors in 0.008976936340332031s
+Calculated max shoots in 0.00010192394256591797s
+Grew shoots in 0.046723008155822754s
+iterating
+Starting with 1570 buds of which there are 687 terminal buds and 883 lateral buds
+Enabled all buds in 0.0005050897598266602s
+Selected 204 (0.12993631%) buds in 0.25366008281707764s
+Selected 99 terminal buds and 105 lateral buds
+Updated exposures in in 0.06997799873352051s
+Updated vigors in 0.009570002555847168s
+Calculated max shoots in 0.0001919269561767578s
+Grew shoots in 0.04737198352813721s
+iterating
+Starting with 1741 buds of which there are 786 terminal buds and 955 lateral buds
+Enabled all buds in 0.0005279779434204102s
+Selected 222 (0.12751292%) buds in 0.2504110336303711s
+Selected 123 terminal buds and 99 lateral buds
+Updated exposures in in 0.07656002044677734s
+Updated vigors in 0.010537028312683105s
+Calculated max shoots in 0.0001289844512939453s
+Grew shoots in 0.05094790458679199s
+iterating
+Starting with 1933 buds of which there are 878 terminal buds and 1055 lateral buds
+Enabled all buds in 0.0005350112915039062s
+Selected 229 (0.1184687%) buds in 0.25355398654937744s
+Selected 96 terminal buds and 133 lateral buds
+Updated exposures in in 0.08581197261810303s
+Updated vigors in 0.011620044708251953s
+Calculated max shoots in 0.00014197826385498047s
+Grew shoots in 0.049368977546691895s
+iterating
+Starting with 2096 buds of which there are 1000 terminal buds and 1096 lateral buds
+Enabled all buds in 0.0006099939346313477s
+Selected 241 (0.11498091%) buds in 0.2649059295654297s
+Selected 125 terminal buds and 116 lateral buds
+Updated exposures in in 0.0997999906539917s
+Updated vigors in 0.014204978942871094s
+Calculated max shoots in 0.0002570152282714844s
+Grew shoots in 0.05407404899597168s
+iterating
+Starting with 2289 buds of which there are 1105 terminal buds and 1184 lateral buds
+Enabled all buds in 0.0008560419082641602s
+Selected 258 (0.11271297%) buds in 0.2852439880371094s
+Selected 127 terminal buds and 131 lateral buds
+Updated exposures in in 0.11881303787231445s
+Updated vigors in 0.014984965324401855s
+Calculated max shoots in 0.00018799304962158203s
+Grew shoots in 0.05191302299499512s
+iterating
+Starting with 2469 buds of which there are 1223 terminal buds and 1246 lateral buds
+Enabled all buds in 0.0007309913635253906s
+Selected 268 (0.10854597%) buds in 0.269023060798645s
+Selected 137 terminal buds and 131 lateral buds
+Updated exposures in in 0.12742304801940918s
+Updated vigors in 0.0170210599899292s
+Calculated max shoots in 0.00014603137969970703s
+Grew shoots in 0.05113399028778076s
+iterating
+Starting with 2650 buds of which there are 1336 terminal buds and 1314 lateral buds
+Enabled all buds in 0.0007050037384033203s
+Selected 260 (0.09811321%) buds in 0.24745392799377441s
+Selected 137 terminal buds and 123 lateral buds
+Updated exposures in in 0.13650298118591309s
+Updated vigors in 0.018023014068603516s
+Calculated max shoots in 0.00014400482177734375s
+Grew shoots in 0.04558706283569336s
+iterating
+Starting with 2817 buds of which there are 1439 terminal buds and 1378 lateral buds
+Enabled all buds in 0.0008120536804199219s
+Selected 275 (0.09762158%) buds in 0.23391997814178467s
+Selected 146 terminal buds and 129 lateral buds
+Updated exposures in in 0.14067602157592773s
+Updated vigors in 0.01837003231048584s
+Calculated max shoots in 0.00017499923706054688s
+Grew shoots in 0.04665100574493408s
+iterating
+Starting with 2995 buds of which there are 1549 terminal buds and 1446 lateral buds
+Enabled all buds in 0.0008269548416137695s
+Selected 271 (0.09048414%) buds in 0.22524702548980713s
+Selected 129 terminal buds and 142 lateral buds
+Updated exposures in in 0.15332400798797607s
+Updated vigors in 0.018945932388305664s
+Calculated max shoots in 0.00014007091522216797s
+Grew shoots in 0.042048096656799316s
+iterating
+Starting with 3136 buds of which there are 1668 terminal buds and 1468 lateral buds
+Enabled all buds in 0.0008139610290527344s
+Selected 266 (0.084821425%) buds in 0.22517991065979004s
+Selected 136 terminal buds and 130 lateral buds
+Updated exposures in in 0.15727603435516357s
+Updated vigors in 0.019230008125305176s
+Calculated max shoots in 0.00013899803161621094s
+Grew shoots in 0.03933000564575195s
+iterating
+Starting with 3286 buds of which there are 1771 terminal buds and 1515 lateral buds
+Enabled all buds in 0.0008960962295532227s
+Selected 270 (0.08216677%) buds in 0.22510898113250732s
+Selected 128 terminal buds and 142 lateral buds
+Updated exposures in in 0.17405998706817627s
+Updated vigors in 0.020829081535339355s
+Calculated max shoots in 0.00015103816986083984s
+Grew shoots in 0.036128997802734375s
+iterating
+Starting with 3407 buds of which there are 1883 terminal buds and 1524 lateral buds
+Enabled all buds in 0.0009440183639526367s
+Selected 275 (0.08071617%) buds in 0.21440398693084717s
+Selected 155 terminal buds and 120 lateral buds
+Updated exposures in in 0.17799103260040283s
+Updated vigors in 0.020348072052001953s
+Calculated max shoots in 0.00014698505401611328s
+Grew shoots in 0.03323793411254883s
+iterating
+Starting with 3532 buds of which there are 1970 terminal buds and 1562 lateral buds
+Enabled all buds in 0.0011140108108520508s
+Selected 273 (0.07729332%) buds in 0.2262040376663208s
+Selected 145 terminal buds and 128 lateral buds
+Updated exposures in in 0.18587398529052734s
+Updated vigors in 0.02176809310913086s
+Calculated max shoots in 0.0001710653305053711s
+Grew shoots in 0.03267991542816162s
+iterating
+Starting with 3645 buds of which there are 2065 terminal buds and 1580 lateral buds
+Enabled all buds in 0.0009109973907470703s
+Selected 271 (0.07434842%) buds in 0.22628700733184814s
+Selected 153 terminal buds and 118 lateral buds
+Updated exposures in in 0.19353795051574707s
+Updated vigors in 0.02219700813293457s
+Calculated max shoots in 0.00023508071899414062s
+Grew shoots in 0.027101993560791016s
+iterating
+Starting with 3742 buds of which there are 2144 terminal buds and 1598 lateral buds
+Enabled all buds in 0.0009270906448364258s
+Selected 262 (0.070016034%) buds in 0.22061491012573242s
+Selected 136 terminal buds and 126 lateral buds
+Updated exposures in in 0.1955660581588745s
+Updated vigors in 0.02446293830871582s
+Calculated max shoots in 0.00018405914306640625s
+Grew shoots in 0.029570937156677246s
+iterating
+Starting with 3843 buds of which there are 2235 terminal buds and 1608 lateral buds
+Enabled all buds in 0.0010209083557128906s
+Selected 261 (0.06791569%) buds in 0.23914098739624023s
+Selected 146 terminal buds and 115 lateral buds
+Updated exposures in in 0.2196180820465088s
+Updated vigors in 0.024776935577392578s
+Calculated max shoots in 0.00015997886657714844s
+Grew shoots in 0.034870028495788574s
+iterating
+Starting with 3972 buds of which there are 2317 terminal buds and 1655 lateral buds
+Enabled all buds in 0.0012220144271850586s
+Selected 254 (0.06394763%) buds in 0.23167097568511963s
+Selected 129 terminal buds and 125 lateral buds
+Updated exposures in in 0.23247909545898438s
+Updated vigors in 0.02587306499481201s
+Calculated max shoots in 0.00021195411682128906s
+Grew shoots in 0.03312194347381592s
+iterating
+Starting with 4081 buds of which there are 2410 terminal buds and 1671 lateral buds
+Enabled all buds in 0.0010290145874023438s
+Selected 250 (0.061259497%) buds in 0.2341369390487671s
+Selected 126 terminal buds and 124 lateral buds
+Updated exposures in in 0.24379396438598633s
+Updated vigors in 0.027490973472595215s
+Calculated max shoots in 0.0001569986343383789s
+Grew shoots in 0.03088200092315674s
+iterating
+Starting with 4178 buds of which there are 2502 terminal buds and 1676 lateral buds
+Enabled all buds in 0.0009839534759521484s
+Selected 253 (0.06055529%) buds in 0.23941802978515625s
+Selected 129 terminal buds and 124 lateral buds
+Updated exposures in in 0.2483539581298828s
+Updated vigors in 0.027565956115722656s
+Calculated max shoots in 0.00016498565673828125s
+Grew shoots in 0.03416907787322998s
+iterating
+Starting with 4284 buds of which there are 2594 terminal buds and 1690 lateral buds
+Enabled all buds in 0.0009620189666748047s
+Selected 246 (0.05742297%) buds in 0.23975801467895508s
+Selected 131 terminal buds and 115 lateral buds
+Updated exposures in in 0.2660229206085205s
+Updated vigors in 0.029708027839660645s
+Calculated max shoots in 0.00024402141571044922s
+Grew shoots in 0.032897114753723145s
+iterating
+Starting with 4386 buds of which there are 2677 terminal buds and 1709 lateral buds
+Enabled all buds in 0.0011829137802124023s
+Selected 242 (0.055175558%) buds in 0.2562030553817749s
+Selected 127 terminal buds and 115 lateral buds
+Updated exposures in in 0.2874189615249634s
+Updated vigors in 0.03284299373626709s
+Calculated max shoots in 0.0001900196075439453s
+Grew shoots in 0.03988194465637207s
+iterating
+Starting with 4504 buds of which there are 2765 terminal buds and 1739 lateral buds
+Enabled all buds in 0.0011019706726074219s
+Selected 240 (0.053285968%) buds in 0.266664981842041s
+Selected 130 terminal buds and 110 lateral buds
+Updated exposures in in 0.2904829978942871s
+Updated vigors in 0.03206002712249756s
+Calculated max shoots in 0.00017690658569335938s
+Grew shoots in 0.03604698181152344s
+iterating
+Starting with 4622 buds of which there are 2851 terminal buds and 1771 lateral buds
+Enabled all buds in 0.00115203857421875s
+Selected 239 (0.051709216%) buds in 0.2550489902496338s
+Selected 122 terminal buds and 117 lateral buds
+Updated exposures in in 0.3037339448928833s
+Updated vigors in 0.03364896774291992s
+Calculated max shoots in 0.0002510547637939453s
+Grew shoots in 0.03818309307098389s
+iterating
+Starting with 4735 buds of which there are 2944 terminal buds and 1791 lateral buds
+Enabled all buds in 0.0013470649719238281s
+Selected 230 (0.048574444%) buds in 0.26752495765686035s
+Selected 115 terminal buds and 115 lateral buds
+Updated exposures in in 0.3210170269012451s
+Updated vigors in 0.03990793228149414s
+Calculated max shoots in 0.00012695789337158203s
+Grew shoots in 0.033499956130981445s
+iterating
+Starting with 4828 buds of which there are 3036 terminal buds and 1792 lateral buds
+Enabled all buds in 0.0012489557266235352s
+Selected 228 (0.047224525%) buds in 0.25522398948669434s
+Selected 135 terminal buds and 93 lateral buds
+Updated exposures in in 0.3152250051498413s
+Updated vigors in 0.0371549129486084s
+Calculated max shoots in 0.00012600421905517578s
+Grew shoots in 0.04264700412750244s
+iterating
+Starting with 4983 buds of which there are 3111 terminal buds and 1872 lateral buds
+Enabled all buds in 0.0011739730834960938s
+Selected 230 (0.046156935%) buds in 0.2621140480041504s
+Selected 104 terminal buds and 126 lateral buds
+Updated exposures in in 0.33080196380615234s
+Updated vigors in 0.03876698017120361s
+Calculated max shoots in 0.00013399124145507812s
+Grew shoots in 0.03662300109863281s

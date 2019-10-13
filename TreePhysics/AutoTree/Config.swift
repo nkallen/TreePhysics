@@ -10,6 +10,7 @@ extension AutoTree {
 
         public var branchingAngle: Float = .pi/8
         public var phyllotacticAngle: Float = .pi/4
+        public var gravitropismAngle: Float = 0
 
         public var occupationRadius: Float = 0.05
         public var perceptionAngle: Float = .pi/4
@@ -41,6 +42,7 @@ extension AutoTree {
             check.angle(branchingAngle)
             check.angle(phyllotacticAngle)
             check.angle(perceptionAngle)
+            check.angle(gravitropismAngle)
 
             check.positive(occupationRadius)
             check.positive(perceptionRadius)
