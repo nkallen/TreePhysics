@@ -110,22 +110,22 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     }
 }
 
-final class GeometryBuilder<I> where I: FixedWidthInteger {
+public final class GeometryBuilder<I> where I: FixedWidthInteger {
     private let primitiveType: SCNGeometryPrimitiveType
     var vertices: [SIMD3<Float>] = []
     var indices: [I] = []
 
-    init(primitiveType: SCNGeometryPrimitiveType) {
+    public init(primitiveType: SCNGeometryPrimitiveType) {
         self.primitiveType = primitiveType
     }
 
-    func addVertices(_ vertices: [SIMD3<Float>]) -> I {
+    public func addVertices(_ vertices: [SIMD3<Float>]) -> I {
         let minVertexId = self.vertices.count
         self.vertices.append(contentsOf: vertices)
         return I(minVertexId)
     }
 
-    func addIndices(_ indices: [I]) {
+    public func addIndices(_ indices: [I]) {
         if primitiveType == .triangleStrip, let last = self.indices.last {
             let degenerate = [last, indices.first!]
             self.indices.append(contentsOf: degenerate)
@@ -134,7 +134,7 @@ final class GeometryBuilder<I> where I: FixedWidthInteger {
         self.indices.append(contentsOf: indices)
     }
 
-    func addSegment(_ vertices: [SIMD3<Float>], _ indices: [I]) -> [I] {
+    public func addSegment(_ vertices: [SIMD3<Float>], _ indices: [I]) -> [I] {
         let offset = I(self.vertices.count)
         let offsetIndices = indices.map { offset + $0 }
 
@@ -152,7 +152,7 @@ final class GeometryBuilder<I> where I: FixedWidthInteger {
         return SCNGeometrySource(vertices: vertices.map { SCNVector3($0) })
     }()
 
-    private(set) lazy var geometry: SCNGeometry = {
+    public private(set) lazy var geometry: SCNGeometry = {
         return SCNGeometry(sources: [source], elements: [element])
     }()
 }

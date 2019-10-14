@@ -20,14 +20,14 @@ extension AutoTree {
         public var extremityRadius: Float = 0.001
         public var baseRadius: Float = 0.05
 
-        public var fullExposure: Float = 10
+        public var fullExposure: Float = 100
         public var sensitivityOfBudsToLight: Float = 1.1
         public var biasVigorTowardsMainAxis: Float = 0.5
-        public var maxShootLength: Int = 3
+        public var maxShootLength: Float = 3.5
 
         public var shadowIntensity: Float = 0.1
         public var shadowDecayFactor: Float = 0.5
-        public var shadowDepth: Int = 5
+        public var shadowDepth: Int = 4
         public var initialShadowGridSize: Int = 200
 
         public init() {}

@@ -116,10 +116,12 @@ extension AutoTree {
                 var closestBud: Bud?
                 var closestDistance = Float.infinity
                 let nearbyBuds = hash.elements(near: point)
+                var occupies = 0, perceives = 0
                 for bud in nearbyBuds {
                     if bud.occupies(point: point) {
                         attractionPoints.remove(point)
                         closestBud = nil
+                        occupies += 1
                         break
                     } else if bud.perceives(point: point) {
                         let dist = distance(bud.position, point)
@@ -127,6 +129,7 @@ extension AutoTree {
                             closestBud = bud
                             closestDistance = dist
                         }
+                        perceives += 1
                     }
                 }
                 if let closestBud = closestBud {
