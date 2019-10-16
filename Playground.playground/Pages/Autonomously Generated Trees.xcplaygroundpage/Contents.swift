@@ -9,11 +9,10 @@ var config = AutoTree.Config()
 config.internodeLength = 0.02
 config.occupationRadius = config.internodeLength * 1
 config.perceptionRadius = config.internodeLength * 15
-config.perceptionAngle = .pi/2
-config.biasVigorTowardsMainAxis = 0.5 // apical dominance
+config.apicalDominance = 0.5
 config.baseRadius = 0.01
 config.extremityRadius = 0.001
-config.sensitivityOfBudsToLight = 3.5 // bud light sensitivity
+config.sensitivityOfBudsToLight = 3.5
 
 config.branchGravitropismBias = 0.1
 config.branchStraightnessBias = 0.3

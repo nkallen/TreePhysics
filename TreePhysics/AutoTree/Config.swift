@@ -13,7 +13,7 @@ extension AutoTree {
         public var gravitropismAngle: Float = 0
 
         public var occupationRadius: Float = 0.05
-        public var perceptionAngle: Float = .pi/4
+        public var perceptionAngle: Float = .pi/2
         public var perceptionRadius: Float = 0.05 * 12
 
         public var meshDetail: Float = 1.1
@@ -22,7 +22,7 @@ extension AutoTree {
 
         public var fullExposure: Float = 100
         public var sensitivityOfBudsToLight: Float = 1.1
-        public var biasVigorTowardsMainAxis: Float = 0.5
+        public var apicalDominance: Float = 0.5
         public var maxShootLength: Float = 3.5
 
         public var shadowIntensity: Float = 0.1
@@ -52,7 +52,7 @@ extension AutoTree {
 
             check.positive(fullExposure)
             check.nonneg(sensitivityOfBudsToLight)
-            check.normal(biasVigorTowardsMainAxis)
+            check.normal(apicalDominance)
             check.assert(maxShootLength >= 1)
 
             check.positive(shadowIntensity)

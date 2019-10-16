@@ -83,9 +83,9 @@ extension AutoTree {
                         let qMain = exposures[main]!
                         let qLateral = exposures[lateral]!
 
-                        let denominator: Float = (config.biasVigorTowardsMainAxis * qMain + (1 - config.biasVigorTowardsMainAxis) * qLateral) / baseVigor
-                        vigors[main] = config.biasVigorTowardsMainAxis * qMain / denominator
-                        vigors[lateral] = (1 - config.biasVigorTowardsMainAxis) * qLateral / denominator
+                        let denominator: Float = (config.apicalDominance * qMain + (1 - config.apicalDominance) * qLateral) / baseVigor
+                        vigors[main] = config.apicalDominance * qMain / denominator
+                        vigors[lateral] = (1 - config.apicalDominance) * qLateral / denominator
                     }
                     if let internode = main    as? Internode { recurse(internode) }
                     if let internode = lateral as? Internode { recurse(internode) }

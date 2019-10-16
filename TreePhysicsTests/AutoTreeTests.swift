@@ -168,11 +168,11 @@ class AutoTreeTests: XCTestCase {
         let qm = pow(exposure1, config.sensitivityOfBudsToLight)
         let ql = pow(exposure2, config.sensitivityOfBudsToLight)
 
-        let denominator: Float = (config.biasVigorTowardsMainAxis * qm + (1 - config.biasVigorTowardsMainAxis) * ql) / v
+        let denominator: Float = (config.apicalDominance * qm + (1 - config.apicalDominance) * ql) / v
 
         XCTAssertEqual(v, vigors[internode0])
-        XCTAssertEqual(config.biasVigorTowardsMainAxis * qm / denominator, vigors[internode1])
-        XCTAssertEqual((1-config.biasVigorTowardsMainAxis) * ql / denominator, vigors[internode2])
+        XCTAssertEqual(config.apicalDominance * qm / denominator, vigors[internode1])
+        XCTAssertEqual((1-config.apicalDominance) * ql / denominator, vigors[internode2])
     }
 }
 
