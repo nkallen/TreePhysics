@@ -273,6 +273,12 @@ extension simd_quatf {
     var heading: SIMD3<Float> {
         return act(.y)
     }
+
+    var vertical: SIMD3<Float> {
+        let yProjectedOntoPlane = .y - dot(.y, heading) * heading
+        guard simd_length(yProjectedOntoPlane) > 10e-10 else { return .zero }
+        return normalize(yProjectedOntoPlane)
+    }
 }
 
 func simd_bezier(_ v0: SIMD3<Float>, _ v1: SIMD3<Float>, _ v2: SIMD3<Float>, _ v3: SIMD3<Float>, t: Float) -> SIMD3<Float> {

@@ -14,11 +14,11 @@ config.baseRadius = 0.1
 config.extremityRadius = 0.001
 config.sensitivityOfBudsToLight = 3
 
-config.branchGravitropismBias = 0.1
-config.branchStraightnessBias = 0.3
+config.branchGravitropismBias = 0.7
+config.branchStraightnessBias = 0.1
 
-config.maxShootLength = 3
-config.gravitropismAngle = 0
+config.maxShootLength = 5
+config.gravitropismAngle = .pi/2
 config.branchingAngle = .pi/5
 config.phyllotacticAngle = .pi/4
 config.fullExposure = 1
@@ -26,6 +26,14 @@ config.shadowDecayFactor = 0.5
 config.shadowIntensity = 0.1
 config.shadowDepth = 10
 config.initialShadowGridSize = 256
+
+// FIXME using squares
+// FIXME test ev
+// FIXME rename variables
+// FIXME ensure sp/sv max at 1, otherwise vertical internodes are starved
+config.sp = 1/3
+config.sv = 1
+
 let autoTree = AutoTree(config)
 
 let (root, _) = autoTree.seedling()
@@ -48,6 +56,32 @@ if !enableAllBuds {
 
     let vertices: [SIMD3<Float>] = mdlMesh.vertices.map { $0 * scale + offset }
     simulator.addAttractionPoints(vertices)
+}
+
+func draw(_ node: AutoTree.Node) -> SCNNode {
+    let result = SCNNode()
+    switch node {
+    case let p as AutoTree.Parent:
+        if let n = p.mainChild {
+            let g = draw(n)
+            result.addChildNode(g)
+        }
+        if let n = p.lateralChild {
+            let g = draw(n)
+            result.addChildNode(g)
+        }
+        let k = createAxesNode(quiverLength: 0.2, quiverThickness: 0.3)
+        k.simdOrientation = node.orientation
+        k.simdPosition = node.position
+
+        let l = createAxesNode(quiverLength: 0.1, quiverThickness: 0.6)
+        l.simdOrientation = simd_quatf(from: SIMD3<Float>(0,1,0), to: normalize(p.orientation.vertical))
+        l.simdPosition = node.position
+        result.addChildNode(k)
+        result.addChildNode(l)
+    default: ()
+    }
+    return result
 }
 
 extension AutoTree.GrowthSimulator: Playable {
@@ -74,10 +108,11 @@ extension AutoTree.GrowthSimulator: Playable {
     }
 
     public func inspect() -> SCNNode? {
-        let plot = Plot<UInt32>()
-        plot.scatter(points: Array(simulator.attractionPoints), scale: config.internodeLength)
-        plot.voxels(data: shadowGrid.storage, size: shadowGrid.size, scale: config.internodeLength)
-        return plot.node()
+//        let plot = Plot<UInt32>()
+//        plot.scatter(points: Array(simulator.attractionPoints), scale: config.internodeLength)
+//        plot.voxels(data: shadowGrid.storage, size: shadowGrid.size, scale: config.internodeLength)
+//        return plot.node()
+        return draw(root)
     }
 }
 
@@ -85,3 +120,9 @@ try! simulator.update(enableAllBuds: enableAllBuds)
 let viewController = PlayerViewController(frame: CGRect(x:0 , y:0, width: 640, height: 480))
 viewController.playable = simulator
 PlaygroundPage.current.liveView = viewController
+
+
+let id: simd_quatf = simd_quatf(angle: 1, axis: .zero)
+let horizontal = simd_quatf(from: SIMD3<Float>(0,1,0), to: SIMD3<Float>(0,0,1))
+
+print(acos(Float(1)))

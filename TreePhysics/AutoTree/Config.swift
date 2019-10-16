@@ -30,6 +30,10 @@ extension AutoTree {
         public var shadowDepth: Int = 4
         public var initialShadowGridSize: Int = 256
 
+        public var sv: Float = 1
+        public var sp: Float = 1
+        public var ev: Float = 0
+
         public init() {}
 
         public func validate() {

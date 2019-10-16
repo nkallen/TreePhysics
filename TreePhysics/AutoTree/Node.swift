@@ -154,7 +154,7 @@ extension AutoTree {
             let direction = point - position
             let dist = simd_length(direction)
             if dist > config.perceptionRadius + config.occupationRadius { return false }
-            return simd_quatf(from: orientation.heading, to: direction).angle <= config.perceptionAngle
+            return acos(dot(orientation.heading, direction)) <= config.perceptionAngle
         }
     }
 
