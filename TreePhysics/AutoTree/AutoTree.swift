@@ -10,8 +10,8 @@ public struct AutoTree {
         self.config = config
     }
     
-    func root() -> Parent {
-        return Parent(config: config, position: .zero, orientation: .identity)
+    func root(position: SIMD3<Float> = .zero) -> Parent {
+        return Parent(config: config, position: position, orientation: .identity)
     }
     
     public func lateralBud(position: SIMD3<Float>, orientation: simd_quatf) -> LateralBud {
@@ -27,8 +27,8 @@ public struct AutoTree {
     }
     
     public func seedling(position: SIMD3<Float> = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
-        let root = self.root()
-        let bud = self.terminalBud(position: .zero, orientation: .identity)
+        let root = self.root(position: position)
+        let bud = self.terminalBud(position: position, orientation: orientation)
         root.addBud(bud)
         return (root, bud)
     }
@@ -71,8 +71,8 @@ public struct AutoTree {
             }
             
             let branch = pen.branch(radialSegmentCount: max(3, radialSegmentCount ?? 3))
-            _ = draw(child, pen: branch, diameterExponent: diameterExponent)
+            _ = draw(child, pen: branch, diameterExponent: diameterExponent, showBuds: showBuds)
         }
-        if let thickest = thickest { _ = draw(thickest, pen: pen, diameterExponent: diameterExponent) }
+        if let thickest = thickest { _ = draw(thickest, pen: pen, diameterExponent: diameterExponent, showBuds: showBuds) }
     }
 }

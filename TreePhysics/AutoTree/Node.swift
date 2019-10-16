@@ -1,8 +1,11 @@
 import Foundation
 import simd
 
+fileprivate var i = 0
+
 extension AutoTree {
     public class Node {
+        let name: String
         let config: Config
         var generation: Int?
 
@@ -15,6 +18,8 @@ extension AutoTree {
             self.config = config
             self.position = position
             self.orientation = orientation
+            self.name = "\(type(of: self))[\(i)]"
+            i += 1
         }
 
     }
@@ -83,9 +88,7 @@ extension AutoTree {
     }
 
     public class Bud: Node {
-        fileprivate func grow(towards points: [SIMD3<Float>], produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
-            guard let parent = parent else { fatalError("\(self) has no parent") }
-
+        func growthDirection(towards points: [SIMD3<Float>]) -> SIMD3<Float> {
             let gravitropismDirection: SIMD3<Float> = simd_quatf(angle: config.gravitropismAngle, axis:  cross(.y, orientation.heading)).act(.y)
 
             var newDirection: SIMD3<Float>
@@ -108,6 +111,12 @@ extension AutoTree {
             newDirection = normalize(newDirection)
             assert(newDirection.isFinite)
 
+            return newDirection
+        }
+
+        fileprivate func grow(inDirection newDirection: SIMD3<Float>, produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
+            guard let parent = parent else { fatalError("\(self) has no parent") }
+
             let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized
             let branchingRotation = simd_quatf(angle: config.branchingAngle, axis: newOrientation.up)
             let phyllotacticRotation = simd_quatf(angle: config.phyllotacticAngle, axis: newOrientation.heading)
@@ -129,6 +138,11 @@ extension AutoTree {
         }
 
         func grow(towards points: [SIMD3<Float>] = []) -> (Internode, (TerminalBud, LateralBud?)) {
+            let newDirection = growthDirection(towards: points)
+            return grow(inDirection: newDirection)
+        }
+
+        func grow(inDirection newDirection: SIMD3<Float>) -> (Internode, (TerminalBud, LateralBud?)) {
             fatalError("Abstract method")
         }
 
@@ -149,8 +163,8 @@ extension AutoTree {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(towards points: [SIMD3<Float>] = []) -> (Internode, (TerminalBud, LateralBud?)) {
-            return grow(towards: points, produceLateralBud: parent is Internode)
+        override func grow(inDirection newDirection: SIMD3<Float>) -> (Internode, (TerminalBud, LateralBud?)) {
+            return grow(inDirection: newDirection, produceLateralBud: parent is Internode)
         }
     }
 
@@ -159,8 +173,8 @@ extension AutoTree {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(towards points: [SIMD3<Float>] = []) -> (Internode, (TerminalBud, LateralBud?)) {
-            return grow(towards: points, produceLateralBud: false)
+        override func grow(inDirection newDirection: SIMD3<Float>) -> (Internode, (TerminalBud, LateralBud?)) {
+            return grow(inDirection: newDirection, produceLateralBud: false)
         }
     }
 

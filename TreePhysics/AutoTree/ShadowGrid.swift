@@ -8,18 +8,18 @@ public protocol AutoTreeShadowGrid: class {
 extension AutoTree {
     public typealias ShadowGrid = AutoTreeShadowGrid
 
-    final class ArrayBackedShadowGrid: ShadowGrid {
+    public final class ArrayBackedShadowGrid: ShadowGrid {
         let config: Config
-        var size: Int
-        private var storage: [Float]
+        public var size: Int
+        public var storage: [Float]
 
-        init(_ config: Config) {
+        public init(_ config: Config) {
             self.config = config
             self.size = config.initialShadowGridSize
-            self.storage = [Float](repeating: 0, count: size * size * size)
+            self.storage = [Float](repeating: 0, count: size*size*size)
         }
 
-        subscript(position: SIMD3<Float>) -> Float {
+        public subscript(position: SIMD3<Float>) -> Float {
             get {
                 let key = self.key(for: position)
                 guard key.x < size && key.y < size && key.z < size else { return 0 }
@@ -34,7 +34,7 @@ extension AutoTree {
                 let oldValue = storage[key.x*size*size + key.y*size + key.z]
                 let delta = newValue - oldValue
                 var q = 0
-                while q <= config.shadowDepth {
+                while q < config.shadowDepth {
                     var p = -q
                     while p <= q {
                         var s = -q
@@ -66,7 +66,9 @@ extension AutoTree {
                 for j in 0..<oldSize {
                     for k in 0..<oldSize {
                         let value = oldStorage[i*oldSize*oldSize + j*oldSize + k]
-                        newStorage[i*newSize*newSize + j*newSize + k] = value
+                        let rebase = -oldSize/2 + newSize/2
+                        let ii = i + rebase, jj = j + rebase, kk = k + rebase
+                        newStorage[ii*newSize*newSize + jj*newSize + kk] = value
                     }
                 }
             }
@@ -75,4 +77,3 @@ extension AutoTree {
         }
     }
 }
-

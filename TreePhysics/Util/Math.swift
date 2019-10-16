@@ -112,9 +112,9 @@ extension SIMD2 where Scalar == Float {
 }
 
 extension SIMD3 where Scalar == Float {
-    static let x = SIMD3<Float>(1,0,0)
-    static let y = SIMD3<Float>(0,1,0)
-    static let z = SIMD3<Float>(0,0,1)
+    public static let x = SIMD3<Float>(1,0,0)
+    public static let y = SIMD3<Float>(0,1,0)
+    public static let z = SIMD3<Float>(0,0,1)
 
     init(_ double3: SIMD3<Double>) {
         self = SIMD3<Float>(Float(double3.x), Float(double3.y), Float(double3.z))
@@ -124,11 +124,11 @@ extension SIMD3 where Scalar == Float {
         self = SIMD3<Float>(float2.x, float2.y, z)
     }
 
-    var xy: SIMD2<Float> {
+    public var xy: SIMD2<Float> {
         return SIMD2<Float>(x, y)
     }
 
-    var xz: SIMD2<Float> {
+    public var xz: SIMD2<Float> {
         return SIMD2<Float>(x, z)
     }
 

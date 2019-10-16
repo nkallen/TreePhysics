@@ -112,11 +112,13 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
 
 public final class GeometryBuilder<I> where I: FixedWidthInteger {
     private let primitiveType: SCNGeometryPrimitiveType
+    private let material: SCNMaterial?
     var vertices: [SIMD3<Float>] = []
     var indices: [I] = []
 
-    public init(primitiveType: SCNGeometryPrimitiveType) {
+    public init(primitiveType: SCNGeometryPrimitiveType, material: SCNMaterial? = nil) {
         self.primitiveType = primitiveType
+        self.material = material
     }
 
     public func addVertices(_ vertices: [SIMD3<Float>]) -> I {
@@ -153,6 +155,10 @@ public final class GeometryBuilder<I> where I: FixedWidthInteger {
     }()
 
     public private(set) lazy var geometry: SCNGeometry = {
-        return SCNGeometry(sources: [source], elements: [element])
+        let result = SCNGeometry(sources: [source], elements: [element])
+        if let material = material {
+            result.firstMaterial = material
+        }
+        return result
     }()
 }

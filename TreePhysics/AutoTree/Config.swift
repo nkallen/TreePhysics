@@ -28,7 +28,7 @@ extension AutoTree {
         public var shadowIntensity: Float = 0.1
         public var shadowDecayFactor: Float = 0.5
         public var shadowDepth: Int = 4
-        public var initialShadowGridSize: Int = 200
+        public var initialShadowGridSize: Int = 256
 
         public init() {}
 

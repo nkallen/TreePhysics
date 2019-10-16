@@ -1,5 +1,6 @@
 import Foundation
 import ModelIO
+import SceneKit.ModelIO
 
 extension MDLMesh {
     var vertices: [SIMD3<Float>] {

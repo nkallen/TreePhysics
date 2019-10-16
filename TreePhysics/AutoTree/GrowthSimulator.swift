@@ -15,10 +15,10 @@ extension AutoTree {
 
         private(set) var generation = 0
         private(set) var attractionPoints: Set<SIMD3<Float>> = []
-        let hash: LocalitySensitiveHash<Bud>
-        let shadowGrid: ShadowGrid
-        private(set) var root: Parent!
-        private(set) var buds: Set<Bud> = []
+        private let hash: LocalitySensitiveHash<Bud>
+        private let shadowGrid: ShadowGrid
+        private var root: Parent!
+        private var buds: Set<Bud> = []
 
         init(_ config: Config, shadowGrid: ShadowGrid) {
             self.config = config
@@ -56,7 +56,9 @@ extension AutoTree {
         internal func updateLightExposure() -> [Node:Float] {
             var lightExposures: [Node:Float] = [:]
             func lightExposure(of bud: Bud) -> Float {
-                return max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
+                let l = max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
+                let q = pow(l, config.sensitivityOfBudsToLight)
+                return q
             }
 
             for bud in buds {
@@ -74,11 +76,6 @@ extension AutoTree {
         internal func updateVigor(exposures: [Node:Float]) -> [Node:Float] {
             var vigors: [Node:Float] = [:]
 
-            func unbiasedVigor(for node: Node) -> Float {
-                let l = exposures[node]!
-                return pow(l, config.sensitivityOfBudsToLight)
-            }
-
             func recurse(_ parent: Parent) {
                 let baseVigor = vigors[parent]!
 
@@ -87,24 +84,24 @@ extension AutoTree {
                         vigors[main] = 0
                         vigors[lateral] = 0
                     } else {
-                        let unbiasedMainVigor = unbiasedVigor(for: main)
-                        let unbiasedLateralVigor = unbiasedVigor(for: lateral)
+                        let qMain = exposures[main]!
+                        let qLateral = exposures[lateral]!
 
-                        let denominator: Float = (config.biasVigorTowardsMainAxis * unbiasedMainVigor + (1 - config.biasVigorTowardsMainAxis) * unbiasedLateralVigor) / baseVigor
-                        vigors[main] = config.biasVigorTowardsMainAxis * unbiasedMainVigor / denominator
-                        vigors[lateral] = (1 - config.biasVigorTowardsMainAxis) * unbiasedLateralVigor / denominator
+                        let denominator: Float = (config.biasVigorTowardsMainAxis * qMain + (1 - config.biasVigorTowardsMainAxis) * qLateral) / baseVigor
+                        vigors[main] = config.biasVigorTowardsMainAxis * qMain / denominator
+                        vigors[lateral] = (1 - config.biasVigorTowardsMainAxis) * qLateral / denominator
                     }
                     if let internode = main    as? Internode { recurse(internode) }
                     if let internode = lateral as? Internode { recurse(internode) }
                 } else if let main = parent.mainChild {
                     vigors[main] = baseVigor
-                    if let internode = main    as? Internode { recurse(internode) }
+                    if let internode = main as? Internode { recurse(internode) }
                 } else {
                     fatalError()
                 }
             }
 
-            vigors[root] = unbiasedVigor(for: root)
+            vigors[root] = exposures[root]!
             recurse(root)
 
             return vigors
@@ -145,10 +142,11 @@ extension AutoTree {
             guard selectedBuds.count > 0 else { return }
 
             for (bud, points) in selectedBuds {
-                let shootLength = Int(Float(config.maxShootLength) * vigors[bud]! / maxVigor)
+                let shootLength = Int(floor(Float(config.maxShootLength) * vigors[bud]! / maxVigor))
+                let newDirection = bud.growthDirection(towards: Array(points))
                 var currentBud = bud
                 for _ in 0..<shootLength {
-                    let (internode, (terminalBud, lateralBud)) = currentBud.grow(towards: Array(points))
+                    let (internode, (terminalBud, lateralBud)) = currentBud.grow(inDirection: newDirection)
                     hash.remove(currentBud)
                     self.buds.remove(currentBud)
                     // NOTE: For now, the internode and bud it replaces are at the same location, so changing the shadow grid is a no-op
