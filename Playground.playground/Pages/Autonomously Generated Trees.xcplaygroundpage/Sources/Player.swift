@@ -73,6 +73,7 @@ public class PlayerViewController: NSViewController {
         case 0x22:
             if let previousNode = previousNode, let node = playable.inspect() {
                 previousNode.addChildNode(node)
+                print(2)
             }
         default: super.keyDown(with: event)
         }

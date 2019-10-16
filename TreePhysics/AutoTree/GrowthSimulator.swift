@@ -213,7 +213,7 @@ extension AutoTree {
                 maxVigor = max(maxVigor, vigors[bud]!)
             }
             guard maxVigor > 0 else { throw Error.noVigor }
-            print("Calculated max shoots in \(Date().timeIntervalSince(start))s")
+            print("Calculated max vigor (\(maxVigor)) in \(Date().timeIntervalSince(start))s")
             start = Date()
 
             growShoots(selectedBuds: selectedBuds, vigors: vigors, maxVigor: maxVigor)

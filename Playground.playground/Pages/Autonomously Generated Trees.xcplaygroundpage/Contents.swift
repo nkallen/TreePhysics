@@ -6,25 +6,25 @@ import SceneKit.ModelIO
 @testable import TreePhysics
 
 var config = AutoTree.Config()
-config.internodeLength = 0.02
+config.internodeLength = 0.1
 config.occupationRadius = config.internodeLength * 1
-config.perceptionRadius = config.internodeLength * 15
+config.perceptionRadius = config.internodeLength * 5
 config.apicalDominance = 0.5
-config.baseRadius = 0.01
+config.baseRadius = 0.1
 config.extremityRadius = 0.001
-config.sensitivityOfBudsToLight = 3.5
+config.sensitivityOfBudsToLight = 3
 
 config.branchGravitropismBias = 0.1
 config.branchStraightnessBias = 0.3
 
-config.maxShootLength = 5
+config.maxShootLength = 3
 config.gravitropismAngle = 0
 config.branchingAngle = .pi/5
 config.phyllotacticAngle = .pi/4
 config.fullExposure = 1
-config.shadowDecayFactor = 0.6
+config.shadowDecayFactor = 0.5
 config.shadowIntensity = 0.1
-config.shadowDepth = 5
+config.shadowDepth = 10
 config.initialShadowGridSize = 256
 let autoTree = AutoTree(config)
 
@@ -33,21 +33,23 @@ let shadowGrid = AutoTree.ArrayBackedShadowGrid(config)
 let simulator = autoTree.growthSimulator(shadowGrid: shadowGrid)
 simulator.addRoot(root)
 
-let url = Bundle.main.url(forResource: "ARFaceGeometry", withExtension: "obj", subdirectory: "art.scnassets")!
-let asset = MDLAsset(url: url)
-let mdlMesh = asset.object(at: 0) as! MDLMesh
+var enableAllBuds = true
 
+if !enableAllBuds {
+    let url = Bundle.main.url(forResource: "ARFaceGeometry", withExtension: "obj", subdirectory: "art.scnassets")!
+    let asset = MDLAsset(url: url)
+    let mdlMesh = asset.object(at: 0) as! MDLMesh
 
-let face = SCNNode(mdlObject: mdlMesh)
-let scale: Float = 0.01
-let offset = SIMD3<Float>(0,1,-0.1)
-face.simdScale = SIMD3<Float>(repeating: 1) * scale
-face.simdPosition = offset
+    let face = SCNNode(mdlObject: mdlMesh)
+    let scale: Float = 0.1
+    let offset = SIMD3<Float>(0,1,-0.1)
+    face.simdScale = SIMD3<Float>(repeating: 1) * scale
+    face.simdPosition = offset
 
-let vertices: [SIMD3<Float>] = mdlMesh.vertices.map { $0 * scale + offset }
-simulator.addAttractionPoints(vertices)
+    let vertices: [SIMD3<Float>] = mdlMesh.vertices.map { $0 * scale + offset }
+    simulator.addAttractionPoints(vertices)
+}
 
-var enableAllBuds = false
 extension AutoTree.GrowthSimulator: Playable {
     public func update() -> SCNNode? {
         do {
