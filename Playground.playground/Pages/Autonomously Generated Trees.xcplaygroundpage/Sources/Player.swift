@@ -4,7 +4,8 @@ import TreePhysics
 import SceneKit
 
 public protocol Playable: class {
-    func update()
+    func update() -> SCNNode?
+    func inspect() -> SCNNode?
 }
 
 public class PlayerViewController: NSViewController {
@@ -18,21 +19,47 @@ public class PlayerViewController: NSViewController {
     private var state: State = .paused
 
     public weak var playable: Playable!
+    var previousNode: SCNNode? = nil
 
-    public func setup(view: SCNView) {
+    public init(frame: CGRect) {
+        super.init(nibName: nil, bundle: nil)
+
+        let view = SCNView(frame: frame)
         self.view = view
+        let scene = SCNScene()
+
+        view.scene = scene
+        view.backgroundColor = .gray
+        view.showsStatistics = true
+        view.allowsCameraControl = true
+
         let clickGesture = NSClickGestureRecognizer(target: self, action: #selector(handleClick(_:)))
-        var gestureRecognizers = scnView.gestureRecognizers
+        var gestureRecognizers = view.gestureRecognizers
         gestureRecognizers.insert(clickGesture, at: 0)
-        scnView.gestureRecognizers = gestureRecognizers
+        view.gestureRecognizers = gestureRecognizers
 
         queue.async {
             while true {
                 self.semaphore.wait()
-                self.playable.update()
+                self.update()
                 self.semaphore.signal()
             }
         }
+    }
+
+    private func update() {
+        if let node = playable.update() {
+            if let previousNode = previousNode {
+                previousNode.removeFromParentNode()
+            }
+            let scene = scnView.scene!
+            scene.rootNode.addChildNode(node)
+            previousNode = node
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override public func keyDown(with event: NSEvent) {
@@ -43,6 +70,10 @@ public class PlayerViewController: NSViewController {
         case 0x31 where state == .paused:
             semaphore.signal()
             state = .playing
+        case 0x22:
+            if let previousNode = previousNode, let node = playable.inspect() {
+                previousNode.addChildNode(node)
+            }
         default: super.keyDown(with: event)
         }
     }
@@ -50,7 +81,7 @@ public class PlayerViewController: NSViewController {
     override public func moveRight(_ sender: Any?) {
         switch state {
         case .paused:
-            playable.update()
+            update()
         case .playing: ()
         }
     }

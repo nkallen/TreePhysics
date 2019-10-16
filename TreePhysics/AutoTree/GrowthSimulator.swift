@@ -55,15 +55,11 @@ extension AutoTree {
 
         internal func updateLightExposure() -> [Node:Float] {
             var lightExposures: [Node:Float] = [:]
-            func lightExposure(of bud: Bud) -> Float {
-                let l = max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
-                let q = pow(l, config.sensitivityOfBudsToLight)
-                return q
-            }
 
             for bud in buds {
-                let l = lightExposure(of: bud)
-                lightExposures[bud] = l
+                let l = max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
+                let q = pow(l, config.sensitivityOfBudsToLight)
+                lightExposures[bud] = q
                 var node: Node = bud
                 while let internode = node.parent {
                     lightExposures[internode, default: 0] += l
