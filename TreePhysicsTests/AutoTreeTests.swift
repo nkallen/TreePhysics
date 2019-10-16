@@ -86,7 +86,7 @@ class AutoTreeTests: XCTestCase {
     func testShadowGrid() {
         var config = AutoTree.Config()
         config.internodeLength = 1
-        config.shadowDepth = 2
+        config.shadowDepth = 3
         config.initialShadowGridSize = 1 // This SHOULD trigger resizing
         let grid = AutoTree.ArrayBackedShadowGrid(config)
         grid[SIMD3<Float>(3.1,3.1,3.1)] += 1
@@ -131,9 +131,10 @@ class AutoTreeTests: XCTestCase {
 
         fakeShadowGrid[terminalBud.position] = config.shadowIntensity
         let exposures = simulator.updateLightExposure()
-        XCTAssertEqual(config.fullExposure, exposures[internode])
+        let q = pow(config.fullExposure, config.sensitivityOfBudsToLight)
+        XCTAssertEqual(q, exposures[internode])
         let vigors = simulator.updateVigor(exposures: exposures)
-        XCTAssertEqual(pow(config.fullExposure, config.sensitivityOfBudsToLight), vigors[internode])
+        XCTAssertEqual(q, vigors[internode])
     }
 
     func testVigorBranch() throws {
@@ -159,20 +160,17 @@ class AutoTreeTests: XCTestCase {
         let exposure1 = try XCTUnwrap(exposures[internode1])
         let exposure2 = try XCTUnwrap(exposures[internode2])
 
-        XCTAssertEqual(config.fullExposure, exposure1)
-        XCTAssertEqual(config.fullExposure - config.shadowIntensity * 3, exposure2, accuracy: 0.0001)
+        XCTAssertEqual(pow(config.fullExposure, config.sensitivityOfBudsToLight), exposure1)
+        XCTAssertEqual(pow(config.fullExposure - config.shadowIntensity * 3, config.sensitivityOfBudsToLight), exposure2, accuracy: 0.0001)
         XCTAssertEqual(exposure1 + exposure2, exposure0)
 
         let vigors = simulator.updateVigor(exposures: exposures)
-        let v = pow(exposure0, config.sensitivityOfBudsToLight)
-        let qm = pow(exposure1, config.sensitivityOfBudsToLight)
-        let ql = pow(exposure2, config.sensitivityOfBudsToLight)
 
-        let denominator: Float = (config.apicalDominance * qm + (1 - config.apicalDominance) * ql) / v
+        let denominator: Float = (config.apicalDominance * exposure1 + (1 - config.apicalDominance) * exposure2) / exposure0
 
-        XCTAssertEqual(v, vigors[internode0])
-        XCTAssertEqual(config.apicalDominance * qm / denominator, vigors[internode1])
-        XCTAssertEqual((1-config.apicalDominance) * ql / denominator, vigors[internode2])
+        XCTAssertEqual(exposure0, vigors[internode0])
+        XCTAssertEqual(config.apicalDominance * exposure1 / denominator, vigors[internode1])
+        XCTAssertEqual((1-config.apicalDominance) * exposure2 / denominator, vigors[internode2])
     }
 }
 

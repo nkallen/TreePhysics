@@ -62,7 +62,7 @@ extension AutoTree {
                 lightExposures[bud] = q
                 var node: Node = bud
                 while let internode = node.parent {
-                    lightExposures[internode, default: 0] += l
+                    lightExposures[internode, default: 0] += q
                     node = internode
                 }
             }
