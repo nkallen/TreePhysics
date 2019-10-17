@@ -74,7 +74,6 @@
 		9E9D4B7622F37244007DCF49 /* RigidBodyPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94A22E792820095C8AC /* RigidBodyPen.swift */; };
 		9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
-		9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
 		9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
 		9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E7F22E86B290030DB0E /* Rewriter.swift */; };
 		9E9D4B7E22F37244007DCF49 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
@@ -876,7 +875,6 @@
 				9E0674E4230AD24C0044C3C4 /* UpdateRigidBodies.metal in Sources */,
 				9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */,
 				9E0674EC230ADBE40044C3C4 /* ApplyPhysicsFields.swift in Sources */,
-				9E9D4B7A22F37244007DCF49 /* Math.swift in Sources */,
 				9EE801B122FC492900198166 /* UpdateJoints.swift in Sources */,
 				9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */,
 				9E9D4B7D22F37244007DCF49 /* Rewriter.swift in Sources */,

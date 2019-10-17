@@ -9,8 +9,8 @@ var config = AutoTree.Config()
 config.internodeLength = 0.1
 config.occupationRadius = config.internodeLength * 1
 config.perceptionRadius = config.internodeLength * 5
-config.apicalDominance = 0.5
-config.baseRadius = 0.1
+config.apicalDominance = 0.53
+config.baseRadius = 0.15
 config.extremityRadius = 0.001
 config.sensitivityOfBudsToLight = 2
 
@@ -18,8 +18,8 @@ config.branchGravitropismBias = 0.2
 config.branchStraightnessBias = 0.5
 
 config.maxShootLength = 4
-config.gravitropismAngle = .pi
-config.branchingAngle = .pi/3
+config.gravitropismAngle = 0
+config.branchingAngle = .pi/5
 config.phyllotacticAngle = .pi/4
 config.fullExposure = 1
 config.shadowDecayFactor = 0.5
@@ -29,7 +29,7 @@ config.initialShadowGridSize = 256
 
 config.horizontalGravimorphismBias = 10
 config.verticalGravimorphismBias = 1
-config.topsideGravimorphismBias = 0
+config.upperSideGravimorphismBias = 0
 
 let autoTree = AutoTree(config)
 

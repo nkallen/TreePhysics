@@ -32,7 +32,7 @@ extension AutoTree {
 
         public var verticalGravimorphismBias: Float = 1
         public var horizontalGravimorphismBias: Float = 1
-        public var topsideGravimorphismBias: Float = 0
+        public var upperSideGravimorphismBias: Float = 0
 
         public init() {}
 
@@ -66,7 +66,7 @@ extension AutoTree {
 
             check.positive(verticalGravimorphismBias)
             check.positive(horizontalGravimorphismBias)
-            check.assert(abs(topsideGravimorphismBias) < verticalGravimorphismBias)
+            check.assert(abs(upperSideGravimorphismBias) < verticalGravimorphismBias)
         }
     }
 }

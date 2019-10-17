@@ -121,8 +121,8 @@ extension AutoTree {
             let tau = parentOrientation.heading.angle(with:  .y)
             let solution = solve_quadratic(
                 a: sqr(config.verticalGravimorphismBias*cos(theta)) + sqr(config.horizontalGravimorphismBias*sin(theta)),
-                b: -2*sqr(config.horizontalGravimorphismBias)*config.topsideGravimorphismBias*sin(theta),
-                c: sqr(config.horizontalGravimorphismBias*config.topsideGravimorphismBias) - sqr(config.horizontalGravimorphismBias*config.verticalGravimorphismBias))
+                b: -2*sqr(config.horizontalGravimorphismBias)*config.upperSideGravimorphismBias*sin(theta),
+                c: sqr(config.horizontalGravimorphismBias*config.upperSideGravimorphismBias) - sqr(config.horizontalGravimorphismBias*config.verticalGravimorphismBias))
             let b: Float
             switch solution {
             case let .realDistinct(x, y):
@@ -138,12 +138,12 @@ extension AutoTree {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
             let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized
-            let branchingRotation = simd_quatf(angle: -config.branchingAngle, axis: newOrientation.up)
+            let branchingRotation = simd_quatf(angle: -config.branchingAngle, axis: parent.orientation.up)
             let phyllotacticRotation = simd_quatf(angle: config.phyllotacticAngle, axis: newOrientation.heading)
 
             var lateralBud: LateralBud? = nil
             if produceLateralBud {
-                lateralBud = LateralBud(config: config, position: position, orientation: (branchingRotation * newOrientation).normalized)
+                lateralBud = LateralBud(config: config, position: position, orientation: (branchingRotation * parent.orientation).normalized)
                 parent.addBud(lateralBud!)
             }
 

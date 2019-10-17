@@ -22,6 +22,7 @@ class AutoTreeTests: XCTestCase {
         XCTAssertEqual(simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation, terminalBud.orientation)
 
         // transition to root -> internode -> [lateralBud] internode -> terminalBud
+        let branchingPoint = internode
         (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [SIMD3<Float>(10,0,0)])
         let lateralBud_ = try XCTUnwrap(lateralBud)
 
@@ -32,7 +33,7 @@ class AutoTreeTests: XCTestCase {
 
         XCTAssertEqual(internode.position, lateralBud_.position)
         XCTAssertEqual(
-            (simd_quatf(angle: -config.branchingAngle, axis: internode.orientation.up) * internode.orientation).normalized,
+            (simd_quatf(angle: -config.branchingAngle, axis: branchingPoint.orientation.up) * branchingPoint.orientation).normalized,
             lateralBud_.orientation)
     }
 
