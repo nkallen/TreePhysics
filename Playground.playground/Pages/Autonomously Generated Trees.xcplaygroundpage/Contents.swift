@@ -12,14 +12,14 @@ config.perceptionRadius = config.internodeLength * 5
 config.apicalDominance = 0.5
 config.baseRadius = 0.1
 config.extremityRadius = 0.001
-config.sensitivityOfBudsToLight = 3
+config.sensitivityOfBudsToLight = 2
 
-config.branchGravitropismBias = 0.7
-config.branchStraightnessBias = 0.1
+config.branchGravitropismBias = 0.2
+config.branchStraightnessBias = 0.5
 
-config.maxShootLength = 5
-config.gravitropismAngle = .pi/2
-config.branchingAngle = .pi/5
+config.maxShootLength = 4
+config.gravitropismAngle = .pi
+config.branchingAngle = .pi/3
 config.phyllotacticAngle = .pi/4
 config.fullExposure = 1
 config.shadowDecayFactor = 0.5
@@ -27,12 +27,9 @@ config.shadowIntensity = 0.1
 config.shadowDepth = 10
 config.initialShadowGridSize = 256
 
-// FIXME using squares
-// FIXME test ev
-// FIXME rename variables
-// FIXME ensure sp/sv max at 1, otherwise vertical internodes are starved
-config.sp = 1/3
-config.sv = 1
+config.horizontalGravimorphismBias = 10
+config.verticalGravimorphismBias = 1
+config.topsideGravimorphismBias = 0
 
 let autoTree = AutoTree(config)
 
@@ -58,39 +55,13 @@ if !enableAllBuds {
     simulator.addAttractionPoints(vertices)
 }
 
-func draw(_ node: AutoTree.Node) -> SCNNode {
-    let result = SCNNode()
-    switch node {
-    case let p as AutoTree.Parent:
-        if let n = p.mainChild {
-            let g = draw(n)
-            result.addChildNode(g)
-        }
-        if let n = p.lateralChild {
-            let g = draw(n)
-            result.addChildNode(g)
-        }
-        let k = createAxesNode(quiverLength: 0.2, quiverThickness: 0.3)
-        k.simdOrientation = node.orientation
-        k.simdPosition = node.position
-
-        let l = createAxesNode(quiverLength: 0.1, quiverThickness: 0.6)
-        l.simdOrientation = simd_quatf(from: SIMD3<Float>(0,1,0), to: normalize(p.orientation.vertical))
-        l.simdPosition = node.position
-        result.addChildNode(k)
-        result.addChildNode(l)
-    default: ()
-    }
-    return result
-}
-
 extension AutoTree.GrowthSimulator: Playable {
     public func update() -> SCNNode? {
         do {
             try simulator.update(enableAllBuds: enableAllBuds)
             let pen = CylinderPen<UInt32>(radialSegmentCount: 15, parent: nil)
             pen.start(at: root.position, orientation: root.orientation, thickness: config.baseRadius)
-            autoTree.draw(root, pen: pen, showBuds: false)
+            autoTree.draw(root, pen: pen, showBuds: true)
             return pen.node()
         } catch AutoTree.Error.noAttractionPoints {
             print("No attraction points")
@@ -116,7 +87,7 @@ extension AutoTree.GrowthSimulator: Playable {
     }
 }
 
-try! simulator.update(enableAllBuds: enableAllBuds)
+//try! simulator.update(enableAllBuds: enableAllBuds)
 let viewController = PlayerViewController(frame: CGRect(x:0 , y:0, width: 640, height: 480))
 viewController.playable = simulator
 PlaygroundPage.current.liveView = viewController

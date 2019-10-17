@@ -114,11 +114,31 @@ extension AutoTree {
             return newDirection
         }
 
+        var gravimorphismFactor: Float {
+            let parentOrientation: simd_quatf = parent!.orientation
+            let theta = parentOrientation.vertical.angle(with:
+                orientation.heading.project(ontoPlane: parentOrientation.heading)) + .pi/2
+            let tau = parentOrientation.heading.angle(with:  .y)
+            let solution = solve_quadratic(
+                a: sqr(config.verticalGravimorphismBias*cos(theta)) + sqr(config.horizontalGravimorphismBias*sin(theta)),
+                b: -2*sqr(config.horizontalGravimorphismBias)*config.topsideGravimorphismBias*sin(theta),
+                c: sqr(config.horizontalGravimorphismBias*config.topsideGravimorphismBias) - sqr(config.horizontalGravimorphismBias*config.verticalGravimorphismBias))
+            let b: Float
+            switch solution {
+            case let .realDistinct(x, y):
+                let d = max(x,y)
+                b = sqr(cos(tau)) + d*sqr(sin(tau))
+            default:
+                fatalError("\(solution)")
+            }
+            return b
+        }
+
         fileprivate func grow(inDirection newDirection: SIMD3<Float>, produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
             let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized
-            let branchingRotation = simd_quatf(angle: config.branchingAngle, axis: newOrientation.up)
+            let branchingRotation = simd_quatf(angle: -config.branchingAngle, axis: newOrientation.up)
             let phyllotacticRotation = simd_quatf(angle: config.phyllotacticAngle, axis: newOrientation.heading)
 
             var lateralBud: LateralBud? = nil

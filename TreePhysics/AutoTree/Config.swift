@@ -30,9 +30,9 @@ extension AutoTree {
         public var shadowDepth: Int = 4
         public var initialShadowGridSize: Int = 256
 
-        public var sv: Float = 1
-        public var sp: Float = 1
-        public var ev: Float = 0
+        public var verticalGravimorphismBias: Float = 1
+        public var horizontalGravimorphismBias: Float = 1
+        public var topsideGravimorphismBias: Float = 0
 
         public init() {}
 
@@ -63,6 +63,10 @@ extension AutoTree {
             check.normal(shadowDecayFactor)
             check.positive(shadowDepth)
             check.positive(initialShadowGridSize)
+
+            check.positive(verticalGravimorphismBias)
+            check.positive(horizontalGravimorphismBias)
+            check.assert(abs(topsideGravimorphismBias) < verticalGravimorphismBias)
         }
     }
 }

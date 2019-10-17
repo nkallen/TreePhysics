@@ -58,23 +58,7 @@ extension AutoTree {
 
             for bud in buds {
                 let l = max(config.fullExposure - shadowGrid[bud.position] + config.shadowIntensity, 0)
-                let parentOrientation: simd_quatf = bud.parent!.orientation
-                let theta = acos(min(max(dot(parentOrientation.vertical, parentOrientation.left), -1), 1))
-                let tau = acos(min(max(dot(parentOrientation.heading, .y), -1), 1))
-                let solution = solve_quadratic(
-                    a: config.sv*sqr(cos(theta)) + config.sp*sqr(sin(theta)),
-                    b: -2*config.sp*config.ev * sin(theta),
-                    c: sqr(config.ev) - config.sp*config.sv)
-                let b: Float
-                switch solution {
-                case let .realDistinct(x, y):
-                    let d = max(x,y)
-                    b = sqr(cos(tau)) + d*sqr(sin(tau))
-                default:
-                    fatalError("\(solution)")
-                }
-                // FIXME extract code to bud where it can be unit tested
-                let q = b * pow(l, config.sensitivityOfBudsToLight)
+                let q = bud.gravimorphismFactor * pow(l, config.sensitivityOfBudsToLight)
                 lightExposures[bud] = q
                 var node: Node = bud
                 while let internode = node.parent {

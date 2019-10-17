@@ -32,7 +32,7 @@ class AutoTreeTests: XCTestCase {
 
         XCTAssertEqual(internode.position, lateralBud_.position)
         XCTAssertEqual(
-            (simd_quatf(angle: config.branchingAngle, axis: internode.orientation.up) * internode.orientation).normalized,
+            (simd_quatf(angle: -config.branchingAngle, axis: internode.orientation.up) * internode.orientation).normalized,
             lateralBud_.orientation)
     }
 
@@ -172,10 +172,27 @@ class AutoTreeTests: XCTestCase {
         XCTAssertEqual(config.apicalDominance * exposure1 / denominator, vigors[internode1])
         XCTAssertEqual((1-config.apicalDominance) * exposure2 / denominator, vigors[internode2])
     }
+
+    func testGravimorphismFactor() throws {
+        var config = AutoTree.Config()
+        config.horizontalGravimorphismBias = 1
+        config.verticalGravimorphismBias = 10
+        let autoTree = AutoTree(config)
+
+        let internode0 = autoTree.internode(position: .zero, orientation: .x)
+        let internode1 = autoTree.internode(position: .zero, orientation: .x)
+        let verticalBud = autoTree.lateralBud(position: .zero, orientation: .y)
+        let horizontalBud = autoTree.lateralBud(position: .zero, orientation: .z)
+        internode0.addBud(horizontalBud)
+        internode1.addBud(verticalBud)
+
+        XCTAssertEqual(config.horizontalGravimorphismBias, horizontalBud.gravimorphismFactor)
+        XCTAssertEqual(config.verticalGravimorphismBias, verticalBud.gravimorphismFactor, accuracy: 0.001)
+    }
 }
 
 class FakeShadowGrid: AutoTree.ShadowGrid {
-    var data: [float3:Float] = [:]
+    var data: [SIMD3<Float>:Float] = [:]
 
     subscript(position: SIMD3<Float>) -> Float {
         get {

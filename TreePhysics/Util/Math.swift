@@ -149,6 +149,16 @@ extension SIMD3 where Scalar == Float {
             self.z >= min.z && self.z <= max.z
     }
 
+    func angle(with other: SIMD3<Float>) -> Float {
+        acos(Swift.min(Swift.max(dot(self, other), -1), 1))
+    }
+
+    func project(ontoPlane plane: SIMD3<Float>) -> SIMD3<Float> {
+        let projectedOntoPlane = self - dot(self, plane) * plane
+        guard simd_length(projectedOntoPlane) > 10e-10 else { return .zero }
+        return normalize(projectedOntoPlane)
+    }
+
     var isFinite: Bool {
         return x.isFinite && y.isFinite && z.isFinite
     }
@@ -258,6 +268,11 @@ extension float3x3 {
 extension simd_quatf {
     public static let identity = simd_quatf(angle: 1, axis: .zero)
 
+    // quaternions with `heading` (i.e. the local y-axis) pointing in the direction of world axes:
+    public static let x = simd_quatf(from: .y, to: .x)
+    public static let y = simd_quatf.identity
+    public static let z = simd_quatf(from: .y, to: .z)
+
     var isFinite: Bool {
         return real.isFinite && imag.isFinite
     }
@@ -275,9 +290,7 @@ extension simd_quatf {
     }
 
     var vertical: SIMD3<Float> {
-        let yProjectedOntoPlane = .y - dot(.y, heading) * heading
-        guard simd_length(yProjectedOntoPlane) > 10e-10 else { return .zero }
-        return normalize(yProjectedOntoPlane)
+        return SIMD3<Float>.y.project(ontoPlane: heading)
     }
 }
 
