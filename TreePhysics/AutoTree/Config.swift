@@ -9,6 +9,7 @@ extension AutoTree {
         public var branchEnvironmentalBias: Float { return 1 - branchStraightnessBias - branchGravitropismBias }
 
         public var branchingAngle: Float = .pi/8
+        public var deflectionAngle: Float = 0
         public var phyllotacticAngle: Float = .pi/4
         public var gravitropismAngle: Float = 0
 
@@ -44,6 +45,7 @@ extension AutoTree {
             check.normal(branchStraightnessBias + branchGravitropismBias)
 
             check.angle(branchingAngle)
+            check.angle(deflectionAngle)
             check.angle(phyllotacticAngle)
             check.angle(perceptionAngle)
             check.angle(gravitropismAngle)

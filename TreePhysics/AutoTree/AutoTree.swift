@@ -53,7 +53,7 @@ public struct AutoTree {
             // FIXME diameter math is wrong
             let diameter = internode.diameter(exponent: diameterExponent)
             let thickness = sqr(diameter / 2) * .pi
-            _ = pen.cont(distance: config.internodeLength, orientation: internode.orientation, thickness: thickness)
+            _ = pen.cont(distance: config.internodeLength, heading: internode.orientation.heading, thickness: thickness)
         default:
             pen.start(at: node.position, orientation: node.orientation, thickness: sqr(config.baseRadius) * .pi)
         }

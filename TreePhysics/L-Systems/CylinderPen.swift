@@ -41,6 +41,12 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         state = State(position: position, orientation: orientation, thickness: thickness, vertexId: vertexId)
     }
 
+    public func cont(distance: Float, heading: SIMD3<Float>, thickness: Float) -> T {
+        guard let state = state else { fatalError() }
+        let turn = simd_quatf(from: state.orientation.heading, to: heading)
+        return cont(distance: distance, orientation: (turn * state.orientation).normalized, thickness: thickness)
+    }
+
     public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> T {
         guard let state = state else { fatalError() }
 

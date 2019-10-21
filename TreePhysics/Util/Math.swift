@@ -316,3 +316,7 @@ func bezier(_ x0: Float, _ x1: Float, _ x2: Float, _ x3: Float, t: Float) -> Flo
 func mix(_ x: Float, _ y: Float, t: Float) -> Float {
     return x * (1-t) + y * t
 }
+
+func normalize(angle: Float) -> Float {
+    angle - 2 * .pi * floor(angle / (2 * .pi))
+}

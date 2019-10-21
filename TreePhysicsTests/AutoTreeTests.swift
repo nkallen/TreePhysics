@@ -8,7 +8,7 @@ class AutoTreeTests: XCTestCase {
         var config = AutoTree.Config()
         config.branchStraightnessBias = 0
         let autoTree = AutoTree(config)
-        let (root, firstBud) = autoTree.seedling()
+        let (r, firstBud) = autoTree.seedling()
 
         // start with root -> terminalBud
         // transition to root -> internode -> terminalBud
@@ -19,22 +19,39 @@ class AutoTreeTests: XCTestCase {
         XCTAssertNil(lateralBud)
 
         XCTAssertEqual(internode.orientation.heading * config.internodeLength, terminalBud.position, accuracy: 0.0001)
-        XCTAssertEqual(simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation, terminalBud.orientation)
+        XCTAssertEqual(internode.orientation, terminalBud.orientation)
 
         // transition to root -> internode -> [lateralBud] internode -> terminalBud
-        let branchingPoint = internode
         (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [SIMD3<Float>(10,0,0)])
-        let lateralBud_ = try XCTUnwrap(lateralBud)
+        var lateralBud_ = try XCTUnwrap(lateralBud)
 
         XCTAssertEqual(internode.orientation.heading * config.internodeLength * 2, terminalBud.position, accuracy: 0.0001)
         XCTAssertEqual(
-            (simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) * internode.orientation).normalized,
+            internode.orientation,
             terminalBud.orientation)
 
         XCTAssertEqual(internode.position, lateralBud_.position)
         XCTAssertEqual(
-            (simd_quatf(angle: -config.branchingAngle, axis: branchingPoint.orientation.up) * branchingPoint.orientation).normalized,
-            lateralBud_.orientation)
+            (simd_quatf(angle: -config.branchingAngle, axis: internode.orientation.up) *
+                simd_quatf(angle: config.phyllotacticAngle, axis: internode.orientation.heading) *
+                    internode.orientation).normalized,
+            lateralBud_.orientation, accuracy: 0.0001)
+
+        // transition to root -> internode -> [lateralBud] internode -> [lateralBud] internode -> terminalBud
+        (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [SIMD3<Float>(10,0,0)])
+        lateralBud_ = try XCTUnwrap(lateralBud)
+
+        XCTAssertEqual(internode.orientation.heading * config.internodeLength * 3, terminalBud.position, accuracy: 0.0001)
+        XCTAssertEqual(
+            internode.orientation,
+            terminalBud.orientation)
+
+        XCTAssertEqual(internode.position, lateralBud_.position)
+        XCTAssertEqual(
+            (simd_quatf(angle: -config.branchingAngle, axis: internode.orientation.up) *
+                simd_quatf(angle: config.phyllotacticAngle * 2, axis: internode.orientation.heading) *
+                    internode.orientation).normalized,
+            lateralBud_.orientation, accuracy: 0.0001)
     }
 
     func testGrowWithStraighness() {

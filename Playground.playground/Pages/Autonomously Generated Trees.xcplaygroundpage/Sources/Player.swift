@@ -91,7 +91,7 @@ public class PlayerViewController: NSViewController {
         print(scnView.hitTest(gestureRecognizer.location(in: scnView), options: nil))
     }
 
-    var scnView: SCNView {
+    public var scnView: SCNView {
         return self.view as! SCNView
     }
 }
