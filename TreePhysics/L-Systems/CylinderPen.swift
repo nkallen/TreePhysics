@@ -68,8 +68,8 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     public func copy(scale: Float, orientation: simd_quatf) -> T {
         guard let state = state else { fatalError() }
 
-        let vertices = [SIMD3<Float>(-0.5, 0, 0), SIMD3<Float>(0, 1, 0),
-                        SIMD3<Float>(0, 1, 0), SIMD3<Float>(0.5, 0, 0)]
+        let vertices = [SIMD3<Float>(-0.5, 0, 0), SIMD3<Float>(0, 2, 0),
+                        SIMD3<Float>(0, 2, 0), SIMD3<Float>(0.5, 0, 0)]
         let indices: [I] = [0,1,2, 0,2,3,
                             2,1,0, 3,2,0]
 

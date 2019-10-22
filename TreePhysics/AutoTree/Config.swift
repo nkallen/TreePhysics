@@ -11,6 +11,8 @@ extension AutoTree {
         public var branchingAngle: Float = .pi/8
         public var deflectionAngle: Float = 0
         public var phyllotacticAngle: Float = .pi/4
+
+        // FIXME reinterpret as relative to UP not HEADING
         public var gravitropismAngle: Float = 0
 
         public var occupationRadius: Float = 0.05
@@ -35,6 +37,14 @@ extension AutoTree {
         public var horizontalGravimorphismBias: Float = 1
         public var upperSideGravimorphismBias: Float = 0
 
+        public var leafTropismAngle: Float = 0
+        public var leafRadiusThreshold: Float = 0
+        public var eh: Float = 0.1
+        public var petioleSegmentCount: Int = 8
+        public var petioleLength: Float = 0.05
+        public var petioleRadius: Float = 0.001
+        public var leafScale: Float = 0.05
+
         public init() {}
 
         public func validate() {
@@ -49,6 +59,7 @@ extension AutoTree {
             check.angle(phyllotacticAngle)
             check.angle(perceptionAngle)
             check.angle(gravitropismAngle)
+            check.angle(leafTropismAngle)
 
             check.positive(occupationRadius)
             check.positive(perceptionRadius)

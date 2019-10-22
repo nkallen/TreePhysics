@@ -25,7 +25,6 @@ extension AutoTree {
     }
 
     public class Parent: Node {
-        let phyllotacticAngle: Float
         private(set) var lateralChild: Node? = nil
         private(set) var mainChild: Node? = nil
 
@@ -58,8 +57,7 @@ extension AutoTree {
             return (thickest, rest)
         }
 
-        public init(config: Config, position: SIMD3<Float>, orientation: simd_quatf, phyllotacticAngle: Float = 0) {
-            self.phyllotacticAngle = normalize(angle: phyllotacticAngle)
+        public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
@@ -91,7 +89,7 @@ extension AutoTree {
 
     public class Bud: Node {
         func growthDirection(towards points: [SIMD3<Float>]) -> SIMD3<Float> {
-            let gravitropismDirection: SIMD3<Float> = simd_quatf(angle: config.gravitropismAngle, axis:  cross(.y, orientation.heading)).act(.y)
+            let gravitropismDirection: SIMD3<Float> = simd_quatf(angle: config.gravitropismAngle, axis: cross(.y, orientation.heading)).act(.y)
 
             var newDirection: SIMD3<Float>
 
@@ -139,24 +137,32 @@ extension AutoTree {
         fileprivate func grow(inDirection newDirection: SIMD3<Float>, produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
-            let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized
-            let branchingRotation = simd_quatf(angle: -config.branchingAngle, axis: parent.orientation.up)
-
-            let phyllotacticRotation = simd_quatf(angle: parent.phyllotacticAngle, axis: parent.orientation.heading)
-            let deflectionRotation = simd_quatf(angle: config.deflectionAngle, axis: newOrientation.up)
-
+            // 1. Lateral Bud
             var lateralBud: LateralBud? = nil
             if produceLateralBud {
-                lateralBud = LateralBud(config: config, position: position, orientation: (branchingRotation * phyllotacticRotation * parent.orientation).normalized)
+                let branchingRotation = simd_quatf(angle: -config.branchingAngle, axis: parent.orientation.up)
+                let phyllotacticRotation = simd_quatf(angle: config.phyllotacticAngle, axis: parent.orientation.heading)
+                lateralBud = LateralBud(config: config, position: position, orientation: phyllotacticRotation * branchingRotation * parent.orientation)
                 parent.addBud(lateralBud!)
             }
 
-            let internode = Internode(config: config, position: position, orientation: newOrientation, phyllotacticAngle: parent.phyllotacticAngle + config.phyllotacticAngle)
+            // 2. Internode
+            let newOrientation = (simd_quatf(from: orientation.heading, to: newDirection) * orientation).normalized
+            let internode = Internode(config: config, position: position, orientation: newOrientation)
 
+            // 3. Terminal Bud
+            let terminalBudOrientation: simd_quatf
+            if produceLateralBud {
+                let phyllotacticRotation = simd_quatf(angle: config.phyllotacticAngle, axis: newOrientation.heading)
+                let deflectionRotation = simd_quatf(angle: config.deflectionAngle, axis: newOrientation.up)
+                terminalBudOrientation = phyllotacticRotation * deflectionRotation * newOrientation
+            } else {
+                terminalBudOrientation = newOrientation
+            }
             let terminalBud = TerminalBud(
                 config: config,
                 position: position + config.internodeLength * newOrientation.heading,
-                orientation: (deflectionRotation * newOrientation))
+                orientation: terminalBudOrientation)
             internode.addBud(terminalBud)
 
             parent.replaceBud(self, with: internode)

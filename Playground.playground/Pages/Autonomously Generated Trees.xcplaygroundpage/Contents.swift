@@ -6,32 +6,38 @@ import SceneKit.ModelIO
 @testable import TreePhysics
 
 var config = AutoTree.Config()
-config.internodeLength = 0.1
-config.occupationRadius = config.internodeLength * 5
-config.perceptionRadius = config.internodeLength * 5
+config.internodeLength = 0.08
+config.occupationRadius = config.internodeLength * 0.8
+config.perceptionRadius = config.internodeLength * 4
 config.apicalDominance = 0.5
-config.baseRadius = 0.2
+config.baseRadius = 0.1
 config.extremityRadius = 0.005
 config.sensitivityOfBudsToLight = 2.5
 
-config.branchGravitropismBias = 0
-config.branchStraightnessBias = 1
+config.branchGravitropismBias = 0.05
+config.branchStraightnessBias = 0.39
 
 config.maxShootLength = 4
-config.gravitropismAngle = .pi/4
+config.gravitropismAngle = 0 // FIXME make angle consistent
 config.branchingAngle = .pi/6
-config.phyllotacticAngle = .pi/4
+config.phyllotacticAngle = .pi/2
 config.fullExposure = 1
-config.shadowDecayFactor = 0.8
+config.shadowDecayFactor = 0.7
 config.shadowIntensity = 0.1
-config.shadowDepth = 12
+config.shadowDepth = 10
 config.initialShadowGridSize = 256
 
 config.horizontalGravimorphismBias = 1
 config.verticalGravimorphismBias = 1
 config.upperSideGravimorphismBias = 0
 
-config.deflectionAngle = config.branchingAngle
+config.deflectionAngle = config.branchingAngle/2
+
+config.leafRadiusThreshold = 0.005
+config.petioleLength = config.internodeLength / 2
+config.leafScale = 0.1
+config.eh = 0.2
+config.petioleSegmentCount = 10
 
 let autoTree = AutoTree(config)
 
@@ -61,7 +67,7 @@ extension AutoTree.GrowthSimulator: Playable {
     public func update() -> SCNNode? {
         do {
             if !success {
-                //                simulator.addAttractionPoints(vertices)
+                simulator.addAttractionPoints(vertices)
             }
             try simulator.update(enableAllBuds: false)
             success = true

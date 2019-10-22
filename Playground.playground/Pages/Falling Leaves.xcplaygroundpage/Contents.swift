@@ -1,20 +1,52 @@
 import AppKit
 import SceneKit
 import PlaygroundSupport
+import Cocoa
 @testable import TreePhysics
 
-let windField = WindField(windVelocity: float3(5, 0, -1))
-let gravityField = GravityField(float3(0,-9.81,0))
+let colors: [NSColor] = [
+    NSColor(red: 107/255, green: 147/255, blue: 77/255, alpha: 1),
+    NSColor(red: 202/255, green: 174/255, blue: 110/255, alpha: 1),
+    NSColor(red: 141/255, green: 154/255, blue: 57/255, alpha: 1),
+    NSColor(red: 212/255, green: 97/255, blue: 93/255, alpha: 1),
+]
+
+let images: [NSImage] = ["leaf1", "leaf2", "leaf3"].map { name in
+    let url = Bundle.main.url(forResource: name, withExtension: "png", subdirectory: "art.scnassets")!
+    let image = NSImage(byReferencing: url)
+    return image
+}
+
+var materials: [SCNMaterial] = []
+for color in colors {
+    for image in images {
+        let material = SCNMaterial()
+        material.diffuse.contents = image
+        material.multiply.contents = color
+
+        materials.append(material)
+    }
+}
+
+//let asset = MDLAsset(url: url)
+//let mdlMesh = asset.object(at: 0) as! MDLMesh
+
+let windField = WindField(windVelocity: SIMD3<Float>(5, 0, -1))
+let gravityField = GravityField(SIMD3<Float>(0,-9.81,0))
 
 let world = PhysicsWorld()
 let simulator = CPUSimulator(world: world)
-let emitter = Emitter(birthRate: 1/5, max: 50, maxAge: 15, world: world)
+let emitter = Emitter(birthRate: 1/5, max: 30, maxAge: 15, world: world)
 let scene = Scene()
 scene.add { time in
     emitter.update()
     simulator.update(at: 1.0/60)
     if let leaf = emitter.emit() {
-        scene.rootNode.addChildNode(leaf.node)
+        let node = leaf.node
+        let material = materials.randomElement()!
+        node.geometry?.firstMaterial = material
+
+        scene.rootNode.addChildNode(node)
     }
 }
 
