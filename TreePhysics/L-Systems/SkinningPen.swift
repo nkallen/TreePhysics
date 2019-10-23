@@ -81,7 +81,7 @@ final class BoneBuilder<I> where I: FixedWidthInteger {
 
         var boneNodes: [SCNNode] = []
         var boneInverseBindTransforms: [NSValue] = []
-        let vectorCount = builder.source.vectorCount
+        let vectorCount = builder.sources.first!.vectorCount // FIXME should select by semantic
         var boneWeights: [Float] = Array(repeating: 1.0, count: vectorCount)
         var boneIndices: [I] = Array(repeating: 0, count: vectorCount)
 
