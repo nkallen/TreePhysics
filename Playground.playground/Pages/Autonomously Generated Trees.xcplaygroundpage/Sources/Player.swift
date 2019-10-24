@@ -33,6 +33,18 @@ public class PlayerViewController: NSViewController {
         view.showsStatistics = true
         view.allowsCameraControl = true
 
+        let cameraNode = SCNNode()
+        let camera = SCNCamera()
+        camera.wantsDepthOfField = true
+        camera.focusDistance = 1.0
+        camera.fStop = 2.5
+        camera.zNear = 0
+        camera.zFar = 100
+        cameraNode.camera = camera
+        scene.rootNode.addChildNode(cameraNode)
+        cameraNode.position = SCNVector3(x: 0, y: 0.75, z: 2.5)
+        cameraNode.name = "Camera"
+
         let clickGesture = NSClickGestureRecognizer(target: self, action: #selector(handleClick(_:)))
         var gestureRecognizers = view.gestureRecognizers
         gestureRecognizers.insert(clickGesture, at: 0)
