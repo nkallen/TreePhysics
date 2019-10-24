@@ -11,7 +11,7 @@ class ApplyPhysicsFieldsTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer: MTLBuffer!
 
-    var root, b1, b2: Internode!
+    var root, b1, b2: ArticulatedRigidBody!
 
     override func setUp() {
         super.setUp()
@@ -19,9 +19,9 @@ class ApplyPhysicsFieldsTests: XCTestCase {
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = Internode()
-        self.b1 = Internode()
-        self.b2 = Internode()
+        self.root = Tree.internode()
+        self.b1 = Tree.internode()
+        self.b2 = Tree.internode()
         _ = root.add(b1)
         _ = b1.add(b2)
 
@@ -53,7 +53,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer: MTLBuffer!
 
-    var root, b1, b2: Internode!
+    var root, b1, b2: ArticulatedRigidBody!
     let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
 
     override func setUp() {
@@ -62,9 +62,9 @@ class UpdateCompositeBodiesTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = Internode()
-        self.b1 = Internode()
-        self.b2 = Internode()
+        self.root = Tree.internode()
+        self.b1 = Tree.internode()
+        self.b2 = Tree.internode()
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force)
@@ -124,7 +124,7 @@ class UpdateJointsTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer: MTLBuffer!
 
-    var root, b1, b2: Internode!
+    var root, b1, b2: ArticulatedRigidBody!
     let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
@@ -134,9 +134,9 @@ class UpdateJointsTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = Internode()
-        self.b1 = Internode()
-        self.b2 = Internode()
+        self.root = Tree.internode()
+        self.b1 = Tree.internode()
+        self.b2 = Tree.internode()
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force)
@@ -193,7 +193,7 @@ class UpdateRigidBodiesTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
-    var root, b1, b2: Internode!
+    var root, b1, b2: ArticulatedRigidBody!
     let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
@@ -203,9 +203,9 @@ class UpdateRigidBodiesTests: XCTestCase {
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = Internode()
-        self.b1 = Internode()
-        self.b2 = Internode()
+        self.root = Tree.internode()
+        self.b1 = Tree.internode()
+        self.b2 = Tree.internode()
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force)
@@ -273,7 +273,7 @@ class AdvancedMetalTests: XCTestCase {
     var cpuSimulator: CPUSimulator!
     var metalSimulator: MetalSimulator!
 
-    var expecteds: [Internode]!
+    var expecteds: [ArticulatedRigidBody]!
 
     override func setUp() {
         super.setUp()
@@ -281,16 +281,16 @@ class AdvancedMetalTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        let root = Internode()
-        let b1 = Internode()
-        let b2 = Internode()
-        let b3 = Internode()
-        let b4 = Internode()
-        let b5 = Internode()
-        let b6 = Internode()
-        let b7 = Internode()
-        let b8 = Internode()
-        let b9 = Internode()
+        let root = Tree.internode()
+        let b1 = Tree.internode()
+        let b2 = Tree.internode()
+        let b3 = Tree.internode()
+        let b4 = Tree.internode()
+        let b5 = Tree.internode()
+        let b6 = Tree.internode()
+        let b7 = Tree.internode()
+        let b8 = Tree.internode()
+        let b9 = Tree.internode()
 
         _ = root.add(b1)
         _ = b1.add(b2)
@@ -378,7 +378,7 @@ class EvenMoreAdvancedMetalTests: XCTestCase {
         interpreter.interpret(lSystem)
 
         // FIXME
-        (root.flattened().last! as! Internode).apply(force: force)
+        (root.flattened().last! as! ArticulatedRigidBody).apply(force: force)
 
         let world = PhysicsWorld()
         self.cpuSimulator = CPUSimulator(world: world)

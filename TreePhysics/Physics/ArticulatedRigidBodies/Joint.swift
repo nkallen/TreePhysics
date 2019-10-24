@@ -32,15 +32,15 @@ public final class Joint {
         self.θ = float3x3(0)
 
         // FIXME
-        switch child {
-        case is Leaf:
+        switch child.shape {
+        case .leaf:
             self.stiffness = 0.1
             self.torqueThreshold = 0.30
-            self.damping = Internode.β
-        default:
-            self.stiffness = Internode.K
+            self.damping = Tree.β
+        case .internode, nil:
+            self.stiffness = Tree.K
             self.torqueThreshold = Float.infinity
-            self.damping = Internode.β
+            self.damping = Tree.β
         }
     }
 
@@ -59,10 +59,6 @@ public final class Joint {
 
     func rotate(vector: SIMD3<Float>) -> SIMD3<Float> {
         return inverseRotation.act(vector)
-    }
-
-    private static func computeK(radius: Float, length: Float) -> Float {
-        return Internode.K
     }
 
     var isFinite: Bool {

@@ -10,7 +10,7 @@ public class Emitter {
     var bucket: (Float, Int)? = nil
 
     public var count = 0
-    public var particles: [(Leaf, Date)?]
+    public var particles: [(ArticulatedRigidBody, Date)?]
     public var ticks = 0
     let noise = Noise()
     var total = 0
@@ -20,16 +20,16 @@ public class Emitter {
         
         self.birthRate = birthRate
         self.maxAge = maxAge
-        self.particles = [(Leaf, Date)?](repeating: nil, count: max)
+        self.particles = [(ArticulatedRigidBody, Date)?](repeating: nil, count: max)
         self.world = world
     }
 
-    public func emit() -> Leaf? {
+    public func emit() -> ArticulatedRigidBody? {
         ticks += 1
         guard ticks % Int(1/birthRate) == 0 else { return nil }
         guard count + 1 < particles.count else { return nil }
 
-        let leaf = Leaf(length: 1, density: 500)
+        let leaf = Tree.leaf(length: 1, density: 500)
         let seed = 1 + total
         leaf.rotation =
             simd_quatf(angle: noise.random(seed + 0) * 2 * .pi, axis: .x) *

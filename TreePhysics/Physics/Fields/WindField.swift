@@ -18,54 +18,45 @@ public final class WindField: PhysicsField {
     }
 
     override func force(rigidBody: RigidBody, time: TimeInterval) -> SIMD3<Float> {
-        switch rigidBody {
-        case let internode as Internode:
-            return force(internode: internode, time: time)
-        case let leaf as Leaf:
-            return force(leaf: leaf, time: time)
-        default:
-            return .zero
-        }
-    }
+        guard let shape = rigidBody.shape else { return .zero }
 
-    func force(internode: Internode, time: TimeInterval) -> SIMD3<Float> {
-        let windVelocity = self.windVelocity(for: internode, at: time)
-        let relativeVelocity = windVelocity - internode.velocity
-        let relativeVelocity_normal = relativeVelocity - dot(relativeVelocity, internode.axis) * internode.axis
-        let result = branchScale * airDensity * internode.area * length(relativeVelocity_normal) * relativeVelocity_normal
-        return result
+        let windVelocity = self.windVelocity(for: rigidBody, at: time)
+        let relativeVelocity: SIMD3<Float> = windVelocity - rigidBody.velocity
+
+        switch shape {
+        case let .internode(area: area, length: _, radius: _):
+            let normal = rigidBody.rotation.heading
+            let relativeVelocity_normal = relativeVelocity - dot(relativeVelocity, normal) * normal
+            let result = branchScale * airDensity * area * length(relativeVelocity_normal) * relativeVelocity_normal
+            return result
+        case let .leaf(area: area):
+            let normal = rigidBody.rotation.up
+            let relativeVelocity_normal: SIMD3<Float> = dot(relativeVelocity, normal) * normal
+            let relativeVelocity_tangential: SIMD3<Float> = relativeVelocity - relativeVelocity_normal
+            let lift: SIMD3<Float> = leafScale * airDensity * area * length(relativeVelocity) * relativeVelocity_normal
+            let k: Float = airResistanceMultiplier * rigidBody.mass
+            let drag: SIMD3<Float> = k * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
+            return lift + drag
+        }
     }
 
     override func torque(rigidBody: RigidBody, time: TimeInterval) -> SIMD3<Float> {
-        switch rigidBody {
-        case _ as Internode:
+        guard let shape = rigidBody.shape else { return .zero }
+
+        switch shape {
+        case .internode:
             return .zero
-        case let leaf as Leaf:
-            return torque(leaf: leaf, time: time)
-        default:
-            return .zero
+        case let .leaf(area: area):
+            let normal = rigidBody.rotation.up
+
+            let windVelocity = self.windVelocity(for: rigidBody, at: time)
+            let relativeVelocity: SIMD3<Float> = windVelocity - rigidBody.velocity
+            let k: Float = leafScale * airDensity * area / 2 * sqrt(area / .pi) * dot(relativeVelocity, normal)
+            var torque: SIMD3<Float> = k * cross(normal, relativeVelocity * cos(phi) + cross(normal, relativeVelocity * sin(phi)))
+            torque -= airResistanceMultiplier * rigidBody.inertiaTensor * rigidBody.angularVelocity
+
+            return torque
         }
-    }
-
-    func force(leaf: Leaf, time: TimeInterval) -> SIMD3<Float> {
-        let windVelocity = self.windVelocity(for: leaf, at: time)
-        let relativeVelocity: SIMD3<Float> = windVelocity - leaf.velocity
-        let relativeVelocity_normal: SIMD3<Float> = dot(relativeVelocity, leaf.normal) * leaf.normal
-        let relativeVelocity_tangential: SIMD3<Float> = relativeVelocity - relativeVelocity_normal
-        let lift: SIMD3<Float> = leafScale * airDensity * leaf.area * length(relativeVelocity) * relativeVelocity_normal
-        let k: Float = airResistanceMultiplier * leaf.mass
-        let drag: SIMD3<Float> = k * (relativeVelocity_normal + relativeVelocity_tangential / normal2tangentialDragCoefficientRatio)
-        return lift + drag
-    }
-
-    func torque(leaf: Leaf, time: TimeInterval) -> SIMD3<Float> {
-        let windVelocity = self.windVelocity(for: leaf, at: time)
-        let relativeVelocity: SIMD3<Float> = windVelocity - leaf.velocity
-        let k: Float = leafScale * airDensity * leaf.area / 2 * sqrt(leaf.area / .pi) * dot(relativeVelocity, leaf.normal)
-        var torque: SIMD3<Float> = k * cross(leaf.normal, relativeVelocity * cos(phi) + cross(leaf.normal, relativeVelocity * sin(phi)))
-        torque -= airResistanceMultiplier * leaf.inertiaTensor * leaf.angularVelocity
-
-        return torque
     }
 
     func windVelocity(for rigidBody: RigidBody, at time: TimeInterval) -> SIMD3<Float> {

@@ -22,7 +22,7 @@ extension RigidBody: CustomDebugStringConvertible {
 
 extension RigidBodyStruct: CustomDebugStringConvertible {
     public var debugDescription: String {
-        return "RigidBody: parentId=\(parentId) position=\(position), rotation=\(rotation), mass=\(mass), length=\(length), radius=\(radius), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
+        return "RigidBody: parentId=\(parentId) position=\(position), rotation=\(rotation), mass=\(mass), centerOfMass=\(centerOfMass), force=\(force), torque=\(torque), inertiaTensor=\(inertiaTensor)"
     }
 }
 

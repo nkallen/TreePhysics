@@ -10,7 +10,8 @@ inline float3 joint_position(
                              JointStruct joint,
                              RigidBodyStruct parentRigidBody)
 {
-    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
+//    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
+    return float3(0);
 }
 
 inline float3x3 rigidBody_localRotation(
@@ -19,28 +20,11 @@ inline float3x3 rigidBody_localRotation(
     return matrix_rotate(joint.θ[0]);
 }
 
-inline float3x3 rigidBody_localInertiaTensor(
-                                             RigidBodyStruct rigidBody)
-{
-    float mass = rigidBody.mass;
-    float length = rigidBody.length;
-    float radius = rigidBody.radius;
-
-    float momentOfInertiaAboutY = 1.0/12 * mass * length * length; // Moment of Inertia of a rod about its center of mass;
-    float momentOfInertiaAboutX = 1.0/4 * mass * radius * radius; // MoI of a disc about its center
-    float momentOfInertiaAboutZ = 1.0/4 * mass * radius * radius; // ditto
-
-    // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
-    // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-    return float3x3(momentOfInertiaAboutY + momentOfInertiaAboutX, 0, 0,
-                    0, momentOfInertiaAboutZ + momentOfInertiaAboutX, 0,
-                    0, 0, momentOfInertiaAboutX + momentOfInertiaAboutY);
-}
-
 inline float3 rigidBody_localCenterOfMass(
                                           RigidBodyStruct rigidBody)
 {
-    return float3(0, 1, 0) * rigidBody.length / 2;
+//    return float3(0, 1, 0) * rigidBody.length / 2;
+    return float3(0);
 }
 
 inline RigidBodyStruct
@@ -54,7 +38,7 @@ updateRigidBody(
     rigidBody.rotation = parentRigidBody.rotation * rigidBody.jointLocalRotation * rigidBody_localRotation(parentJoint);
     rigidBody.position = parentJointPosition;
 
-    rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody_localInertiaTensor(rigidBody) * (float3x3)transpose(rigidBody.rotation);
+    rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody.localInertiaTensor * (float3x3)transpose(rigidBody.rotation);
     rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
 
     return rigidBody;

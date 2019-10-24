@@ -36,7 +36,8 @@ inline float3 joint_position(
                              JointStruct joint,
                              RigidBodyStruct parentRigidBody)
 {
-    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
+//    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
+    return float3(0);
 }
 
 inline JointStruct

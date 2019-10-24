@@ -6,14 +6,14 @@ import SceneKit
 class RigidBodyTests: XCTestCase {
 
     func testFlattenIsBreadthFirst() {
-        let root = Internode()
-        let b1 = Internode()
-        let b2 = Internode()
-        let b3 = Internode()
-        let b4 = Internode()
-        let b5 = Internode()
-        let b6 = Internode()
-        let b7 = Internode()
+        let root = Tree.internode()
+        let b1 = Tree.internode()
+        let b2 = Tree.internode()
+        let b3 = Tree.internode()
+        let b4 = Tree.internode()
+        let b5 = Tree.internode()
+        let b6 = Tree.internode()
+        let b7 = Tree.internode()
         _ = root.add(b1)
         _ = root.add(b2)
         _ = b1.add(b3)
@@ -27,9 +27,9 @@ class RigidBodyTests: XCTestCase {
     }
     
     func testLevelsSimple() {
-        let root = Internode()
-        let b1 = Internode()
-        let b2 = Internode()
+        let root = Tree.internode()
+        let b1 = Tree.internode()
+        let b2 = Tree.internode()
         _ = root.add(b1)
         _ = b1.add(b2)
 
@@ -40,16 +40,16 @@ class RigidBodyTests: XCTestCase {
     }
 
     func testLevelsComplex() {
-        let root = Internode()
-        let b1 = Internode()
-        let b2 = Internode()
-        let b3 = Internode()
-        let b4 = Internode()
-        let b5 = Internode()
-        let b6 = Internode()
-        let b7 = Internode()
-        let b8 = Internode()
-        let b9 = Internode()
+        let root = Tree.internode()
+        let b1 = Tree.internode()
+        let b2 = Tree.internode()
+        let b3 = Tree.internode()
+        let b4 = Tree.internode()
+        let b5 = Tree.internode()
+        let b6 = Tree.internode()
+        let b7 = Tree.internode()
+        let b8 = Tree.internode()
+        let b9 = Tree.internode()
 
         _ = root.add(b1)
         _ = b1.add(b2)
@@ -61,7 +61,7 @@ class RigidBodyTests: XCTestCase {
         _ = b7.add(b8)
         _ = b7.add(b9)
 
-        let empty: [Internode] = []
+        let empty: [ArticulatedRigidBody] = []
 
         let expected: [Level] = [
             [

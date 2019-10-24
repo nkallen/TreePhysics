@@ -54,9 +54,9 @@ typedef struct {
     int climberOffset;
     ushort childCount;
     ushort climberCount;
+
     float mass;
-    float length;
-    float radius;
+    matrix_float3x3 localInertiaTensor;
 
     float jointStiffness;
     matrix_float3x3 jointLocalRotation;

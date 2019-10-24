@@ -130,10 +130,9 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
             climberOffset: climberOffset,
             childCount: ushort(childRigidBodies.count),
             climberCount: ushort(climbers.count),
+
             mass: rigidBody.mass,
-            // FIXME cast
-            length: (rigidBody as! Internode).length,
-            radius: (rigidBody as! Internode).radius,
+            localInertiaTensor: rigidBody.localInertiaTensor,
 
             jointStiffness: 200.0,
             jointLocalRotation: rigidBody.parentJoint.map { float3x3($0.localRotation) } ?? matrix_identity_float3x3,

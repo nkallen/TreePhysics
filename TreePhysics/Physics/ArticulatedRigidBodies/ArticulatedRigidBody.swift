@@ -2,7 +2,7 @@ import Foundation
 import simd
 import SceneKit
 
-public class ArticulatedRigidBody: RigidBody {
+final public class ArticulatedRigidBody: RigidBody {
     weak var parentJoint: Joint? = nil
     public var childJoints: Set<Joint> = []
     let composite = CompositeBody()
@@ -11,25 +11,23 @@ public class ArticulatedRigidBody: RigidBody {
     var pivot: SIMD3<Float> // The `pivot` is the point at which the object connects to its parent, relative to the center of mass.
 
     public class func `static`() -> ArticulatedRigidBody {
-        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, node: SCNNode())
-        rigidBody.kind = .static
+        let rigidBody = ArticulatedRigidBody(kind: .static, mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, shape: nil, node: SCNNode())
         return rigidBody
     }
 
     public class func dynamic() -> ArticulatedRigidBody {
-        let rigidBody = ArticulatedRigidBody(mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, node: SCNNode())
-        rigidBody.kind = .dynamic
+        let rigidBody = ArticulatedRigidBody(kind: .dynamic, mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, shape: nil, node: SCNNode())
         return rigidBody
     }
 
-    public init(mass: Float, localInertiaTensor: float3x3, localPivot: SIMD3<Float>, node: SCNNode) {
+    public init(kind: Kind, mass: Float, localInertiaTensor: float3x3, localPivot: SIMD3<Float>, shape: Shape?, node: SCNNode) {
         self.localPivot = localPivot
         self.pivot = localPivot
 
-        super.init(mass: mass, localInertiaTensor: localInertiaTensor, node: node)
+        super.init(kind: kind, mass: mass, localInertiaTensor: localInertiaTensor, shape: shape, node: node)
     }
 
-    func add(_ child: ArticulatedRigidBody, rotation: simd_quatf, position: SIMD3<Float>) -> Joint {
+    func add(_ child: ArticulatedRigidBody, rotation: simd_quatf = simd_quatf(angle: -.pi/4, axis: .z), position: SIMD3<Float> = .zero) -> Joint {
         let joint = Joint(parent: self, child: child, localRotation: rotation, localPosition: position)
         childJoints.insert(joint)
         child.parentJoint = joint

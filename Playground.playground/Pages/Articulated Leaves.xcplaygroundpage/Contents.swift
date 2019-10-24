@@ -26,7 +26,7 @@ let world = PhysicsWorld()
 let simulator = CPUSimulator(world: world)
 world.add(rigidBody: root)
 world.add(field: windField)
-world.add(field: gravityField)
+//world.add(field: gravityField)
 let scene = Scene()
 scene.add { time in
     simulator.update(at: 1.0/60)

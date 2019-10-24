@@ -17,11 +17,11 @@ class ModelTests: XCTestCase {
      */
     func test2DCaseIsSameAsPlanar3DCase() {
         let root = ArticulatedRigidBody.static()
-        let rigidBody = Internode(length: 1, radius: 1, density: 1)
+        let rigidBody = Tree.internode(length: 1, radius: 1, density: 1)
         let parentJoint = root.add(rigidBody, rotation: .identity, position: .zero)
 
         // 1. The 2D setup:
-        let momentOfInertia_jointSpace = rigidBody.momentOfInertia + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, parentJoint.position))
+        let momentOfInertia_jointSpace = rigidBody.momentOfInertia! + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, parentJoint.position))
 
         let force = SIMD3<Float>(-1, 0, 0)
         let torque = cross(SIMD3<Float>(0, 1, 0), force)
@@ -61,9 +61,11 @@ class ModelTests: XCTestCase {
     }
 }
 
-extension Internode {
-    var momentOfInertia: Float {
+extension ArticulatedRigidBody {
+    var momentOfInertia: Float? {
+        guard case let .internode(area: _, length: length, radius: radius) = shape else { return nil }
+
         // Moment of Inertia of a rod about its center of mass
-        return 1.0/4 * mass * sqr(radius) + 1.0/12 * mass * sqr(length)
+        return 1.0/4 * mass * sqr(radius) + 1/12 * mass * sqr(length)
     }
 }

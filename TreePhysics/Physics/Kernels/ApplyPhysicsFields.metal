@@ -35,12 +35,12 @@ inline RigidBodyStruct
 rigidBody_applyForce(
                      RigidBodyStruct rigidBody,
                      float3 force,
-                     float distance)
+                     float3 torque)
 {
-    if (distance < 0 || distance > 1) return rigidBody;
-    
     rigidBody.force += force;
-    rigidBody.torque += cross(rigidBody_convert(rigidBody, float3(0, 1, 0) * distance * rigidBody.length) - rigidBody.position, force);
+    rigidBody.torque += torque;
+
+    // FIXME (if parentId != nil ... then             torque += cross(rotation.act(-localPivot), force)
     
     return rigidBody;
 }

@@ -10,17 +10,20 @@ fileprivate let delta: TimeInterval = 1
  */
 class SimpleCPUSimulatorTests: XCTestCase {
     var simulator: CPUSimulator!
-    var b0: Internode!
+    var b0: ArticulatedRigidBody!
     var joint: Joint!
-    var forceAppliedPosition: float3!
+    var forceAppliedPosition: simd_float3!
     let force = SIMD3<Float>(1, 0, 0)
 
     override func setUp() {
         super.setUp()
 
         let root = ArticulatedRigidBody.static()
-        b0 = Internode()
-        joint = root.add(b0)
+        b0 = Tree.internode(length: 1, radius: 1)
+        joint = root.add(b0, rotation: .identity, position: .zero)
+        joint.stiffness = 1
+        joint.torqueThreshold = .infinity
+        joint.damping = 1
 
         let world = PhysicsWorld()
         simulator = CPUSimulator(world: world)
@@ -36,8 +39,6 @@ class SimpleCPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b0.mass, 1)
         XCTAssertEqual(b0.force, force)
         XCTAssertEqual(b0.torque, cross(forceAppliedPosition, force))
-        XCTAssertEqual(b0.radius, 1)
-        XCTAssertEqual(b0.length, 1)
         XCTAssertEqual(b0.torque, cross(forceAppliedPosition - b0.pivot, force), accuracy: 0.0001)
         XCTAssertEqual(float3x3(b0.rotation.normalized) * b0.inertiaTensor * float3x3(b0.rotation.normalized).transpose,
                        float3x3(diagonal: SIMD3<Float>(
@@ -102,19 +103,26 @@ class SimpleCPUSimulatorTests: XCTestCase {
  */
 class CPUSimulatorTests: XCTestCase {
     var simulator: CPUSimulator!
-    var b0: Internode!
-    var b1: Internode!
+    var b0: ArticulatedRigidBody!
+    var b1: ArticulatedRigidBody!
     let force = SIMD3<Float>(1, 0, 0) // world coordinates
-    var forceAppliedPosition: float3!
+    var forceAppliedPosition: simd_float3!
 
     override func setUp() {
         super.setUp()
 
         let root = ArticulatedRigidBody.static()
-        b0 = Internode()
-        b1 = Internode()
-        _ = root.add(b0)
-        _ = b0.add(b1)
+        b0 = Tree.internode(length: 1, radius: 1)
+        b1 = Tree.internode(length: 1, radius: 1)
+        let b0joint = root.add(b0, rotation: .identity, position: .zero)
+        b0joint.stiffness = 1
+        b0joint.torqueThreshold = .infinity
+        b0joint.damping = 1
+
+        let b1Joint = b0.add(b1, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
+        b1Joint.stiffness = 1
+        b1Joint.torqueThreshold = .infinity
+        b1Joint.damping = 1
 
         let world = PhysicsWorld()
         simulator = CPUSimulator(world: world)
@@ -130,8 +138,6 @@ class CPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b0.mass, 1)
         XCTAssertEqual(b0.force, .zero)
         XCTAssertEqual(b0.torque, .zero)
-        XCTAssertEqual(b0.radius, 1)
-        XCTAssertEqual(b0.length, 1)
         XCTAssertEqual(float3x3(b0.rotation).transpose * b0.inertiaTensor * float3x3(b0.rotation),
                        float3x3(diagonal: SIMD3<Float>(
                         1.0/4 + 1.0/12,
@@ -147,8 +153,6 @@ class CPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b1.mass, 1)
         XCTAssertEqual(b1.force, force)
         XCTAssertEqual(b1.torque, cross(forceAppliedPosition, force))
-        XCTAssertEqual(b1.radius, 1)
-        XCTAssertEqual(b1.length, 1)
         XCTAssertEqual(float3x3(b1.rotation).transpose * b1.inertiaTensor * float3x3(b1.rotation),
                        float3x3(diagonal: SIMD3<Float>(
                         1.0/4 + 1.0/12,

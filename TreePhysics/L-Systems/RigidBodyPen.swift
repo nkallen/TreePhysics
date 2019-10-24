@@ -18,7 +18,7 @@ public final class RigidBodyPen: Pen {
     public func cont(distance: Float, orientation: simd_quatf, thickness: Float) -> ArticulatedRigidBody {
         guard let start = start else { fatalError() }
 
-        let newBranch = Internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
+        let newBranch = Tree.internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
         let worldPosition = start - parentBranch.pivot
         let localPosition = parentBranch.rotation.inverse.act(worldPosition)
@@ -33,7 +33,7 @@ public final class RigidBodyPen: Pen {
     public func copy(scale: Float, orientation: simd_quatf) -> ArticulatedRigidBody {
         guard let start = start else { fatalError() }
 
-        let newLeaf = Leaf(length: scale, density: 500)
+        let newLeaf = Tree.leaf(length: scale, density: 500)
 
         let worldPosition = start - parentBranch.pivot
         let localPosition = parentBranch.rotation.inverse.act(worldPosition)

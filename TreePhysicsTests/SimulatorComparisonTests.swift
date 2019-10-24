@@ -9,7 +9,7 @@ class SimulatorComparisonTests: XCTestCase {
 
     var cpuSimulator: CPUSimulator!
     var metalSimulator: MetalSimulator!
-    var expecteds: [Internode]!
+    var expecteds: [ArticulatedRigidBody]!
 
     var attractorField: AttractorField!
 

@@ -98,7 +98,7 @@ func XCTAssertEqual(_ a: Joint, _ b: JointStruct, accuracy: Float, _ message: @a
     XCTAssertEqual(a.θ, b.θ, accuracy: accuracy, message(), file: file, line: line)
 }
 
-func XCTAssertEqual(_ a: Internode, _ b: RigidBodyStruct, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertEqual(_ a: ArticulatedRigidBody, _ b: RigidBodyStruct, accuracy: Float, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(a.mass, b.mass, accuracy: accuracy, "mass", file: file, line: line)
     XCTAssertEqual(a.force, b.force, accuracy: accuracy, "force", file: file, line: line)
     XCTAssertEqual(a.torque, b.torque, accuracy: accuracy, "torque", file: file, line: line)
@@ -127,24 +127,5 @@ class SharedBuffersMTLDevice: MTLDeviceProxy {
         options.remove(.storageModePrivate)
         options.insert(.storageModeShared)
         return options
-    }
-}
-
-extension ArticulatedRigidBody {
-    func add(_ child: Internode) -> Joint {
-        switch self {
-        case is Internode:
-            let joint = add(child, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: SIMD3<Float>(0,1,0))
-            joint.stiffness = 1
-            joint.torqueThreshold = .infinity
-            joint.damping = 1
-            return joint
-        default:
-            let joint = add(child, rotation: .identity, position: .zero)
-            joint.stiffness = 1
-            joint.torqueThreshold = .infinity
-            joint.damping = 1
-            return joint
-        }
     }
 }
