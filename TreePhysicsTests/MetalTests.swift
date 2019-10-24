@@ -239,7 +239,7 @@ class UpdateRigidBodiesTests: XCTestCase {
 
             XCTAssertEqual(
                 SIMD3<Float>(0.70687836, 1.7073351, 0),
-                SIMD3<Float>(b2.position), accuracy: 0.001)
+                SIMD3<Float>(b2.pivot), accuracy: 0.001)
             XCTAssertEqual(
                 float3x3(
                     SIMD3<Float>(0.0011795461,-1,0),
@@ -249,7 +249,7 @@ class UpdateRigidBodiesTests: XCTestCase {
 
             XCTAssertEqual(
                 SIMD3<Float>(0, 1, 0),
-                SIMD3<Float>(b1.position))
+                SIMD3<Float>(b1.pivot))
             XCTAssertEqual(
                 float3x3(
                     SIMD3<Float>(0.7073351,-0.70687836,0),

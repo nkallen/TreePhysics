@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger, FunctionConstantIndex)
 };
 
 typedef struct {
-    vector_float3 position;
+    vector_float3 pivot;
     float mass;
     matrix_float3x3 inertiaTensor;
     vector_float3 force;
@@ -61,7 +61,8 @@ typedef struct {
     float jointStiffness;
     matrix_float3x3 jointLocalRotation;
 
-    vector_float3 position;
+    vector_float3 pivot;
+    vector_float3 localPivot;
     matrix_float3x3 rotation;
     matrix_float3x3 inertiaTensor;
     vector_float3 centerOfMass;

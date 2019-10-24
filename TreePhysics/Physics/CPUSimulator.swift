@@ -99,7 +99,7 @@ public final class CPUSimulator {
         let time = Float(time)
         for rigidBody in world.rigidBodiesUnordered {
             if let parentJoint = rigidBody.parentJoint {
-                let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - parentJoint.position)
+                let pr = parentJoint.rotate(vector: rigidBody.composite.centerOfMass - rigidBody.pivot)
 
                 let inertiaTensor_jointSpace = parentJoint.rotate(tensor: rigidBody.composite.inertiaTensor) -
                     rigidBody.composite.mass * sqr(pr.skew)

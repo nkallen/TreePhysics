@@ -56,8 +56,8 @@ extension GameViewController: MySceneViewDelegate {
         let vpWithZ = SCNVector3(x: nsPoint.x, y: nsPoint.y, z: projectedOrigin.z)
         let worldPoint = SIMD3<Float>(view.unprojectPoint(vpWithZ))
 
-//        scene.attractorField.position = worldPoint
-//        scene.attractor.simdPosition = worldPoint
+        scene.attractorField.position = worldPoint
+        scene.attractor.simdPosition = worldPoint
     }
 }
 

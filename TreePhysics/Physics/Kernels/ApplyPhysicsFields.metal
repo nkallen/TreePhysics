@@ -17,20 +17,10 @@ physicsField_applies(
     
     if (halfExtent.x < 0 || halfExtent.y < 0 || halfExtent.z < 0) return false;
 
-    bool3 all = (rigidBody.position >= physicsField.position - halfExtent && rigidBody.position <= physicsField.position + halfExtent);
+    bool3 all = (rigidBody.centerOfMass >= physicsField.position - halfExtent && rigidBody.centerOfMass <= physicsField.position + halfExtent);
     return all.x == true && all.y == true && all.z == true;
 }
 
-inline float3
-rigidBody_convert(
-                  RigidBodyStruct rigidBody,
-                  float3 position)
-{
-    return rigidBody.position + rigidBody.rotation * position;
-}
-
-// NOTE: location is along the Y axis of the cylinder/branch, relative to the pivot/parent's end
-// distance is in normalize [0..1] coordinates
 inline RigidBodyStruct
 rigidBody_applyForce(
                      RigidBodyStruct rigidBody,
@@ -54,7 +44,7 @@ applyPhysicsFields(
     RigidBodyStruct rigidBody = rigidBodies[gid];
     
     if (physicsField_applies(physicsField, rigidBody)) {
-        float3 delta = physicsField.position - rigidBody.position;
+        float3 delta = physicsField.position - rigidBody.centerOfMass;
         float distance = length(delta);
         if (distance > 0) {
             float3 direction = normalize(delta);

@@ -43,7 +43,7 @@ public class RigidBody {
     var angularAcceleration: SIMD3<Float>
     var angularMomentum: SIMD3<Float>
 
-    var node: SCNNode
+    public var node: SCNNode
 
     public init(kind: Kind, mass: Float, localInertiaTensor: float3x3, shape: Shape? = nil, node: SCNNode) {
         self.name = "RigidBody[\(i)]"

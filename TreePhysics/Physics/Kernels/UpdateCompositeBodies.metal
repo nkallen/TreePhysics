@@ -15,14 +15,14 @@ rigidBody_updateCompositeBody(
     float3 force = rigidBody.force;
     float3 torque = rigidBody.torque;
     float3 centerOfMass = rigidBody.mass * (float3)rigidBody.centerOfMass;
-    float3 position = rigidBody.position;
+    float3 pivot = rigidBody.pivot;
 
     for (ushort i = 0; i < rigidBody.childCount; i++) {
         CompositeBodyStruct childCompositeBody = childCompositeBodies[i];
 
         mass += childCompositeBody.mass;
         force += childCompositeBody.force;
-        torque += cross(childCompositeBody.position - position, childCompositeBody.force) + childCompositeBody.torque;
+        torque += cross(childCompositeBody.pivot - pivot, childCompositeBody.force) + childCompositeBody.torque;
         centerOfMass += childCompositeBody.mass * (float3)childCompositeBody.centerOfMass;
     }
     centerOfMass /= mass;
@@ -40,7 +40,7 @@ rigidBody_updateCompositeBody(
         .force = force,
         .torque = torque,
         .centerOfMass = float3(centerOfMass),
-        .position = position,
+        .pivot = pivot,
         .inertiaTensor = inertiaTensor
     };
 
@@ -56,11 +56,11 @@ rigidBody_updateCompositeBody(
     float3 force = rigidBody.force;
     float3 torque = rigidBody.torque;
     float3 centerOfMass = mass * (float3)rigidBody.centerOfMass;
-    float3 position = rigidBody.position;
+    float3 pivot = rigidBody.pivot;
 
     mass += childCompositeBody.mass;
     force += childCompositeBody.force;
-    torque += cross(childCompositeBody.position - position, childCompositeBody.force) + childCompositeBody.torque;
+    torque += cross(childCompositeBody.pivot - pivot, childCompositeBody.force) + childCompositeBody.torque;
     centerOfMass += childCompositeBody.mass * (float3)childCompositeBody.centerOfMass;
     centerOfMass /= mass;
 
@@ -73,7 +73,7 @@ rigidBody_updateCompositeBody(
         .force = force,
         .torque = torque,
         .centerOfMass = (float3)centerOfMass,
-        .position = position,
+        .pivot = pivot,
         .inertiaTensor = inertiaTensor
     };
 
@@ -89,7 +89,7 @@ rigidBody_updateCompositeBody(
         .force = rigidBody.force,
         .torque = rigidBody.torque,
         .centerOfMass = rigidBody.centerOfMass,
-        .position = rigidBody.position,
+        .pivot = rigidBody.pivot,
         .inertiaTensor = rigidBody.inertiaTensor
     };
 

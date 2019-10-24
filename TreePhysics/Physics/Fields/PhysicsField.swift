@@ -4,8 +4,8 @@ import SceneKit
 import ShaderTypes
 
 public class PhysicsField {
-    var position: SIMD3<Float> = .zero
-    var halfExtent: SIMD3<Float> = SIMD3<Float>(.infinity, .infinity, .infinity)
+    public var position: SIMD3<Float> = .zero
+    public var halfExtent: SIMD3<Float> = SIMD3<Float>(.infinity, .infinity, .infinity)
 
     func force(rigidBody: RigidBody, time: TimeInterval) -> SIMD3<Float> {
         return .zero

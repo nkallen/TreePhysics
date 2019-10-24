@@ -2,7 +2,7 @@ import Foundation
 import MetalKit
 import MetalPerformanceShaders
 
-class MetalSimulator {
+public final class MetalSimulator {
     private let device: MTLDevice
 
     private let updateCompositeBodies: UpdateCompositeBodies
@@ -11,17 +11,18 @@ class MetalSimulator {
     private let resetForces: ResetForces
     private let applyPhysicsFields: ApplyPhysicsFields
 
-    internal let compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer
+    // FIXME shouldn't be public
 
-    internal var rigidBodies: [RigidBody]
+    public let compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer
+    public var rigidBodies: [RigidBody]
 
     private var fields: [PhysicsFieldStructConvertible] = []
 
-    func add(field: PhysicsFieldStructConvertible) {
+    public func add(field: PhysicsFieldStructConvertible) {
         fields.append(field)
     }
 
-    init(device: MTLDevice, root: ArticulatedRigidBody) {
+    public init(device: MTLDevice, root: ArticulatedRigidBody) {
         self.device = device
 
         // Initialize buffers:
@@ -39,7 +40,7 @@ class MetalSimulator {
         self.updateRigidBodies = UpdateRigidBodies(device: device, rigidBodiesBuffer: rigidBodiesBuffer, compositeBodiesBuffer: compositeBodiesBuffer, jointsBuffer: jointsBuffer, ranges: ranges)
     }
 
-    func encode(commandBuffer: MTLCommandBuffer, at time: TimeInterval) {
+    public func encode(commandBuffer: MTLCommandBuffer, at time: TimeInterval) {
         if let field = fields.first {
             applyPhysicsFields.encode(commandBuffer: commandBuffer, field: field)
         }

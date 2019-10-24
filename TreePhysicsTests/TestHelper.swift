@@ -105,7 +105,7 @@ func XCTAssertEqual(_ a: ArticulatedRigidBody, _ b: RigidBodyStruct, accuracy: F
     XCTAssertEqual(a.centerOfMass, b.centerOfMass, accuracy: accuracy, "center of mass", file: file, line: line)
     XCTAssertEqual(a.inertiaTensor, b.inertiaTensor, accuracy: accuracy, "inertia tensor", file: file, line: line)
 
-    XCTAssertEqual(a.pivot, b.position, accuracy: accuracy, "pivot", file: file, line: line)
+    XCTAssertEqual(a.pivot, b.pivot, accuracy: accuracy, "pivot", file: file, line: line)
     XCTAssertEqual(float3x3(a.rotation), b.rotation, accuracy: accuracy, "rotation", file: file, line: line)
 }
 

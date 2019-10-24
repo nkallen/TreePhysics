@@ -5,12 +5,12 @@ import TreePhysics
 
 class Scene: NSObject {
     let scene: SCNScene
-//    let gravityField: GravityField
-//    let attractorField: AttractorField
-//    let attractor: SCNNode
+    let gravityField: GravityField
+    let attractorField: AttractorField
+    let attractor: SCNNode
     let root: ArticulatedRigidBody
 
-//    private let metalSimulator: MetalSimulator
+    private let metalSimulator: MetalSimulator
     private let cpuSimulator: CPUSimulator
 
     let device: MTLDevice, commandQueue: MTLCommandQueue
@@ -66,20 +66,20 @@ class Scene: NSObject {
 
         // Forces:
         let gravityField = GravityField(.zero)
-//        let attractorField = AttractorField()
+        let attractorField = AttractorField()
 
-//        let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
-//        scene.rootNode.addChildNode(attractor)
+        let attractor = SCNNode(geometry: SCNSphere(radius: 0.1))
+        scene.rootNode.addChildNode(attractor)
 
-//        self.gravityField = gravityField
-//        self.attractorField = attractorField
-//        self.attractor = attractor
+        self.gravityField = gravityField
+        self.attractorField = attractorField
+        self.attractor = attractor
 
-//        self.metalSimulator = MetalSimulator(device: device, root: root)
+        self.metalSimulator = MetalSimulator(device: device, root: root)
 
 //        cpuSimulator.add(field: gravityField)
 //        cpuSimulator.add(field: attractorField)
-//        metalSimulator.add(field: attractorField)
+        metalSimulator.add(field: attractorField)
 
         let windField = WindField(windVelocity: SIMD3<Float>(1,0,1)*15)
         world.add(field: windField)
@@ -94,29 +94,28 @@ var done: Bool = false
 
 extension Scene: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        //        let pov = renderer.pointOfView!
+//                let pov = renderer.pointOfView!
 //        pov.simdPosition = SIMD3<Float>(
 //            radius * sinf(Float(start.timeIntervalSinceNow)),
 //            1,
 //            radius * cosf(Float(start.timeIntervalSinceNow)))
 //        pov.look(at: SCNVector3(0,1,0), up: SCNVector3(0,1,0), localFront: SCNVector3(0,0,-1))
 
-        cpuSimulator.update(at: 1/60)
+//        cpuSimulator.update(at: 1/60)
         renderer.isPlaying = true
 
-//        return ()
-//        let commandBuffer = commandQueue.makeCommandBuffer()!
-//        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 100)
-//        commandBuffer.addCompletedHandler { [unowned self] _ in
-//            let metalSimulator = self.metalSimulator
-//            DispatchQueue.main.async {
-//                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
-//
-//                for i in 0..<(metalSimulator.rigidBodies.count-1) {
-//                    metalSimulator.rigidBodies[i].node.simdPosition = rigidBodies[i].position
-//                }
-//            }
-//        }
-//        commandBuffer.commit()
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        metalSimulator.encode(commandBuffer: commandBuffer, at: 1.0 / 60)
+        commandBuffer.addCompletedHandler { [unowned self] _ in
+            let metalSimulator = self.metalSimulator
+            DispatchQueue.main.async {
+                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+
+                for i in 0..<(metalSimulator.rigidBodies.count-1) {
+                    metalSimulator.rigidBodies[i].node.simdPosition = rigidBodies[i].pivot
+                }
+            }
+        }
+        commandBuffer.commit()
     }
 }

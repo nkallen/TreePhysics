@@ -6,25 +6,10 @@ using namespace metal;
 
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
 
-inline float3 joint_position(
-                             JointStruct joint,
-                             RigidBodyStruct parentRigidBody)
-{
-//    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
-    return float3(0);
-}
-
 inline float3x3 rigidBody_localRotation(
                                     JointStruct joint)
 {
     return matrix_rotate(joint.θ[0]);
-}
-
-inline float3 rigidBody_localCenterOfMass(
-                                          RigidBodyStruct rigidBody)
-{
-//    return float3(0, 1, 0) * rigidBody.length / 2;
-    return float3(0);
 }
 
 inline RigidBodyStruct
@@ -33,13 +18,13 @@ updateRigidBody(
                 const JointStruct parentJoint,
                 RigidBodyStruct rigidBody)
 {
-    float3 parentJointPosition = joint_position(parentJoint, parentRigidBody);
+    float3 parentJointPosition = rigidBody.pivot;
 
     rigidBody.rotation = parentRigidBody.rotation * rigidBody.jointLocalRotation * rigidBody_localRotation(parentJoint);
-    rigidBody.position = parentJointPosition;
+    rigidBody.pivot = parentJointPosition;
 
     rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody.localInertiaTensor * (float3x3)transpose(rigidBody.rotation);
-    rigidBody.centerOfMass = rigidBody.position + rigidBody.rotation * rigidBody_localCenterOfMass(rigidBody);
+    rigidBody.centerOfMass = rigidBody.pivot + rigidBody.rotation * (-rigidBody.localPivot);
 
     return rigidBody;
 }

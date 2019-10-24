@@ -7,7 +7,7 @@ public final class AttractorField: PhysicsField {
     private let b: Float = 0.01
     private let c: Float = 0.1
 
-    override init() {
+    public override init() {
         super.init()
         self.halfExtent = SIMD3<Float>(1, 1, 1)
     }

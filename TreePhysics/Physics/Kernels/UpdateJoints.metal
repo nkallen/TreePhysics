@@ -32,14 +32,6 @@ inline matrix<T, 3, 3> joint_rotateTensor(
     return R * tensor * transpose(R);
 }
 
-inline float3 joint_position(
-                             JointStruct joint,
-                             RigidBodyStruct parentRigidBody)
-{
-//    return parentRigidBody.position + parentRigidBody.rotation * float3(0, parentRigidBody.length, 0);
-    return float3(0);
-}
-
 inline JointStruct
 updateJoint(
             JointStruct joint,
@@ -49,7 +41,7 @@ updateJoint(
             CompositeBodyStruct childCompositeBody,
             float time)
 {
-    float3 pr = joint_rotateVector(jointLocalRotation, parentRigidBody, childCompositeBody.centerOfMass - joint_position(joint, parentRigidBody));
+    float3 pr = joint_rotateVector(jointLocalRotation, parentRigidBody, childCompositeBody.centerOfMass - parentRigidBody.pivot);
 
     float3x3 inertiaTensor_jointSpace = joint_rotateTensor(jointLocalRotation, parentRigidBody, childCompositeBody.inertiaTensor) - childCompositeBody.mass * sqr(crossMatrix(pr));
     float3 torque_jointSpace = joint_rotateVector(jointLocalRotation, parentRigidBody, childCompositeBody.torque);
