@@ -7,16 +7,12 @@ final public class ArticulatedRigidBody: RigidBody {
     public var childJoints: Set<Joint> = []
     let composite = CompositeBody()
 
+    // The `pivot` is the point at which the object connects to its parent, and the "local" pivot is relative to the center of mass.
     let localPivot: SIMD3<Float>
-    var pivot: SIMD3<Float> // The `pivot` is the point at which the object connects to its parent, relative to the center of mass.
+    var pivot: SIMD3<Float>
 
     public class func `static`() -> ArticulatedRigidBody {
         let rigidBody = ArticulatedRigidBody(kind: .static, mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, shape: nil, node: SCNNode())
-        return rigidBody
-    }
-
-    public class func dynamic() -> ArticulatedRigidBody {
-        let rigidBody = ArticulatedRigidBody(kind: .dynamic, mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, shape: nil, node: SCNNode())
         return rigidBody
     }
 
@@ -90,11 +86,6 @@ final public class ArticulatedRigidBody: RigidBody {
     func flattened() -> [ArticulatedRigidBody] {
         var result: [ArticulatedRigidBody] = []
         var queue: [ArticulatedRigidBody] = [self]
-        searchBreadthFirst(queue: &queue, result: &result)
-        return result
-    }
-
-    private func searchBreadthFirst(queue: inout [ArticulatedRigidBody], result: inout [ArticulatedRigidBody]) {
         while !queue.isEmpty {
             let start = queue.removeFirst()
             result.append(start)
@@ -102,6 +93,7 @@ final public class ArticulatedRigidBody: RigidBody {
                 queue.append(childJoint.childRigidBody)
             }
         }
+        return result
     }
 
     var leaves: [ArticulatedRigidBody] {
