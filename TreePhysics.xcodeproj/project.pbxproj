@@ -111,6 +111,7 @@
 		9EBEB1CD2327B3EF0073E5D9 /* RigidBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBEB1CB2327B3E60073E5D9 /* RigidBody.swift */; };
 		9EC6A4E8234C9B4900E43FE9 /* ShadowGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */; };
 		9EC88E25231989930049737D /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC88E24231989930049737D /* ModelTests.swift */; };
+		9ED324F72361A6C9002D1DA2 /* MetalKernelDebugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
 		9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
@@ -230,6 +231,7 @@
 		9EC6A4E6234C999100E43FE9 /* TreeSketch.SBM2012.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = TreeSketch.SBM2012.pdf; sourceTree = "<group>"; };
 		9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowGrid.swift; sourceTree = "<group>"; };
 		9EC88E24231989930049737D /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
+		9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalKernelDebugger.swift; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodies.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics_macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics_macOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 				9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */,
 				9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */,
 				9EE801A322FC450D00198166 /* UpdateJoints.swift */,
+				9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */,
 			);
 			path = Encoders;
 			sourceTree = "<group>";
@@ -795,6 +798,7 @@
 				9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */,
 				9EAA8C1423292430002E9260 /* PhysicsField.swift in Sources */,
 				9EAA8C1023292411002E9260 /* UpdateJoints.swift in Sources */,
+				9ED324F72361A6C9002D1DA2 /* MetalKernelDebugger.swift in Sources */,
 				9EAA8C1723292440002E9260 /* PrettyPrint.swift in Sources */,
 				9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */,
 			);
