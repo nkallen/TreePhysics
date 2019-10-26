@@ -17,7 +17,7 @@ class GameViewController: UIViewController {
         self.root = ArticulatedRigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
 
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]////[!"&FA]////[!"&FA]"#)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]////[!"&FFFFFFFA]////[!"&FFFFFFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 9)
         let configuration = InterpreterConfig(
             randomScale: 0.4,
@@ -62,7 +62,7 @@ extension GameViewController: SCNSceneRendererDelegate {
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
 
-        print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000))
+        print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBody.count)
 
     }
 }

@@ -17,6 +17,8 @@ typedef struct {
 typedef struct {
     device ushort *childCount;
     device int *firstChildId;
+    device ushort *climberCount;
+    device int *firstClimberId;
     device float *mass;
     device vector_float3 *pivot;
     device vector_float3 *force;
@@ -28,9 +30,9 @@ typedef struct {
 
 inline void
 update(
-       int id,
-       UpdateCompositeBodiesIn in,
-       UpdateCompositeBodiesOut out)
+       const int id,
+       const UpdateCompositeBodiesIn in,
+       const UpdateCompositeBodiesOut out)
 {
     ushort childCount = in.childCount[id];
     int firstChildId = in.firstChildId[id];
@@ -61,12 +63,37 @@ update(
     out.torque[id] = torque;
     out.centerOfMass[id] = centerOfMass;
     out.inertiaTensor[id] = inertiaTensor;
+
+    ushort climberCount = in.climberCount[id];
+    if (climberCount == 0) return;
+    int firstClimberId = in.firstClimberId[id];
+    for (ushort i = 0; i < climberCount; i++) {
+        int climberId = firstClimberId + i;
+
+        mass = out.mass[id] + in.mass[climberId];
+        force = out.force[id] + in.force[climberId];
+        torque = cross(in.pivot[climberId] - pivot, out.force[id]) + out.torque[id] +  in.torque[climberId];
+        centerOfMass = out.mass[id] * out.centerOfMass[id] + in.mass[climberId] * in.centerOfMass[climberId];
+        centerOfMass /= mass;
+
+        float3x3 inertiaTensor = in.inertiaTensor[climberId] - in.mass[climberId] * sqr(crossMatrix(in.centerOfMass[climberId] - centerOfMass));
+
+        inertiaTensor += out.inertiaTensor[id] - out.mass[id] * sqr(crossMatrix(out.centerOfMass[id] - centerOfMass));
+
+        out.mass[id] = mass;
+        out.force[id] = force;
+        out.torque[id] = torque;
+        out.centerOfMass[id] = centerOfMass;
+        out.inertiaTensor[id] = inertiaTensor;
+    }
 }
 
 kernel void
 updateCompositeBodies(
                       device ushort *in_childCount,
                       device int *in_firstChildId,
+                      device ushort *in_climberCount,
+                      device int *in_firstClimberId,
                       device float *in_mass,
                       device vector_float3 *in_pivot,
                       device vector_float3 *in_force,
@@ -83,7 +110,6 @@ updateCompositeBodies(
                       constant int2 * ranges,
                       uint gid [[ thread_position_in_grid ]])
 {
-    int offset = -1;
     for (ushort i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
         int lowerBound = range.x;
@@ -96,6 +122,8 @@ updateCompositeBodies(
                 UpdateCompositeBodiesIn in = {
                     .childCount = in_childCount,
                     .firstChildId = in_firstChildId,
+                    .climberCount = in_climberCount,
+                    .firstClimberId = in_firstClimberId,
                     .mass = in_mass,
                     .pivot = in_pivot,
                     .force = in_force,
@@ -122,6 +150,8 @@ updateCompositeBodies(
                 UpdateCompositeBodiesIn in = {
                     .childCount = in_childCount,
                     .firstChildId = in_firstChildId,
+                    .climberCount = in_climberCount,
+                    .firstClimberId = in_firstClimberId,
                     .mass = in_mass,
                     .pivot = in_pivot,
                     .force = in_force,
@@ -145,8 +175,7 @@ updateCompositeBodies(
                 };
                 update(id, in, out);
             }
-            threadgroup_barrier(mem_flags::mem_device);
         }
-        offset = lowerBound;
+        threadgroup_barrier(mem_flags::mem_device);
     }
 }

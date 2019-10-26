@@ -6,7 +6,7 @@ class MemoryLayoutManager {
     class RigidBodies {
         let ranges: [Range<Int>]
         let count: Int
-        let childCount, firstChildId, mass, pivot, force, torque, centerOfMass, inertiaTensor: MTLBuffer
+        let childCount, firstChildId, climberCount, firstClimberId, mass, pivot, force, torque, centerOfMass, inertiaTensor: MTLBuffer
 
         init(device: MTLDevice, root: ArticulatedRigidBody) {
             var rangesOfWork: [Range<Int>] = []
@@ -38,7 +38,9 @@ class MemoryLayoutManager {
             // Step 2: Allocate the buffers
             self.count = offset + allClimbers.count + 1 // +1 for root
             self.childCount = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
-            self.firstChildId = device.makeBuffer(length: count * MemoryLayout<Int>.stride, options: [.storageModeShared])!
+            self.firstChildId = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
+            self.climberCount = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
+            self.firstClimberId = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
             self.mass = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
             self.pivot = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
             self.force = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
@@ -48,7 +50,9 @@ class MemoryLayoutManager {
 
             // Step 3: Bind the buffers to swift types
             let childCount = UnsafeMutableRawPointer(self.childCount.contents())!.bindMemory(to: UInt16.self, capacity: count)
-            let firstChildId = UnsafeMutableRawPointer(self.firstChildId.contents())!.bindMemory(to: Int.self, capacity: count)
+            let firstChildId = UnsafeMutableRawPointer(self.firstChildId.contents())!.bindMemory(to: Int32.self, capacity: count)
+            let climberCount = UnsafeMutableRawPointer(self.climberCount.contents())!.bindMemory(to: UInt16.self, capacity: count)
+            let firstClimberId = UnsafeMutableRawPointer(self.firstClimberId.contents())!.bindMemory(to: Int32.self, capacity: count)
             let mass = UnsafeMutableRawPointer(self.mass.contents())!.bindMemory(to: Float.self, capacity: count)
             let pivot = UnsafeMutableRawPointer(self.pivot.contents())!.bindMemory(to: simd_float3.self, capacity: count)
             let force = UnsafeMutableRawPointer(self.force.contents())!.bindMemory(to: simd_float3.self, capacity: count)
@@ -59,22 +63,27 @@ class MemoryLayoutManager {
             // Step 4: Store data into the buffer
             for level in levels {
                 for unitOfWork in level {
-                    let id = index[unitOfWork.rigidBody]!
-                    childCount[id] = UInt16(unitOfWork.rigidBody.childJoints.count)
-                    if let childJoint = unitOfWork.rigidBody.childJoints.first {
-                        firstChildId[id] = index[childJoint.childRigidBody]! // FIXME set unordered
+                    let rigidBody = unitOfWork.rigidBody
+                    let climbers = unitOfWork.climbers
+                    let id = index[rigidBody]!
+                    childCount[id] = UInt16(rigidBody.childJoints.count)
+                    if let childJoint = rigidBody.childJoints.first {
+                        firstChildId[id] = Int32(index[childJoint.childRigidBody]!) // FIXME set unordered
                     }
-
+                    climberCount[id] = UInt16(climbers.count)
+                    firstClimberId[id] = Int32(climbers.first.map { index[$0]! } ?? 0)
                 }
             }
             for rigidBody in allClimbers {
                 let id = index[rigidBody]!
                 childCount[id] = UInt16(rigidBody.childJoints.count)
-                firstChildId[id] = index[rigidBody.childJoints.first!.childRigidBody]!
+                firstChildId[id] = Int32(index[rigidBody.childJoints.first!.childRigidBody]!)
+                climberCount[id] = 0
             }
             id = index[root]!
             childCount[id] = UInt16(root.childJoints.count)
-            firstChildId[id] = index[root.childJoints.first!.childRigidBody]!
+            firstChildId[id] = Int32(index[root.childJoints.first!.childRigidBody]!)
+            climberCount[id] = 0
         }
     }
 
