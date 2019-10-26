@@ -109,11 +109,11 @@ extension Scene: SCNSceneRendererDelegate {
         commandBuffer.addCompletedHandler { [unowned self] _ in
             let metalSimulator = self.metalSimulator
             DispatchQueue.main.async {
-                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
-
-                for i in 0..<(metalSimulator.rigidBodies.count-1) {
-                    metalSimulator.rigidBodies[i].node.simdPosition = rigidBodies[i].pivot
-                }
+//                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
+//
+//                for i in 0..<(metalSimulator.rigidBodies.count-1) {
+//                    metalSimulator.rigidBodies[i].node.simdPosition = rigidBodies[i].pivot
+//                }
             }
         }
         commandBuffer.commit()

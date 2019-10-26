@@ -6,7 +6,12 @@ class MemoryLayoutManager {
     class RigidBodies {
         let ranges: [Range<Int>]
         let count: Int
-        let childCount, firstChildId, climberCount, firstClimberId, mass, pivot, force, torque, centerOfMass, inertiaTensor: MTLBuffer
+        let childCountBuffer, firstChildIdBuffer, climberCountBuffer, firstClimberIdBuffer, massBuffer, pivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
+        let childCount: UnsafeMutablePointer<UInt16>, firstChildId: UnsafeMutablePointer<Int32>
+        let climberCount: UnsafeMutablePointer<UInt16>, firstClimberId: UnsafeMutablePointer<Int32>
+        let mass: UnsafeMutablePointer<Float>
+        let pivot, force, torque, centerOfMass: UnsafeMutablePointer<simd_float3>
+        let inertiaTensor: UnsafeMutablePointer<simd_float3x3>
 
         init(device: MTLDevice, root: ArticulatedRigidBody) {
             var rangesOfWork: [Range<Int>] = []
@@ -37,73 +42,94 @@ class MemoryLayoutManager {
 
             // Step 2: Allocate the buffers
             self.count = offset + allClimbers.count + 1 // +1 for root
-            self.childCount = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
-            self.firstChildId = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
-            self.climberCount = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
-            self.firstClimberId = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
-            self.mass = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
-            self.pivot = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.force = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.torque = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.centerOfMass = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.inertiaTensor = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModeShared])!
+            self.childCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
+            self.firstChildIdBuffer = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
+            self.climberCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
+            self.firstClimberIdBuffer = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
+            self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
+            self.pivotBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
+            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
+            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
+            self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
+            self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModeShared])!
 
-            // Step 3: Bind the buffers to swift types
-            let childCount = UnsafeMutableRawPointer(self.childCount.contents())!.bindMemory(to: UInt16.self, capacity: count)
-            let firstChildId = UnsafeMutableRawPointer(self.firstChildId.contents())!.bindMemory(to: Int32.self, capacity: count)
-            let climberCount = UnsafeMutableRawPointer(self.climberCount.contents())!.bindMemory(to: UInt16.self, capacity: count)
-            let firstClimberId = UnsafeMutableRawPointer(self.firstClimberId.contents())!.bindMemory(to: Int32.self, capacity: count)
-            let mass = UnsafeMutableRawPointer(self.mass.contents())!.bindMemory(to: Float.self, capacity: count)
-            let pivot = UnsafeMutableRawPointer(self.pivot.contents())!.bindMemory(to: simd_float3.self, capacity: count)
-            let force = UnsafeMutableRawPointer(self.force.contents())!.bindMemory(to: simd_float3.self, capacity: count)
-            let torque = UnsafeMutableRawPointer(self.torque.contents())!.bindMemory(to: simd_float3.self, capacity: count)
-            let centerOfMass = UnsafeMutableRawPointer(self.centerOfMass.contents())!.bindMemory(to: simd_float3.self, capacity: count)
-            let inertiaTensor = UnsafeMutableRawPointer(self.inertiaTensor.contents())!.bindMemory(to: simd_float3x3.self, capacity: count)
+            self.childCount = UnsafeMutableRawPointer(childCountBuffer.contents())!.bindMemory(to: UInt16.self, capacity: count)
+            self.firstChildId = UnsafeMutableRawPointer(firstChildIdBuffer.contents())!.bindMemory(to: Int32.self, capacity: count)
+            self.climberCount = UnsafeMutableRawPointer(climberCountBuffer.contents())!.bindMemory(to: UInt16.self, capacity: count)
+            self.firstClimberId = UnsafeMutableRawPointer(firstClimberIdBuffer.contents())!.bindMemory(to: Int32.self, capacity: count)
+            self.mass = UnsafeMutableRawPointer(massBuffer.contents())!.bindMemory(to: Float.self, capacity: count)
+            self.pivot = UnsafeMutableRawPointer(pivotBuffer.contents())!.bindMemory(to: simd_float3.self, capacity: count)
+            self.force = UnsafeMutableRawPointer(forceBuffer.contents())!.bindMemory(to: simd_float3.self, capacity: count)
+            self.torque = UnsafeMutableRawPointer(torqueBuffer.contents())!.bindMemory(to: simd_float3.self, capacity: count)
+            self.centerOfMass = UnsafeMutableRawPointer(centerOfMassBuffer.contents())!.bindMemory(to: simd_float3.self, capacity: count)
+            self.inertiaTensor = UnsafeMutableRawPointer(inertiaTensorBuffer.contents())!.bindMemory(to: simd_float3x3.self, capacity: count)
 
-            // Step 4: Store data into the buffer
+            // Step 3: Store data into the buffer
             for level in levels {
                 for unitOfWork in level {
                     let rigidBody = unitOfWork.rigidBody
-                    let climbers = unitOfWork.climbers
                     let id = index[rigidBody]!
-                    childCount[id] = UInt16(rigidBody.childJoints.count)
-                    if let childJoint = rigidBody.childJoints.first {
-                        firstChildId[id] = Int32(index[childJoint.childRigidBody]!) // FIXME set unordered
-                    }
-                    climberCount[id] = UInt16(climbers.count)
-                    firstClimberId[id] = Int32(climbers.first.map { index[$0]! } ?? 0)
+                    store(id: id, rigidBody: rigidBody, climbers: unitOfWork.climbers, index: index)
                 }
             }
             for rigidBody in allClimbers {
                 let id = index[rigidBody]!
-                childCount[id] = UInt16(rigidBody.childJoints.count)
-                firstChildId[id] = Int32(index[rigidBody.childJoints.first!.childRigidBody]!)
-                climberCount[id] = 0
+                store(id: id, rigidBody: rigidBody, index: index)
             }
             id = index[root]!
-            childCount[id] = UInt16(root.childJoints.count)
-            firstChildId[id] = Int32(index[root.childJoints.first!.childRigidBody]!)
-            climberCount[id] = 0
+            store(id: id, rigidBody: root, index: index)
         }
+
+        private func store(id: Int, rigidBody: ArticulatedRigidBody, climbers: [ArticulatedRigidBody] = [], index: [RigidBody:Int] = [:]) {
+            childCount[id] = UInt16(rigidBody.childJoints.count)
+            if let childJoint = rigidBody.childJoints.first {
+                firstChildId[id] = Int32(index[childJoint.childRigidBody]!) // FIXME set unordered
+            }
+            climberCount[id] = UInt16(climbers.count)
+            firstClimberId[id] = Int32(climbers.first.map { index[$0]! } ?? 0)
+            mass[id] = rigidBody.mass
+        }
+
     }
 
-    class CompositeBody {
-        let mass, force, torque, centerOfMass, inertiaTensor: MTLBuffer
+    class CompositeBodies {
+        let count: Int
+        let massBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
+        let mass: UnsafeMutablePointer<Float>
+        let force, torque, centerOfMass: UnsafeMutablePointer<simd_float3>
+        let inertiaTensor: UnsafeMutablePointer<simd_float3x3>
 
         init(device: MTLDevice, count: Int) {
-            self.mass = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModePrivate])!
-            self.force = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
-            self.torque = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
-            self.centerOfMass = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
-            self.inertiaTensor = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModePrivate])!
+            self.count = count
+
+            self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModePrivate])!
+            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
+            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
+            self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
+            self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModePrivate])!
+
+            self.mass = UnsafeMutableRawPointer(massBuffer.contents())!.bindMemory(to: Float.self, capacity: count)
+            self.force = UnsafeMutableRawPointer(forceBuffer.contents())!.bindMemory(to: simd_float3.self, capacity: count)
+            self.torque = UnsafeMutableRawPointer(torqueBuffer.contents())!.bindMemory(to: simd_float3.self, capacity: count)
+            self.centerOfMass = UnsafeMutableRawPointer(centerOfMassBuffer.contents())!.bindMemory(to: simd_float3.self, capacity: count)
+            self.inertiaTensor = UnsafeMutableRawPointer(inertiaTensorBuffer.contents())!.bindMemory(to: simd_float3x3.self, capacity: count)
+        }
+
+        subscript(id: Int) -> CompositeBody {
+            return CompositeBody(
+                mass: mass[id],
+                inertiaTensor: inertiaTensor[id],
+                force: force[id],
+                torque: torque[id],
+                centerOfMass: centerOfMass[id])
         }
     }
 
-    let rigidBody: RigidBodies
-    let compositeBody: CompositeBody
+    let rigidBodies: RigidBodies
+    let compositeBodies: CompositeBodies
 
     init(device: MTLDevice, root: ArticulatedRigidBody) {
-        self.rigidBody = RigidBodies(device: device, root: root)
-        self.compositeBody = CompositeBody(device: device, count: rigidBody.count)
+        self.rigidBodies = RigidBodies(device: device, root: root)
+        self.compositeBodies = CompositeBodies(device: device, count: rigidBodies.count)
     }
 }
