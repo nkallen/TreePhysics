@@ -74,26 +74,6 @@ typedef struct {
     vector_float3 torque;
 } RigidBodyStruct;
 
-#ifdef __METAL_VERSION__
-typedef struct {
-    device ushort *childCount;
-    device float *mass;
-    device vector_float3 *pivot;
-    device vector_float3 *force;
-    device vector_float3 *torque;
-    device vector_float3 *centerOfMass;
-    device matrix_float3x3 *inertiaTensor;
-} UpdateCompositeBodiesIn;
-
-typedef struct {
-    device float *mass;
-    device vector_float3 *force;
-    device vector_float3 *torque;
-    device vector_float3 *centerOfMass;
-    device matrix_float3x3 *inertiaTensor;
-} UpdateCompositeBodiesOut;
-#endif
-
 typedef struct {
     matrix_float3x3 θ;
 } JointStruct;

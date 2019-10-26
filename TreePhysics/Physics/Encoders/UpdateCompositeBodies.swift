@@ -5,7 +5,7 @@ import SceneKit
 import ShaderTypes
 
 final class UpdateCompositeBodies: MetalKernelEncoder {
-    let argumentEncoder: UpdateCompositeBodiesArgumentEncoder
+    let argumentEncoder: ArgumentEncoder
     let ranges: [Range<Int>]
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, memoryLayoutManager: MemoryLayoutManager, ranges: [Range<Int>]) {
@@ -19,7 +19,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         constantValues.setConstantValue(&rangeCount, type: .int, index: FunctionConstantIndex.rangeCount.rawValue)
         let function = try! library.makeFunction(name: "updateCompositeBodies", constantValues: constantValues)
 
-        self.argumentEncoder = UpdateCompositeBodiesArgumentEncoder(function: function, memoryLayoutManager: memoryLayoutManager, count: ranges.count)
+        self.argumentEncoder = ArgumentEncoder2(function: function, memoryLayoutManager: memoryLayoutManager, count: ranges.count)
 
         super.init(device: device, function: function)
     }
@@ -31,7 +31,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         argumentEncoder.encode(commandEncoder: commandEncoder)
 
         var ranges = self.ranges.map { SIMD2<Int32>(Int32($0.lowerBound), Int32($0.upperBound)) }
-        commandEncoder.setBytes(&ranges, length: MemoryLayout<SIMD2<Int32>>.stride * ranges.count, index: BufferIndex.ranges.rawValue)
+        commandEncoder.setBytes(&ranges, length: MemoryLayout<SIMD2<Int32>>.stride * ranges.count, index: 12)
 
         let maxWidth = self.ranges.first!.count
 
@@ -156,113 +156,91 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
     }
 }
 
-class MemoryLayoutManager {
-    struct RigidBody {
-        let count: Int
-        let childCount, mass, pivot, force, torque, centerOfMass, inertiaTensor: MTLBuffer
-
-        init(device: MTLDevice, count: Int) {
-            self.count = count
-
-            self.childCount = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
-            self.mass = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
-            self.pivot = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.force = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.torque = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.centerOfMass = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
-            self.inertiaTensor = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModeShared])!
-        }
-
-        // FIXME use a regular method
-        subscript(index: Int) -> ArticulatedRigidBody {
-            set(newValue) {
-                UnsafeMutableRawPointer(childCount.contents())!.bindMemory(to: UInt16.self, capacity: count)[index] = UInt16(newValue.childJoints.count)
-            }
-
-            get {
-                fatalError()
-            }
-        }
-    }
-    struct CompositeBody {
-        let mass, force, torque, centerOfMass, inertiaTensor: MTLBuffer
-
-        init(device: MTLDevice, count: Int) {
-            self.mass = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModePrivate])!
-            self.force = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
-            self.torque = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
-            self.centerOfMass = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
-            self.inertiaTensor = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModePrivate])!
-        }
-    }
-
-    var rigidBody: RigidBody
-    var compositeBody: CompositeBody
-
-    init(device: MTLDevice, count: Int) {
-        self.rigidBody = RigidBody(device: device, count: count)
-        self.compositeBody = CompositeBody(device: device, count: count)
-    }
+protocol ArgumentEncoder {
+    func encode(commandEncoder: MTLComputeCommandEncoder)
 }
 
-class UpdateCompositeBodiesArgumentEncoder {
-    let mem: MemoryLayoutManager
-    let updateCompositeBodiesIn: MTLBuffer
-    let compositeBodies: MTLBuffer
-    let updateCompositeBodiesOut: MTLBuffer
+extension UpdateCompositeBodies {
+    class ArgumentEncoder1: ArgumentEncoder {
+        let mem: MemoryLayoutManager
+        let updateCompositeBodiesIn: MTLBuffer
+        let updateCompositeBodiesOut: MTLBuffer
 
-    init(function: MTLFunction, memoryLayoutManager: MemoryLayoutManager, count: Int) {
-        self.mem = memoryLayoutManager
+        init(function: MTLFunction, memoryLayoutManager: MemoryLayoutManager, count: Int) {
+            self.mem = memoryLayoutManager
 
-        let device = function.device
+            let device = function.device
 
-        var encoder = function.makeArgumentEncoder(bufferIndex: BufferIndex.updateCompositeBodiesIn.rawValue)
+            var encoder = function.makeArgumentEncoder(bufferIndex: BufferIndex.updateCompositeBodiesIn.rawValue)
 
-        self.updateCompositeBodiesIn = device.makeBuffer(length: encoder.encodedLength, options: [.storageModeShared])!
-        encoder.setArgumentBuffer(updateCompositeBodiesIn, offset: 0)
+            self.updateCompositeBodiesIn = device.makeBuffer(length: encoder.encodedLength, options: [.storageModeShared])!
+            encoder.setArgumentBuffer(updateCompositeBodiesIn, offset: 0)
 
-        encoder.setBuffer(mem.rigidBody.childCount, offset: 0, index: 0)
-        encoder.setBuffer(mem.rigidBody.mass, offset: 0, index: 1)
-        encoder.setBuffer(mem.rigidBody.pivot, offset: 0, index: 2)
-        encoder.setBuffer(mem.rigidBody.force, offset: 0, index: 3)
-        encoder.setBuffer(mem.rigidBody.torque, offset: 0, index: 4)
-        encoder.setBuffer(mem.rigidBody.centerOfMass, offset: 0, index: 5)
-        encoder.setBuffer(mem.rigidBody.inertiaTensor, offset: 0, index: 6)
+            encoder.setBuffer(mem.rigidBody.childCount, offset: 0, index: 0)
+            encoder.setBuffer(mem.rigidBody.mass, offset: 0, index: 1)
+            encoder.setBuffer(mem.rigidBody.pivot, offset: 0, index: 2)
+            encoder.setBuffer(mem.rigidBody.force, offset: 0, index: 3)
+            encoder.setBuffer(mem.rigidBody.torque, offset: 0, index: 4)
+            encoder.setBuffer(mem.rigidBody.centerOfMass, offset: 0, index: 5)
+            encoder.setBuffer(mem.rigidBody.inertiaTensor, offset: 0, index: 6)
 
-        encoder = function.makeArgumentEncoder(bufferIndex: BufferIndex.updateCompositeBodiesOut.rawValue)
-        self.compositeBodies = device.makeBuffer(length: count * MemoryLayout<CompositeBodyStruct>.stride, options: [.storageModePrivate])!
-        self.updateCompositeBodiesOut = device.makeBuffer(length: count * MemoryLayout<CompositeBodyStruct>.stride, options: [.storageModeShared])!
-        encoder.setArgumentBuffer(updateCompositeBodiesOut, offset: 0)
+            encoder = function.makeArgumentEncoder(bufferIndex: BufferIndex.updateCompositeBodiesOut.rawValue)
+            self.updateCompositeBodiesOut = device.makeBuffer(length: count * MemoryLayout<CompositeBodyStruct>.stride, options: [.storageModeShared])!
+            encoder.setArgumentBuffer(updateCompositeBodiesOut, offset: 0)
 
-        encoder.setBuffer(mem.compositeBody.mass, offset: 0, index: 0)
-        encoder.setBuffer(mem.compositeBody.force, offset: 0, index: 1)
-        encoder.setBuffer(mem.compositeBody.torque, offset: 0, index: 2)
-        encoder.setBuffer(mem.compositeBody.centerOfMass, offset: 0, index: 3)
-        encoder.setBuffer(mem.compositeBody.inertiaTensor, offset: 0, index: 4)
+            encoder.setBuffer(mem.compositeBody.mass, offset: 0, index: 0)
+            encoder.setBuffer(mem.compositeBody.force, offset: 0, index: 1)
+            encoder.setBuffer(mem.compositeBody.torque, offset: 0, index: 2)
+            encoder.setBuffer(mem.compositeBody.centerOfMass, offset: 0, index: 3)
+            encoder.setBuffer(mem.compositeBody.inertiaTensor, offset: 0, index: 4)
+        }
+
+        func encode(commandEncoder: MTLComputeCommandEncoder) {
+            commandEncoder.setBuffer(updateCompositeBodiesIn, offset: 0, index: BufferIndex.updateCompositeBodiesIn.rawValue)
+            commandEncoder.useResources(
+                [
+                    mem.rigidBody.childCount,
+                    mem.rigidBody.mass,
+                    mem.rigidBody.pivot,
+                    mem.rigidBody.force,
+                    mem.rigidBody.torque,
+                    mem.rigidBody.centerOfMass,
+                    mem.rigidBody.inertiaTensor],
+                usage: .read)
+
+            commandEncoder.setBuffer(updateCompositeBodiesOut, offset: 0, index: BufferIndex.updateCompositeBodiesOut.rawValue)
+            commandEncoder.useResources(
+                [
+                    mem.compositeBody.mass,
+                    mem.compositeBody.force,
+                    mem.compositeBody.torque,
+                    mem.compositeBody.centerOfMass,
+                    mem.compositeBody.inertiaTensor],
+                usage: [.read, .write])
+        }
     }
 
-    func encode(commandEncoder: MTLComputeCommandEncoder) {
-        commandEncoder.setBuffer(updateCompositeBodiesIn, offset: 0, index: BufferIndex.updateCompositeBodiesIn.rawValue)
-        commandEncoder.useResources(
-            [
-                mem.rigidBody.childCount,
-                mem.rigidBody.mass,
-                mem.rigidBody.pivot,
-                mem.rigidBody.force,
-                mem.rigidBody.torque,
-                mem.rigidBody.centerOfMass,
-                mem.rigidBody.inertiaTensor],
-            usage: .read)
+    class ArgumentEncoder2: ArgumentEncoder {
+        let mem: MemoryLayoutManager
 
-        commandEncoder.setBuffer(updateCompositeBodiesOut, offset: 0, index: BufferIndex.updateCompositeBodiesOut.rawValue)
-//        commandEncoder.setBuffer(compositeBodies, offset: 0, index: BufferIndex.compositeBodies.rawValue)
-        commandEncoder.useResources(
-            [
-                mem.compositeBody.mass,
-                mem.compositeBody.force,
-                mem.compositeBody.torque,
-                mem.compositeBody.centerOfMass,
-                mem.compositeBody.inertiaTensor],
-            usage: [.read, .write])
+        init(function: MTLFunction, memoryLayoutManager: MemoryLayoutManager, count: Int) {
+            self.mem = memoryLayoutManager
+        }
+
+        func encode(commandEncoder: MTLComputeCommandEncoder) {
+            commandEncoder.setBuffer(mem.rigidBody.childCount, offset: 0, index: 0)
+            commandEncoder.setBuffer(mem.rigidBody.mass, offset: 0, index: 1)
+            commandEncoder.setBuffer(mem.rigidBody.pivot, offset: 0, index: 2)
+            commandEncoder.setBuffer(mem.rigidBody.force, offset: 0, index: 3)
+            commandEncoder.setBuffer(mem.rigidBody.torque, offset: 0, index: 4)
+            commandEncoder.setBuffer(mem.rigidBody.centerOfMass, offset: 0, index: 5)
+            commandEncoder.setBuffer(mem.rigidBody.inertiaTensor, offset: 0, index: 6)
+
+            commandEncoder.setBuffer(mem.compositeBody.mass, offset: 0, index: 7)
+            commandEncoder.setBuffer(mem.compositeBody.force, offset: 0, index: 8)
+            commandEncoder.setBuffer(mem.compositeBody.torque, offset: 0, index: 9)
+            commandEncoder.setBuffer(mem.compositeBody.centerOfMass, offset: 0, index: 10)
+            commandEncoder.setBuffer(mem.compositeBody.inertiaTensor, offset: 0, index: 11)
+        }
     }
 }
