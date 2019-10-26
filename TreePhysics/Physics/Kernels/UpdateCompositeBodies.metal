@@ -32,62 +32,31 @@ update(
        UpdateCompositeBodiesOut out)
 {
     ushort childCount = in.childCount[id];
-    if (childCount == 0) {
-        out.mass[id] = in.mass[id];
-        out.force[id] = in.force[id];
-        out.torque[id] = in.torque[id];
-        out.centerOfMass[id] = in.centerOfMass[id];
-        out.inertiaTensor[id] = in.inertiaTensor[id];
-    } else {
-        float mass = in.mass[id];
-        float3 force = in.force[id];
-        float3 pivot = in.pivot[id];
-        float3 torque = in.torque[id];
-        float3 centerOfMass = mass * in.centerOfMass[id];
-        float originalMass = mass;
-        float3 originalCenterOfMass = centerOfMass;
-        float3 masses;
-        float3x3 pivots, centerOfMasses;
+    float mass = in.mass[id];
+    float3 force = in.force[id];
+    float3 pivot = in.pivot[id];
+    float3 torque = in.torque[id];
+    float3 centerOfMass = mass * in.centerOfMass[id];
 
-        for (ushort i = 0; i < 3; i++) {
-            float x = in.children.mass[id + i];
-            mass += x;
-            masses[i] = x;
-        }
-
-        for (ushort i = 0; i < 3; i++) {
-            pivots[i] = in.pivot[id + i];
-        }
-
-        for (ushort i = 0; i < 3; i++) {
-            float3 x = in.children.force[id + i];
-            force += x;
-            torque += cross(pivots[i] - pivot, x);
-        }
-
-        for (ushort i = 0; i < 3; i++) {
-            torque += in.children.torque[id + i];
-        }
-
-        for (ushort i = 0; i < 3; i++) {
-            float3 x = in.children.centerOfMass[id + i];
-            centerOfMass += masses[i] * x;
-            centerOfMasses[i] = x;
-        }
-        centerOfMass /= mass;
-
-        float3x3 inertiaTensor = in.inertiaTensor[id] - originalMass * sqr(crossMatrix(originalCenterOfMass - centerOfMass));
-
-        for (ushort i = 0; i < 3; i++) {
-            inertiaTensor += in.children.inertiaTensor[id + i] - masses[i] * sqr(crossMatrix(centerOfMasses[i] - centerOfMass));
-        }
-
-        out.mass[id] = mass;
-        out.force[id] = force;
-        out.torque[id] = torque;
-        out.centerOfMass[id] = centerOfMass;
-        out.inertiaTensor[id] = inertiaTensor;
+    for (ushort i = 0; i < childCount; i++) {
+        mass += in.children.mass[id + i];
+        force += in.children.force[id + i];
+        torque += cross(in.pivot[id + i] - pivot, in.children.force[id + i]) + in.children.torque[id + i];
+        centerOfMass += in.children.mass[id + i] * in.children.centerOfMass[id + i];
     }
+    centerOfMass /= mass;
+
+    float3x3 inertiaTensor = in.inertiaTensor[id] - in.mass[id] * sqr(crossMatrix(in.centerOfMass[id] - centerOfMass));
+
+    for (ushort i = 0; i < childCount; i++) {
+        inertiaTensor += in.children.inertiaTensor[id + i] - in.children.mass[id + i] * sqr(crossMatrix(in.children.centerOfMass[id + i] - centerOfMass));
+    }
+
+    out.mass[id] = mass;
+    out.force[id] = force;
+    out.torque[id] = torque;
+    out.centerOfMass[id] = centerOfMass;
+    out.inertiaTensor[id] = inertiaTensor;
 }
 
 kernel void
