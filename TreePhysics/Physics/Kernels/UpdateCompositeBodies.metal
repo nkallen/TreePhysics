@@ -67,24 +67,37 @@ update(
     ushort climberCount = in.climberCount[id];
     if (climberCount == 0) return;
     int firstClimberId = in.firstClimberId[id];
+
+    float3 f = out.force[id];
+    float3 t = out.torque[id];
+    float3 c = out.centerOfMass[id];
+    float m = out.mass[id];
+    float3x3 it = out.inertiaTensor[id];
+
     for (ushort i = 0; i < climberCount; i++) {
         int climberId = firstClimberId + i;
 
-        mass = out.mass[id] + in.mass[climberId];
-        force = out.force[id] + in.force[climberId];
-        torque = cross(in.pivot[climberId] - pivot, out.force[id]) + out.torque[id] +  in.torque[climberId];
-        centerOfMass = out.mass[id] * out.centerOfMass[id] + in.mass[climberId] * in.centerOfMass[climberId];
+        mass = m + in.mass[climberId];
+        force = f + in.force[climberId];
+        torque = cross(in.pivot[climberId] - pivot, f) + t + in.torque[climberId];
+        centerOfMass = m * c + in.mass[climberId] * in.centerOfMass[climberId];
         centerOfMass /= mass;
 
         float3x3 inertiaTensor = in.inertiaTensor[climberId] - in.mass[climberId] * sqr(crossMatrix(in.centerOfMass[climberId] - centerOfMass));
 
-        inertiaTensor += out.inertiaTensor[id] - out.mass[id] * sqr(crossMatrix(out.centerOfMass[id] - centerOfMass));
+        inertiaTensor += it - m * sqr(crossMatrix(c - centerOfMass));
 
-        out.mass[id] = mass;
-        out.force[id] = force;
-        out.torque[id] = torque;
-        out.centerOfMass[id] = centerOfMass;
-        out.inertiaTensor[id] = inertiaTensor;
+        out.mass[climberId] = mass;
+        out.force[climberId] = force;
+        out.torque[climberId] = torque;
+        out.centerOfMass[climberId] = centerOfMass;
+        out.inertiaTensor[climberId] = inertiaTensor;
+
+        m = mass;
+        f = force;
+        t = torque;
+        c = centerOfMass;
+        it = inertiaTensor;
     }
 }
 
