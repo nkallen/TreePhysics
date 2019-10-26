@@ -31,9 +31,9 @@ class GameViewController: UIViewController {
 
         self.device = MTLCreateSystemDefaultDevice()!
 
-        let (rigidBodies, mem, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
+        let (rigidBodies, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.ranges = ranges
-        self.mem = mem
+        self.mem = MemoryLayoutManager(device: device, root: root)
         print(rigidBodies.count)
 
         self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
