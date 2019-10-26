@@ -5,7 +5,7 @@ import UIKit
 class GameViewController: UIViewController {
     var root: ArticulatedRigidBody!
     var device: MTLDevice!
-    var argumentEncoder: UpdateCompositeBodiesArgumentEncoder!
+    var mem: MemoryLayoutManager!
     var ranges: [Range<Int>]!
     var compositeBodiesBuffer: MTLBuffer!
 
@@ -18,7 +18,7 @@ class GameViewController: UIViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]////[!"&FA]////[!"&FA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 9)
         let configuration = InterpreterConfig(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
@@ -31,9 +31,9 @@ class GameViewController: UIViewController {
 
         self.device = MTLCreateSystemDefaultDevice()!
 
-        let (rigidBodies, argumentEncoder, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
+        let (rigidBodies, mem, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.ranges = ranges
-        self.argumentEncoder = argumentEncoder
+        self.mem = mem
         print(rigidBodies.count)
 
         self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
@@ -53,7 +53,7 @@ extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let commandQueue = device.makeCommandQueue()!
 
-        let updateCompositeBodies = UpdateCompositeBodies(argumentEncoder: argumentEncoder, ranges: ranges)
+        let updateCompositeBodies = UpdateCompositeBodies(memoryLayoutManager: mem, ranges: ranges)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
