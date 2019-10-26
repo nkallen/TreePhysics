@@ -21,6 +21,9 @@ typedef NS_ENUM(NSInteger, BufferIndex)
     BufferIndexRanges = 5,
     BufferIndexPhysicsField = 6, 
 
+    BufferIndexUpdateCompositeBodiesIn = 10,
+    BufferIndexUpdateCompositeBodiesOut = 11,
+
     BufferIndexDebug = 20,
     BufferIndexDebugLength = 21,
 };
@@ -70,6 +73,26 @@ typedef struct {
     vector_float3 force;
     vector_float3 torque;
 } RigidBodyStruct;
+
+#ifdef __METAL_VERSION__
+typedef struct {
+    device ushort *childCount;
+    device float *mass;
+    device vector_float3 *pivot;
+    device vector_float3 *force;
+    device vector_float3 *torque;
+    device vector_float3 *centerOfMass;
+    device matrix_float3x3 *inertiaTensor;
+} UpdateCompositeBodiesIn;
+
+typedef struct {
+    device float *mass;
+    device vector_float3 *force;
+    device vector_float3 *torque;
+    device vector_float3 *centerOfMass;
+    device matrix_float3x3 *inertiaTensor;
+} UpdateCompositeBodiesOut;
+#endif
 
 typedef struct {
     matrix_float3x3 θ;

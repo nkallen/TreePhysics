@@ -1,32 +1,47 @@
-#if os(iOS)
 import Foundation
 import SceneKit
 import UIKit
 
 class GameViewController: UIViewController {
-    var scene: Scene!
+    var root: ArticulatedRigidBody!
+    var device: MTLDevice!
+    var argumentEncoder: UpdateCompositeBodiesArgumentEncoder!
+    var ranges: [Range<Int>]!
+    var compositeBodiesBuffer: MTLBuffer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.scene = Scene()
-
-        scnView.scene = scene.scene
-        scnView.allowsCameraControl = true
-        scnView.showsStatistics = true
-        scnView.backgroundColor = .black
-        scnView.preferredFramesPerSecond = 60
-
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
-        panGesture.minimumNumberOfTouches = 1
-        panGesture.maximumNumberOfTouches = 1
-        scnView.addGestureRecognizer(tapGesture)
-        scnView.addGestureRecognizer(panGesture)
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        scnView.delegate = scene
+        self.root = ArticulatedRigidBody.static()
+        let rigidBodyPen = RigidBodyPen(parent: root)
+
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]////[!"&FA]////[!"&FA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
+        let configuration = InterpreterConfig(
+            randomScale: 0.4,
+            angle: 18 * .pi / 180,
+            thickness: 0.002*0.002*Float.pi,
+            thicknessScale: 0.7,
+            stepSize: 0.3,
+            stepSizeScale: 0.9)
+        let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
+        interpreter.interpret(lSystem)
+
+        self.device = MTLCreateSystemDefaultDevice()!
+
+        let (rigidBodies, argumentEncoder, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
+        self.ranges = ranges
+        self.argumentEncoder = argumentEncoder
+        print(rigidBodies.count)
+
+        self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
+
+        scnView.delegate = self
+        let scene = SCNScene()
+        scene.rootNode.addChildNode(SCNNode(geometry: SCNSphere(radius: 0.1)))
+        scnView.scene = scene
     }
 
     var scnView: SCNView {
@@ -34,27 +49,20 @@ class GameViewController: UIViewController {
     }
 }
 
-fileprivate var toggle: Bool = false
+extension GameViewController: SCNSceneRendererDelegate {
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        let commandQueue = device.makeCommandQueue()!
 
-extension GameViewController {
-    @objc
-    func handleTap(_ gestureRecognizer: UIGestureRecognizer) {
-        toggle = !toggle
-        print(scnView.hitTest(gestureRecognizer.location(in: scnView), options: nil))
-        scene.gravityField.g = toggle ? .zero : SIMD3<Float>(0, -9.81, 0)
-    }
+        let updateCompositeBodies = UpdateCompositeBodies(argumentEncoder: argumentEncoder, ranges: ranges)
 
-    @objc
-    func handlePan(_ gestureRecognizer: UIGestureRecognizer) {
-        let point = gestureRecognizer.location(in: scnView)
+        let commandBuffer = commandQueue.makeCommandBuffer()!
 
-        let projectedOrigin = scnView.projectPoint(SCNVector3Zero)
-        let vpWithZ = SCNVector3(x: Float(point.x), y: Float(point.y), z: projectedOrigin.z)
-        let worldPoint = SIMD3<Float>(scnView.unprojectPoint(vpWithZ))
+        updateCompositeBodies.encode(commandBuffer: commandBuffer)
 
-        scene.attractorField.position = worldPoint
-        scene.attractor.simdPosition = worldPoint
+        commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
+
+        print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000))
+
     }
 }
-
-#endif
