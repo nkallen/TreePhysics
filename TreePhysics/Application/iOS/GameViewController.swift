@@ -6,8 +6,6 @@ class GameViewController: UIViewController {
     var root: ArticulatedRigidBody!
     var device: MTLDevice!
     var mem: MemoryLayoutManager!
-    var ranges: [Range<Int>]!
-    var compositeBodiesBuffer: MTLBuffer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,12 +29,7 @@ class GameViewController: UIViewController {
 
         self.device = MTLCreateSystemDefaultDevice()!
 
-        let (rigidBodies, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
-        self.ranges = ranges
         self.mem = MemoryLayoutManager(device: device, root: root)
-        print(rigidBodies.count)
-
-        self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
 
         scnView.delegate = self
         let scene = SCNScene()
@@ -53,7 +46,7 @@ extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let commandQueue = device.makeCommandQueue()!
 
-        let updateCompositeBodies = UpdateCompositeBodies(memoryLayoutManager: mem, ranges: ranges)
+        let updateCompositeBodies = UpdateCompositeBodies(memoryLayoutManager: mem)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
@@ -62,7 +55,7 @@ extension GameViewController: SCNSceneRendererDelegate {
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
 
-        print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBody.count)
+        print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)
 
     }
 }

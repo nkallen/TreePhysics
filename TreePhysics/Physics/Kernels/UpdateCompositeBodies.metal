@@ -35,69 +35,71 @@ update(
        const UpdateCompositeBodiesOut out)
 {
     ushort childCount = in.childCount[id];
-    int firstChildId = in.firstChildId[id];
-    float mass = in.mass[id];
-    float3 force = in.force[id];
-    float3 pivot = in.pivot[id];
-    float3 torque = in.torque[id];
-    float3 centerOfMass = mass * in.centerOfMass[id];
 
+    float mass = in.mass[id];
+//    float3 force = in.force[id];
+//    float3 pivot = in.pivot[id];
+//    float3 torque = in.torque[id];
+//    float3 centerOfMass = mass * in.centerOfMass[id];
+
+    int firstChildId = in.firstChildId[id];
     for (ushort i = 0; i < childCount; i++) {
         int childId = firstChildId + i;
         mass += in.children.mass[childId];
-        force += in.children.force[childId];
-        torque += cross(in.pivot[childId] - pivot, in.children.force[childId]) + in.children.torque[childId];
-        centerOfMass += in.children.mass[childId] * in.children.centerOfMass[childId];
+//        force += in.children.force[childId];
+//        torque += cross(in.pivot[childId] - pivot, in.children.force[childId]) + in.children.torque[childId];
+//        centerOfMass += in.children.mass[childId] * in.children.centerOfMass[childId];
     }
-    centerOfMass /= mass;
+//    centerOfMass /= mass;
 
-    float3x3 inertiaTensor = in.inertiaTensor[id] - in.mass[id] * sqr(crossMatrix(in.centerOfMass[id] - centerOfMass));
+//    float3x3 inertiaTensor = in.inertiaTensor[id] - in.mass[id] * sqr(crossMatrix(in.centerOfMass[id] - centerOfMass));
 
-    for (ushort i = 0; i < childCount; i++) {
-        int childId = firstChildId + i;
-        inertiaTensor += in.children.inertiaTensor[childId] - in.children.mass[childId] * sqr(crossMatrix(in.children.centerOfMass[childId] - centerOfMass));
-    }
+//    for (ushort i = 0; i < childCount; i++) {
+//        int childId = firstChildId + i;
+//        inertiaTensor += in.children.inertiaTensor[childId] - in.children.mass[childId] * sqr(crossMatrix(in.children.centerOfMass[childId] - centerOfMass));
+//    }
 
     out.mass[id] = mass;
-    out.force[id] = force;
-    out.torque[id] = torque;
-    out.centerOfMass[id] = centerOfMass;
-    out.inertiaTensor[id] = inertiaTensor;
+//    out.force[id] = force;
+//    out.torque[id] = torque;
+//    out.centerOfMass[id] = centerOfMass;
+//    out.inertiaTensor[id] = inertiaTensor;
+
+    float m = mass;
+//    float3 f = force;
+//    float3 t = torque;
+//    float3 c = centerOfMass;
+//    float3x3 it = inertiaTensor;
 
     ushort climberCount = in.climberCount[id];
     if (climberCount == 0) return;
     int firstClimberId = in.firstClimberId[id];
 
-    float3 f = out.force[id];
-    float3 t = out.torque[id];
-    float3 c = out.centerOfMass[id];
-    float m = out.mass[id];
-    float3x3 it = out.inertiaTensor[id];
-
     for (ushort i = 0; i < climberCount; i++) {
         int climberId = firstClimberId + i;
 
-        mass = m + in.mass[climberId];
-        force = f + in.force[climberId];
-        torque = cross(in.pivot[climberId] - pivot, f) + t + in.torque[climberId];
-        centerOfMass = m * c + in.mass[climberId] * in.centerOfMass[climberId];
-        centerOfMass /= mass;
+        float mass = m + in.mass[climberId];
+//        float3 force = f + in.force[climberId];
+//        float3 torque = cross(in.pivot[climberId] - pivot, f) + t + in.torque[climberId];
+//        float3 centerOfMass = m * c + in.mass[climberId] * in.centerOfMass[climberId];
+//        centerOfMass /= mass;
 
-        float3x3 inertiaTensor = in.inertiaTensor[climberId] - in.mass[climberId] * sqr(crossMatrix(in.centerOfMass[climberId] - centerOfMass));
+//        float3x3 inertiaTensor = in.inertiaTensor[climberId] - in.mass[climberId] * sqr(crossMatrix(in.centerOfMass[climberId] - centerOfMass));
 
-        inertiaTensor += it - m * sqr(crossMatrix(c - centerOfMass));
+//        inertiaTensor += it - m * sqr(crossMatrix(c - centerOfMass));
 
         out.mass[climberId] = mass;
-        out.force[climberId] = force;
-        out.torque[climberId] = torque;
-        out.centerOfMass[climberId] = centerOfMass;
-        out.inertiaTensor[climberId] = inertiaTensor;
+//        out.force[climberId] = force;
+//        out.torque[climberId] = torque;
+//        out.centerOfMass[climberId] = centerOfMass;
+//        out.inertiaTensor[climberId] = inertiaTensor;
 
         m = mass;
-        f = force;
-        t = torque;
-        c = centerOfMass;
-        it = inertiaTensor;
+//        f = force;
+//        t = torque;
+//        c = centerOfMass;
+//        it = inertiaTensor;
+//        pivot = in.pivot[climberId];
     }
 }
 
@@ -123,6 +125,14 @@ updateCompositeBodies(
                       constant int2 * ranges,
                       uint gid [[ thread_position_in_grid ]])
 {
+    UpdateCompositeBodiesOut out = {
+        .mass = out_mass,
+        .force = out_force,
+        .torque = out_torque,
+        .centerOfMass = out_centerOfMass,
+        .inertiaTensor = out_inertiaTensor
+    };
+
     for (ushort i = 0; i < rangeCount; i++) {
         int2 range = ranges[i];
         int lowerBound = range.x;
@@ -131,6 +141,19 @@ updateCompositeBodies(
             int id = lowerBound + gid;
 
             if (i == 0) {
+                UpdateCompositeBodiesIn in = {
+                    .childCount = in_childCount,
+                    .firstChildId = in_firstChildId,
+                    .climberCount = in_climberCount,
+                    .firstClimberId = in_firstClimberId,
+                    .mass = in_mass,
+                    .pivot = in_pivot,
+                    .force = in_force,
+                    .torque = in_torque,
+                    .centerOfMass = in_centerOfMass,
+                    .inertiaTensor = in_inertiaTensor
+                };
+                //                update(id, in, out);
             } else if (i == 1) {
                 UpdateCompositeBodiesIn in = {
                     .childCount = in_childCount,
@@ -150,13 +173,6 @@ updateCompositeBodies(
                         .centerOfMass = in_centerOfMass,
                         .inertiaTensor = in_inertiaTensor
                     }
-                };
-                UpdateCompositeBodiesOut out = {
-                    .mass = out_mass,
-                    .force = out_force,
-                    .torque = out_torque,
-                    .centerOfMass = out_centerOfMass,
-                    .inertiaTensor = out_inertiaTensor
                 };
                 update(id, in, out);
             } else {
@@ -178,13 +194,6 @@ updateCompositeBodies(
                         .centerOfMass = out_centerOfMass,
                         .inertiaTensor = out_inertiaTensor
                     }
-                };
-                UpdateCompositeBodiesOut out = {
-                    .mass = out_mass,
-                    .force = out_force,
-                    .torque = out_torque,
-                    .centerOfMass = out_centerOfMass,
-                    .inertiaTensor = out_inertiaTensor
                 };
                 update(id, in, out);
             }

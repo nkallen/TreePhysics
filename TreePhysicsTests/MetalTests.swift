@@ -84,29 +84,26 @@ class UpdateCompositeBodiesTests: XCTestCase {
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
             let b2_composite = self.mem.compositeBodies[0]
-            let b1_composite = self.mem.compositeBodies[1]
+            let b1_composite = self.mem.compositeBodies[1]!
+
+            XCTAssertNil(b2_composite)
 
             // mass
-            XCTAssertEqual(b2_composite.mass, 1)
             XCTAssertEqual(b1_composite.mass, 2)
 
             // force
-            XCTAssertEqual(SIMD3<Float>(b2_composite.force), self.force)
             XCTAssertEqual(SIMD3<Float>(b1_composite.force), self.force)
 
             // torque
-            XCTAssertEqual(SIMD3<Float>(b2_composite.torque), self.b2.torque)
             let r_b1 = forceAppliedPosition - self.b1.parentJoint!.position
             XCTAssertEqual(SIMD3<Float>(b1_composite.torque), cross(r_b1, self.force), accuracy: 0.0001)
 
             // center of mass
-            XCTAssertEqual(SIMD3<Float>(b2_composite.centerOfMass), self.b2.centerOfMass, accuracy: 0.0001)
             XCTAssertEqual(SIMD3<Float>(b1_composite.centerOfMass), (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
 
             // inertia tensor
-            XCTAssertEqual(b2_composite.inertiaTensor, self.b2.inertiaTensor, accuracy: 0.0001)
             var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - SIMD3<Float>(b1_composite.centerOfMass)).skew)
-            b1_inertiaTensor += b2_composite.inertiaTensor - b2_composite.mass * sqr((b2_composite.centerOfMass - b1_composite.centerOfMass).skew)
+            b1_inertiaTensor += self.b2.inertiaTensor - self.b2.mass * sqr((self.b2.centerOfMass - b1_composite.centerOfMass).skew)
             XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
 
             expect.fulfill()
