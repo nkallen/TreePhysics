@@ -50,9 +50,8 @@ extension UpdateCompositeBodies {
         }
 
         func encode(commandEncoder: MTLComputeCommandEncoder) {
-            commandEncoder.setBuffers([
-                mem.rigidBodies.childCountBuffer,
-                mem.rigidBodies.firstChildIdBuffer,
+            let bufs = [
+                mem.rigidBodies.childInfoBuffer,
                 mem.rigidBodies.climberCountBuffer,
                 mem.rigidBodies.firstClimberIdBuffer,
                 mem.rigidBodies.massBuffer,
@@ -67,10 +66,11 @@ extension UpdateCompositeBodies {
                 mem.compositeBodies.torqueBuffer,
                 mem.compositeBodies.centerOfMassBuffer,
                 mem.compositeBodies.inertiaTensorBuffer,
-            ], offsets: [Int](repeating: 0, count: 15), range: 0..<15)
+            ]
+            commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 
             var ranges = mem.rigidBodies.ranges.map { simd_int2(Int32($0.lowerBound), Int32($0.upperBound)) }
-            commandEncoder.setBytes(&ranges, length: MemoryLayout<SIMD2<Int32>>.stride * ranges.count, index: 15)
+            commandEncoder.setBytes(&ranges, length: MemoryLayout<SIMD2<Int32>>.stride * ranges.count, index: bufs.count)
         }
     }
 }

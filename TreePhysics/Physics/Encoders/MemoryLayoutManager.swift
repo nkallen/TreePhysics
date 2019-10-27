@@ -6,7 +6,7 @@ class MemoryLayoutManager {
     class RigidBodies {
         let ranges: [Range<Int>]
         let count: Int
-        let childCountBuffer, firstChildIdBuffer, climberCountBuffer, firstClimberIdBuffer, massBuffer, pivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
+        let childInfoBuffer, climberCountBuffer, firstClimberIdBuffer, massBuffer, pivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
 
         init(device: MTLDevice, root: ArticulatedRigidBody) {
             var rangesOfWork: [Range<Int>] = []
@@ -38,8 +38,7 @@ class MemoryLayoutManager {
             // Step 2: Allocate the shared buffers
             self.count = offset + allClimbers.count + 1 // +1 for root
 
-            let childCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
-            let firstChildIdBuffer = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
+            let childInfoBuffer = device.makeBuffer(length: count * MemoryLayout<simd_int2>.stride, options: [.storageModeShared])!
             let climberCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModeShared])!
             let firstClimberIdBuffer = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModeShared])!
             let massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
@@ -49,8 +48,7 @@ class MemoryLayoutManager {
             let centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModeShared])!
             let inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModeShared])!
 
-            let childCount = UnsafeMutableRawPointer(childCountBuffer.contents())!.bindMemory(to: UInt16.self, capacity: count)
-            let firstChildId = UnsafeMutableRawPointer(firstChildIdBuffer.contents())!.bindMemory(to: Int32.self, capacity: count)
+            let childInfo = UnsafeMutableRawPointer(childInfoBuffer.contents())!.bindMemory(to: simd_int2.self, capacity: count)
             let climberCount = UnsafeMutableRawPointer(climberCountBuffer.contents())!.bindMemory(to: UInt16.self, capacity: count)
             let firstClimberId = UnsafeMutableRawPointer(firstClimberIdBuffer.contents())!.bindMemory(to: Int32.self, capacity: count)
             let mass = UnsafeMutableRawPointer(massBuffer.contents())!.bindMemory(to: Float.self, capacity: count)
@@ -62,9 +60,11 @@ class MemoryLayoutManager {
 
             // Step 3: Store data into the buffer
             func store(id: Int, rigidBody: ArticulatedRigidBody, climbers: [ArticulatedRigidBody] = []) {
-                childCount[id] = UInt16(rigidBody.childJoints.count)
                 if let childJoint = rigidBody.childJoints.first {
-                    firstChildId[id] = Int32(index[childJoint.childRigidBody]!) // FIXME set unordered
+                    let firstChildId = index[childJoint.childRigidBody]!  // FIXME set unordered
+                    childInfo[id] = simd_int2(Int32(rigidBody.childJoints.count), Int32(firstChildId))
+                } else {
+                    childInfo[id] = simd_int2(0, -1)
                 }
                 climberCount[id] = UInt16(climbers.count)
                 firstClimberId[id] = Int32(climbers.first.map { index[$0]! } ?? 0)
@@ -86,8 +86,7 @@ class MemoryLayoutManager {
             store(id: id, rigidBody: root)
 
             // Step 4: Allocated the private buffers
-            self.childCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModePrivate])!
-            self.firstChildIdBuffer = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModePrivate])!
+            self.childInfoBuffer = device.makeBuffer(length: count * MemoryLayout<simd_int2>.stride, options: [.storageModePrivate])!
             self.climberCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt16>.stride, options: [.storageModePrivate])!
             self.firstClimberIdBuffer = device.makeBuffer(length: count * MemoryLayout<Int32>.stride, options: [.storageModePrivate])!
             self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModePrivate])!
@@ -102,8 +101,7 @@ class MemoryLayoutManager {
             let commandBuffer = commandQueue.makeCommandBuffer()!
             let blitCommandEncoder = commandBuffer.makeBlitCommandEncoder()!
 
-            blitCommandEncoder.copy(from: childCountBuffer, sourceOffset: 0, to: self.childCountBuffer, destinationOffset: 0, size: childCountBuffer.length)
-            blitCommandEncoder.copy(from: firstChildIdBuffer, sourceOffset: 0, to: self.firstChildIdBuffer, destinationOffset: 0, size: firstChildIdBuffer.length)
+            blitCommandEncoder.copy(from: childInfoBuffer, sourceOffset: 0, to: self.childInfoBuffer, destinationOffset: 0, size: childInfoBuffer.length)
             blitCommandEncoder.copy(from: climberCountBuffer, sourceOffset: 0, to: self.climberCountBuffer, destinationOffset: 0, size: climberCountBuffer.length)
             blitCommandEncoder.copy(from: firstClimberIdBuffer, sourceOffset: 0, to: self.firstClimberIdBuffer, destinationOffset: 0, size: firstClimberIdBuffer.length)
             blitCommandEncoder.copy(from: massBuffer, sourceOffset: 0, to: self.massBuffer, destinationOffset: 0, size: massBuffer.length)
