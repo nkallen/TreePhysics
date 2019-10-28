@@ -75,6 +75,11 @@ final public class ArticulatedRigidBody: RigidBody {
         return childJoints.isEmpty
     }
 
+    var onlyChild: ArticulatedRigidBody? {
+        guard childJoints.count == 1, let childJoint = childJoints.first else { return nil }
+        return childJoint.childRigidBody
+    }
+
     var hasOneChild: Bool {
         return childJoints.count == 1
     }

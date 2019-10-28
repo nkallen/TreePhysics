@@ -33,10 +33,8 @@ class RigidBodyTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
 
-        let expected: [Level] = [
-            [UnitOfWork(rigidBody: b2, climbers: [b1])],
-        ]
-        XCTAssertEqual(expected, root.levels())
+        let expected = Levels(rigidBodies: [[[root]]], climbers: [[b1], [b2]])
+        XCTAssertEqual(expected, root.levels2())
     }
 
     func testLevelsComplex() {
@@ -61,28 +59,17 @@ class RigidBodyTests: XCTestCase {
         _ = b7.add(b8)
         _ = b7.add(b9)
 
-        let empty: [ArticulatedRigidBody] = []
-
-        let expected: [Level] = [
-            [
-                UnitOfWork(rigidBody: b9, climbers: empty),
-                UnitOfWork(rigidBody: b8, climbers: empty),
-                UnitOfWork(rigidBody: b6, climbers: empty),
-                UnitOfWork(rigidBody: b2, climbers: empty)],
-            [UnitOfWork(rigidBody: b7, climbers: empty)],
-            [UnitOfWork(rigidBody: b5, climbers: [b4, b3])],
-            [UnitOfWork(rigidBody: b1, climbers: [])]
-        ]
-        XCTAssertEqual(expected, root.levels())
+        let expected = Levels(rigidBodies: [], climbers: [])
+        XCTAssertEqual(expected, root.levels2())
     }
 }
 
 /**
- root
+ root                -> [[b1]]
   |
-  b1
+  b1                 -> [[b2], [b3]]
  /  \
-b2  b3
+b2  b3               ->
     |
     b4
     |
