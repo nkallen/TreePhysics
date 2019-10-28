@@ -156,11 +156,21 @@ class MemoryLayoutManager {
 //        }
     }
 
+    class Joints {
+        let thetaBuffer: MTLBuffer
+
+        init(device: MTLDevice, count: Int) {
+            self.thetaBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3x3>.stride, options: [.storageModePrivate])!
+        }
+    }
+
     let rigidBodies: RigidBodies
     let compositeBodies: CompositeBodies
+    let joints: Joints
 
     init(device: MTLDevice, root: ArticulatedRigidBody) {
         self.rigidBodies = RigidBodies(device: device, root: root)
         self.compositeBodies = CompositeBodies(device: device, count: rigidBodies.count, ranges: rigidBodies.ranges)
+        self.joints = Joints(device: device, count: rigidBodies.count)
     }
 }

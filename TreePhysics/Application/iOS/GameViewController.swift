@@ -30,6 +30,7 @@ class GameViewController: UIViewController {
         self.device = MTLCreateSystemDefaultDevice()!
 
         self.mem = MemoryLayoutManager(device: device, root: root)
+        print("Total nodes:", mem.rigidBodies.count)
 
         scnView.delegate = self
         let scene = SCNScene()
