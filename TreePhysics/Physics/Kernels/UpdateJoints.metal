@@ -4,47 +4,31 @@
 
 using namespace metal;
 
-constant float β [[ function_constant(FunctionConstantIndexBeta) ]];
+struct UpdateJointsIn {
+    device float3x3 *theta;
+    device float *stiffness;
+    device float *damping;
+    device quatf *rotation;
+    device float3 *pivot;
+    device float *mass;
+    device float3 *torque;
+    device float3 *centerOfMass;
+    device float3x3 *inertiaTensor;
+};
 
-inline float3x3 joint_worldToLocalRotation(
-                                           float3x3 jointLocalRotation,
-                                           RigidBodyStruct parentRigidBody)
-{
-    return transpose(parentRigidBody.rotation * jointLocalRotation);
-}
-
-template <class T>
-inline vec<T, 3> joint_rotateVector(
-                                    float3x3 jointLocalRotation,
-                                    RigidBodyStruct parentRigidBody,
-                                    vec<T, 3> vector)
-{
-    return (matrix<T, 3, 3>)joint_worldToLocalRotation(jointLocalRotation, parentRigidBody) * vector;
-}
-
-template <class T>
-inline matrix<T, 3, 3> joint_rotateTensor(
-                                          float3x3 jointLocalRotation,
-                                          RigidBodyStruct parentRigidBody,
-                                          matrix<T, 3, 3> tensor)
-{
-    matrix<T, 3, 3> R = matrix<T, 3, 3>(joint_worldToLocalRotation(jointLocalRotation, parentRigidBody));
-    return R * tensor * transpose(R);
-}
-
-inline JointStruct
-updateJoint(
-            JointStruct joint,
-            float jointStiffness,
-            float3x3 jointLocalRotation,
-            RigidBodyStruct parentRigidBody,
-            CompositeBodyStruct childCompositeBody,
+inline float3x3
+update(
+            uint id,
+            UpdateJointsIn in,
             float time)
 {
-    float3 pr = joint_rotateVector(jointLocalRotation, parentRigidBody, childCompositeBody.centerOfMass - parentRigidBody.pivot);
-
-    float3x3 inertiaTensor_jointSpace = joint_rotateTensor(jointLocalRotation, parentRigidBody, childCompositeBody.inertiaTensor) - childCompositeBody.mass * sqr(crossMatrix(pr));
-    float3 torque_jointSpace = joint_rotateVector(jointLocalRotation, parentRigidBody, childCompositeBody.torque);
+    quatf rotation = in.rotation[id];
+    float3x3 rotationMatrix = float3x3_from_quat(rotation);
+    quatf inverseRotation = quat_inverse(rotation);
+    float3 pr = (float3)quat_act(inverseRotation, (float3)in.centerOfMass[id] - (float3)in.pivot[id]);
+    float3x3 inertiaTensor_jointSpace = transpose(rotationMatrix) * in.inertiaTensor[id] * rotationMatrix;
+    inertiaTensor_jointSpace -= in.mass[id] * sqr(crossMatrix(pr));
+    float3 torque_jointSpace = quat_act(inverseRotation, in.torque[id]);
 
     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
     // K is a spring stiffness matrix, θ = euler angles of the joint,
@@ -60,12 +44,18 @@ updateJoint(
 
     // 1.b. the generalized eigenvalue problem A * X = X * Λ
     // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
-    float3x3 A = L_inverse * ((float)jointStiffness * float3x3(1)) * L_transpose_inverse;
+    float3x3 A = L_inverse * (in.stiffness[id] * float3x3(1)) * L_transpose_inverse;
 
-    float4 q = diagonalize(A);
-    float3x3 X = qmat(q);
-    float3x3 Λ_M = transpose(X) * A * X;
-    float3 Λ = float3(Λ_M[0][0], Λ_M[1][1], Λ_M[2][2]);
+    float3x3 B = float3x3(
+        float3(1, 20, 3),
+        float3(20, 400, 5),
+        float3(3, 5, 6000));
+
+    EigenResult result = dsyevq3(B + (in.stiffness[id] * float3x3(1)));
+    float3x3 X = result.Q;
+    float3 Λ = result.w;
+
+    X += A;
 
     // 2. Now we can restate the differential equation in terms of other (diagonal)
     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
@@ -75,9 +65,10 @@ updateJoint(
     float3x3 U_inverse = inverse(U);
 
     float3 torque_diagonal = U_transpose * torque_jointSpace;
-    float3 θ_diagonal_0 = U_inverse * joint.θ[0];
-    float3 θ_ddt_diagonal_0 = U_inverse * joint.θ[1];
-    float3 βΛ = β * Λ;
+    float3x3 θ = in.theta[id];
+    float3 θ_diagonal_0 = U_inverse * θ[0];
+    float3 θ_ddt_diagonal_0 = U_inverse * θ[1];
+    float3 βΛ = in.damping[id] * Λ;
 
     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
     // differential equations, θ'' + bθ' + kθ = f
@@ -88,23 +79,37 @@ updateJoint(
 
     float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
-    joint.θ = U * θ_diagonal;
-    return joint;
+    θ = U * θ_diagonal;
+    return θ;
 }
 
 kernel void
 updateJoints(
-             device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
-             device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
-             device CompositeBodyStruct * compositeBodies [[ buffer(BufferIndexCompositeBodies) ]],
-             constant float * time [[ buffer(BufferIndexTime) ]],
+             device float3x3 *joint_theta,
+             device float *joint_stiffness,
+             device float *joint_damping,
+             device quatf *joint_rotation,
+             device float3 *rigidBody_pivot,
+
+             device float *compositeBody_mass,
+             device float3 *compositeBody_torque,
+             device float3 *compositeBody_centerOfMass,
+             device float3x3 *compositeBody_inertiaTensor,
+
+             constant float * time,
              uint gid [[ thread_position_in_grid ]])
 {
-    JointStruct joint = joints[gid];
-    RigidBodyStruct rigidBody = rigidBodies[gid];
-
-    RigidBodyStruct parentRigidBody = rigidBodies[rigidBody.parentId];
-    CompositeBodyStruct compositeBody = compositeBodies[gid];
-    joint = updateJoint(joint, rigidBody.jointStiffness, rigidBody.jointLocalRotation, parentRigidBody, compositeBody, *time);
-    joints[gid] = joint;
+    UpdateJointsIn in = {
+        .theta = joint_theta,
+        .stiffness = joint_stiffness,
+        .damping = joint_damping,
+        .rotation = joint_rotation,
+        .pivot = rigidBody_pivot,
+        .mass = compositeBody_mass,
+        .torque = compositeBody_torque,
+        .centerOfMass = compositeBody_centerOfMass,
+        .inertiaTensor = compositeBody_inertiaTensor
+    };
+    float3x3 theta = update(gid, in, *time);
+    joint_theta[gid] = theta;
 }

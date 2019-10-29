@@ -4,40 +4,23 @@ import Metal
 import ShaderTypes
 
 final class UpdateJoints: MetalKernelEncoder {
-    let rigidBodiesBuffer: MTLBuffer
-    let compositeBodiesBuffer: MTLBuffer
-    let jointsBuffer: MTLBuffer
-    let numJoints: Int
-    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, rigidBodiesBuffer: MTLBuffer, compositeBodiesBuffer: MTLBuffer, jointsBuffer: MTLBuffer, numJoints: Int) {
-        precondition(numJoints > 0)
+    private let argumentEncoder: ArgumentEncoder
 
-        let library = device.makeDefaultLibrary()!
-        let constantValues = MTLFunctionConstantValues()
-        var β = Tree.β
-        constantValues.setConstantValue(&β, type: .float, index: FunctionConstantIndex.beta.rawValue)
-        let function = try! library.makeFunction(name: "updateJoints", constantValues: constantValues)
+    init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, memoryLayoutManager: MemoryLayoutManager) {
+        self.argumentEncoder = ArgumentEncoder(memoryLayoutManager: memoryLayoutManager)
 
-        self.rigidBodiesBuffer = rigidBodiesBuffer
-        self.jointsBuffer = jointsBuffer
-        self.compositeBodiesBuffer = compositeBodiesBuffer
-        self.numJoints = numJoints
-
-        super.init(device: device, function: function)
+        super.init(device: device, name: "updateJoints")
     }
 
     func encode(commandBuffer: MTLCommandBuffer, at time: Float) {
         let commandEncoder = commandBuffer.makeComputeCommandEncoder()!
         commandEncoder.setComputePipelineState(computePipelineState)
         commandEncoder.label  = "Update Joints"
-        commandEncoder.setBuffer(rigidBodiesBuffer, offset: 0, index: BufferIndex.rigidBodies.rawValue)
-        commandEncoder.setBuffer(compositeBodiesBuffer, offset: 0, index: BufferIndex.compositeBodies.rawValue)
-        commandEncoder.setBuffer(jointsBuffer, offset: 0, index: BufferIndex.joints.rawValue)
-        var time = time
-        commandEncoder.setBytes(&time, length: MemoryLayout<Float>.size, index: BufferIndex.time.rawValue)
+        argumentEncoder.encode(commandEncoder: commandEncoder, at: time)
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)
-        let numJointsExcludingRoot = numJoints - 1
+        let numJointsExcludingRoot = argumentEncoder.mem.rigidBodies.count - 1
         let threadsPerGrid = MTLSize(
             width: numJointsExcludingRoot,
             height: 1,
@@ -50,5 +33,34 @@ final class UpdateJoints: MetalKernelEncoder {
     static func buffer(count: Int, device: MTLDevice) -> MTLBuffer {
         let buffer = device.makeBuffer(length: count * MemoryLayout<JointStruct>.stride, options: [.storageModePrivate])!
         return buffer
+    }
+}
+
+extension UpdateJoints {
+    class ArgumentEncoder {
+        let mem: MemoryLayoutManager
+
+        init(memoryLayoutManager: MemoryLayoutManager) {
+            self.mem = memoryLayoutManager
+        }
+
+        func encode(commandEncoder: MTLComputeCommandEncoder, at time: Float) {
+            let bufs = [
+                mem.joints.thetaBuffer,
+                mem.rigidBodies.jointStiffnessBuffer,
+                mem.rigidBodies.jointDampingBuffer,
+                mem.rigidBodies.jointRotationBuffer,
+                mem.rigidBodies.pivotBuffer,
+
+                mem.compositeBodies.massBuffer,
+                mem.compositeBodies.torqueBuffer,
+                mem.compositeBodies.centerOfMassBuffer,
+                mem.compositeBodies.inertiaTensorBuffer,
+            ]
+            commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
+
+            var time = time
+            commandEncoder.setBytes(&time, length: MemoryLayout<Float>.size, index: bufs.count)
+        }
     }
 }

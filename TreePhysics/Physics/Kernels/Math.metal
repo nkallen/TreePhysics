@@ -1,102 +1,6 @@
 #include <metal_stdlib>
+#include "Diagonalize.metal"
 using namespace metal;
-
-// MARK: Quaternion
-
-// Quaternion and diagonalization ported from https://github.com/melax/sandbox/blob/3e267f2db2262a4cc6bf3f576c8c92b3cba79efc/include/geometric.h
-
-template <class T>
-inline vec<T, 4>
-qmul(vec<T, 4> a, vec<T, 4> b) {
-    return vec<T, 4>(
-                     a.x*b.w+a.w*b.x+a.y*b.z-a.z*b.y,
-                     a.y*b.w+a.w*b.y+a.z*b.x-a.x*b.z,
-                     a.z*b.w+a.w*b.z+a.x*b.y-a.y*b.x,
-                     a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z);
-}
-
-template <class T>
-inline vec<T, 3>
-qxdir(vec<T, 4> q) {
-    return {q.w*q.w+q.x*q.x-q.y*q.y-q.z*q.z, (q.x*q.y+q.z*q.w)*2, (q.z*q.x-q.y*q.w)*2};
-}
-
-template <class T>
-inline vec<T, 3>
-qydir (vec<T, 4> q) {
-    return {(q.x*q.y-q.z*q.w)*2, q.w*q.w-q.x*q.x+q.y*q.y-q.z*q.z, (q.y*q.z+q.x*q.w)*2};
-}
-
-template <class T>
-inline vec<T, 3>
-qzdir (vec<T, 4> q) {
-    return {(q.z*q.x+q.y*q.w)*2, (q.y*q.z-q.x*q.w)*2, q.w*q.w-q.x*q.x-q.y*q.y+q.z*q.z};
-}
-
-template <class T>
-inline matrix<T, 3, 3>
-qmat(vec<T, 4> q) {
-    return matrix<T, 3, 3>(qxdir(q), qydir(q), qzdir(q));
-}
-
-// MARK: Diagonlization
-
-template <class T>
-inline vec<T, 4>
-diagonalize(matrix<T, 3, 3> A)
-{
-    // A must be a symmetric matrix.
-    // returns orientation of the principle axes.
-    // returns quaternion q such that its corresponding column major matrix Q
-    // can be used to Diagonalize A
-    // Diagonal matrix D = transpose(Q) * A * (Q);  thus  A == Q*D*QT
-    // The directions of q (cols of Q) are the eigenvectors D's diagonal is the eigenvalues
-    // As per 'col' convention if float3x3 Q = qgetmatrix(q); then Q*v = q*v*conj(q)
-    int maxsteps = 24;  // certainly wont need that many.
-    int i;
-    vec<T, 4> q(0, 0, 0, 1);
-    for (i = 0; i<maxsteps; i++)
-    {
-        matrix<T, 3, 3> Q = qmat(q); // Q*v == q*v*conj(q)
-        matrix<T, 3, 3> D = transpose(Q) * A * Q;  // A = Q*D*Q^T
-        vec<T, 3> offdiag(D[1][2], D[0][2], D[0][1]); // elements not on the diagonal
-        vec<T, 3> om(fabs(offdiag.x), fabs(offdiag.y), fabs(offdiag.z)); // mag of each offdiag elem
-        int k = (om.x>om.y && om.x>om.z) ? 0 : (om.y>om.z) ? 1 : 2; // index of largest element of offdiag
-        T thet;
-        if (om.x>om.y && om.x>om.z) {
-            thet = (D[2][2] - D[1][1]) / (2.0f*offdiag[0]);
-        } else if (om.y>om.z) {
-            thet = (D[0][0] - D[2][2]) / (2.0f*offdiag[1]);
-        } else {
-            thet = (D[1][1] - D[0][0]) / (2.0f*offdiag[2]);
-        }
-        if (offdiag[k] == 0.0f) break;  // diagonal already
-        T sgn = sign(thet);
-        thet *= sgn; // make it positive
-        T t = sgn / (thet + ((thet<1.E6f) ? sqrt(thet*thet + 1.0f) : thet)); // sign(T)/(|T|+sqrt(T^2+1))
-        T c = rsqrt(t*t + 1.0f); //  c= 1/(t^2+1) , t=s/c
-        if (c == 1.0f) break;  // no room for improvement - reached machine precision.
-        vec<T, 4> jr(0, 0, 0, 0); // jacobi rotation for this iteration.
-        jr[k] = sgn*sqrt((1.0f - c) / 2.0f);  // using 1/2 angle identity sin(a/2) = sqrt((1-cos(a))/2)
-        jr[k] *= -1.0f; // note we want a final result semantic that takes D to A, not A to D
-        jr.w = sqrt(1.0f - (jr[k] * jr[k]));
-        if (jr.w == 1.0f) break; // reached limits of floating point precision
-        q = qmul(q, jr);
-        q = normalize(q);
-    }
-    T h = 1.0f/sqrt(2.0f);  // M_SQRT1_2
-    matrix<T, 3, 3> M = transpose(qmat(q)) * A * qmat(q);
-    vec<T, 3> e = vec<T, 3>(M[0][0],M[1][1],M[2][2]);
-    q = (e.x < e.z)  ? qmul(q, vec<T, 4>( 0, h, 0, h )) : q;
-    q = (e.y < e.z)  ? qmul(q, vec<T, 4>( h, 0, 0, h )) : q;
-    q = (e.x < e.y)  ? qmul(q, vec<T, 4>( 0, 0, h, h )) : q;   // size order z,y,x so xy spans a planeish spread
-    q = (qzdir(q).z < 0) ? qmul(q, vec<T, 4>( 1, 0, 0, 0 )) : q;
-    q = (qydir(q).y < 0) ? qmul(q, vec<T, 4>( 0, 0, 1, 0 )) : q;
-    q = (q.w < 0) ? -q : q;
-    return q;
-}
-
-// MARK: General
 
 template <class T>
 inline T
@@ -377,4 +281,172 @@ evaluateDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, T t)
 {
     DifferentialSolution<T> differentialSolution = solveDifferential(a, b, c, g, y_0, y_ddt_0);
     return evaluateDifferential(differentialSolution, t);
+}
+
+// MARK: Quaternions
+
+// Quaternion and diagonlization adapted from Apple's "ForwardPlusWithTileShading"
+
+/// A single-precision quaternion type
+typedef float4 quatf;
+
+inline quatf quaternion(float x, float y, float z, float w) {
+    return (quatf){ x, y, z, w };
+}
+
+inline quatf quaternion(float3 v, float w) {
+    return (quatf){ v.x, v.y, v.z, w };
+}
+
+inline quatf quat_identity() {
+    return quaternion(0, 0, 0, 1);
+}
+
+inline quatf quat_from_axis_angle(float3 axis, float radians) {
+    float t = radians * 0.5;
+    return quatf(axis.x * sin(t), axis.y * sin(t), axis.z * sin(t), cos(t));
+}
+
+inline quatf quat_from_euler(float3 euler) {
+    quatf q;
+
+    float cx = cos(euler.x / 2.f);
+    float cy = cos(euler.y / 2.f);
+    float cz = cos(euler.z / 2.f);
+    float sx = sin(euler.x / 2.f);
+    float sy = sin(euler.y / 2.f);
+    float sz = sin(euler.z / 2.f);
+
+    q.w = cx * cy * cz + sx * sy * sz;
+    q.x = sx * cy * cz - cx * sy * sz;
+    q.y = cx * sy * cz + sx * cy * sz;
+    q.z = cx * cy * sz - sx * sy * cz;
+
+    return q;
+}
+
+inline quatf quaternion(float3x3 m) {
+    float m00 = m.columns[0].x;
+    float m11 = m.columns[1].y;
+    float m22 = m.columns[2].z;
+    float x = sqrt(1 + m00 - m11 - m22) * 0.5;
+    float y = sqrt(1 - m00 + m11 - m22) * 0.5;
+    float z = sqrt(1 - m00 - m11 + m22) * 0.5;
+    float w = sqrt(1 + m00 + m11 + m22) * 0.5;
+    return quaternion(x, y, z, w);
+}
+
+inline float quat_length(quatf q) {
+    return sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+}
+
+inline float quat_length_squared(quatf q) {
+    return q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w;
+}
+
+inline quatf quat_normalize(quatf q) {
+    return q / quat_length(q);
+}
+
+inline float3 quat_axis(quatf q) {
+    // This query doesn't make sense if w > 1, but we do our best by
+    // forcing q to be a unit quaternion if it obviously isn't
+    if (q.w > 1.0)
+    {
+        q = quat_normalize(q);
+    }
+
+    float axisLen = sqrt(1 - q.w * q.w);
+
+    if (axisLen < 1e-5)
+    {
+        // At lengths this small, direction is arbitrary
+        return float3(1, 0, 0);
+    }
+    else
+    {
+        return float3(q.x / axisLen, q.y / axisLen, q.z / axisLen);
+    }
+}
+
+inline float quat_angle(quatf q) {
+    return 2 * acos(q.w);
+}
+
+inline quatf quat_conjugate(quatf q) {
+    return quaternion(-q.x, -q.y, -q.z, q.w);
+}
+
+inline quatf quat_inverse(quatf q) {
+    return quat_conjugate(q) / quat_length_squared(q);
+}
+
+inline quatf quat_multiply(quatf q0, quatf q1) {
+    quatf q;
+
+    q.x = q0.w*q1.x + q0.x*q1.w + q0.y*q1.z - q0.z*q1.y;
+    q.y = q0.w*q1.y - q0.x*q1.z + q0.y*q1.w + q0.z*q1.x;
+    q.z = q0.w*q1.z + q0.x*q1.y - q0.y*q1.x + q0.z*q1.w;
+    q.w = q0.w*q1.w - q0.x*q1.x - q0.y*q1.y - q0.z*q1.z;
+    return q;
+}
+
+inline quatf quat_slerp(quatf q0, quatf q1, float t) {
+
+     quatf q;
+
+    float cosHalfTheta = dot(q0, q1);
+    if (fabs(cosHalfTheta) >= 1.f) ///q0=q1 or q0=q1
+    {
+        return q0;
+    }
+
+    float halfTheta = acos(cosHalfTheta);
+    float sinHalfTheta = sqrt(1.f - cosHalfTheta * cosHalfTheta);
+    if (fabs(sinHalfTheta) < 0.001f)
+    {    // q0 & q1 180 degrees not defined
+        return q0*0.5f + q1*0.5f;
+    }
+    float srcWeight = sin((1 - t) * halfTheta) / sinHalfTheta;
+    float dstWeight = sin(t * halfTheta) / sinHalfTheta;
+
+    q = srcWeight*q0 + dstWeight*q1;
+
+    return q;
+}
+
+inline float3 quat_act(quatf q, float3 v) {
+    float3 qp = float3(q.x, q.y, q.z);
+    float w = q.w;
+    return 2 * dot(qp, v) * qp +
+           ((w * w) - dot(qp, qp)) * v +
+           2 * w * cross(qp, v);
+}
+
+inline float3x3 float3x3_from_quat(quatf q) {
+    float xx = q.x * q.x;
+    float xy = q.x * q.y;
+    float xz = q.x * q.z;
+    float xw = q.x * q.w;
+    float yy = q.y * q.y;
+    float yz = q.y * q.z;
+    float yw = q.y * q.w;
+    float zz = q.z * q.z;
+    float zw = q.z * q.w;
+
+    float m00 = 1 - 2 * (yy + zz);
+    float m01 = 2 * (xy - zw);
+    float m02 = 2 * (xz + yw);
+
+    float m10 = 2 * (xy + zw);
+    float m11 = 1 - 2 * (xx + zz);
+    float m12 = 2 * (yz - xw);
+
+    float m20 = 2 * (xz - yw);
+    float m21 = 2 * (yz + xw);
+    float m22 = 1 - 2 * (xx + yy);
+
+    return float3x3(m00, m10, m20,
+                       m01, m11, m21,
+                       m02, m12, m22);
 }

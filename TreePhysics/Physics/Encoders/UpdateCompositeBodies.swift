@@ -16,7 +16,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         constantValues.setConstantValue(&rangeCount, type: .int, index: FunctionConstantIndex.rangeCount.rawValue)
         let function = try! library.makeFunction(name: "updateCompositeBodies", constantValues: constantValues)
 
-        self.argumentEncoder = ArgumentEncoder(function: function, memoryLayoutManager: memoryLayoutManager, count: ranges.count)
+        self.argumentEncoder = ArgumentEncoder(memoryLayoutManager: memoryLayoutManager)
 
         super.init(device: device, function: function)
     }
@@ -45,7 +45,7 @@ extension UpdateCompositeBodies {
     class ArgumentEncoder {
         let mem: MemoryLayoutManager
 
-        init(function: MTLFunction, memoryLayoutManager: MemoryLayoutManager, count: Int) {
+        init(memoryLayoutManager: MemoryLayoutManager) {
             self.mem = memoryLayoutManager
         }
 
