@@ -2,3 +2,7 @@ module ShaderTypes {
     header "../Physics/Kernels/ShaderTypes.h"
     export *
 }
+
+module Eigen {
+    header "../Util/Eigensolver.h"
+}

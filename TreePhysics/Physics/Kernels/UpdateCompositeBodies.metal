@@ -18,12 +18,12 @@ typedef struct {
     device int2 *childInfo;
     device ushort *climberCount;
     device int *firstClimberId;
-    device float *mass;
-    device float3 *pivot;
-    device float3 *force;
-    device float3 *torque;
-    device float3 *centerOfMass;
-    device float3x3 *inertiaTensor;
+    device half *mass;
+    device packed_half3 *pivot;
+    device packed_half3 *force;
+    device packed_half3 *torque;
+    device packed_half3 *centerOfMass;
+    device half3x3 *inertiaTensor;
     UpdateCompositeBodiesOut children;
 } UpdateCompositeBodiesIn;
 
@@ -32,7 +32,7 @@ typedef struct {
 inline void
 climb(
       int id,
-      float m, float3 f, float3 pivot, float3 t, float3 c, float3x3 it,
+      half m, half3 f, half3 pivot, half3 t, half3 c, half3x3 it,
       const UpdateCompositeBodiesIn in,
       const UpdateCompositeBodiesOut out)
 {
@@ -40,9 +40,9 @@ climb(
                     if (climberCount == 0) return;
     //                int firstClimberId = in.firstClimberId[id];
 
-                    float mass;
-                    float3 force, torque, centerOfMass;
-                    float3x3 inertiaTensor;
+                    half mass;
+                    half3 force, torque, centerOfMass;
+                    half3x3 inertiaTensor;
                     int climberId;
                     for (ushort i = 0; i < climberCount; i++) {
                         climberId = id + 29523 + i;
@@ -53,7 +53,7 @@ climb(
                         centerOfMass = m * c + in.mass[climberId] * in.centerOfMass[climberId];
                         centerOfMass /= mass;
 
-                        float3x3 inertiaTensor = in.inertiaTensor[climberId] - in.mass[climberId] * sqr(crossMatrix(in.centerOfMass[climberId] - centerOfMass));
+                        half3x3 inertiaTensor = in.inertiaTensor[climberId] - in.mass[climberId] * sqr(crossMatrix(in.centerOfMass[climberId] - centerOfMass));
 
                         inertiaTensor += it - m * sqr(crossMatrix(c - centerOfMass));
 
@@ -80,11 +80,11 @@ update(
 {
     int2 childInfo = in.childInfo[id];
 
-    float mass = in.mass[id];
-    float3 force = in.force[id];
-    float3 pivot = in.pivot[id];
-    float3 torque = in.torque[id];
-    float3 centerOfMass = mass * in.centerOfMass[id];
+    half mass = in.mass[id];
+    half3 force = in.force[id];
+    half3 pivot = in.pivot[id];
+    half3 torque = in.torque[id];
+    half3 centerOfMass = mass * in.centerOfMass[id];
 
     int firstChildId = childInfo.y;
     for (ushort i = 0; i < childInfo.x; i++) {
@@ -98,7 +98,7 @@ update(
     }
     centerOfMass /= mass;
 
-    float3x3 inertiaTensor = in.inertiaTensor[id] - in.mass[id] * sqr(crossMatrix(in.centerOfMass[id] - centerOfMass));
+    half3x3 inertiaTensor = in.inertiaTensor[id] - in.mass[id] * sqr(crossMatrix(in.centerOfMass[id] - centerOfMass));
 
     for (ushort i = 0; i < childInfo.x; i++) {
         int childId = firstChildId + i;
@@ -120,12 +120,12 @@ updateCompositeBodies(
                       device int2 *in_childInfo,
                       device ushort *in_climberCount,
                       device int *in_firstClimberId,
-                      device float *in_mass,
-                      device float3 *in_pivot,
-                      device float3 *in_force,
-                      device float3 *in_torque,
-                      device float3 *in_centerOfMass,
-                      device float3x3 *in_inertiaTensor,
+                      device half *in_mass,
+                      device packed_half3 *in_pivot,
+                      device packed_half3 *in_force,
+                      device packed_half3 *in_torque,
+                      device packed_half3 *in_centerOfMass,
+                      device half3x3 *in_inertiaTensor,
 
                       device half *out_mass,
                       device packed_half3 *out_force,
@@ -165,16 +165,16 @@ updateCompositeBodies(
             int id = lowerBound + gid;
             int2 childInfo = in.childInfo[id];
 
-            float mass = in.mass[id];
-            float3 force = in.force[id];
-            float3 torque = in.torque[id];
-            float3 centerOfMass = in.centerOfMass[id];
-            float3x3 inertiaTensor = in.inertiaTensor[id];
+            half mass = in.mass[id];
+            half3 force = in.force[id];
+            half3 torque = in.torque[id];
+            half3 centerOfMass = in.centerOfMass[id];
+            half3x3 inertiaTensor = in.inertiaTensor[id];
 
-            for (ushort i = 0; i < childInfo.x; i++) {
-//                int childId = gid + prev.x + i * (prev.y - prev.x) / 3;
+            for (ushort i = 0; i < (i > 0 ? 3 : 0); i++) {
+                int childId = gid + prev.x + i * (prev.y - prev.x) / 3;
 //                int childId = i + prev.x + gid * 3;
-                int childId = i + childInfo.y;
+//                int childId = i + childInfo.y;
 
                 mass += in.mass[childId];
                 force += in.force[childId];
@@ -183,24 +183,24 @@ updateCompositeBodies(
                 inertiaTensor += in.inertiaTensor[childId];
             }
 
-            out.mass[id] = mass;
-            out.force[id] = (packed_half3)force;
-            out.torque[id] = (packed_half3)torque;
-            out.centerOfMass[id] = (packed_half3)centerOfMass;
+//            out.mass[id] = mass;
+//            out.force[id] = (packed_half3)force;
+//            out.torque[id] = (packed_half3)torque;
+//            out.centerOfMass[id] = (packed_half3)centerOfMass;
             out.inertiaTensor[id] = (half3x3)inertiaTensor;
 
             ushort climberCount = in.climberCount[id];
-            for (ushort i = 0; i < climberCount; i++) {
+            for (ushort i = 0; i < 6; i++) {
                 int climberId = gid + 29523 + i * (206662-29523)/6;
 //                int climberId = i + 29523 + gid * 6;
-                out.mass[climberId] = in.mass[climberId];
-                out.force[climberId] = (packed_half3)in.force[climberId];
-                out.torque[climberId] = (packed_half3)in.torque[climberId];
-                out.centerOfMass[climberId] = (packed_half3)in.centerOfMass[climberId];
+//                out.mass[climberId] = in.mass[climberId];
+//                out.force[climberId] = (packed_half3)in.force[climberId];
+//                out.torque[climberId] = (packed_half3)in.torque[climberId];
+//                out.centerOfMass[climberId] = (packed_half3)in.centerOfMass[climberId];
                 out.inertiaTensor[climberId] = (half3x3)in.inertiaTensor[climberId];
             }
             prev = range;
         }
-        threadgroup_barrier(mem_flags::mem_device);
+//        threadgroup_barrier(mem_flags::mem_device);
     }
 }

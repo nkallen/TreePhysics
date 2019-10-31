@@ -47,11 +47,11 @@ extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let commandQueue = device.makeCommandQueue()!
 
-        let command = UpdateJoints(memoryLayoutManager: mem)
+        let command =  UpdateCompositeBodies(memoryLayoutManager: mem)
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
-        command.encode(commandBuffer: commandBuffer, at: 1/60)
+        command.encode(commandBuffer: commandBuffer)
 
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()

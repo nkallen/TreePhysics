@@ -1,6 +1,7 @@
 import Foundation
 import simd
 import Accelerate
+import Eigen
 
 // This code is ported from C found here: https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/
 
@@ -260,7 +261,6 @@ extension matrix_double3x3 {
 
         return SIMD3<Double>(w0, w1, w2)
     }
-
 }
 
 extension float3x3 {
@@ -277,5 +277,12 @@ extension float3x3 {
             return nil
         }
         return (SIMD3<Float>(eigenvalues), float3x3(eigenvectors))
+    }
+
+    var eigen: (SIMD3<Float>, float3x3)? {
+        let ltr = simd_float3(self[0,1], self[0,2], self[1,2])
+        let diag = simd_float3(self[0,0], self[1,1], self[2,2])
+        let result = eigenvalues(ltr, diag)
+        return (result.eigenvalues, result.eigenvectors)
     }
 }

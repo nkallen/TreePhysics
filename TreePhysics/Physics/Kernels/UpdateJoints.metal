@@ -46,21 +46,15 @@ update(
     // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
     float3x3 A = L_inverse * (in.stiffness[id] * float3x3(1)) * L_transpose_inverse;
 
-    float3x3 B = float3x3(
-        float3(1, 20, 3),
-        float3(20, 400, 5),
-        float3(3, 5, 6000));
-
-    EigenResult result = dsyevq3(B + (in.stiffness[id] * float3x3(1)));
-    float3x3 X = result.Q;
-    float3 Λ = result.w;
-
-    X += A;
+    float4 q = diagonalize(A);
+    float3x3 X = qmat(q);
+    float3x3 Λ_M = transpose(X) * A * X;
+    float3 Λ = float3(Λ_M[0][0], Λ_M[1][1], Λ_M[2][2]);
 
     // 2. Now we can restate the differential equation in terms of other (diagonal)
     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
 
-    float3x3 U = L_transpose_inverse * X;
+    float3x3 U = (float3x3)L_transpose_inverse * X;
     float3x3 U_transpose = transpose(U);
     float3x3 U_inverse = inverse(U);
 

@@ -49,6 +49,10 @@ public final class Joint {
         self.position = parentRigidBody.pivot + parentRigidBody.rotation.act(localPosition)
         self.inverseRotation = rotation.inverse.normalized
 
+        assert(rotation.isFinite)
+        assert(position.isFinite)
+        assert(inverseRotation.isFinite)
+
         self.acceleration = parentRigidBody.acceleration +
             (parentRigidBody.angularAcceleration.skew + sqr(parentRigidBody.angularVelocity.skew)) * parentRigidBody.rotation.act(localPosition)
     }

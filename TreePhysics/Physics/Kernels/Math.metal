@@ -92,7 +92,7 @@ inverse_lowerTriangular(matrix<T, 3, 3> m)
 template <class T>
 inline matrix<T, 2, 2>
 inverse(matrix<T, 2, 2> m) {
-    return (1.0 / determinant(m)) *
+    return ((T)1.0 / determinant(m)) *
     matrix<T, 2, 2>(vec<T, 2>(m[1][1],-m[0][1]),
                     vec<T, 2>(-m[1][0], m[0][0]));
 }

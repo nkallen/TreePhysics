@@ -44,14 +44,21 @@ final public class ArticulatedRigidBody: RigidBody {
     override func updateTransform() {
         if let parentJoint = parentJoint {
             let sora = parentJoint.θ[0]
+            assert(sora.isFinite)
             let localRotation = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
 
             self.rotation = (parentJoint.rotation * localRotation).normalized
+            assert(parentJoint.rotation.isFinite)
+            assert(localRotation.isFinite)
+            assert(rotation.isFinite)
             self.pivot = parentJoint.position
-            
+            assert(pivot.isFinite)
+
             self.inertiaTensor = float3x3(rotation) * localInertiaTensor * float3x3(rotation).transpose
+            assert(inertiaTensor.isFinite)
             
             self.centerOfMass = self.pivot + rotation.act(-localPivot)
+            assert(centerOfMass.isFinite)
         }
 
         self.pivot = centerOfMass + rotation.act(localPivot)

@@ -17,88 +17,38 @@ class MathTests: XCTestCase {
             )).cholesky)
     }
     
-    func testEigenvaluesAnalytical() {
+    func testEigen1() {
         let matrix = float3x3(columns: (
             SIMD3<Float>(2,1,0),
             SIMD3<Float>(1,2,1),
             SIMD3<Float>(0,1,2)))
-        guard let (eigenvalues, eigenvectors) = matrix.eigen_analytical else {
+        guard let (eigenvalues, eigenvectors) = matrix.eigen else {
             XCTFail()
             return
         }
 
         XCTAssertEqual(
-            SIMD3<Float>(2 + sqrt(2), 2 - sqrt(2.0), 2),
+            SIMD3<Float>(2 - sqrt(2), 2, 2 + sqrt(2.0)),
             eigenvalues, accuracy: 0.0001)
 
         XCTAssertEqual(
             float3x3(columns: (
-                SIMD3<Float>(1.0/2, sqrt(2.0) / 2, 1.0/2),
-                SIMD3<Float>(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),
-                SIMD3<Float>(1 / sqrt(2.0), 0, -1/sqrt(2.0))
+                SIMD3<Float>(-1/2, sqrt(2.0)/2, -1/2),
+                SIMD3<Float>(1/sqrt(2.0), 0, -1/sqrt(2.0)),
+                SIMD3<Float>(-1/2, -sqrt(2.0)/2, -1/2)
             )),
             eigenvectors, accuracy: 0.0001)
     }
 
-    func testTridiagonal() {
-        let matrix = double3x3(columns: (
-            SIMD3<Double>(2,1,0),
-            SIMD3<Double>(1,2,1),
-            SIMD3<Double>(0,1,2)))
-
-        let (Q, d, e) = matrix.tridiagonal
-        let Q_transpose = Q.transpose
-        let X = double3x3(columns: (
-            SIMD3<Double>(d[0],e[0],0),
-            SIMD3<Double>(e[0],d[1],e[1]),
-            SIMD3<Double>(0,e[1],d[2])))
-        let Y = Q * X * Q_transpose
-
-        XCTAssertEqual(matrix, Y)
-    }
-
-    func testEigenQL_0() {
-        let matrix = double3x3(columns: (
-            SIMD3<Double>(2,1,0),
-            SIMD3<Double>(1,2,1),
-            SIMD3<Double>(0,1,2)))
-
-        guard let (eigenvalues, eigenvectors) = matrix.eigen_ql else {
-            XCTFail()
-            return
-        }
-
-        XCTAssertEqual(
-            SIMD3<Double>(2 - sqrt(2), 2, 2 + sqrt(2.0)),
-            eigenvalues, accuracy: 0.0001)
-
-        XCTAssertEqual(
-            double3x3(columns: (
-                -SIMD3<Double>(1.0 / 2, -sqrt(2.0) / 2, 1.0 / 2),
-                SIMD3<Double>(1 / sqrt(2.0), 0, -1/sqrt(2.0)),
-                SIMD3<Double>(1.0/2, sqrt(2.0) / 2, 1.0/2)
-            )),
-            eigenvectors, accuracy: 0.001)
-    }
-
-    func testEigenQL_1() {
+    func testEigen2() {
         let matrix = float3x3(columns: (
             SIMD3<Float>(1.0/3,-1.9254154e-10,2.9612822e-08),
             SIMD3<Float>(-1.9254154e-10,0.48408476,-0.048982114),
             SIMD3<Float>(2.9612824e-08,-0.04898209,0.34924862)
         ))
-
-        let (Q, d, e) = double3x3(matrix).tridiagonal
-        XCTAssertEqual(double3x3(columns: (
-            SIMD3<Double>(1,0,0),
-            SIMD3<Double>(0,-0.006502,0.999979),
-            SIMD3<Double>(0,0.999979,0.006502)
-        )), Q, accuracy: 0.001)
-        XCTAssertEqual(SIMD3<Double>(1/3,0.349891,0.483442), d, accuracy: 0.0001)
-        XCTAssertEqual(SIMD2<Double>(0,-0.049855), e, accuracy: 0.0001)
         XCTAssertEqual(
             SIMD3<Float>(1/3,1/3,1/2),
-            matrix.eigen_ql!.0, accuracy: 0.0001)
+            matrix.eigen!.0, accuracy: 0.0001)
     }
 }
 

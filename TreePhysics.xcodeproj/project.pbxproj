@@ -104,6 +104,8 @@
 		9EC88E25231989930049737D /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC88E24231989930049737D /* ModelTests.swift */; };
 		9ED324F72361A6C9002D1DA2 /* MetalKernelDebugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */; };
 		9EDAD5A92361ABDD007EF889 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDAD5A82361ABDD007EF889 /* Tree.swift */; };
+		9EE0BD6B236B2B78000A8AB3 /* Eigensolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 9EE0BD6A236B2B78000A8AB3 /* Eigensolver.c */; };
+		9EE0BD6D236B2C23000A8AB3 /* Eigensolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 9EE0BD6A236B2B78000A8AB3 /* Eigensolver.c */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
 		9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
@@ -253,6 +255,8 @@
 		9EC88E24231989930049737D /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalKernelDebugger.swift; sourceTree = "<group>"; };
 		9EDAD5A82361ABDD007EF889 /* Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
+		9EE0BD6A236B2B78000A8AB3 /* Eigensolver.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Eigensolver.c; sourceTree = "<group>"; };
+		9EE0BD6C236B2B8D000A8AB3 /* Eigensolver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigensolver.h; sourceTree = "<group>"; };
 		9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCompositeBodies.swift; sourceTree = "<group>"; };
 		9EE7EB9E22DDDC6C00535997 /* TreePhysics_macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreePhysics_macOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -573,6 +577,8 @@
 				9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */,
 				9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */,
 				9EA52EC4234F4A4200463E51 /* Check.swift */,
+				9EE0BD6A236B2B78000A8AB3 /* Eigensolver.c */,
+				9EE0BD6C236B2B8D000A8AB3 /* Eigensolver.h */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -693,6 +699,7 @@
 				TargetAttributes = {
 					9E34C47F232911C6008C7353 = {
 						CreatedOnToolsVersion = 10.3;
+						LastSwiftMigration = 1120;
 					};
 					9EE7EB9D22DDDC6C00535997 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -777,6 +784,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9EAE86422332717C0037EA92 /* GravityField.swift in Sources */,
+				9EE0BD6B236B2B78000A8AB3 /* Eigensolver.c in Sources */,
 				9E34C48E23291252008C7353 /* Joint.swift in Sources */,
 				9E1223C02364539200692A72 /* MemoryLayoutManager.swift in Sources */,
 				9EAA8C0C232923FD002E9260 /* MetalKernalEncoder.swift in Sources */,
@@ -838,6 +846,7 @@
 				9EF46F0F2362418D00AEC82F /* RigidBodyPen.swift in Sources */,
 				9EF46F15236241EC00AEC82F /* Joint.swift in Sources */,
 				9E40A0D82362515700C8D39C /* GameViewController.swift in Sources */,
+				9EE0BD6D236B2C23000A8AB3 /* Eigensolver.c in Sources */,
 				9EF46F1F2362439000AEC82F /* ResetForces.metal in Sources */,
 				9EF46F25236243A000AEC82F /* UpdateRigidBodies.metal in Sources */,
 				9E40A0DA2362519100C8D39C /* AppDelegate.swift in Sources */,
@@ -969,6 +978,7 @@
 		9E34C486232911C6008C7353 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1000,6 +1010,7 @@
 		9E34C487232911C6008C7353 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
