@@ -15,9 +15,10 @@ typedef struct {
 } UpdateCompositeBodiesOut;
 
 typedef struct {
-    device int2 *childInfo;
-    device ushort *climberCount;
-    device int *firstClimberId;
+    device uchar *childCount;
+    device uchar *childIndex;
+    device ushort *parentId;
+    device uchar *climberCount;
     device half *mass;
     device packed_half3 *pivot;
     device packed_half3 *force;
@@ -32,7 +33,7 @@ typedef struct {
 inline void
 climb(
       int id,
-      half m, half3 f, half3 pivot, half3 t, half3 c, half3x3 it,
+      half m, packed_half3 f, packed_half3 pivot, packed_half3 t, packed_half3 c, half3x3 it,
       const UpdateCompositeBodiesIn in,
       const UpdateCompositeBodiesOut out)
 {
@@ -41,7 +42,7 @@ climb(
     //                int firstClimberId = in.firstClimberId[id];
 
                     half mass;
-                    half3 force, torque, centerOfMass;
+                    packed_half3 force, torque, centerOfMass;
                     half3x3 inertiaTensor;
                     int climberId;
                     for (ushort i = 0; i < climberCount; i++) {
@@ -81,10 +82,10 @@ update(
     int2 childInfo = in.childInfo[id];
 
     half mass = in.mass[id];
-    half3 force = in.force[id];
-    half3 pivot = in.pivot[id];
-    half3 torque = in.torque[id];
-    half3 centerOfMass = mass * in.centerOfMass[id];
+    packed_half3 force = in.force[id];
+    packed_half3 pivot = in.pivot[id];
+    packed_half3 torque = in.torque[id];
+    packed_half3 centerOfMass = mass * in.centerOfMass[id];
 
     int firstChildId = childInfo.y;
     for (ushort i = 0; i < childInfo.x; i++) {
@@ -92,7 +93,7 @@ update(
         int childId = id + 29523 + i;
 
         mass += in.children.mass[childId];
-        force += packed_half3(in.children.force[childId]);
+        force += half3(in.children.force[childId]);
         torque += cross(in.pivot[childId] - pivot, in.children.force[childId]) + in.children.torque[childId];
         centerOfMass += in.children.mass[childId] * in.children.centerOfMass[childId];
     }
@@ -117,9 +118,10 @@ update(
 
 kernel void
 updateCompositeBodies(
-                      device int2 *in_childInfo,
-                      device ushort *in_climberCount,
-                      device int *in_firstClimberId,
+                      device uchar *in_childCount,
+                      device uchar *in_childIndex,
+                      device ushort *in_parentId,
+                      device uchar *in_climberCount,
                       device half *in_mass,
                       device packed_half3 *in_pivot,
                       device packed_half3 *in_force,
@@ -133,7 +135,8 @@ updateCompositeBodies(
                       device packed_half3 *out_centerOfMass,
                       device half3x3 *out_inertiaTensor,
 
-                      constant int2 * ranges,
+                      constant uint * upperBound,
+                      constant ushort * deltas,
                       uint gid [[ thread_position_in_grid ]])
 {
     UpdateCompositeBodiesOut out = {
@@ -145,9 +148,10 @@ updateCompositeBodies(
     };
 
     UpdateCompositeBodiesIn in = {
-        .childInfo = in_childInfo,
+        .childCount = in_childCount,
+        .childIndex = in_childIndex,
+        .parentId = in_parentId,
         .climberCount = in_climberCount,
-        .firstClimberId = in_firstClimberId,
         .mass = in_mass,
         .pivot = in_pivot,
         .force = in_force,
@@ -156,51 +160,62 @@ updateCompositeBodies(
         .inertiaTensor = in_inertiaTensor
     };
 
-    int2 prev;
+    uint prev;
+    uint start = *upperBound;
+    ushort delta = deltas[0];
     for (ushort i = 0; i < rangeCount; i++) {
-        int2 range = ranges[i];
-        int lowerBound = range.x;
-        int upperBound = range.y;
-        if ((int)gid < upperBound - lowerBound) {
-            int id = lowerBound + gid;
-            int2 childInfo = in.childInfo[id];
+        const uint lowerBound = start - delta;
+        const uint upperBound = start;
+        if (gid < delta) {
+            const int id = lowerBound + gid;
+            const uchar childCount = in.childCount[id];
+            const uchar childIndex = in.childIndex[id];
+            const ushort parentId = in.parentId[id];
 
             half mass = in.mass[id];
-            half3 force = in.force[id];
-            half3 torque = in.torque[id];
-            half3 centerOfMass = in.centerOfMass[id];
+            packed_half3 force = in.force[id];
+            packed_half3 torque = in.torque[id];
+            packed_half3 centerOfMass = in.centerOfMass[id];
             half3x3 inertiaTensor = in.inertiaTensor[id];
 
-            for (ushort i = 0; i < (i > 0 ? 3 : 0); i++) {
-                int childId = gid + prev.x + i * (prev.y - prev.x) / 3;
+            for (uchar j = 0; j < childCount; j++) {
+//                int childId = gid + prev.x + i * (prev.y - prev.x) / 3;
+                int childId = j * (upperBound - lowerBound) + gid;
 //                int childId = i + prev.x + gid * 3;
 //                int childId = i + childInfo.y;
 
-                mass += in.mass[childId];
-                force += in.force[childId];
-                torque += in.torque[childId];
-                centerOfMass += in.centerOfMass[childId];
-                inertiaTensor += in.inertiaTensor[childId];
+                mass += out.mass[childId];
+                force += out.force[childId];
+                torque += out.torque[childId];
+                centerOfMass += out.centerOfMass[childId];
+                inertiaTensor += out.inertiaTensor[childId];
             }
 
-//            out.mass[id] = mass;
-//            out.force[id] = (packed_half3)force;
-//            out.torque[id] = (packed_half3)torque;
-//            out.centerOfMass[id] = (packed_half3)centerOfMass;
-            out.inertiaTensor[id] = (half3x3)inertiaTensor;
+            ushort nextDelta = 0;
+            if (parentId < USHRT_MAX) {
+                nextDelta = deltas[i+1];
+                const uint oid = childIndex * nextDelta + parentId;
+                out.mass[oid] = mass;
+                out.force[oid] = force;
+                out.torque[oid] = torque;
+                out.centerOfMass[oid] = centerOfMass;
+                out.inertiaTensor[oid] = inertiaTensor;
+            }
 
-            ushort climberCount = in.climberCount[id];
-            for (ushort i = 0; i < 6; i++) {
+            const uchar climberCount = in.climberCount[id];
+            for (uchar i = 0; i < climberCount; i++) {
                 int climberId = gid + 29523 + i * (206662-29523)/6;
 //                int climberId = i + 29523 + gid * 6;
 //                out.mass[climberId] = in.mass[climberId];
-//                out.force[climberId] = (packed_half3)in.force[climberId];
-//                out.torque[climberId] = (packed_half3)in.torque[climberId];
-//                out.centerOfMass[climberId] = (packed_half3)in.centerOfMass[climberId];
-                out.inertiaTensor[climberId] = (half3x3)in.inertiaTensor[climberId];
+//                out.force[climberId] = in.force[climberId];
+//                out.torque[climberId] = in.torque[climberId];
+//                out.centerOfMass[climberId] = in.centerOfMass[climberId];
+                out.inertiaTensor[climberId] = in.inertiaTensor[climberId];
             }
-            prev = range;
+            prev = lowerBound;
+            start = lowerBound;
+            delta = nextDelta;
         }
-//        threadgroup_barrier(mem_flags::mem_device);
+        threadgroup_barrier(mem_flags::mem_device);
     }
 }

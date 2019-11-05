@@ -74,6 +74,12 @@ final public class ArticulatedRigidBody: RigidBody {
         parentRigidBody.childJoints.remove(parentJoint)
     }
 
+    override var isFinite: Bool {
+        return super.isFinite && pivot.isFinite
+    }
+}
+
+extension ArticulatedRigidBody {
     var isRoot: Bool {
         return parentJoint == nil
     }
@@ -108,6 +114,43 @@ final public class ArticulatedRigidBody: RigidBody {
         return result
     }
 
+    var children: [ArticulatedRigidBody] {
+        return childJoints.map { $0.childRigidBody }
+    }
+
+    func levels() -> [[UnitOfWork]] {
+        var result: [[UnitOfWork]] = []
+        func nextLevel(_ level: [UnitOfWork]) -> [UnitOfWork] {
+            var result: [UnitOfWork] = []
+            for (parentId, item) in level.enumerated() {
+                for (childIndex, child) in item.rigidBody.children.enumerated() {
+                    result.append(UnitOfWork(
+                        childCount: child.childJoints.count,
+                        childIndex: childIndex,
+                        parentId: parentId,
+                        rigidBody: child,
+                        climbers: []))
+                }
+            }
+            return result.sorted()
+        }
+        var current = [
+            UnitOfWork(
+                childCount: childJoints.count,
+                childIndex: 0,
+                parentId: -1,
+                rigidBody: self,
+                climbers: [])]
+        while true {
+            result.append(current)
+            let next = nextLevel(current)
+            if next.isEmpty { break }
+            current = next
+        }
+        return result
+    }
+
+   /*
     var leaves: [ArticulatedRigidBody] {
         var result: [ArticulatedRigidBody] = []
         for childJoint in childJoints {
@@ -160,14 +203,21 @@ final public class ArticulatedRigidBody: RigidBody {
         } while !remaining.isEmpty
         return result
     }
-
-    override var isFinite: Bool {
-        return super.isFinite && pivot.isFinite
-    }
+     */
 }
 
 struct UnitOfWork {
+    let childCount: Int
+    let childIndex: Int
+    let parentId: Int
     let rigidBody: ArticulatedRigidBody
     let climbers: [ArticulatedRigidBody]
 }
-typealias Level = [UnitOfWork]
+
+extension UnitOfWork: Comparable {
+    static func < (lhs: UnitOfWork, rhs: UnitOfWork) -> Bool {
+        return lhs.childCount < rhs.childCount &&
+            lhs.childIndex < rhs.childIndex &&
+            lhs.parentId < rhs.parentId
+    }
+}

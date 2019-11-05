@@ -6,13 +6,11 @@ import ShaderTypes
 
 final class UpdateCompositeBodies: MetalKernelEncoder {
     private let argumentEncoder: ArgumentEncoder
-    private let ranges: [Range<Int>]
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, memoryLayoutManager: MemoryLayoutManager) {
         let library = device.makeDefaultLibrary()!
         let constantValues = MTLFunctionConstantValues()
-        self.ranges = memoryLayoutManager.rigidBodies.ranges
-        var rangeCount = ranges.count
+        var rangeCount = memoryLayoutManager.rigidBodies.ranges.count
         constantValues.setConstantValue(&rangeCount, type: .int, index: FunctionConstantIndex.rangeCount.rawValue)
         let function = try! library.makeFunction(name: "updateCompositeBodies", constantValues: constantValues)
 
@@ -27,7 +25,7 @@ final class UpdateCompositeBodies: MetalKernelEncoder {
         commandEncoder.label  = "Update Composite Bodies"
         argumentEncoder.encode(commandEncoder: commandEncoder)
 
-        let maxWidth = self.ranges.first!.count
+        let maxWidth = argumentEncoder.mem.rigidBodies.ranges.last!.count
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)
@@ -51,9 +49,10 @@ extension UpdateCompositeBodies {
 
         func encode(commandEncoder: MTLComputeCommandEncoder) {
             let bufs = [
-                mem.rigidBodies.childInfoBuffer,
+                mem.rigidBodies.childCountBuffer,
+                mem.rigidBodies.childIndexBuffer,
+                mem.rigidBodies.parentIdBuffer,
                 mem.rigidBodies.climberCountBuffer,
-                mem.rigidBodies.firstClimberIdBuffer,
                 mem.rigidBodies.massBuffer,
                 mem.rigidBodies.pivotBuffer,
                 mem.rigidBodies.forceBuffer,
@@ -69,8 +68,13 @@ extension UpdateCompositeBodies {
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 
-            var ranges = mem.rigidBodies.ranges.map { simd_int2(Int32($0.lowerBound), Int32($0.upperBound)) }
-            commandEncoder.setBytes(&ranges, length: MemoryLayout<SIMD2<Int32>>.stride * ranges.count, index: bufs.count)
+            let ranges = mem.rigidBodies.ranges.reversed()
+            var start = ranges.first!.upperBound
+            commandEncoder.setBytes(&start, length: MemoryLayout<UInt32>.stride * ranges.count, index: bufs.count)
+            var deltas = ranges.map { range in
+                UInt16(range.upperBound - range.lowerBound)
+            }
+            commandEncoder.setBytes(&deltas, length: MemoryLayout<UInt16>.stride * deltas.count, index: bufs.count+1)
         }
     }
 }
