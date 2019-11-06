@@ -60,12 +60,18 @@ extension UpdateCompositeBodies {
                 mem.rigidBodies.centerOfMassBuffer,
                 mem.rigidBodies.inertiaTensorBuffer,
 
+                mem.rigidBodies.jointStiffnessBuffer,
+                mem.rigidBodies.jointDampingBuffer,
+                mem.rigidBodies.jointRotationBuffer,
+
                 mem.compositeBodies.massBuffer,
                 mem.compositeBodies.forceBuffer,
                 mem.compositeBodies.torqueBuffer,
                 mem.compositeBodies.pivotBuffer,
                 mem.compositeBodies.centerOfMassBuffer,
                 mem.compositeBodies.inertiaTensorBuffer,
+
+                mem.joints.thetaBuffer,
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 

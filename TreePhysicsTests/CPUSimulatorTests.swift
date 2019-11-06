@@ -3,7 +3,7 @@ import XCTest
 import simd
 
 fileprivate let sqrt2: Float = sqrtf(2)
-fileprivate let delta: TimeInterval = 1
+fileprivate let delta: TimeInterval = 1/60
 
 /*
  The simplest test: One vertical node (attached to a root) with a force applied in the x direction.
@@ -194,9 +194,9 @@ class CPUSimulatorTests: XCTestCase {
 
             let momentOfInertia: Float = 1/4 + 1/12
             let compositeInertiaRelativeToJoint = momentOfInertia +
-                b1.composite.mass * sqr(distance(b1.composite.centerOfMass, joint.position))
+                b1.mass * sqr(distance(b1.centerOfMass, b1.pivot))
 
-            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b1.composite.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
+            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b1.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
             XCTAssertEqual(
                 float3x3(

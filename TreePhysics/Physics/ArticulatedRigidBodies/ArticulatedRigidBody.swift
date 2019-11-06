@@ -155,61 +155,6 @@ extension ArticulatedRigidBody {
         }
         return result
     }
-
-   /*
-    var leaves: [ArticulatedRigidBody] {
-        var result: [ArticulatedRigidBody] = []
-        for childJoint in childJoints {
-            let childRigidBody = childJoint.childRigidBody
-            if childRigidBody.isLeaf {
-                result.append(childRigidBody)
-            } else {
-                result.append(contentsOf: childRigidBody.leaves)
-            }
-        }
-        return result
-    }
-
-    func levels() -> [Level] {
-        var result: [Level] = []
-        var visited = Set<ArticulatedRigidBody>()
-
-        var remaining = self.leaves
-        repeat {
-            var level: Level = []
-            var nextRemaining: [ArticulatedRigidBody] = []
-            while var n = remaining.popLast() {
-                if n.childJoints.allSatisfy({ visited.contains($0.childRigidBody) }) && !visited.contains(n) {
-                    var climbers: [ArticulatedRigidBody] = []
-                    let beforeClimb = n
-                    while let parentRigidBody = n.parentRigidBody, parentRigidBody.hasOneChild {
-                        n = parentRigidBody
-                        if !visited.contains(n) {
-                            visited.insert(n)
-                            if !n.isRoot {
-                                climbers.append(n)
-                            }
-                        }
-                    }
-                    if !beforeClimb.isRoot {
-                        level.append(
-                            UnitOfWork(rigidBody: beforeClimb, climbers: climbers))
-                    }
-                    if let parentJoint = n.parentJoint {
-                        nextRemaining.append(parentJoint.parentRigidBody)
-                    }
-                }
-            }
-            if !level.isEmpty {
-                result.append(level)
-            }
-            let beforeClimbs = level.map { $0.rigidBody }
-            visited.formUnion(beforeClimbs)
-            remaining = Array(Set(nextRemaining))
-        } while !remaining.isEmpty
-        return result
-    }
-     */
 }
 
 struct UnitOfWork {

@@ -16,7 +16,7 @@ class GameViewController: UIViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]////[!"&FFFFFFFA]////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 9)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 7)
         let configuration = InterpreterConfig(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
@@ -29,7 +29,23 @@ class GameViewController: UIViewController {
 
         self.device = MTLCreateSystemDefaultDevice()!
 
-        self.mem = MemoryLayoutManager(device: device, root: root)
+        let root2 = ArticulatedRigidBody.static()
+        let b0 = Tree.internode(length: 1, radius: 1)
+        let b1 = Tree.internode(length: 1, radius: 1)
+        let b0joint = root2.add(b0, rotation: .identity, position: .zero)
+        b0joint.stiffness = 1
+        b0joint.torqueThreshold = .infinity
+        b0joint.damping = 1
+
+        let b1Joint = b0.add(b1, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
+        b1Joint.stiffness = 1
+        b1Joint.torqueThreshold = .infinity
+        b1Joint.damping = 1
+        let force = simd_float3(1, 0, 0) // world coordinates
+
+        b1.apply(force: force)
+
+        self.mem = MemoryLayoutManager(device: device, root: root2)
         print("Total nodes:", mem.rigidBodies.count)
 
         scnView.delegate = self

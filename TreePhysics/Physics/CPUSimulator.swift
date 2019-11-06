@@ -136,11 +136,7 @@ public final class CPUSimulator {
                 // 1.b. the generalized eigenvalue problem A * X = X * Λ
                 // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
                 let A = L_inverse * (parentJoint.stiffness * matrix_identity_float3x3) * L_transpose_inverse
-                let (Λ, X) = A.eigen!
-                let (Λ2, X2) = A.eigen_ql!
-                assert(abs(reduce_min(Λ) - reduce_min(Λ2)) / abs(reduce_min(Λ2)) < 0.05, "\(Λ) \(Λ2) \(A)")
-                assert(Λ.isFinite)
-                assert(X.isFinite)
+                let (Λ, X) = A.eigen_ql!
 
                 // 2. Now we can restate the differential equation in terms of other (diagonal)
                 // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
@@ -159,11 +155,6 @@ public final class CPUSimulator {
                     evaluateDifferential(a: 1, b: βΛ.y, c: Λ.y, g: torque_diagonal.y, y_0: θ_diagonal_0.y, y_ddt_0: θ_ddt_diagonal_0.y, at: time),
                     evaluateDifferential(a: 1, b: βΛ.z, c: Λ.z, g: torque_diagonal.z, y_0: θ_diagonal_0.z, y_ddt_0: θ_ddt_diagonal_0.z, at: time)])
 
-                assert(θ_diagonal_0.isFinite, "\(θ_diagonal_0)")
-                let x = evaluateDifferential(a: 1, b: βΛ.x, c: Λ.x, g: torque_diagonal.x, y_0: θ_diagonal_0.x, y_ddt_0: θ_ddt_diagonal_0.x, at: time)
-                assert(x.isFinite, "\(Λ2), \(Λ)")
-                assert(U.isFinite)
-                assert(θ_diagonal.isFinite, "\(θ_diagonal.columns.0)")
                 parentJoint.θ = U * θ_diagonal
             }
         }

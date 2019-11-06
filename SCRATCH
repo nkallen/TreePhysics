@@ -29,3 +29,19 @@ all floats ... + loading all children:
 climbing:
 
 1.96 ms [Range(0..<1), Range(1..<4), Range(4..<13), Range(13..<40), Range(40..<121), Range(121..<364), Range(364..<1093), Range(1093..<3280), Range(3280..<9841), Range(9841..<29524)]
+
+
+====
+
+(lldb) p compositeInertiaRelativeToJoint
+(Float) $R0 = 0.583333373
+(lldb) p joint.damping * joint.stiffness
+(Float) $R2 = 1
+(lldb) p joint.stiffness
+(Float) $R4 = 1
+(lldb) p self.b1.torque.z
+(Float) $R6 = -0.353553414
+
+
+
+(SIMD3<Float>) $R10 = (-0.000083386898, -0.00995779037, -0.588878095)
