@@ -11,7 +11,17 @@ sqr(T A)
 
 template <class T>
 inline matrix<T, 3, 3>
-crossMatrix(vec<T, 3> v)
+skew(vec<T, 3> v)
+{
+    return matrix<T, 3, 3>(
+                           vec<T, 3>(0, v.z, -v.y),
+                           vec<T, 3>(-v.z, 0, v.x),
+                           vec<T, 3>(v.y, -v.x, 0));
+}
+
+template <class T>
+inline matrix<T, 3, 3>
+skew(packed_vec<T, 3> v)
 {
     return matrix<T, 3, 3>(
                            vec<T, 3>(0, v.z, -v.y),

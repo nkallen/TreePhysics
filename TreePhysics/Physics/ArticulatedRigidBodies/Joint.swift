@@ -69,13 +69,3 @@ public final class Joint {
         return rotation.isFinite && position.isFinite && acceleration.isFinite
     }
 }
-
-extension Joint: Equatable, Hashable {
-    public static func == (lhs: Joint, rhs: Joint) -> Bool {
-        return lhs === rhs
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(self))
-    }
-}

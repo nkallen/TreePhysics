@@ -64,20 +64,20 @@ class RigidBodyTests: XCTestCase {
         _ = b7.add(b9)
 
         XCTAssertEqual(
-         [
-            [UnitOfWork(childCount: 1, childIndex: 0, parentId: -1, rigidBody: root, climbers: [])],
-            [UnitOfWork(childCount: 2, childIndex: 0, parentId: 0, rigidBody: b1, climbers: [])],
             [
-                UnitOfWork(childCount: 0, childIndex: 0, parentId: 0, rigidBody: b2, climbers: []),
-                UnitOfWork(childCount: 1, childIndex: 1, parentId: 0, rigidBody: b3, climbers: [])],
-            [UnitOfWork(childCount: 1, childIndex: 0, parentId: 1, rigidBody: b4, climbers: [])],
-            [UnitOfWork(childCount: 2, childIndex: 0, parentId: 0, rigidBody: b5, climbers: [])],
-            [
-                UnitOfWork(childCount: 0, childIndex: 0, parentId: 0, rigidBody: b6, climbers: []),
-                UnitOfWork(childCount: 2, childIndex: 1, parentId: 0, rigidBody: b7, climbers: [])],
-            [
-                UnitOfWork(childCount: 0, childIndex: 0, parentId: 1, rigidBody: b9, climbers: []),
-                UnitOfWork(childCount: 0, childIndex: 1, parentId: 1, rigidBody: b8, climbers: [])]]
+                [UnitOfWork(childCount: 1, childIndex: 0, parentId: -1, rigidBody: root, climbers: [])],
+                [UnitOfWork(childCount: 2, childIndex: 0, parentId: 0, rigidBody: b1, climbers: [])],
+                [
+                    UnitOfWork(childCount: 0, childIndex: 0, parentId: 0, rigidBody: b2, climbers: []),
+                    UnitOfWork(childCount: 1, childIndex: 1, parentId: 0, rigidBody: b5,
+                               climbers: [b4, b3])],
+                [
+                    UnitOfWork(childCount: 0, childIndex: 0, parentId: 1, rigidBody: b6, climbers: []),
+                    UnitOfWork(childCount: 2, childIndex: 1, parentId: 1, rigidBody: b7, climbers: [])],
+                [
+                    UnitOfWork(childCount: 0, childIndex: 0, parentId: 1, rigidBody: b8, climbers: []),
+                    UnitOfWork(childCount: 0, childIndex: 1, parentId: 1, rigidBody: b9, climbers: [])]
+            ]
             , root.levels())
     }
 }
@@ -98,8 +98,8 @@ b2  b3
     b8 b9
  */
 
-extension UnitOfWork: Equatable {
+//extension UnitOfWork: Equatable {
 //    public static func == (lhs: UnitOfWork, rhs: UnitOfWork) -> Bool {
 //        return lhs.rigidBody == rhs.rigidBody && lhs.climbers == rhs.climbers
 //    }
-}
+//}

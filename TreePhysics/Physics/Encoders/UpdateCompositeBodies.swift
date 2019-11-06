@@ -63,18 +63,24 @@ extension UpdateCompositeBodies {
                 mem.compositeBodies.massBuffer,
                 mem.compositeBodies.forceBuffer,
                 mem.compositeBodies.torqueBuffer,
+                mem.compositeBodies.pivotBuffer,
                 mem.compositeBodies.centerOfMassBuffer,
                 mem.compositeBodies.inertiaTensorBuffer,
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 
             let ranges = mem.rigidBodies.ranges.reversed()
-            var start = ranges.first!.upperBound
-            commandEncoder.setBytes(&start, length: MemoryLayout<UInt32>.stride * ranges.count, index: bufs.count)
+            var upperBound = ranges.first!.upperBound
+            commandEncoder.setBytes(&upperBound, length: MemoryLayout<UInt32>.stride, index: bufs.count)
+
+            var maxClimberCount = mem.rigidBodies.maxClimberCount
+            commandEncoder.setBytes(&maxClimberCount, length:
+                MemoryLayout<UInt8>.stride, index: bufs.count+1)
+
             var deltas = ranges.map { range in
                 UInt16(range.upperBound - range.lowerBound)
             }
-            commandEncoder.setBytes(&deltas, length: MemoryLayout<UInt16>.stride * deltas.count, index: bufs.count+1)
+            commandEncoder.setBytes(&deltas, length: MemoryLayout<UInt16>.stride * deltas.count, index: bufs.count+2)
         }
     }
 }

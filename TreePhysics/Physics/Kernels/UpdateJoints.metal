@@ -27,7 +27,7 @@ update(
     quatf inverseRotation = quat_inverse(rotation);
     float3 pr = (float3)quat_act(inverseRotation, (float3)in.centerOfMass[id] - (float3)in.pivot[id]);
     float3x3 inertiaTensor_jointSpace = transpose(rotationMatrix) * in.inertiaTensor[id] * rotationMatrix;
-    inertiaTensor_jointSpace -= in.mass[id] * sqr(crossMatrix(pr));
+    inertiaTensor_jointSpace -= in.mass[id] * sqr(skew(pr));
     float3 torque_jointSpace = quat_act(inverseRotation, in.torque[id]);
 
     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,

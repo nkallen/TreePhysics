@@ -5,38 +5,44 @@ import MetalKit
 class MemoryLayoutManager {
     class RigidBodies {
         let ranges: [Range<Int>]
+        let maxClimberCount: Int
         let count: Int
         let childCountBuffer, childIndexBuffer, parentIdBuffer, climberCountBuffer, massBuffer, pivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, inertiaTensorBuffer, jointDampingBuffer, jointStiffnessBuffer, jointRotationBuffer: MTLBuffer
 
         init(device: MTLDevice, root: ArticulatedRigidBody) {
-            var rangesOfWork: [Range<Int>] = []
+            var ranges: [Range<Int>] = []
             let levels = root.levels()
             var offset = 0
             var id = 0
             var index = [RigidBody:Int]()
-            var allClimbers: [ArticulatedRigidBody] = []
 
             // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
+            var maxClimberCount = 0
             for level in levels {
                 for unitOfWork in level {
-//                    allClimbers.append(contentsOf: unitOfWork.climbers)
                     index[unitOfWork.rigidBody] = id
                     id += 1
+                    maxClimberCount = max(maxClimberCount, unitOfWork.climbers.count)
                 }
 
                 let range = offset..<(offset+level.count)
-                rangesOfWork.append(range)
+                ranges.append(range)
                 offset += level.count
             }
-            self.ranges = rangesOfWork
-//            for rigidBody in allClimbers {
-//                index[rigidBody] = id
-//                id += 1
-//            }
-//            index[root] = id
+            self.ranges = ranges
+            self.maxClimberCount = maxClimberCount
+
+            for level in levels {
+                for (id, unitOfWork) in level.enumerated() {
+                    for (i, climber) in unitOfWork.climbers.enumerated() {
+                        index[climber] = offset + level.count * i + id
+                    }
+                }
+                offset += level.count * maxClimberCount
+            }
 
             // Step 2: Allocate the shared buffers
-            self.count = offset + allClimbers.count + 1 // +1 for root
+            self.count = offset
 
             let childCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
             let childIndexBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
@@ -67,36 +73,40 @@ class MemoryLayoutManager {
             let jointRotation = jointRotationBuffer.contents().bindMemory(to: simd_quatf.self, capacity: count)
 
             // Step 3: Store data into the buffer
-            func store(id: Int, childIndex _childIndex: Int, parentId _parentId: Int, rigidBody: ArticulatedRigidBody, climbers: [ArticulatedRigidBody] = []) {
+            func store(childIndex _childIndex: Int, parentId _parentId: Int, rigidBody: ArticulatedRigidBody, climbers: [ArticulatedRigidBody]) {
                 assert(_parentId < UInt16.max)
+                let id = index[rigidBody]!
 
                 childCount[id] = UInt8(rigidBody.childJoints.count)
                 childIndex[id] = UInt8(_childIndex)
-                parentId[id] = _parentId == -1 ? UInt16.max : UInt16(_parentId)
+                parentId[id] = UInt16(_parentId)
                 climberCount[id] = UInt8(climbers.count)
-                mass[id] = rigidBody.mass
-                pivot[id] = rigidBody.pivot
-                force[id] = rigidBody.force
-                torque[id] = rigidBody.torque
-                centerOfMass[id] = rigidBody.centerOfMass
-                inertiaTensor[id] = rigidBody.inertiaTensor
-                if let parentJoint = rigidBody.parentJoint {
-                    jointDamping[id] = parentJoint.damping
-                    jointStiffness[id] = parentJoint.stiffness
-                    jointRotation[id] = parentJoint.rotation
+
+                for rigidBody in climbers + [rigidBody] {
+                    let id = index[rigidBody]!
+
+                    mass[id] = rigidBody.mass
+                    pivot[id] = rigidBody.pivot
+                    force[id] = rigidBody.force
+                    torque[id] = rigidBody.torque
+                    centerOfMass[id] = rigidBody.centerOfMass
+                    inertiaTensor[id] = rigidBody.inertiaTensor
+                    if let parentJoint = rigidBody.parentJoint {
+                        jointDamping[id] = parentJoint.damping
+                        jointStiffness[id] = parentJoint.stiffness
+                        jointRotation[id] = parentJoint.rotation
+                    }
                 }
             }
 
             for level in levels {
                 for unitOfWork in level {
 //                    let rigidBody = unitOfWork.rigidBody
-                    let id = index[unitOfWork.rigidBody]!
-                    store(id: id, childIndex: unitOfWork.childIndex, parentId: unitOfWork.parentId, rigidBody: unitOfWork.rigidBody, climbers: [])
+                    store(childIndex: unitOfWork.childIndex, parentId: unitOfWork.parentId, rigidBody: unitOfWork.rigidBody, climbers: unitOfWork.climbers)
                 }
             }
 //            for rigidBody in allClimbers {
-//                let id = index[rigidBody]!
-//                store(id: id, rigidBody: rigidBody)
+//                store(rigidBody: rigidBody)
 //            }
 //            id = index[root]!
 //            store(id: id, rigidBody: root)
@@ -141,7 +151,7 @@ class MemoryLayoutManager {
     class CompositeBodies {
         let count: Int
         let ranges: [Range<Int>]
-        let massBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
+        let massBuffer, forceBuffer, torqueBuffer, pivotBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
 
         init(device: MTLDevice, count: Int, ranges: [Range<Int>]) {
             self.count = count
@@ -150,21 +160,22 @@ class MemoryLayoutManager {
             self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModePrivate])!
             self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
             self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
+            self.pivotBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
             self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<simd_float3>.stride, options: [.storageModePrivate])!
             self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<matrix_float3x3>.stride, options: [.storageModePrivate])!
         }
 
         subscript(id: Int) -> CompositeBody? {
-            if ranges[0].contains(id) {
-                return nil
-            } else {
+//            if ranges[0].contains(id) {
+//                return nil
+//            } else {
                 return CompositeBody(
                     mass: mass[id],
                     inertiaTensor: inertiaTensor[id],
                     force: force[id],
                     torque: torque[id],
                     centerOfMass: centerOfMass[id])
-            }
+//            }
         }
 
         var mass: UnsafeMutablePointer<Float> {

@@ -4,7 +4,7 @@ import SceneKit
 
 final public class ArticulatedRigidBody: RigidBody {
     weak var parentJoint: Joint? = nil
-    public var childJoints: Set<Joint> = []
+    public var childJoints: [Joint] = []
     let composite = CompositeBody()
 
     // The `pivot` is the point at which the object connects to its parent, and the "local" pivot is relative to the center of mass.
@@ -25,7 +25,7 @@ final public class ArticulatedRigidBody: RigidBody {
 
     func add(_ child: ArticulatedRigidBody, rotation: simd_quatf = simd_quatf(angle: -.pi/4, axis: .z), position: SIMD3<Float> = .zero) -> Joint {
         let joint = Joint(parent: self, child: child, localRotation: rotation, localPosition: position)
-        childJoints.insert(joint)
+        childJoints.append(joint)
         child.parentJoint = joint
         joint.updateTransform()
         child.updateTransform()
@@ -71,7 +71,7 @@ final public class ArticulatedRigidBody: RigidBody {
         let parentRigidBody = parentJoint.parentRigidBody
 
         self.parentJoint = nil
-        parentRigidBody.childJoints.remove(parentJoint)
+        parentRigidBody.childJoints.removeAll { $0 === self }
     }
 
     override var isFinite: Bool {
@@ -124,12 +124,18 @@ extension ArticulatedRigidBody {
             var result: [UnitOfWork] = []
             for (parentId, item) in level.enumerated() {
                 for (childIndex, child) in item.rigidBody.children.enumerated() {
+                    var climbers: [ArticulatedRigidBody] = [child]
+                    var current = child
+                    while let next = current.onlyChild {
+                        climbers.append(next)
+                        current = next
+                    }
                     result.append(UnitOfWork(
                         childCount: child.childJoints.count,
                         childIndex: childIndex,
                         parentId: parentId,
-                        rigidBody: child,
-                        climbers: []))
+                        rigidBody: climbers.popLast()!,
+                        climbers: climbers.reversed()))
                 }
             }
             return result.sorted()
@@ -138,7 +144,7 @@ extension ArticulatedRigidBody {
             UnitOfWork(
                 childCount: childJoints.count,
                 childIndex: 0,
-                parentId: -1,
+                parentId: 0,
                 rigidBody: self,
                 climbers: [])]
         while true {

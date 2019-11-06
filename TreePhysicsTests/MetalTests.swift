@@ -56,7 +56,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
     var mem: MemoryLayoutManager!
 
     var root, b1, b2: ArticulatedRigidBody!
-    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
+    let force: simd_float3 = simd_float3(0, 1, 0) // world coordinates
 
     override func setUp() {
         super.setUp()
@@ -64,7 +64,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
         self.commandQueue = device.makeCommandQueue()!
 
-        self.root = Tree.internode()
+        self.root = ArticulatedRigidBody.static()
         self.b1 = Tree.internode()
         self.b2 = Tree.internode()
         _ = root.add(b1)
@@ -76,35 +76,30 @@ class UpdateCompositeBodiesTests: XCTestCase {
     }
 
     func testUpdateCompositeBodies() {
-        let forceAppliedPosition = b2.pivot + b2.rotation.act(SIMD3<Float>(0, 1, 0))
-
         let expect = expectation(description: "wait")
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
-            let b2_composite = self.mem.compositeBodies[0]!
-            let b1_composite = self.mem.compositeBodies[1]!
-
-            XCTAssertNil(b2_composite)
+            let root_composite = self.mem.compositeBodies[0]!
 
             // mass
-            XCTAssertEqual(b1_composite.mass, 2)
+            XCTAssertEqual(root_composite.mass, self.b1.mass + self.b2.mass)
 
             // force
-            XCTAssertEqual(SIMD3<Float>(b1_composite.force), self.force)
+            XCTAssertEqual(simd_float3(root_composite.force), self.force)
 
             // torque
-            let r_b1 = forceAppliedPosition - self.b1.parentJoint!.position
-            XCTAssertEqual(SIMD3<Float>(b1_composite.torque), cross(r_b1, self.force), accuracy: 0.0001)
+            let r_b1 = self.b2.centerOfMass - self.b1.pivot
+            XCTAssertEqual(simd_float3(root_composite.torque), cross(r_b1, self.force), accuracy: 0.0001)
 
             // center of mass
-            XCTAssertEqual(SIMD3<Float>(b1_composite.centerOfMass), (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
+            XCTAssertEqual(simd_float3(root_composite.centerOfMass), (self.b1.centerOfMass + self.b2.centerOfMass)/2, accuracy: 0.0001)
 
             // inertia tensor
-            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - SIMD3<Float>(b1_composite.centerOfMass)).skew)
-            b1_inertiaTensor += self.b2.inertiaTensor - self.b2.mass * sqr((self.b2.centerOfMass - b1_composite.centerOfMass).skew)
-            XCTAssertEqual(b1_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
+            var b1_inertiaTensor = self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - simd_float3(root_composite.centerOfMass)).skew)
+            b1_inertiaTensor += self.b2.inertiaTensor - self.b2.mass * sqr((self.b2.centerOfMass - root_composite.centerOfMass).skew)
+            XCTAssertEqual(root_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
 
             expect.fulfill()
         }
@@ -121,7 +116,7 @@ class UpdateJointsTests: XCTestCase {
     var compositeBodiesBuffer, jointsBuffer: MTLBuffer!
 
     var root, b1, b2: ArticulatedRigidBody!
-    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
+    let force: simd_float3 = simd_float3(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
     override func setUp() {
@@ -136,7 +131,7 @@ class UpdateJointsTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force)
-        self.forceAppliedPosition = b2.pivot + b2.rotation.act(SIMD3<Float>(0, 1, 0))
+        self.forceAppliedPosition = b2.pivot + b2.rotation.act(simd_float3(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.compositeBodiesBuffer = UpdateCompositeBodies.compositeBodiesBuffer(count: rigidBodies.count, device: device)
@@ -160,17 +155,17 @@ class UpdateJointsTests: XCTestCase {
 
             XCTAssertEqual(
                 float3x3(
-                    SIMD3<Float>(0,0,0.00022747851), // i.e., a small rotation about the z axis
-                    SIMD3<Float>(0,0,0.02657279),
-                    SIMD3<Float>(0,0,1.4540789)
+                    simd_float3(0,0,0.00022747851), // i.e., a small rotation about the z axis
+                    simd_float3(0,0,0.02657279),
+                    simd_float3(0,0,1.4540789)
                 ),
                 b2_parentJoint.θ, accuracy: 0.0001)
 
             XCTAssertEqual(
                 float3x3(
-                    SIMD3<Float>(0,0,8.1739134e-05), // a slightly larger torque and larger moment of inertia
-                    SIMD3<Float>(0,0,0.009755036),
-                    SIMD3<Float>(0,0,0.5747628)
+                    simd_float3(0,0,8.1739134e-05), // a slightly larger torque and larger moment of inertia
+                    simd_float3(0,0,0.009755036),
+                    simd_float3(0,0,0.5747628)
                 ),
                 b1_parentJoint.θ, accuracy: 0.0001)
 
@@ -190,7 +185,7 @@ class UpdateRigidBodiesTests: XCTestCase {
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
 
     var root, b1, b2: ArticulatedRigidBody!
-    let force: SIMD3<Float> = SIMD3<Float>(0, 1, 0) // world coordinates
+    let force: simd_float3 = simd_float3(0, 1, 0) // world coordinates
     var forceAppliedPosition: float3!
 
     override func setUp() {
@@ -205,7 +200,7 @@ class UpdateRigidBodiesTests: XCTestCase {
         _ = root.add(b1)
         _ = b1.add(b2)
         b2.apply(force: force)
-        self.forceAppliedPosition = b2.pivot + b2.rotation.act(SIMD3<Float>(0, 1, 0))
+        self.forceAppliedPosition = b2.pivot + b2.rotation.act(simd_float3(0, 1, 0))
 
         let (rigidBodies, rigidBodiesBuffer, ranges) = UpdateCompositeBodies.rigidBodiesBuffer(root: root, device: device)
         self.rigidBodiesBuffer = rigidBodiesBuffer
@@ -234,23 +229,23 @@ class UpdateRigidBodiesTests: XCTestCase {
             let b1 = rigidBodies[1]
 
             XCTAssertEqual(
-                SIMD3<Float>(0.70687836, 1.7073351, 0),
-                SIMD3<Float>(b2.pivot), accuracy: 0.001)
+                simd_float3(0.70687836, 1.7073351, 0),
+                simd_float3(b2.pivot), accuracy: 0.001)
             XCTAssertEqual(
                 float3x3(
-                    SIMD3<Float>(0.0011795461,-1,0),
-                    SIMD3<Float>(1,0.0011795461,0),
-                    SIMD3<Float>(0,0,1)),
+                    simd_float3(0.0011795461,-1,0),
+                    simd_float3(1,0.0011795461,0),
+                    simd_float3(0,0,1)),
                 b2.rotation, accuracy: 0.001)
 
             XCTAssertEqual(
-                SIMD3<Float>(0, 1, 0),
-                SIMD3<Float>(b1.pivot))
+                simd_float3(0, 1, 0),
+                simd_float3(b1.pivot))
             XCTAssertEqual(
                 float3x3(
-                    SIMD3<Float>(0.7073351,-0.70687836,0),
-                    SIMD3<Float>(0.70687836,0.7073351,0),
-                    SIMD3<Float>(0,0,1)),
+                    simd_float3(0.7073351,-0.70687836,0),
+                    simd_float3(0.70687836,0.7073351,0),
+                    simd_float3(0,0,1)),
                 b1.rotation, accuracy: 0.001)
 
             expect.fulfill()
