@@ -7,12 +7,12 @@ using namespace metal;
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
 
 typedef struct {
-    device float *mass;
-    device float3 *force;
-    device float3 *torque;
-    device float3 *pivot;
-    device float3 *centerOfMass;
-    device float3x3 *inertiaTensor;
+    device half *mass;
+    device half3 *force;
+    device half3 *torque;
+    device half3 *pivot;
+    device half3 *centerOfMass;
+    device half3x3 *inertiaTensor;
 } Children;
 
 typedef struct {
@@ -21,37 +21,39 @@ typedef struct {
     device ushort *parentId;
     device uchar *climberCount;
 
-    device float *mass;
-    device float3 *force;
-    device float3 *torque;
-    device float3 *centerOfMass;
-    device float3 *pivot;
-    device float3x3 *inertiaTensor;
+    device half *mass;
+    device half3 *force;
+    device half3 *torque;
+    device half3 *centerOfMass;
+    device half3 *pivot;
+    device half3x3 *inertiaTensor;
     device quatf *rotation;
 
-    device float *stiffness;
-    device float *damping;
-    device float3x3 *theta;
+    device half *stiffness;
+    device half *damping;
+    device half3x3 *theta;
 } Bodies;
 
-inline float3x3
+inline half3x3
 updateJoint(
             uint id,
             Bodies in,
-            float mass,
-            float3 torque,
-            float3 centerOfMass,
-            float3 pivot,
-            float3x3 inertiaTensor,
+            half mass,
+            half3 torque,
+            half3 centerOfMass,
+            half3 pivot,
+            half3x3 inertiaTensor,
             float time)
 {
     quatf rotation = in.rotation[id];
     float3x3 rotationMatrix = float3x3_from_quat(rotation);
     quatf inverseRotation = quat_inverse(rotation);
-    float3 pr = quat_act(inverseRotation, centerOfMass - pivot);
-    float3x3 inertiaTensor_jointSpace = transpose(rotationMatrix) * inertiaTensor * rotationMatrix;
-    inertiaTensor_jointSpace -= mass * sqr(skew(pr));
-    float3 torque_jointSpace = quat_act(inverseRotation, torque);
+    float3 pr = quat_act(inverseRotation, (float3)(centerOfMass - pivot));
+    float3x3 inertiaTensor_jointSpace = transpose(rotationMatrix) * (float3x3)inertiaTensor * rotationMatrix;
+    inertiaTensor_jointSpace -= (float)mass * sqr(skew(pr));
+    float3 torque_jointSpace = quat_act(inverseRotation, (float3)torque);
+
+    return (half3x3)inertiaTensor_jointSpace;
 
     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
     // K is a spring stiffness matrix, θ = euler angles of the joint,
@@ -77,7 +79,7 @@ updateJoint(
     // 2. Now we can restate the differential equation in terms of other (diagonal)
     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
 
-    float3x3 U = (float3x3)L_transpose_inverse * X;
+    float3x3 U = L_transpose_inverse * X;
     float3x3 U_transpose = transpose(U);
     float3x3 U_inverse = inverse(U);
 
@@ -96,8 +98,7 @@ updateJoint(
 
     float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
-    θ = U * θ_diagonal;
-    return θ;
+    return (half3x3)(U * θ_diagonal);
 }
 
 kernel void
@@ -106,25 +107,25 @@ updateCompositeBodies(
                       device uchar    *in_childIndex,
                       device ushort   *in_parentId,
                       device uchar    *in_climberCount,
-                      device float    *in_mass,
-                      device float3   *in_pivot,
-                      device float3   *in_force,
-                      device float3   *in_torque,
-                      device float3   *in_centerOfMass,
-                      device float3x3 *in_inertiaTensor,
+                      device half    *in_mass,
+                      device half3   *in_pivot,
+                      device half3   *in_force,
+                      device half3   *in_torque,
+                      device half3   *in_centerOfMass,
+                      device half3x3 *in_inertiaTensor,
 
-                      device float    *in_stiffness,
-                      device float    *in_damping,
+                      device half    *in_stiffness,
+                      device half    *in_damping,
                       device quatf    *in_rotation,
 
-                      device float    *out_mass,
-                      device float3   *out_force,
-                      device float3   *out_torque,
-                      device float3   *out_pivot,
-                      device float3   *out_centerOfMass,
-                      device float3x3 *out_inertiaTensor,
+                      device half    *out_mass,
+                      device half3   *out_force,
+                      device half3   *out_torque,
+                      device half3   *out_pivot,
+                      device half3   *out_centerOfMass,
+                      device half3x3 *out_inertiaTensor,
 
-                      device float3x3 *out_theta,
+                      device half3x3 *out_theta,
 
                       constant uint * upperBound,
                       constant uchar * maxClimberCount,
@@ -168,24 +169,24 @@ updateCompositeBodies(
             const uchar childIndex = bodies.childIndex[id];
             const ushort parentId = bodies.parentId[id];
 
-            const float parentMass = bodies.mass[id];
-            const float3 parentForce = bodies.force[id];
-            const float3 parentTorque = bodies.torque[id];
-            const float3 parentCenterOfMass = bodies.centerOfMass[id];
-            const float3 parentPivot = bodies.pivot[id];
+            const half parentMass = bodies.mass[id];
+            const half3 parentForce = bodies.force[id];
+            const half3 parentTorque = bodies.torque[id];
+            const half3 parentCenterOfMass = bodies.centerOfMass[id];
+            const half3 parentPivot = bodies.pivot[id];
 
-            float totalMass = parentMass;
-            float3 totalForce = parentForce;
-            float3 totalTorque = parentTorque;
-            float3 previousCenterOfMass, totalCenterOfMass = previousCenterOfMass = parentCenterOfMass;
-            float3x3 totalInertiaTensor = bodies.inertiaTensor[id];
+            half totalMass = parentMass;
+            half3 totalForce = parentForce;
+            half3 totalTorque = parentTorque;
+            half3 previousCenterOfMass, totalCenterOfMass = previousCenterOfMass = parentCenterOfMass;
+            half3x3 totalInertiaTensor = bodies.inertiaTensor[id];
 
             // Step 1: Accumulate children
             for (uchar j = 0; j < childCount; j++) {
                 const int nextId = j * delta + gid;
-                const float nextMass = children.mass[nextId];
-                const float3 nextForce = children.force[nextId];
-                const float3 nextCenterOfMass = children.centerOfMass[nextId];
+                const half nextMass = children.mass[nextId];
+                const half3 nextForce = children.force[nextId];
+                const half3 nextCenterOfMass = children.centerOfMass[nextId];
 
                 totalForce += nextForce;
                 totalTorque += cross(children.pivot[nextId] - parentPivot, nextForce) +  children.torque[nextId];
@@ -196,18 +197,18 @@ updateCompositeBodies(
                 previousCenterOfMass = totalCenterOfMass;
             }
 
-            const float3x3 theta = updateJoint(id, bodies, totalMass, totalTorque, totalCenterOfMass, parentPivot, totalInertiaTensor, 1.0/60);
+            const half3x3 theta = updateJoint(id, bodies, totalMass, totalTorque, totalCenterOfMass, parentPivot, totalInertiaTensor, 1.0/60);
             out_theta[id] = theta;
 
             // Step 2: Walk up any "climber" chains
-            float3 previousPivot = parentPivot;
+            half3 previousPivot = parentPivot;
             const uchar climberCount = bodies.climberCount[id];
             for (uchar j = 0; j < climberCount; j++) {
                 const int nextId = offset + j * delta + gid;
-                const float nextMass = bodies.mass[nextId];
-                const float3 nextForce = bodies.force[nextId];
-                const float3 nextCenterOfMass = bodies.centerOfMass[nextId];
-                const float3 nextPivot = bodies.pivot[nextId];
+                const half nextMass = bodies.mass[nextId];
+                const half3 nextForce = bodies.force[nextId];
+                const half3 nextCenterOfMass = bodies.centerOfMass[nextId];
+                const half3 nextPivot = bodies.pivot[nextId];
 
                 totalTorque += cross(previousPivot - nextPivot, totalForce) + bodies.torque[nextId];
                 totalForce += nextForce;
@@ -216,7 +217,7 @@ updateCompositeBodies(
                 totalInertiaTensor += bodies.inertiaTensor[nextId] - nextMass * sqr(skew(nextCenterOfMass - totalCenterOfMass));
                 totalMass += nextMass;
 
-                const float3x3 theta = updateJoint(nextId, bodies, totalMass, totalTorque, totalCenterOfMass, nextPivot, totalInertiaTensor, 1.0/60);
+                const half3x3 theta = updateJoint(nextId, bodies, totalMass, totalTorque, totalCenterOfMass, nextPivot, totalInertiaTensor, 1.0/60);
                 out_theta[nextId] = theta;
 
                 previousCenterOfMass = totalCenterOfMass;

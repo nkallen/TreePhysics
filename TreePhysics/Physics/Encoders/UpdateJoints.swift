@@ -29,11 +29,6 @@ final class UpdateJoints: MetalKernelEncoder {
         commandEncoder.dispatchThreads(threadsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         commandEncoder.endEncoding()
     }
-
-    static func buffer(count: Int, device: MTLDevice) -> MTLBuffer {
-        let buffer = device.makeBuffer(length: count * MemoryLayout<JointStruct>.stride, options: [.storageModePrivate])!
-        return buffer
-    }
 }
 
 extension UpdateJoints {
