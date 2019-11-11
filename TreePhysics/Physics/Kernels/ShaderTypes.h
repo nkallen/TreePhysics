@@ -7,6 +7,7 @@
 
 #else
 #import <Foundation/Foundation.h>
+#import "Half.h"
 #endif
 
 #include <simd/simd.h>
@@ -69,7 +70,7 @@ typedef struct {
     matrix_float3x3 rotation;
     matrix_float3x3 inertiaTensor;
     vector_float3 centerOfMass;
-    
+
     vector_float3 force;
     vector_float3 torque;
 } RigidBodyStruct;
@@ -81,7 +82,12 @@ typedef struct {
 typedef struct {
     vector_float3 position;
     vector_float3 halfExtent;
-
 } PhysicsFieldStruct;
+
+typedef struct {
+    float scale;
+    packed_half3 diag;
+    packed_half3 ltr;
+} InertiaTensor;
 
 #endif /* ShaderTypes_h */

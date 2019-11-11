@@ -1,34 +1,26 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
+#import "Diagonalize.metal"
 
 using namespace metal;
 
 struct UpdateJointsIn {
-    device float3x3 *theta;
-    device float *stiffness;
-    device float *damping;
-    device quatf *rotation;
-    device float3 *pivot;
-    device float *mass;
-    device float3 *torque;
-    device float3 *centerOfMass;
-    device float3x3 *inertiaTensor;
+    device packed_half3 *theta;
+    device half *stiffness;
+    device half *damping;
+    device packed_half3 *torque;
+    device InertiaTensor *inertiaTensor;
 };
 
 inline float3x3
 update(
-            uint id,
-            UpdateJointsIn in,
-            float time)
+       uint id,
+       UpdateJointsIn in,
+       float time)
 {
-    quatf rotation = in.rotation[id];
-    float3x3 rotationMatrix = float3x3_from_quat(rotation);
-    quatf inverseRotation = quat_inverse(rotation);
-    float3 pr = (float3)quat_act(inverseRotation, (float3)in.centerOfMass[id] - (float3)in.pivot[id]);
-    float3x3 inertiaTensor_jointSpace = transpose(rotationMatrix) * in.inertiaTensor[id] * rotationMatrix;
-    inertiaTensor_jointSpace -= in.mass[id] * sqr(skew(pr));
-    float3 torque_jointSpace = quat_act(inverseRotation, in.torque[id]);
+    float3x3 inertiaTensor_jointSpace = float3x3_from_inertiaTensor(in.inertiaTensor[id]);
+    float3 torque_jointSpace = (float3)in.torque[id];
 
     // Solve: Iθ'' + (αI + βK)θ' + Kθ = τ; where I = inertia tensor, τ = torque,
     // K is a spring stiffness matrix, θ = euler angles of the joint,
@@ -44,24 +36,27 @@ update(
 
     // 1.b. the generalized eigenvalue problem A * X = X * Λ
     // where A = L^(−1) * K * L^(−T); note: A is (approximately) symmetric
-    float3x3 A = L_inverse * (in.stiffness[id] * float3x3(1)) * L_transpose_inverse;
+    float3x3 A = L_inverse * (float3x3(in.stiffness[id])) * L_transpose_inverse;
 
-    float4 q = diagonalize(A);
-    float3x3 X = qmat(q);
-    float3x3 Λ_M = transpose(X) * A * X;
-    float3 Λ = float3(Λ_M[0][0], Λ_M[1][1], Λ_M[2][2]);
+    quatf q = diagonalize(A);
+    float3x3 X = float3x3_from_quat(q); // eigenvectors
+    A = A * X;
+    float3 Λ = float3(dot(X[0], A[0]),
+                      dot(X[1], A[1]),
+                      dot(X[2], A[2]));
 
     // 2. Now we can restate the differential equation in terms of other (diagonal)
     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
 
-    float3x3 U = (float3x3)L_transpose_inverse * X;
+    float3x3 U = L_transpose_inverse * X;
     float3x3 U_transpose = transpose(U);
     float3x3 U_inverse = inverse(U);
 
     float3 torque_diagonal = U_transpose * torque_jointSpace;
-    float3x3 θ = in.theta[id];
-    float3 θ_diagonal_0 = U_inverse * θ[0];
-    float3 θ_ddt_diagonal_0 = U_inverse * θ[1];
+    float3 angle = (float3)in.theta[id];
+    float3 θ_diagonal_0 = U_inverse * angle;
+    float3 angularVelocity = (float3)in.theta[id*2];
+    float3 θ_ddt_diagonal_0 = U_inverse * angularVelocity;
     float3 βΛ = in.damping[id] * Λ;
 
     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
@@ -73,22 +68,17 @@ update(
 
     float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 
-    θ = U * θ_diagonal;
-    return θ;
+    return U * θ_diagonal;
 }
 
 kernel void
 updateJoints(
-             device float3x3 *joint_theta,
-             device float *joint_stiffness,
-             device float *joint_damping,
-             device quatf *joint_rotation,
-             device float3 *rigidBody_pivot,
+             device packed_half3 *joint_theta,
+             device half *joint_stiffness,
+             device half *joint_damping,
 
-             device float *compositeBody_mass,
-             device float3 *compositeBody_torque,
-             device float3 *compositeBody_centerOfMass,
-             device float3x3 *compositeBody_inertiaTensor,
+             device packed_half3 *joint_torque,
+             device InertiaTensor *joint_inertiaTensor,
 
              constant float * time,
              uint gid [[ thread_position_in_grid ]])
@@ -97,13 +87,11 @@ updateJoints(
         .theta = joint_theta,
         .stiffness = joint_stiffness,
         .damping = joint_damping,
-        .rotation = joint_rotation,
-        .pivot = rigidBody_pivot,
-        .mass = compositeBody_mass,
-        .torque = compositeBody_torque,
-        .centerOfMass = compositeBody_centerOfMass,
-        .inertiaTensor = compositeBody_inertiaTensor
+        .torque = joint_torque,
+        .inertiaTensor = joint_inertiaTensor,
     };
     float3x3 theta = update(gid, in, *time);
-    joint_theta[gid] = theta;
+    joint_theta[gid] = (packed_half3)theta[0];
+    joint_theta[gid*2] = (packed_half3)theta[1];
+    joint_theta[gid*3] = (packed_half3)theta[2];
 }

@@ -52,6 +52,7 @@ class ApplyPhysicsFieldsTests: XCTestCase {
 
 class UpdateCompositeBodiesTests: XCTestCase {
     var updateCompositeBodies: UpdateCompositeBodies!
+    var updateJoints: UpdateJoints!
 
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var mem: MemoryLayoutManager!
@@ -84,6 +85,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
 
         self.mem = MemoryLayoutManager(device: device, root: root)
         self.updateCompositeBodies = UpdateCompositeBodies(device: device, memoryLayoutManager: mem)
+        self.updateJoints = UpdateJoints(device: device, memoryLayoutManager: mem)
     }
 
     func testUpdateCompositeBodiesChecksum() {
@@ -123,6 +125,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
+        updateJoints.encode(commandBuffer: commandBuffer, at: 1/60)
         commandBuffer.addCompletedHandler { _ in
             let b1_θ = self.mem.joints[self.mem.rigidBodies.index[self.b1]!]
             let b0_θ = self.mem.joints[self.mem.rigidBodies.index[self.b0]!]

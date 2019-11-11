@@ -29,6 +29,22 @@ class GameViewController: UIViewController {
 
         self.device = MTLCreateSystemDefaultDevice()!
 
+//        let root2 = ArticulatedRigidBody.static()
+//        let b0 = Tree.internode(length: 1, radius: 1)
+//        let b1 = Tree.internode(length: 1, radius: 1)
+//        let b0joint = root2.add(b0, rotation: .identity, position: .zero)
+//        b0joint.stiffness = 1
+//        b0joint.torqueThreshold = .infinity
+//        b0joint.damping = 1
+//
+//        let b1Joint = b0.add(b1, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
+//        b1Joint.stiffness = 1
+//        b1Joint.torqueThreshold = .infinity
+//        b1Joint.damping = 1
+//        let force = simd_float3(1, 0, 0) // world coordinates
+//
+//        b1.apply(force: force)
+
         self.mem = MemoryLayoutManager(device: device, root: root)
         print("Total nodes:", mem.rigidBodies.count)
 
@@ -47,12 +63,10 @@ extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let commandQueue = device.makeCommandQueue()!
 
-        let command =  UpdateCompositeBodies(memoryLayoutManager: mem)
-
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
-        command.encode(commandBuffer: commandBuffer)
-
+        UpdateCompositeBodies(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer)
+        UpdateJoints(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer, at: 1/60)
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
 

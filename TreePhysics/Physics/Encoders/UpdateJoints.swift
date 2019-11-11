@@ -20,7 +20,7 @@ final class UpdateJoints: MetalKernelEncoder {
 
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)
-        let numJointsExcludingRoot = argumentEncoder.mem.rigidBodies.count - 1
+        let numJointsExcludingRoot = argumentEncoder.mem.rigidBodies.count
         let threadsPerGrid = MTLSize(
             width: numJointsExcludingRoot,
             height: 1,
@@ -44,13 +44,9 @@ extension UpdateJoints {
                 mem.joints.thetaBuffer,
                 mem.rigidBodies.jointStiffnessBuffer,
                 mem.rigidBodies.jointDampingBuffer,
-                mem.rigidBodies.jointRotationBuffer,
-                mem.rigidBodies.pivotBuffer,
 
-                mem.compositeBodies.massBuffer,
-                mem.compositeBodies.torqueBuffer,
-                mem.compositeBodies.centerOfMassBuffer,
-                mem.compositeBodies.inertiaTensorBuffer,
+                mem.joints.torqueBuffer,
+                mem.joints.inertiaTensorBuffer,
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 

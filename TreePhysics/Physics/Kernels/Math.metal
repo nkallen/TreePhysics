@@ -1,5 +1,7 @@
 #include <metal_stdlib>
-#include "Diagonalize.metal"
+#include "Math.h"
+#include "ShaderTypes.h"
+
 using namespace metal;
 
 template <class T>
@@ -42,7 +44,7 @@ cholesky(matrix<T, 3, 3> A)
     T a02 = A[0][2], a12 = A[1][2], a22 = A[2][2];
 
     // Factorize A
-    T l00 = sqrt(a00);
+    T l00 = rsqrt(a00);
     T l01 = a01/l00;
     T l02 = a02/l00;
 
@@ -298,7 +300,6 @@ evaluateDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0, T t)
 // Quaternion and diagonlization adapted from Apple's "ForwardPlusWithTileShading"
 
 /// A single-precision quaternion type
-typedef float4 quatf;
 
 inline quatf quaternion(float x, float y, float z, float w) {
     return (quatf){ x, y, z, w };
@@ -391,6 +392,10 @@ inline quatf quat_inverse(quatf q) {
     return quat_conjugate(q) / quat_length_squared(q);
 }
 
+inline quath quat_inverse(quath q) {
+    return (quath)quat_inverse((quatf)q);
+}
+
 inline quatf quat_multiply(quatf q0, quatf q1) {
     quatf q;
 
@@ -459,4 +464,31 @@ inline float3x3 float3x3_from_quat(quatf q) {
     return float3x3(m00, m10, m20,
                        m01, m11, m21,
                        m02, m12, m22);
+}
+
+inline float3x3 float3x3_from_inertiaTensor(InertiaTensor t) {
+    float3x3 result = float3x3(0);
+
+    result[0][0] = (float)t.diag.x;
+    result[1][1] = (float)t.diag.y;
+    result[2][2] = (float)t.diag.z;
+
+    result[0][1] = (float)t.ltr.x;
+    result[0][2] = (float)t.ltr.y;
+    result[1][2] = (float)t.ltr.z;
+
+    result[1][0] = (float)t.ltr.x;
+    result[2][0] = (float)t.ltr.y;
+    result[2][1] = (float)t.ltr.z;
+
+    return t.scale*result;
+}
+
+inline InertiaTensor inertiaTensor_from_float3x3(float3x3 x) {
+    float3 m = max3(x[0], x[1], x[2]);
+    float scale = max3(m.x, m.y, m.z);
+    x = 1.0/scale * x;
+    packed_half3 diag = packed_half3(x[0][0], x[1][1], x[2][2]);
+    packed_half3 ltr = packed_half3(x[0][1], x[0][2], x[1][2]);
+    return {.scale = scale, .diag = diag, .ltr = ltr};
 }

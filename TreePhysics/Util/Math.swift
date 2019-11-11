@@ -320,3 +320,76 @@ func mix(_ x: Float, _ y: Float, t: Float) -> Float {
 func normalize(angle: Float) -> Float {
     angle - 2 * .pi * floor(angle / (2 * .pi))
 }
+
+extension packed_half3 {
+    init(_ x: Float, _ y: Float, _ z: Float) {
+        self.init()
+        self.x = Half(x)
+        self.y = Half(y)
+        self.z = Half(z)
+    }
+
+    init(_ x: half, _ y: half, _ z: half) {
+        self.init()
+        self.x = x
+        self.y = y
+        self.z = z
+    }
+
+    init(_ vec: simd_float3) {
+        self.init(Half(vec.x), Half(vec.y), Half(vec.z))
+    }
+}
+
+extension simd_quath {
+    init(_ q: simd_quatf) {
+        self.init(x: Half(q.imag.x), y: Half(q.imag.y), z: Half(q.imag.z), w: Half(q.real))
+    }
+}
+
+func Half(_ x: Float) -> half {
+    return float16_from_float32(x)
+}
+
+extension Float {
+    init(_ x: half) {
+        self = float32_from_float16(x)
+    }
+}
+
+extension simd_float3 {
+    init(_ v: packed_half3) {
+        self.init(Float(v.x), Float(v.y), Float(v.z))
+    }
+}
+
+extension float3x3 {
+    init(_ x: InertiaTensor) {
+        self.init(0)
+
+        self[0,0] = Float(x.diag.x)
+        self[1,1] = Float(x.diag.y)
+        self[2,2] = Float(x.diag.z)
+
+        self[0,1] = Float(x.ltr.x)
+        self[0,2] = Float(x.ltr.y)
+        self[1,2] = Float(x.ltr.z)
+
+        self[1,0] = Float(x.ltr.x)
+        self[2,0] = Float(x.ltr.y)
+        self[2,1] = Float(x.ltr.z)
+
+        self = x.scale*self
+    }
+}
+
+extension InertiaTensor {
+    init(_ x: simd_float3x3) {
+        var x = x
+        let scale = max(max(reduce_max(x[0]), reduce_max(x[1])), reduce_max(x[2]))
+        x = 1.0/scale * x
+        let diag = packed_half3(x[0,0], x[1,1], x[2,2])
+        let ltr = packed_half3(x[0,1], x[0,2], x[1,2])
+        self.init(scale: scale, diag: diag, ltr: ltr)
+    }
+}
