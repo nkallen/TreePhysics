@@ -205,6 +205,7 @@ solveDifferential(T a, T b, T c, T g, T y_0, T y_ddt_0)
                 solution.x,
                 solution.y,
                 quadraticSolution.a,
+                0,
                 k
             };
         }
@@ -241,50 +242,40 @@ inline vec<T, 3>
 evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
 {
     T e = M_E_F;
+    T c1 = differentialSolution.c1;
+    T c2 = differentialSolution.c2;
+    T r1 = differentialSolution.x;
+    T r2 = differentialSolution.y;
+    T k = differentialSolution.z;
+
+    T y, y_ddt, y_d2dt;
+    T pe1 = pow(e,r1*t);
+
     switch (differentialSolution.type) {
         case QuadraticSolutionTypeComplex: {
-            T c1 = differentialSolution.c1;
-            T c2 = differentialSolution.c2;
-            T λ = differentialSolution.x;
-            T μ = differentialSolution.y;
-            T k = differentialSolution.z;
-
-            T y = c1*pow(e,λ*t)*cos(μ*t) + c2*pow(e,λ*t)*sin(μ*t) + k;
-            T y_ddt = λ*c1*pow(e,λ*t)*cos(μ*t) - μ*c1*pow(e,λ*t)*sin(μ*t) +
-            λ*c2*pow(e,λ*t)*sin(μ*t) + μ*c2*pow(e,λ*t)*cos(μ*t);
-            T y_d2dt = λ*λ*c1*pow(e,λ*t)*cos(μ*t) - μ*λ*c1*pow(e,λ*t)*sin(μ*t) -
-            (λ*μ*c1*pow(e,λ*t)*sin(μ*t) + μ*μ*c1*pow(e,λ*t)*cos(μ*t)) +
-            λ*λ*c2*pow(e,λ*t)*sin(μ*t) + μ*λ*c2*pow(e,λ*t)*cos(μ*t) +
-            λ*μ*c2*pow(e,λ*t)*cos(μ*t) - μ*μ*c2*pow(e,λ*t)*sin(μ*t);
-            return vec<T, 3>(y, y_ddt, y_d2dt);
+            y = c1*pe1*cos(r2*t) + c2*pe1*sin(r2*t) + k;
+            y_ddt = r1*c1*pe1*cos(r2*t) - r2*c1*pe1*sin(r2*t) +
+            r1*c2*pe1*sin(r2*t) + r2*c2*pe1*cos(r2*t);
+            y_d2dt = r1*r1*c1*pe1*cos(r2*t) - r2*r1*c1*pe1*sin(r2*t) -
+            (r1*r2*c1*pe1*sin(r2*t) + r2*r2*c1*pe1*cos(r2*t)) +
+            r1*r1*c2*pe1*sin(r2*t) + r2*r1*c2*pe1*cos(r2*t) +
+            r1*r2*c2*pe1*cos(r2*t) - r2*r2*c2*pe1*sin(r2*t);
         }
         case QuadraticSolutionTypeReal: {
-            T c1 = differentialSolution.c1;
-            T c2 = differentialSolution.c2;
-            T r = differentialSolution.x;
-            T k = differentialSolution.y;
-
-            T y = c1*pow(e,r*t) + c2*t*pow(e,r*t) + k;
-            T y_ddt = r*c1*pow(e,r*t) +
-            c2*pow(e,r*t) + r*c2*t*pow(e,r*t);
-            T y_d2dt = r*r*c1*pow(e,r*t) +
-            r*c2*pow(e,r*t) +
-            r*c2*pow(e,r*t) + r*r*c2*t*pow(e,r*t);
-            return vec<T, 3>(y, y_ddt, y_d2dt);
+            y = c1*pe1 + c2*t*pe1 + k;
+            y_ddt = r1*c1*pe1 +
+            c2*pe1 + r1*c2*t*pe1;
+            y_d2dt = r1*r1*c1*pe1 +
+            r1*c2*pe1 +
+            r1*c2*pe1 + r1*r1*c2*t*pe1;
         }
         case QuadraticSolutionTypeRealDistinct: {
-            T c1 = differentialSolution.c1;
-            T c2 = differentialSolution.c2;
-            T r1 = differentialSolution.x;
-            T r2 = differentialSolution.y;
-            T k = differentialSolution.z;
-
-            T y = c1*pow(e,r1*t) + c2*pow(e,r2*t) + k;
-            T y_ddt = r1*c1*pow(e,r1*t) + r2*c2*pow(e,r2*t);
-            T y_d2dt = r1*r1*c1 * pow(e,r1*t) + r2*r2*c2 * pow(e,r2*t);
-            return vec<T, 3>(y, y_ddt, y_d2dt);
+            y = c1*pe1 + c2*pow(e,r2*t) + k;
+            y_ddt = r1*c1*pe1 + r2*c2*pow(e,r2*t);
+            y_d2dt = r1*r1*c1 * pe1 + r2*r2*c2 * pow(e,r2*t);
         }
     }
+    return vec<T, 3>(y, y_ddt, y_d2dt);
 }
 
 template <class T>

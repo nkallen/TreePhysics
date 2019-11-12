@@ -49,22 +49,21 @@ update(
     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
 
     float3x3 U = L_transpose_inverse * X;
-    float3x3 U_transpose = transpose(U);
     float3x3 U_inverse = inverse(U);
 
-    float3 torque_diagonal = U_transpose * torque_jointSpace;
-    float3 angle = (float3)in.theta[id];
+    float3 torque_diagonal = transpose(U) * torque_jointSpace;
+    float3 angle = (float3)in.theta[id*1];
     float3 θ_diagonal_0 = U_inverse * angle;
     float3 angularVelocity = (float3)in.theta[id*2];
     float3 θ_ddt_diagonal_0 = U_inverse * angularVelocity;
-    float3 βΛ = in.damping[id] * Λ;
+    float damping = in.damping[id];
 
     // 2.a. thanks to diagonalization, we now have three independent 2nd-order
     // differential equations, θ'' + bθ' + kθ = f
 
-    float3 solution_i = evaluateDifferential(1.0, βΛ.x, Λ.x, torque_diagonal.x, θ_diagonal_0.x, θ_ddt_diagonal_0.x, time);
-    float3 solution_ii = evaluateDifferential(1.0, βΛ.y, Λ.y, torque_diagonal.y, θ_diagonal_0.y, θ_ddt_diagonal_0.y, time);
-    float3 solution_iii = evaluateDifferential(1.0, βΛ.z, Λ.z, torque_diagonal.z, θ_diagonal_0.z, θ_ddt_diagonal_0.z, time);
+    float3 solution_i = evaluateDifferential(1.0, damping * Λ.x, Λ.x, torque_diagonal.x, θ_diagonal_0.x, θ_ddt_diagonal_0.x, time);
+    float3 solution_ii = evaluateDifferential(1.0, damping * Λ.y, Λ.y, torque_diagonal.y, θ_diagonal_0.y, θ_ddt_diagonal_0.y, time);
+    float3 solution_iii = evaluateDifferential(1.0, damping * Λ.z, Λ.z, torque_diagonal.z, θ_diagonal_0.z, θ_ddt_diagonal_0.z, time);
 
     float3x3 θ_diagonal = transpose(float3x3(solution_i, solution_ii, solution_iii));
 

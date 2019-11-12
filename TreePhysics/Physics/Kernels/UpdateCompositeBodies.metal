@@ -20,7 +20,7 @@ typedef struct {
     device uchar *childIndex;
     device ushort *parentId;
     device uchar *climberCount;
-    
+
     device half *mass;
     device packed_half3 *force;
     device packed_half3 *torque;
@@ -83,7 +83,6 @@ updateCompositeBodies(
                       device InertiaTensor *out_inertiaTensor,
 
                       constant uint * upperBound,
-                      constant uchar * maxClimberCount,
                       constant ushort * deltas,
                       uint gid [[ thread_position_in_grid ]])
 {
@@ -116,10 +115,10 @@ updateCompositeBodies(
     };
     
     uint start = *upperBound;
-    uint offset = *upperBound + 1;
     for (ushort i = 0; i < rangeCount - 1; i++) {
         ushort delta = deltas[i];
         const uint lowerBound = start - delta;
+
         if (gid < delta) {
             const int id = lowerBound + gid;
             const uchar childCount = bodies.childCount[id];
@@ -155,31 +154,8 @@ updateCompositeBodies(
             }
             
             jointSpace(id, out, (quatf)bodies.rotation[id], totalMass, totalTorque, totalCenterOfMass, parentPivot, totalInertiaTensor);
-            
-            // Step 2: Walk up any "climber" chains
-            float3 previousPivot = parentPivot;
-            const uchar climberCount = bodies.climberCount[id];
-            for (uchar j = 0; j < climberCount; j++) {
-                const int nextId = offset + j * delta + gid;
-                const float nextMass = (float)bodies.mass[nextId];
-                const float3 nextForce = (float3)bodies.force[nextId];
-                const float3 nextCenterOfMass = (float3)bodies.centerOfMass[nextId];
-                const float3 nextPivot = (float3)bodies.pivot[nextId];
-                
-                totalTorque += cross(previousPivot - nextPivot, totalForce) + (float3)bodies.torque[nextId];
-                totalForce += nextForce;
-                totalCenterOfMass = (totalMass * totalCenterOfMass + nextMass * nextCenterOfMass) / (totalMass + nextMass);
-                totalInertiaTensor -= totalMass * sqr(skew(previousCenterOfMass - totalCenterOfMass));
-                totalInertiaTensor += float3x3_from_inertiaTensor(bodies.inertiaTensor[nextId]) - nextMass * sqr(skew(nextCenterOfMass - totalCenterOfMass));
-                totalMass += nextMass;
-                
-                jointSpace(nextId, out, (quatf)bodies.rotation[nextId], totalMass, totalTorque, totalCenterOfMass, nextPivot, totalInertiaTensor);
-                
-                previousCenterOfMass = totalCenterOfMass;
-                previousPivot = nextPivot;
-            }
-            
-            // Step 3: Store (intermediate) result for computation at the next level
+
+            // Step 2: Store (intermediate) result for computation at the next level
             const ushort nextDelta = deltas[i+1];
             const uint oid = childIndex * nextDelta + parentId;
             children.mass[oid] = (half)totalMass;
@@ -189,7 +165,6 @@ updateCompositeBodies(
             children.centerOfMass[oid] = (half3)totalCenterOfMass;
             children.inertiaTensor[oid] = inertiaTensor_from_float3x3(totalInertiaTensor);
             
-            offset += delta * *maxClimberCount;
             start = lowerBound;
         }
         threadgroup_barrier(mem_flags::mem_device);

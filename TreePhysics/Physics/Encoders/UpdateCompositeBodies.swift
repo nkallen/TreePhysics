@@ -77,14 +77,10 @@ extension UpdateCompositeBodies {
             var upperBound = ranges.first!.upperBound
             commandEncoder.setBytes(&upperBound, length: MemoryLayout<UInt32>.stride, index: bufs.count)
 
-            var maxClimberCount = mem.rigidBodies.maxClimberCount
-            commandEncoder.setBytes(&maxClimberCount, length:
-                MemoryLayout<UInt8>.stride, index: bufs.count+1)
-
             var deltas = ranges.map { range in
                 UInt16(range.upperBound - range.lowerBound)
             }
-            commandEncoder.setBytes(&deltas, length: MemoryLayout<UInt16>.stride * deltas.count, index: bufs.count+2)
+            commandEncoder.setBytes(&deltas, length: MemoryLayout<UInt16>.stride * deltas.count, index: bufs.count+1)
         }
     }
 }

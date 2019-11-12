@@ -134,8 +134,8 @@ extension ArticulatedRigidBody {
                         childCount: child.childJoints.count,
                         childIndex: childIndex,
                         parentId: parentId,
-                        rigidBody: climbers.popLast()!,
-                        climbers: climbers.reversed()))
+                        rigidBody: child,
+                        climbers: []))
                 }
             }
             return result.sorted()

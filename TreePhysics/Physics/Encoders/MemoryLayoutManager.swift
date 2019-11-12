@@ -35,17 +35,17 @@ class MemoryLayoutManager {
             self.maxClimberCount = maxClimberCount
 
             for level in levels {
-                for (id, unitOfWork) in level.enumerated() {
-                    for (i, climber) in unitOfWork.climbers.enumerated() {
-                        index[climber] = offset + level.count * i + id
+                for unitOfWork in level {
+                    for climber in unitOfWork.climbers {
+                        index[climber] = id
+                        id += 1
                     }
                 }
-                offset += level.count * maxClimberCount
             }
             self.index = index
 
             // Step 2: Allocate the shared buffers
-            self.count = offset
+            self.count = id
 
             let childCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
             let childIndexBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
