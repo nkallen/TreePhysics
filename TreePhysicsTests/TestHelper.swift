@@ -108,24 +108,3 @@ func XCTAssertEqual(_ a: ArticulatedRigidBody, _ b: RigidBodyStruct, accuracy: F
     XCTAssertEqual(a.pivot, b.pivot, accuracy: accuracy, "pivot", file: file, line: line)
     XCTAssertEqual(float3x3(a.rotation), b.rotation, accuracy: accuracy, "rotation", file: file, line: line)
 }
-
-class SharedBuffersMTLDevice: MTLDeviceProxy {
-    override func makeBuffer(length: Int, options: MTLResourceOptions = []) -> MTLBuffer? {
-        return underlying.makeBuffer(length: length, options: changeStorageMode(of: options))
-    }
-
-    override func makeBuffer(bytes pointer: UnsafeRawPointer, length: Int, options: MTLResourceOptions = []) -> MTLBuffer? {
-        return underlying.makeBuffer(bytes: pointer, length: length, options: changeStorageMode(of: options))
-    }
-
-    override func makeBuffer(bytesNoCopy pointer: UnsafeMutableRawPointer, length: Int, options: MTLResourceOptions = [], deallocator: ((UnsafeMutableRawPointer, Int) -> Void)? = nil) -> MTLBuffer? {
-        return underlying.makeBuffer(bytesNoCopy: pointer, length: length, options: changeStorageMode(of: options), deallocator: deallocator)
-    }
-
-    private func changeStorageMode(of options: MTLResourceOptions) -> MTLResourceOptions {
-        var options = options
-        options.remove(.storageModePrivate)
-        options.insert(.storageModeShared)
-        return options
-    }
-}

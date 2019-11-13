@@ -4,7 +4,7 @@ import Metal
 import SceneKit
 import ShaderTypes
 
-final class UpdateCompositeBodies: MetalKernelEncoder {
+public final class UpdateCompositeBodies: MetalKernelEncoder {
     private let argumentEncoder: ArgumentEncoder
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, memoryLayoutManager: MemoryLayoutManager) {

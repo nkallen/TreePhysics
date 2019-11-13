@@ -263,6 +263,10 @@ extension float3x3 {
     func row(_ i: Int) -> SIMD3<Float> {
         return SIMD3<Float>(self[0, i], self[1, i], self[2, i])
     }
+
+    var diagonal: simd_float3 {
+        return simd_float3(self[0,0], self[1,1], self[2,2])
+    }
 }
 
 extension simd_quatf {
@@ -321,6 +325,19 @@ func normalize(angle: Float) -> Float {
     angle - 2 * .pi * floor(angle / (2 * .pi))
 }
 
+extension packed_float3 {
+    init(_ x: Float, _ y: Float, _ z: Float) {
+        self.init()
+        self.x = x
+        self.y = y
+        self.z = z
+    }
+
+    init(_ vec: simd_float3) {
+        self.init(vec.x, vec.y, vec.z)
+    }
+}
+
 extension packed_half3 {
     init(_ x: Float, _ y: Float, _ z: Float) {
         self.init()
@@ -344,6 +361,12 @@ extension packed_half3 {
 extension simd_quath {
     init(_ q: simd_quatf) {
         self.init(x: Half(q.imag.x), y: Half(q.imag.y), z: Half(q.imag.z), w: Half(q.real))
+    }
+}
+
+extension simd_quatf {
+    init(_ q: simd_quath) {
+        self.init(vector: simd_float4(x: Float(q.x), y: Float(q.y), z: Float(q.z), w: Float(q.w)))
     }
 }
 
@@ -379,17 +402,13 @@ extension float3x3 {
         self[2,0] = Float(x.ltr.y)
         self[2,1] = Float(x.ltr.z)
 
-        self = x.scale*self
     }
 }
 
 extension InertiaTensor {
     init(_ x: simd_float3x3) {
-        var x = x
-        let scale = max(max(reduce_max(x[0]), reduce_max(x[1])), reduce_max(x[2]))
-        x = 1.0/scale * x
-        let diag = packed_half3(x[0,0], x[1,1], x[2,2])
-        let ltr = packed_half3(x[0,1], x[0,2], x[1,2])
-        self.init(scale: scale, diag: diag, ltr: ltr)
+        let diag = packed_float3(x[0,0], x[1,1], x[2,2])
+        let ltr  = packed_float3(x[0,1], x[0,2], x[1,2])
+        self.init(diag: diag, ltr: ltr)
     }
 }

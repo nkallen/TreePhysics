@@ -1,83 +1,89 @@
-#if os(macOS)
 import Foundation
 import SceneKit
-import TreePhysics
+@testable import TreePhysics
 
 class GameViewController: NSViewController {
-    var scene: Scene!
+    var root: ArticulatedRigidBody!
+    var device: MTLDevice!
+    var mem: MemoryLayoutManager!
+
+    var captureScope: MTLCaptureScope!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.scene = Scene()
+        self.root = ArticulatedRigidBody.static()
+        let rigidBodyPen = RigidBodyPen(parent: root)
 
-        scnView.scene = scene.scene
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]////[!"&FA]////[!"&FA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
+        let configuration = InterpreterConfig(
+            randomScale: 0.4,
+            angle: 18 * .pi / 180,
+            thickness: 0.002*0.002*Float.pi,
+            thicknessScale: 0.7,
+            stepSize: 0.3,
+            stepSizeScale: 0.9)
+        let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
+        interpreter.interpret(lSystem)
+
+        self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
+
+        self.mem = MemoryLayoutManager(device: device, root: root)
+        print("Total nodes:", mem.rigidBodies.count)
+
+        scnView.delegate = self
+        let scene = SCNScene()
+        scene.rootNode.addChildNode(SCNNode(geometry: SCNSphere(radius: 0.1)))
+        scnView.scene = scene
+
+        scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.25))
+
         scnView.allowsCameraControl = true
-        scnView.showsStatistics = true
-        scnView.backgroundColor = .black
+        scnView.backgroundColor = .gray
 
-        let clickGesture = NSClickGestureRecognizer(target: self, action: #selector(handleClick(_:)))
-        var gestureRecognizers = scnView.gestureRecognizers
-        gestureRecognizers.insert(clickGesture, at: 0)
-        scnView.gestureRecognizers = gestureRecognizers
+        self.captureScope = MTLCaptureManager.shared().makeCaptureScope(device: MTLCreateSystemDefaultDevice()!)
+        triggerProgrammaticCaptureScope()
     }
 
-    override func viewDidAppear() {
-        scnView.delegate = scene
-        scnView.mySceneViewDelegate = self
+    var scnView: SCNView {
+        return self.view as! SCNView
     }
 
-    var scnView: MySceneView {
-        return self.view as! MySceneView
-    }
-}
-
-fileprivate var toggle: Bool = false
-
-extension GameViewController {
-    @objc
-    func handleClick(_ gestureRecognizer: NSGestureRecognizer) {
-        toggle = !toggle
-        print(scnView.hitTest(gestureRecognizer.location(in: scnView), options: nil))
-//        scene.gravityField.g = toggle ? .zero : SIMD3<Float>(0, -9.81, 0)
-    }
-
-}
-
-protocol MySceneViewDelegate: class {
-    func mouseMoved(with event: NSEvent, in view: SCNView)
-}
-
-extension GameViewController: MySceneViewDelegate {
-    func mouseMoved(with event: NSEvent, in view: SCNView) {
-        let nsPoint = event.locationInWindow
-
-        let projectedOrigin = view.projectPoint(SCNVector3Zero)
-        let vpWithZ = SCNVector3(x: nsPoint.x, y: nsPoint.y, z: projectedOrigin.z)
-        let worldPoint = SIMD3<Float>(view.unprojectPoint(vpWithZ))
-
-        scene.attractorField.position = worldPoint
-        scene.attractor.simdPosition = worldPoint
-    }
-}
-
-class MySceneView: SCNView {
-    weak var mySceneViewDelegate: MySceneViewDelegate!
-    var trackingArea : NSTrackingArea?
-
-    override func updateTrackingAreas() {
-        if trackingArea != nil {
-            self.removeTrackingArea(trackingArea!)
+    func triggerProgrammaticCaptureScope() {
+        print("triggerProgrammaticCaptureScope")
+        let captureManager = MTLCaptureManager.shared()
+        let captureDescriptor = MTLCaptureDescriptor()
+        captureDescriptor.captureObject = captureScope
+        do {
+            try captureManager.startCapture(with:captureDescriptor)
+        } catch {
+            fatalError("error when trying to capture: \(error)")
         }
-        let options : NSTrackingArea.Options =
-            [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow]
-        trackingArea = NSTrackingArea(rect: self.bounds, options: options,
-                                      owner: self, userInfo: nil)
-        self.addTrackingArea(trackingArea!)
-    }
-
-    override func mouseMoved(with event: NSEvent) {
-        mySceneViewDelegate.mouseMoved(with: event, in: self)
     }
 }
-#endif
+
+extension GameViewController: SCNSceneRendererDelegate {
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        let commandQueue = device.makeCommandQueue()!
+
+        print("beginning capture scope")
+        captureScope.begin()
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+
+        UpdateCompositeBodies(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer)
+        UpdateJoints(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer, at: 1/60)
+        UpdateRigidBodies(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer)
+        commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
+
+        print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)
+
+        print("id: 0, theta: \(mem.joints[1][0])")
+        print("id: 0, x: \(mem.rigidBodies[1])")
+
+        if !mem.rigidBodies[1].isFinite {
+            self.captureScope.end()
+        }
+    }
+}

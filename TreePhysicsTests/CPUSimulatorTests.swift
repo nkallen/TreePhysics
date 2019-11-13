@@ -107,6 +107,7 @@ class CPUSimulatorTests: XCTestCase {
     var b1: ArticulatedRigidBody!
     let force = SIMD3<Float>(1, 0, 0) // world coordinates
     var forceAppliedPosition: simd_float3!
+    let momentOfInertiaOfRod: Float = 1/4 + 1/12
 
     override func setUp() {
         super.setUp()
@@ -191,11 +192,9 @@ class CPUSimulatorTests: XCTestCase {
 
         do {
             let joint = b1.parentJoint!
-
-            let momentOfInertia: Float = 1/4 + 1/12
+            let momentOfInertia: Float = momentOfInertiaOfRod
             let compositeInertiaRelativeToJoint = momentOfInertia +
                 b1.mass * sqr(distance(b1.centerOfMass, b1.pivot))
-
             let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b1.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
             XCTAssertEqual(
@@ -209,12 +208,16 @@ class CPUSimulatorTests: XCTestCase {
 
         do {
             let joint = b0.parentJoint!
-
-            let momentOfInertia: Float = b0.composite.inertiaTensor[2,2]
+            var centerOfMass: simd_float3 = (b0.mass * b0.centerOfMass + b1.mass * b1.centerOfMass)
+            centerOfMass /= (b0.mass + b1.mass)
+            var momentOfInertia: Float = 0
+            momentOfInertia += momentOfInertiaOfRod + b1.mass * distance_squared(b1.centerOfMass, centerOfMass)
+            momentOfInertia += momentOfInertiaOfRod + b0.mass * distance_squared(b0.centerOfMass, centerOfMass)
             let compositeInertiaRelativeToJoint = momentOfInertia +
-                b0.composite.mass * sqr(distance(b0.composite.centerOfMass, joint.position))
+                (b0.mass + b1.mass) * sqr(distance(centerOfMass, joint.position))
+            let torque = cross(b1.centerOfMass - b0.pivot, force)
 
-            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b0.composite.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
+            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
             XCTAssertEqual(
                 float3x3(
@@ -227,17 +230,19 @@ class CPUSimulatorTests: XCTestCase {
     }
 
     func testUpdateRigidBodies() {
-        let jointPosition_b0_beforeUpdate = b0.parentJoint!.position
-        let jointPosition_b1_beforeUpdate = b1.parentJoint!.position
-
         simulator.update(at: delta)
 
         do {
             let joint = b0.parentJoint!
-            let momentOfInertia: Float = b0.composite.inertiaTensor[2,2]
+            var centerOfMass: simd_float3 = (b0.mass * b0.centerOfMass + b1.mass * b1.centerOfMass)
+            centerOfMass /= (b0.mass + b1.mass)
+            var momentOfInertia: Float = 0
+            momentOfInertia += momentOfInertiaOfRod + b1.mass * distance_squared(b1.centerOfMass, centerOfMass)
+            momentOfInertia += momentOfInertiaOfRod + b0.mass * distance_squared(b0.centerOfMass, centerOfMass)
             let compositeInertiaRelativeToJoint = momentOfInertia +
-                b0.composite.mass * sqr(distance(b0.composite.centerOfMass, jointPosition_b0_beforeUpdate))
-            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b0.composite.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
+                (b0.mass + b1.mass) * sqr(distance(centerOfMass, joint.position))
+            let torque = cross(b1.centerOfMass - b0.pivot, force)
+            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
             let rotation = simd_quatf(angle: θ[0], axis: .z)
             XCTAssertEqual(
@@ -250,11 +255,10 @@ class CPUSimulatorTests: XCTestCase {
 
         do {
             let joint = b1.parentJoint!
-            let momentOfInertia: Float = 1/4 + 1/12
+            let momentOfInertia: Float = momentOfInertiaOfRod
             let compositeInertiaRelativeToJoint = momentOfInertia +
-                b1.composite.mass * sqr(distance(b1.composite.centerOfMass, jointPosition_b1_beforeUpdate))
-
-            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b1.composite.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
+                b1.mass * sqr(distance(b1.centerOfMass, b1.pivot))
+            let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b1.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
             let rotation = simd_quatf(angle: θ[0], axis: .z)
             XCTAssertEqual(

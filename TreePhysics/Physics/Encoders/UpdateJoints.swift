@@ -3,7 +3,7 @@ import MetalKit
 import Metal
 import ShaderTypes
 
-final class UpdateJoints: MetalKernelEncoder {
+public final class UpdateJoints: MetalKernelEncoder {
     private let argumentEncoder: ArgumentEncoder
 
     init(device: MTLDevice = MTLCreateSystemDefaultDevice()!, memoryLayoutManager: MemoryLayoutManager) {

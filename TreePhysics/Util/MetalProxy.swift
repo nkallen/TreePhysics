@@ -260,12 +260,11 @@ class MTLComputeCommandEncoderProxy: NSObject, MTLComputeCommandEncoder {
         underlying.popDebugGroup()
     }
 
-    @available(OSX 10.15, *)
-    func sampleCounters(sampleBuffer: MTLCounterSampleBuffer, sampleIndex: Int, barrier: Bool) {
-        underlying.sampleCounters(sampleBuffer: sampleBuffer, sampleIndex: sampleIndex, barrier: barrier)
+    #if os(iOS)
+    func resourceStateCommandEncoder() -> MTLResourceStateCommandEncoder? {
+        underlying.resourceStateCommandEncoder()
     }
 
-    #if os(iOS)
     func setImageblockWidth(_ width: Int, height: Int) {
         underlying.setImageblockWidth(width, height: height)
     }
@@ -276,6 +275,10 @@ class MTLComputeCommandEncoderProxy: NSObject, MTLComputeCommandEncoder {
 
     func executeCommands(in indirectCommandbuffer: MTLIndirectCommandBuffer, indirectBuffer indirectRangeBuffer: MTLBuffer, indirectBufferOffset: Int) {
         underlying.executeCommands(in: indirectCommandbuffer, indirectBuffer: indirectRangeBuffer, indirectBufferOffset: indirectBufferOffset)
+    }
+    #else
+    func sampleCounters(sampleBuffer: MTLCounterSampleBuffer, sampleIndex: Int, barrier: Bool) {
+        underlying.sampleCounters(sampleBuffer: sampleBuffer, sampleIndex: sampleIndex, barrier: barrier)
     }
     #endif
 }
@@ -477,52 +480,27 @@ class MTLDeviceProxy: NSObject, MTLDevice {
         return underlying.makeSharedTexture(handle: sharedHandle)
     }
 
-    @available(OSX 10.15, *)
+    #if os(iOS)
     var hasUnifiedMemory: Bool { return underlying.hasUnifiedMemory }
 
-    @available(OSX 10.15, *)
-    var location: MTLDeviceLocation { return underlying.location}
-
-    @available(OSX 10.15, *)
-    var locationNumber: Int { return underlying.locationNumber }
-
-    @available(OSX 10.15, *)
-    var maxTransferRate: UInt64 { return underlying.maxTransferRate }
-
-    @available(OSX 10.15, *)
-    var areBarycentricCoordsSupported: Bool { return underlying.areBarycentricCoordsSupported }
-
-    @available(OSX 10.15, *)
-    var supportsShaderBarycentricCoordinates: Bool { return underlying.supportsShaderBarycentricCoordinates }
-
-    @available(OSX 10.15, *)
-    func supportsFamily(_ gpuFamily: MTLGPUFamily) -> Bool {
-        return underlying.supportsFamily(gpuFamily)
+    func supportsRasterizationRateMap(layerCount: Int) -> Bool {
+        return underlying.supportsRasterizationRateMap(layerCount: layerCount)
     }
 
-    @available(OSX 10.15, *)
-    var peerGroupID: UInt64 { return underlying.peerGroupID }
-
-    @available(OSX 10.15, *)
-    var peerIndex: UInt32 { return underlying.peerIndex }
-
-    @available(OSX 10.15, *)
-    var peerCount: UInt32 { return underlying.peerCount }
-
-    @available(OSX 10.15, *)
-    var counterSets: [MTLCounterSet]? { return underlying.counterSets }
-
-    @available(OSX 10.15, *)
-    func makeCounterSampleBuffer(descriptor: MTLCounterSampleBufferDescriptor) throws -> MTLCounterSampleBuffer {
-        return try underlying.makeCounterSampleBuffer(descriptor: descriptor)
+    func makeRasterizationRateMap(descriptor: MTLRasterizationRateMapDescriptor) -> MTLRasterizationRateMap? {
+        return underlying.makeRasterizationRateMap(descriptor: descriptor)
     }
 
-    @available(OSX 10.15, *)
-    func __sampleTimestamps(_ cpuTimestamp: UnsafeMutablePointer<Int>, gpuTimestamp: UnsafeMutablePointer<Int>) {
-        underlying.__sampleTimestamps(cpuTimestamp, gpuTimestamp: gpuTimestamp)
+    func sparseTileSize(with textureType: MTLTextureType, pixelFormat: MTLPixelFormat, sampleCount: Int) -> MTLSize {
+        return underlying.sparseTileSize(with: textureType, pixelFormat: pixelFormat, sampleCount: sampleCount)
     }
 
-    #if os(iOS)
+    var sparseTileSizeInBytes: Int { return underlying.sparseTileSizeInBytes }
+
+    func supportsVertexAmplificationCount(_ count: Int) -> Bool {
+        return underlying.supportsVertexAmplificationCount(count)
+    }
+    
     func supportsFamily(_ gpuFamily: MTLGPUFamily) -> Bool {
         return underlying.supportsFamily(gpuFamily)
     }
@@ -544,5 +522,37 @@ class MTLDeviceProxy: NSObject, MTLDevice {
     var recommendedMaxWorkingSetSize: UInt64 { return underlying.recommendedMaxWorkingSetSize }
 
     var isDepth24Stencil8PixelFormatSupported: Bool { return underlying.isDepth24Stencil8PixelFormatSupported }
+
+    var hasUnifiedMemory: Bool { return underlying.hasUnifiedMemory }
+
+    var location: MTLDeviceLocation { return underlying.location}
+
+    var locationNumber: Int { return underlying.locationNumber }
+
+    var maxTransferRate: UInt64 { return underlying.maxTransferRate }
+
+    var areBarycentricCoordsSupported: Bool { return underlying.areBarycentricCoordsSupported }
+
+    var supportsShaderBarycentricCoordinates: Bool { return underlying.supportsShaderBarycentricCoordinates }
+
+    func supportsFamily(_ gpuFamily: MTLGPUFamily) -> Bool {
+        return underlying.supportsFamily(gpuFamily)
+    }
+
+    var peerGroupID: UInt64 { return underlying.peerGroupID }
+
+    var peerIndex: UInt32 { return underlying.peerIndex }
+
+    var peerCount: UInt32 { return underlying.peerCount }
+
+    var counterSets: [MTLCounterSet]? { return underlying.counterSets }
+
+    func makeCounterSampleBuffer(descriptor: MTLCounterSampleBufferDescriptor) throws -> MTLCounterSampleBuffer {
+        return try underlying.makeCounterSampleBuffer(descriptor: descriptor)
+    }
+
+    func __sampleTimestamps(_ cpuTimestamp: UnsafeMutablePointer<Int>, gpuTimestamp: UnsafeMutablePointer<Int>) {
+        underlying.__sampleTimestamps(cpuTimestamp, gpuTimestamp: gpuTimestamp)
+    }
     #endif
 }

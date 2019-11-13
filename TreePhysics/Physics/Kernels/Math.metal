@@ -125,9 +125,9 @@ matrix_rotate(vec<T, 3> rotation)
     T sa = sin(roll);
 
     return matrix<T, 3, 3>(
-                    vec<T, 3>(ch*ca,          sa,     -sh*ca),
-                    vec<T, 3>(sh*sb-ch*sa*cb, ca*cb,  sh*sa*cb+ch*sb),
-                    vec<T, 3>(ch*sa*sb+sh*cb, -ca*sb, -sh*sa*sb + ch*cb));
+                           vec<T, 3>(ch*ca,          sa,     -sh*ca),
+                           vec<T, 3>(sh*sb-ch*sa*cb, ca*cb,  sh*sa*cb+ch*sb),
+                           vec<T, 3>(ch*sa*sb+sh*cb, -ca*sb, -sh*sa*sb + ch*cb));
 }
 
 // MARK: - Differential Equations
@@ -252,7 +252,7 @@ evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
     T pe1 = pow(e,r1*t);
 
     switch (differentialSolution.type) {
-        case QuadraticSolutionTypeComplex: {
+        case QuadraticSolutionTypeComplex:
             y = c1*pe1*cos(r2*t) + c2*pe1*sin(r2*t) + k;
             y_ddt = r1*c1*pe1*cos(r2*t) - r2*c1*pe1*sin(r2*t) +
             r1*c2*pe1*sin(r2*t) + r2*c2*pe1*cos(r2*t);
@@ -260,20 +260,20 @@ evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
             (r1*r2*c1*pe1*sin(r2*t) + r2*r2*c1*pe1*cos(r2*t)) +
             r1*r1*c2*pe1*sin(r2*t) + r2*r1*c2*pe1*cos(r2*t) +
             r1*r2*c2*pe1*cos(r2*t) - r2*r2*c2*pe1*sin(r2*t);
-        }
-        case QuadraticSolutionTypeReal: {
+            break;
+        case QuadraticSolutionTypeReal:
             y = c1*pe1 + c2*t*pe1 + k;
             y_ddt = r1*c1*pe1 +
             c2*pe1 + r1*c2*t*pe1;
             y_d2dt = r1*r1*c1*pe1 +
             r1*c2*pe1 +
             r1*c2*pe1 + r1*r1*c2*t*pe1;
-        }
-        case QuadraticSolutionTypeRealDistinct: {
+            break;
+        case QuadraticSolutionTypeRealDistinct:
             y = c1*pe1 + c2*pow(e,r2*t) + k;
             y_ddt = r1*c1*pe1 + r2*c2*pow(e,r2*t);
             y_d2dt = r1*r1*c1 * pe1 + r2*r2*c2 * pow(e,r2*t);
-        }
+            break;
     }
     return vec<T, 3>(y, y_ddt, y_d2dt);
 }
@@ -398,8 +398,7 @@ inline quatf quat_multiply(quatf q0, quatf q1) {
 }
 
 inline quatf quat_slerp(quatf q0, quatf q1, float t) {
-
-     quatf q;
+    quatf q;
 
     float cosHalfTheta = dot(q0, q1);
     if (fabs(cosHalfTheta) >= 1.f) ///q0=q1 or q0=q1
@@ -425,8 +424,8 @@ inline float3 quat_act(quatf q, float3 v) {
     float3 qp = float3(q.x, q.y, q.z);
     float w = q.w;
     return 2 * dot(qp, v) * qp +
-           ((w * w) - dot(qp, qp)) * v +
-           2 * w * cross(qp, v);
+    ((w * w) - dot(qp, qp)) * v +
+    2 * w * cross(qp, v);
 }
 
 inline float3x3 float3x3_from_quat(quatf q) {
@@ -453,8 +452,8 @@ inline float3x3 float3x3_from_quat(quatf q) {
     float m22 = 1 - 2 * (xx + yy);
 
     return float3x3(m00, m10, m20,
-                       m01, m11, m21,
-                       m02, m12, m22);
+                    m01, m11, m21,
+                    m02, m12, m22);
 }
 
 inline float3x3 float3x3_from_inertiaTensor(InertiaTensor t) {
@@ -472,14 +471,11 @@ inline float3x3 float3x3_from_inertiaTensor(InertiaTensor t) {
     result[2][0] = (float)t.ltr.y;
     result[2][1] = (float)t.ltr.z;
 
-    return t.scale*result;
+    return result;
 }
 
 inline InertiaTensor inertiaTensor_from_float3x3(float3x3 x) {
-    float3 m = max3(x[0], x[1], x[2]);
-    float scale = max3(m.x, m.y, m.z);
-    x = 1.0/scale * x;
-    packed_half3 diag = packed_half3(x[0][0], x[1][1], x[2][2]);
-    packed_half3 ltr = packed_half3(x[0][1], x[0][2], x[1][2]);
-    return {.scale = scale, .diag = diag, .ltr = ltr};
+    packed_float3 diag = packed_float3(x[0][0], x[1][1], x[2][2]);
+    packed_float3 ltr  = packed_float3(x[0][1], x[0][2], x[1][2]);
+    return {.diag = diag, .ltr = ltr};
 }

@@ -21,6 +21,10 @@ typedef struct {
 } packed_half3;
 
 typedef struct {
+    float x; float y; float z;
+} packed_float3;
+
+typedef struct {
     half x; half y; half z; half w;
 } __attribute__((aligned(8))) vector_half4;
 

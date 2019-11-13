@@ -6,80 +6,99 @@ using namespace metal;
 
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
 
-inline float3x3 rigidBody_localRotation(
-                                    JointStruct joint)
-{
-    return matrix_rotate(joint.θ[0]);
-}
+struct UpdateRigidBodiesIn {
+    device ushort *parentId;
+    device packed_half3 *localPivot;
+    device packed_float3 *localInertiaTensor;
+    device packed_half3 *theta;
+    device quath *localJointRotation;
+    device packed_half3 *localJointPosition;
+};
 
-inline RigidBodyStruct
-updateRigidBody(
-                const RigidBodyStruct parentRigidBody,
-                const JointStruct parentJoint,
-                RigidBodyStruct rigidBody)
-{
-    float3 parentJointPosition = rigidBody.pivot;
+struct UpdateRigidBodiesOut {
+    device packed_half3 *pivot;
+    device packed_half3 *centerOfMass;
+    device quath *rotation;
+    device quath *jointRotation;
+    device InertiaTensor *inertiaTensor;
+};
 
-    rigidBody.rotation = parentRigidBody.rotation * rigidBody.jointLocalRotation * rigidBody_localRotation(parentJoint);
-    rigidBody.pivot = parentJointPosition;
-
-    rigidBody.inertiaTensor = (float3x3)rigidBody.rotation * rigidBody.localInertiaTensor * (float3x3)transpose(rigidBody.rotation);
-    rigidBody.centerOfMass = rigidBody.pivot + rigidBody.rotation * (-rigidBody.localPivot);
-
-    return rigidBody;
-}
-
-inline RigidBodyStruct
-rigidBody_climbDown(
-                    const RigidBodyStruct rigidBody,
-                    device RigidBodyStruct * rigidBodies,
-                    device JointStruct * joints)
-{
-    RigidBodyStruct parentRigidBody, currentRigidBody;
-    for (short i = rigidBody.climberCount - 1; i >= 0; i--) {
-        int id = rigidBody.climberOffset + i;
-
-        RigidBodyStruct next = rigidBodies[id];
-        JointStruct parentJoint = joints[id];
-        if (i == rigidBody.climberCount - 1) {
-            parentRigidBody = rigidBodies[next.parentId];
-        } else {
-            parentRigidBody = currentRigidBody;
-        }
-        currentRigidBody = next;
-
-        currentRigidBody = updateRigidBody(parentRigidBody, parentJoint, currentRigidBody);
-        rigidBodies[id] = currentRigidBody;
-    }
-    return currentRigidBody;
-}
 
 kernel void
 updateRigidBodies(
-                  device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
-                  device JointStruct * joints [[ buffer(BufferIndexJoints) ]],
-                  constant int2 * ranges [[ buffer(BufferIndexRanges) ]],
+                  device ushort   *in_parentId,
+                  device packed_half3   *in_localPivot,
+                  device packed_float3 *in_localInertiaTensor,
+                  device packed_half3 *in_localJointPosition,
+                  device quath    *in_localJointRotation,
+                  device packed_half3 *in_theta,
+
+                  device packed_half3   *out_pivot,
+                  device packed_half3   *out_centerOfMass,
+                  device InertiaTensor *out_inertiaTensor,
+                  device quath    *out_rotation,
+                  device quath    *out_jointRotation,
+
+                  constant ushort * deltas,
                   uint gid [[ thread_position_in_grid ]])
 {
-    for (int i = 0; i < rangeCount; i++) {
-        int2 range = ranges[i];
-        int lowerBound = range.x;
-        int upperBound = range.y;
-        if ((int)gid < upperBound - lowerBound) {
-            int id = lowerBound + gid;
+    UpdateRigidBodiesIn in = {
+        .parentId = in_parentId,
+        .localPivot = in_localPivot,
+        .localInertiaTensor = in_localInertiaTensor,
+        .localJointPosition = in_localJointPosition,
+        .localJointRotation = in_localJointRotation,
+        .theta = in_theta,
+    };
+    UpdateRigidBodiesOut out = {
+        .pivot = out_pivot,
+        .centerOfMass = out_centerOfMass,
+        .inertiaTensor = out_inertiaTensor,
+        .rotation = out_rotation,
+        .jointRotation = out_jointRotation,
+    };
 
-            RigidBodyStruct rigidBody = rigidBodies[id];
-            RigidBodyStruct parentRigidBody;
-            if (rigidBody.climberCount > 0) {
-                parentRigidBody = rigidBody_climbDown(rigidBody, rigidBodies, joints);
-            } else {
-                parentRigidBody = rigidBodies[rigidBody.parentId];
-            }
-            // potentially can optimize away:
-            const JointStruct parentJoint = joints[id];
+    uint previousLowerBound = 0;
+    uint lowerBound = deltas[0];
+    for (int i = 1; i < rangeCount; i++) {
+        ushort delta = deltas[i];
 
-            rigidBody = updateRigidBody(parentRigidBody, parentJoint, rigidBody);
-            rigidBodies[id] = rigidBody;
+        if (gid < delta) {
+            const int id = lowerBound + gid;
+            const ushort parentId = previousLowerBound + in.parentId[id];
+            const float3 parentPivot = (float3)out.pivot[parentId];
+            const quatf parentRotation = (quatf)out.rotation[parentId];
+
+            const quatf localJointRotation = (quatf)in.localJointRotation[id];
+            const float3 localJointPosition = (float3)in.localJointPosition[id];
+
+            const packed_float3 localInertiaTensor = in.localInertiaTensor[id];
+            const float3 localPivot = (float3)in.localPivot[id];
+            const float3 theta = (float3)in.theta[id];
+
+            const quatf jointRotation = quat_multiply(parentRotation, localJointRotation);
+            float3 pivot = parentPivot + quat_act(parentRotation, localJointPosition);
+
+            const quatf localRotation = length(theta) < 10e-10 ? quatf(0,0,0,1) :  quat_from_axis_angle(normalize(theta), length(theta));
+            const quatf rotation = normalize(quat_multiply(jointRotation, localRotation));
+
+            const float3x3 R = float3x3_from_quat(rotation);
+
+            const float3x3 IT = float3x3(
+                                         localInertiaTensor.x, 0, 0,
+                                         0, localInertiaTensor.y, 0,
+                                         0, 0, localInertiaTensor.z);
+            const float3x3 inertiaTensor = R * IT * transpose(R);
+            const float3 centerOfMass = pivot + quat_act(rotation, -localPivot);
+
+            out.pivot[id] = (packed_half3)pivot;
+            out.centerOfMass[id] = (packed_half3)centerOfMass;
+            out.inertiaTensor[id] = inertiaTensor_from_float3x3(inertiaTensor);
+            out.rotation[id] = (quath)rotation;
+            out.jointRotation[id] = (quath)jointRotation;
+
+            previousLowerBound = lowerBound;
+            lowerBound += delta;
         }
         threadgroup_barrier(mem_flags::mem_device);
     }

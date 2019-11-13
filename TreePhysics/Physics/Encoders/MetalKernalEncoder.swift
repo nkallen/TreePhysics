@@ -4,7 +4,7 @@ import ShaderTypes
 
 let maxBuffersInFlight = 3
 
-class MetalKernelEncoder {
+public class MetalKernelEncoder {
     let device: MTLDevice
     let computePipelineState: MTLComputePipelineState
 

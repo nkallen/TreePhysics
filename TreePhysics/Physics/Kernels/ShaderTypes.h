@@ -85,9 +85,8 @@ typedef struct {
 } PhysicsFieldStruct;
 
 typedef struct {
-    float scale;
-    packed_half3 diag;
-    packed_half3 ltr;
+    packed_float3 diag;
+    packed_float3 ltr;
 } InertiaTensor;
 
 #endif /* ShaderTypes_h */
