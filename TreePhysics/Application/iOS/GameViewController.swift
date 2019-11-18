@@ -19,7 +19,7 @@ class GameViewController: UIViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]////[!"&FFFFFFFA]////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
         let configuration = InterpreterConfig(
 //            randomScale: 0.4,
             angle: 18 * .pi / 180,

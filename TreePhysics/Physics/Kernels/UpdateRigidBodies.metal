@@ -83,11 +83,12 @@ updateRigidBodies(
 
             const float3x3 R = float3x3_from_quat(rotation);
 
-            const float3x3 IT = float3x3(
-                                         localInertiaTensor.x, 0, 0,
-                                         0, localInertiaTensor.y, 0,
-                                         0, 0, localInertiaTensor.z);
-            const float3x3 inertiaTensor = R * IT * transpose(R);
+            float3x3 IRt = R;
+            IRt[0] *= localInertiaTensor.x;
+            IRt[1] *= localInertiaTensor.y;
+            IRt[2] *= localInertiaTensor.z;
+            IRt = transpose(IRt);
+            const float3x3 inertiaTensor = R * IRt; // R * InertiaTensor * R^T
             const float3 centerOfMass = pivot + quat_act(rotation, -localPivot);
 
             out.pivot[id] = (packed_half3)pivot;
