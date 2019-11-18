@@ -42,7 +42,7 @@ class SimulatorComparisonTests: XCTestCase {
         self.metalSimulator = MetalSimulator(device: device, root: root)
         metalSimulator.add(field: attractorField)
         
-        attractorField.position = SIMD3<Float>(0.1, 0.1, 0.1)
+        attractorField.position = simd_float3(0.1, 0.1, 0.1)
     }
     
     func testUpdate() {

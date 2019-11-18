@@ -8,22 +8,22 @@ final public class ArticulatedRigidBody: RigidBody {
     let composite = CompositeBody()
 
     // The `pivot` is the point at which the object connects to its parent, and the "local" pivot is relative to the center of mass.
-    let localPivot: SIMD3<Float>
-    var pivot: SIMD3<Float>
+    let localPivot: simd_float3
+    var pivot: simd_float3
 
     public class func `static`() -> ArticulatedRigidBody {
         let rigidBody = ArticulatedRigidBody(kind: .static, mass: 0, localInertiaTensor: float3x3(0), localPivot: .zero, shape: nil, node: SCNNode())
         return rigidBody
     }
 
-    public init(kind: Kind, mass: Float, localInertiaTensor: float3x3, localPivot: SIMD3<Float>, shape: Shape?, node: SCNNode) {
+    public init(kind: Kind, mass: Float, localInertiaTensor: float3x3, localPivot: simd_float3, shape: Shape?, node: SCNNode) {
         self.localPivot = localPivot
         self.pivot = localPivot
 
         super.init(kind: kind, mass: mass, localInertiaTensor: localInertiaTensor, shape: shape, node: node)
     }
 
-    func add(_ child: ArticulatedRigidBody, orientation: simd_quatf = simd_quatf(angle: -.pi/4, axis: .z), position: SIMD3<Float> = .zero) -> Joint {
+    func add(_ child: ArticulatedRigidBody, orientation: simd_quatf = simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3 = .zero) -> Joint {
         let joint = Joint(parent: self, child: child, localOrientation: orientation, localPosition: position)
         childJoints.append(joint)
         child.parentJoint = joint
@@ -32,7 +32,7 @@ final public class ArticulatedRigidBody: RigidBody {
         return joint
     }
 
-    override func apply(force: SIMD3<Float>, torque: SIMD3<Float> = .zero) {
+    override func apply(force: simd_float3, torque: simd_float3 = .zero) {
         var torque = torque
         if parentJoint != nil {
             torque += cross(orientation.act(-localPivot), force)

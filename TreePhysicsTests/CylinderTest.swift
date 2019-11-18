@@ -18,13 +18,13 @@ class CylinderPenTests: XCTestCase {
 
     func testVertices() {
         XCTAssertEqual([
-            SIMD3<Float>(cos(0), 0, sin(0)),
-            SIMD3<Float>(cos(arcLength), 0, sin(arcLength)),
-            SIMD3<Float>(cos(2*arcLength), 0, sin(2*arcLength)),
+            simd_float3(cos(0), 0, sin(0)),
+            simd_float3(cos(arcLength), 0, sin(arcLength)),
+            simd_float3(cos(2*arcLength), 0, sin(2*arcLength)),
 
-            SIMD3<Float>(cos(0), 1, sin(0)),
-            SIMD3<Float>(cos(arcLength), 1, sin(arcLength)),
-            SIMD3<Float>(cos(2*arcLength), 1, sin(2*arcLength)),
+            simd_float3(cos(0), 1, sin(0)),
+            simd_float3(cos(arcLength), 1, sin(arcLength)),
+            simd_float3(cos(2*arcLength), 1, sin(2*arcLength)),
 
             ], pen.branchGeometry.vertices)
     }

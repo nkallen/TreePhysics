@@ -163,9 +163,9 @@ class UpdateCompositeBodiesTests: XCTestCase {
 
                 XCTAssertEqual(
                     float3x3(
-                        SIMD3<Float>(0,0,θ[0]),
-                        SIMD3<Float>(0,0,θ[1]),
-                        SIMD3<Float>(0,0,θ[2])
+                        simd_float3(0,0,θ[0]),
+                        simd_float3(0,0,θ[1]),
+                        simd_float3(0,0,θ[2])
                     ),
                     b0_θ.theta, accuracy: 0.0001)
             }
@@ -198,7 +198,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
 
                 let rotation = simd_quatf(angle: θ[0], axis: .z)
                 XCTAssertEqual(
-                    self.b0.pivot + rotation.act(SIMD3<Float>(0, 0.5, 0)),
+                    self.b0.pivot + rotation.act(simd_float3(0, 0.5, 0)),
                     self.b0.centerOfMass, accuracy: 0.0001)
                 XCTAssertEqual(
                     rotation,
@@ -214,7 +214,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
 
                 let rotation = simd_quatf(angle: θ[0], axis: .z)
                 XCTAssertEqual(
-                    self.b1.pivot + (joint.rotation * rotation).normalized.act(SIMD3<Float>(0, 0.5, 0)),
+                    self.b1.pivot + (joint.rotation * rotation).normalized.act(simd_float3(0, 0.5, 0)),
                     self.b1.centerOfMass, accuracy: 0.0001)
                 XCTAssertEqual(
                     (joint.rotation * rotation).normalized,

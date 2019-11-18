@@ -20,7 +20,7 @@ public func draw(_ node: AutoTree.Node) -> SCNNode {
         k.simdPosition = node.position
 
         let l = createAxesNode(quiverLength: 0.1, quiverThickness: 1)
-        l.simdOrientation = simd_quatf(from: SIMD3<Float>(0,1,0), to: normalize(p.orientation.vertical))
+        l.simdOrientation = simd_quatf(from: simd_float3(0,1,0), to: normalize(p.orientation.vertical))
         l.simdPosition = node.position
         result.addChildNode(k)
         result.addChildNode(l)

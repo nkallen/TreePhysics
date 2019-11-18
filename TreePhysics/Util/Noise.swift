@@ -12,25 +12,25 @@ public class Noise {
         return modf(sin(x)*1.0).1
     }
 
-    public func random(_ st: SIMD2<Float>) -> Float {
+    public func random(_ st: simd_float2) -> Float {
         return modf(sin(dot(st,
-                            SIMD2<Float>(12.9898,78.233))) *
+                            simd_float2(12.9898,78.233))) *
             43758.5453123).1
     }
 
     // Based on Morgan McGuire @morgan3d
     // https://www.shadertoy.com/view/4dS3Wd
-    func noise(_ st: SIMD2<Float>) -> Float {
+    func noise(_ st: simd_float2) -> Float {
         let i = floor(st)
         let f = fract(st)
 
         // Four corners in 2D of a tile
         let a = random(i)
-        let b = random(i + SIMD2<Float>(1.0, 0.0))
-        let c = random(i + SIMD2<Float>(0.0, 1.0))
-        let d = random(i + SIMD2<Float>(1.0, 1.0))
+        let b = random(i + simd_float2(1.0, 0.0))
+        let c = random(i + simd_float2(0.0, 1.0))
+        let d = random(i + simd_float2(1.0, 1.0))
 
-        var u: SIMD2<Float> = f * f
+        var u: simd_float2 = f * f
         u *= (3.0 - 2.0 * f)
 
         return mix(a, b, t: u.x) +
@@ -41,7 +41,7 @@ public class Noise {
     let octaves = 4
     let lacunarity: Float = 1.5
     let gain: Float = 0.75
-    public func fbm(_ st: SIMD2<Float>, amplitude: Float) -> Float {
+    public func fbm(_ st: simd_float2, amplitude: Float) -> Float {
         var st = st
         var amplitude = amplitude
         var value: Float = 0.0

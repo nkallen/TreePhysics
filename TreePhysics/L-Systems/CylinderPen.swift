@@ -5,7 +5,7 @@ import ModelIO
 public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     public typealias T = [I]
     private struct State {
-        let position: SIMD3<Float>
+        let position: simd_float3
         let orientation: simd_quatf
         let thickness: Float
         let vertexId: I
@@ -35,7 +35,7 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         }
     }
 
-    public func start(at position: SIMD3<Float>, orientation: simd_quatf, thickness: Float) {
+    public func start(at position: simd_float3, orientation: simd_quatf, thickness: Float) {
         let bottom = makeCircle(radius: sqrt(thickness / .pi)).map {
             position + orientation.act($0)
         }
@@ -46,7 +46,7 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         state = State(position: position, orientation: orientation, thickness: thickness, vertexId: vertexId, distance: 0)
     }
 
-    public func cont(distance: Float, heading: SIMD3<Float>, thickness: Float) -> T {
+    public func cont(distance: Float, heading: simd_float3, thickness: Float) -> T {
         guard let state = state else { fatalError() }
         let turn = simd_quatf(from: state.orientation.heading, to: heading)
         return cont(distance: distance, orientation: (turn * state.orientation).normalized, thickness: thickness)
@@ -57,7 +57,7 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
 
         let radius: Float = sqrt(thickness / .pi)
         let circle = makeCircle(radius: radius)
-        let top: [SIMD3<Float>] = circle.map {
+        let top: [simd_float3] = circle.map {
             state.position + orientation.act(distance * .y + $0)
         }
 
@@ -77,12 +77,12 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     public func copy(scale: Float, orientation: simd_quatf) -> T {
         guard let state = state else { fatalError() }
 
-        let vertices = [SIMD3<Float>(-0.5, 0, 0), SIMD3<Float>(0, 2, 0),
-                        SIMD3<Float>(0, 2, 0), SIMD3<Float>(0.5, 0, 0)]
+        let vertices = [simd_float3(-0.5, 0, 0), simd_float3(0, 2, 0),
+                        simd_float3(0, 2, 0), simd_float3(0.5, 0, 0)]
         let indices: [I] = [0,1,2, 0,2,3,
                             2,1,0, 3,2,0]
 
-        let rotatedVertices: [SIMD3<Float>]
+        let rotatedVertices: [simd_float3]
         rotatedVertices = vertices.map { vertex in
             state.position + orientation.act(scale * vertex)
         }
@@ -101,15 +101,15 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
         return pen
     }
 
-    private func makeCircle(radius: Float) -> [SIMD3<Float>] {
-        var vertices: [SIMD3<Float>] = []
+    private func makeCircle(radius: Float) -> [simd_float3] {
+        var vertices: [simd_float3] = []
         let arcLength: Float = 2.0 * .pi / Float(radialSegmentCount)
         for j in 0...radialSegmentCount {
             let theta = arcLength*Float(j)
             let rCosTheta = radius*cos(theta)
             let rSinTheta = radius*sin(theta)
 
-            vertices.append(SIMD3<Float>(rCosTheta, 0, rSinTheta))
+            vertices.append(simd_float3(rCosTheta, 0, rSinTheta))
         }
         return vertices
     }
@@ -132,7 +132,7 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
 public final class GeometryBuilder<I> where I: FixedWidthInteger {
     private let primitiveType: SCNGeometryPrimitiveType
     private let material: SCNMaterial?
-    var vertices: [SIMD3<Float>] = []
+    var vertices: [simd_float3] = []
     var textureCoordinates: [simd_float2] = []
     var indices: [I] = []
 
@@ -141,7 +141,7 @@ public final class GeometryBuilder<I> where I: FixedWidthInteger {
         self.material = material
     }
 
-    public func addVertices(_ vertices: [SIMD3<Float>]) -> I {
+    public func addVertices(_ vertices: [simd_float3]) -> I {
         let minVertexId = self.vertices.count
         self.vertices.append(contentsOf: vertices)
         return I(minVertexId)
@@ -160,7 +160,7 @@ public final class GeometryBuilder<I> where I: FixedWidthInteger {
         self.indices.append(contentsOf: indices)
     }
 
-    public func addSegment(_ vertices: [SIMD3<Float>], _ indices: [I]) -> [I] {
+    public func addSegment(_ vertices: [simd_float3], _ indices: [I]) -> [I] {
         let offset = I(self.vertices.count)
         let offsetIndices = indices.map { offset + $0 }
 

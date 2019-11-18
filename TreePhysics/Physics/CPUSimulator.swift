@@ -104,11 +104,11 @@ public final class CPUSimulator {
                 let parentAngularVelocity_jointSpace = parentJoint.rotate(vector: parentJoint.parentRigidBody.angularVelocity)
                 let childAngularVelocity_jointSpace = parentJoint.rotate(vector: rigidBody.angularVelocity)
 
-                let torqueFictitious_jointSpace_i: SIMD3<Float> = configuration.torqueFictitiousMultiplier_i *
+                let torqueFictitious_jointSpace_i: simd_float3 = configuration.torqueFictitiousMultiplier_i *
                     -rigidBody.composite.mass * pr.skew * parentJoint.rotate(vector: parentJoint.acceleration)
-                let torqueFictitious_jointSpace_ii: SIMD3<Float> = configuration.torqueFictitiousMultiplier_ii *
+                let torqueFictitious_jointSpace_ii: simd_float3 = configuration.torqueFictitiousMultiplier_ii *
                     -inertiaTensor_jointSpace * (parentAngularAcceleration_jointSpace + parentAngularVelocity_jointSpace.skew * childAngularVelocity_jointSpace)
-                let torqueFictitious_jointSpace_iii: SIMD3<Float> = configuration.torqueFictitiousMultiplier_ii *
+                let torqueFictitious_jointSpace_iii: simd_float3 = configuration.torqueFictitiousMultiplier_ii *
                     -childAngularVelocity_jointSpace.skew * inertiaTensor_jointSpace * childAngularVelocity_jointSpace
 
                 let torqueFictitious_jointSpace = torqueFictitious_jointSpace_i + torqueFictitious_jointSpace_ii + torqueFictitious_jointSpace_iii
@@ -201,7 +201,7 @@ public final class CPUSimulator {
         guard rigidBody.kind != .static else { return }
 
         // FIXME untested
-        let force, torque: SIMD3<Float>
+        let force, torque: simd_float3
         let mass: Float
         let inertiaTensor: float3x3
         switch rigidBody {

@@ -13,7 +13,7 @@ class AutoTreeTests: XCTestCase {
 
         // start with root -> terminalBud
         // transition to root -> internode -> terminalBud
-        var (internode, (terminalBud, lateralBud)) = firstBud.grow(towards: [SIMD3<Float>(1,1,0), SIMD3<Float>(1,-1,0)])
+        var (internode, (terminalBud, lateralBud)) = firstBud.grow(towards: [simd_float3(1,1,0), simd_float3(1,-1,0)])
 
         XCTAssertEqual(internode.position, firstBud.position)
         XCTAssertEqual(simd_quatf(angle: -.pi/2, axis: .z), internode.orientation, accuracy: 0.0001)
@@ -23,7 +23,7 @@ class AutoTreeTests: XCTestCase {
         XCTAssertEqual(internode.orientation, terminalBud.orientation)
 
         // transition to root -> internode -> [lateralBud] internode -> terminalBud
-        (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [SIMD3<Float>(10,0,0)])
+        (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [simd_float3(10,0,0)])
         var lateralBud_ = try XCTUnwrap(lateralBud)
 
         XCTAssertEqual(internode.orientation.heading * config.internodeLength * 2, terminalBud.position, accuracy: 0.0001)
@@ -41,7 +41,7 @@ class AutoTreeTests: XCTestCase {
 
         // transition to root -> internode -> [lateralBud] internode -> [lateralBud] internode -> terminalBud
         let branchingPoint = internode
-        (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [SIMD3<Float>(10,0,0)])
+        (internode, (terminalBud, lateralBud)) = terminalBud.grow(towards: [simd_float3(10,0,0)])
         lateralBud_ = try XCTUnwrap(lateralBud)
 
         XCTAssertEqual(internode.orientation.heading * config.internodeLength * 3, terminalBud.position, accuracy: 0.0001)
@@ -65,7 +65,7 @@ class AutoTreeTests: XCTestCase {
         let autoTree = AutoTree(config)
         let (root, firstBud) = autoTree.seedling()
 
-        let (internode, (terminalBud, _)) = firstBud.grow(towards: [SIMD3<Float>(1,1,0), SIMD3<Float>(1,-1,0)])
+        let (internode, (terminalBud, _)) = firstBud.grow(towards: [simd_float3(1,1,0), simd_float3(1,-1,0)])
 
         XCTAssertEqual(simd_quatf(angle: -.pi/4, axis: .z), internode.orientation, accuracy: 0.0001)
 
@@ -79,7 +79,7 @@ class AutoTreeTests: XCTestCase {
         let autoTree = AutoTree(config)
         let (root, firstBud) = autoTree.seedling()
 
-        let (internode, (terminalBud, _)) = firstBud.grow(towards: [SIMD3<Float>(1,1,0), SIMD3<Float>(1,-1,0)])
+        let (internode, (terminalBud, _)) = firstBud.grow(towards: [simd_float3(1,1,0), simd_float3(1,-1,0)])
 
         XCTAssertEqual(simd_quatf(angle: -.pi/4, axis: .z), internode.orientation, accuracy: 0.0001)
 
@@ -111,31 +111,31 @@ class AutoTreeTests: XCTestCase {
         config.shadowDepth = 3
         config.initialShadowGridSize = 1 // This SHOULD trigger resizing
         let grid = AutoTree.ArrayBackedShadowGrid(config)
-        grid[SIMD3<Float>(3.1,3.1,3.1)] += 1
+        grid[simd_float3(3.1,3.1,3.1)] += 1
         for i in 0..<8 {
             for k in 0..<7 {
-                XCTAssertEqual(0, grid[SIMD3<Float>(Float(i), 4, Float(k))]) // top slice all 0s
+                XCTAssertEqual(0, grid[simd_float3(Float(i), 4, Float(k))]) // top slice all 0s
 
                 if i == 3 && k == 3 { // next is all zeros except i,k=0
-                    XCTAssertEqual(1, grid[SIMD3<Float>(Float(i), 3, Float(k))])
+                    XCTAssertEqual(1, grid[simd_float3(Float(i), 3, Float(k))])
                 } else {
-                    XCTAssertEqual(0, grid[SIMD3<Float>(Float(i), 3, Float(k))])
+                    XCTAssertEqual(0, grid[simd_float3(Float(i), 3, Float(k))])
                 }
 
                 // the rest decays like a pyramid:
                 if (2...4).contains(i) && (2...4).contains(k) {
-                    XCTAssertEqual(1/2, grid[SIMD3<Float>(Float(i), 2, Float(k))])
+                    XCTAssertEqual(1/2, grid[simd_float3(Float(i), 2, Float(k))])
                 } else {
-                    XCTAssertEqual(0, grid[SIMD3<Float>(Float(i), 2, Float(k))])
+                    XCTAssertEqual(0, grid[simd_float3(Float(i), 2, Float(k))])
                 }
 
                 if (1...5).contains(i) && (1...5).contains(k) {
-                    XCTAssertEqual(1/4, grid[SIMD3<Float>(Float(i), 1, Float(k))])
+                    XCTAssertEqual(1/4, grid[simd_float3(Float(i), 1, Float(k))])
                 } else {
-                    XCTAssertEqual(0, grid[SIMD3<Float>(Float(i), 1, Float(k))])
+                    XCTAssertEqual(0, grid[simd_float3(Float(i), 1, Float(k))])
                 }
 
-                XCTAssertEqual(0, grid[SIMD3<Float>(Float(i), 0, Float(k))])
+                XCTAssertEqual(0, grid[simd_float3(Float(i), 0, Float(k))])
             }
         }
     }
@@ -214,9 +214,9 @@ class AutoTreeTests: XCTestCase {
 }
 
 class FakeShadowGrid: AutoTree.ShadowGrid {
-    var data: [SIMD3<Float>:Float] = [:]
+    var data: [simd_float3:Float] = [:]
 
-    subscript(position: SIMD3<Float>) -> Float {
+    subscript(position: simd_float3) -> Float {
         get {
             return data[position] ?? 0
         }

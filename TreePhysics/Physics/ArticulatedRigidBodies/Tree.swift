@@ -23,11 +23,11 @@ public class Tree {
         // Inertia tensor of a rod about its center of mass, see http://scienceworld.wolfram.com/physics/MomentofInertiaCylinder.html
         // and https://en.wikipedia.org/wiki/List_of_moments_of_inertia
         let localInertiaTensor = float3x3(diagonal:
-            SIMD3<Float>(momentOfInertiaAboutY + momentOfInertiaAboutZ,
+            simd_float3(momentOfInertiaAboutY + momentOfInertiaAboutZ,
                    momentOfInertiaAboutZ + momentOfInertiaAboutX,
                    momentOfInertiaAboutX + momentOfInertiaAboutY))
 
-        let localPivot = SIMD3<Float>(0, -length/2, 0)
+        let localPivot = simd_float3(0, -length/2, 0)
 
         let shape = Shape.internode(area: area, length: length, radius: radius)
         let node = SCNNode(geometry: SCNSphere(radius: 0.01))
@@ -47,7 +47,7 @@ public class Tree {
         // Inertia tensor for rectangular plate:
         let mass = density * area * Tree.leafThickness
         let localInertiaTensor = float3x3(diagonal:
-            SIMD3<Float>(1/12 * mass * sqr(length),
+            simd_float3(1/12 * mass * sqr(length),
                    1/12 * mass * sqr(length),
                    1/6  * mass * sqr(length)))
 
@@ -61,7 +61,7 @@ public class Tree {
             kind: .dynamic,
             mass: mass,
             localInertiaTensor: localInertiaTensor,
-            localPivot: SIMD3<Float>(0, -length/2, 0),
+            localPivot: simd_float3(0, -length/2, 0),
             shape: shape,
             node: node)
     }

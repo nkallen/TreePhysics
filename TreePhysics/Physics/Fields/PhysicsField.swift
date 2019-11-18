@@ -4,18 +4,18 @@ import SceneKit
 import ShaderTypes
 
 public class PhysicsField {
-    public var position: SIMD3<Float> = .zero
-    public var halfExtent: SIMD3<Float> = SIMD3<Float>(.infinity, .infinity, .infinity)
+    public var position: simd_float3 = .zero
+    public var halfExtent: simd_float3 = simd_float3(.infinity, .infinity, .infinity)
 
-    func force(rigidBody: RigidBody, time: TimeInterval) -> SIMD3<Float> {
+    func force(rigidBody: RigidBody, time: TimeInterval) -> simd_float3 {
         return .zero
     }
 
-    func torque(rigidBody: RigidBody, time: TimeInterval) -> SIMD3<Float> {
+    func torque(rigidBody: RigidBody, time: TimeInterval) -> simd_float3 {
         return .zero
     }
 
-    final func applies(to position: SIMD3<Float>) -> Bool {
+    final func applies(to position: simd_float3) -> Bool {
         return position.in(min: self.position - halfExtent, max: self.position + halfExtent)
     }
 

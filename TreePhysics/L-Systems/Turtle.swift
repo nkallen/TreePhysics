@@ -7,7 +7,7 @@ import simd
 
 enum TurtleCommand {
     case forward(distance: Float?, width: Float?)
-    case tropism(force: SIMD3<Float>?)
+    case tropism(force: simd_float3?)
     case turnLeft(radians: Float?)
     case turnRight(radians: Float?)
     case turnRandom(upToRadians: Float?)
@@ -31,7 +31,7 @@ public struct InterpreterConfig {
         thicknessScale: Float = 0.9,
         stepSize: Float = 0.1,
         stepSizeScale: Float = 0.9,
-        tropism: SIMD3<Float> = .zero,
+        tropism: simd_float3 = .zero,
         elasticity: Float = 0.1) {
         self.randomScale = randomScale
         self.randomSeed = randomSeed
@@ -51,13 +51,13 @@ public struct InterpreterConfig {
     let thicknessScale: Float
     let stepSize: Float
     let stepSizeScale: Float
-    let tropism: SIMD3<Float>
+    let tropism: simd_float3
     let elasticity: Float
 }
 
 public class Interpreter<P> where P: Pen {
     struct State {
-        var position: SIMD3<Float>
+        var position: simd_float3
         var orientation: simd_quatf
         var stepSize: Float // meters
         var thickness: Float // meters^2

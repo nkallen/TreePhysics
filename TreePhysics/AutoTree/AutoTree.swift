@@ -10,23 +10,23 @@ public struct AutoTree {
         self.config = config
     }
     
-    func root(position: SIMD3<Float> = .zero) -> Parent {
+    func root(position: simd_float3 = .zero) -> Parent {
         return Parent(config: config, position: position, orientation: .identity)
     }
     
-    public func lateralBud(position: SIMD3<Float>, orientation: simd_quatf) -> LateralBud {
+    public func lateralBud(position: simd_float3, orientation: simd_quatf) -> LateralBud {
         return LateralBud(config: config, position: position, orientation: orientation)
     }
     
-    public func terminalBud(position: SIMD3<Float>, orientation: simd_quatf) -> TerminalBud {
+    public func terminalBud(position: simd_float3, orientation: simd_quatf) -> TerminalBud {
         return TerminalBud(config: config, position: position, orientation: orientation)
     }
     
-    public func internode(position: SIMD3<Float>, orientation: simd_quatf) -> Internode {
+    public func internode(position: simd_float3, orientation: simd_quatf) -> Internode {
         return Internode(config: config, position: position, orientation: orientation)
     }
     
-    public func seedling(position: SIMD3<Float> = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
+    public func seedling(position: simd_float3 = .zero, orientation: simd_quatf = .identity) -> (Parent, TerminalBud) {
         let root = self.root(position: position)
         let bud = self.terminalBud(position: position, orientation: orientation)
         root.addBud(bud)

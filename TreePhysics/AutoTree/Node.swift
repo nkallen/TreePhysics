@@ -11,10 +11,10 @@ extension AutoTree {
 
         weak var parent: Parent? = nil
 
-        let position: SIMD3<Float>
+        let position: simd_float3
         let orientation: simd_quatf
 
-        fileprivate init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
+        fileprivate init(config: Config, position: simd_float3, orientation: simd_quatf) {
             self.config = config
             self.position = position
             self.orientation = orientation.normalized
@@ -57,7 +57,7 @@ extension AutoTree {
             return (thickest, rest)
         }
 
-        public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
+        public override init(config: Config, position: simd_float3, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
@@ -88,12 +88,12 @@ extension AutoTree {
     }
 
     public class Bud: Node {
-        func growthDirection(towards points: [SIMD3<Float>]) -> SIMD3<Float> {
-            let gravitropismDirection: SIMD3<Float> = simd_quatf(angle: config.gravitropismAngle, axis: cross(.y, orientation.heading)).act(.y)
+        func growthDirection(towards points: [simd_float3]) -> simd_float3 {
+            let gravitropismDirection: simd_float3 = simd_quatf(angle: config.gravitropismAngle, axis: cross(.y, orientation.heading)).act(.y)
 
-            var newDirection: SIMD3<Float>
+            var newDirection: simd_float3
 
-            var environmentalDirection: SIMD3<Float> = .zero
+            var environmentalDirection: simd_float3 = .zero
             if points.count > 0 {
                 for point in points {
                     let directionToAttractionPoint = point - self.position
@@ -134,7 +134,7 @@ extension AutoTree {
             return b
         }
 
-        fileprivate func grow(inDirection newDirection: SIMD3<Float>, produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
+        fileprivate func grow(inDirection newDirection: simd_float3, produceLateralBud: Bool) -> (Internode, (TerminalBud, LateralBud?)) {
             guard let parent = parent else { fatalError("\(self) has no parent") }
 
             // 1. Lateral Bud
@@ -170,20 +170,20 @@ extension AutoTree {
             return (internode, (terminalBud, lateralBud))
         }
 
-        func grow(towards points: [SIMD3<Float>] = []) -> (Internode, (TerminalBud, LateralBud?)) {
+        func grow(towards points: [simd_float3] = []) -> (Internode, (TerminalBud, LateralBud?)) {
             let newDirection = growthDirection(towards: points)
             return grow(inDirection: newDirection)
         }
 
-        func grow(inDirection newDirection: SIMD3<Float>) -> (Internode, (TerminalBud, LateralBud?)) {
+        func grow(inDirection newDirection: simd_float3) -> (Internode, (TerminalBud, LateralBud?)) {
             fatalError("Abstract method")
         }
 
-        func occupies(point: SIMD3<Float>) -> Bool {
+        func occupies(point: simd_float3) -> Bool {
             return distance(position, point) <= config.occupationRadius
         }
 
-        func perceives(point: SIMD3<Float>) -> Bool {
+        func perceives(point: simd_float3) -> Bool {
             let direction = point - position
             let dist = simd_length(direction)
             if dist > config.perceptionRadius + config.occupationRadius { return false }
@@ -192,21 +192,21 @@ extension AutoTree {
     }
 
     public final class TerminalBud: Bud {
-        public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
+        public override init(config: Config, position: simd_float3, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(inDirection newDirection: SIMD3<Float>) -> (Internode, (TerminalBud, LateralBud?)) {
+        override func grow(inDirection newDirection: simd_float3) -> (Internode, (TerminalBud, LateralBud?)) {
             return grow(inDirection: newDirection, produceLateralBud: parent is Internode)
         }
     }
 
     public final class LateralBud: Bud {
-        public override init(config: Config, position: SIMD3<Float>, orientation: simd_quatf) {
+        public override init(config: Config, position: simd_float3, orientation: simd_quatf) {
             super.init(config: config, position: position, orientation: orientation)
         }
 
-        override func grow(inDirection newDirection: SIMD3<Float>) -> (Internode, (TerminalBud, LateralBud?)) {
+        override func grow(inDirection newDirection: simd_float3) -> (Internode, (TerminalBud, LateralBud?)) {
             return grow(inDirection: newDirection, produceLateralBud: false)
         }
     }

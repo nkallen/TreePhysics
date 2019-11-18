@@ -31,8 +31,8 @@ for color in colors {
 //let asset = MDLAsset(url: url)
 //let mdlMesh = asset.object(at: 0) as! MDLMesh
 
-let windField = WindField(windVelocity: SIMD3<Float>(5, 0, -1))
-let gravityField = GravityField(SIMD3<Float>(0,-9.81,0))
+let windField = WindField(windVelocity: simd_float3(5, 0, -1))
+let gravityField = GravityField(simd_float3(0,-9.81,0))
 
 let world = PhysicsWorld()
 let simulator = CPUSimulator(world: world)

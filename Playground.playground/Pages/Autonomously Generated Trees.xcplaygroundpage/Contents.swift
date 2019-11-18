@@ -54,11 +54,11 @@ let mdlMesh = asset.object(at: 0) as! MDLMesh
 
 let face = SCNNode(mdlObject: mdlMesh)
 let scale: Float = config.internodeLength / 3
-let offset = SIMD3<Float>(0,3.5,-0.5)
-face.simdScale = SIMD3<Float>(repeating: 1) * scale
+let offset = simd_float3(0,3.5,-0.5)
+face.simdScale = simd_float3(repeating: 1) * scale
 face.simdPosition = offset
 
-let vertices: [SIMD3<Float>] = mdlMesh.vertices.map { $0 * scale + offset }
+let vertices: [simd_float3] = mdlMesh.vertices.map { $0 * scale + offset }
 //simulator.addAttractionPoints(vertices)
 
 var success = false

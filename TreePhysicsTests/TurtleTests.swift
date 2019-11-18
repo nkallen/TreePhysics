@@ -6,14 +6,14 @@ import simd
 final class FakePen: Pen {
     typealias T = ()
 
-    var points: [SIMD3<Float>] = []
+    var points: [simd_float3] = []
     let _branch: FakePen?
 
     init(branch: FakePen? = nil) {
         self._branch = branch
     }
 
-    func start(at: SIMD3<Float>, orientation: simd_quatf, thickness: Float) {
+    func start(at: simd_float3, orientation: simd_quatf, thickness: Float) {
         points.append(at)
     }
 
@@ -43,7 +43,7 @@ class TurtleTests: XCTestCase {
 
     func testForward() {
         interpreter.interpret([.forward(distance: nil, width: nil), .turnLeft(radians: nil), .forward(distance: nil, width: nil)])
-        XCTAssertEqual([.zero, SIMD3<Float>(0, stepSize, 0), SIMD3<Float>(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+        XCTAssertEqual([.zero, simd_float3(0, stepSize, 0), simd_float3(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
                        pen.points,
                        accuracy: 0.0001)
     }
@@ -57,13 +57,13 @@ class TurtleTests: XCTestCase {
                                .turnLeft(radians: nil), .forward(distance: nil, width: nil)])
         XCTAssertEqual([
             .zero,
-            SIMD3<Float>(0, stepSize, 0),
-            SIMD3<Float>(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+            simd_float3(0, stepSize, 0),
+            simd_float3(stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
                        pen.points,
                        accuracy: 0.0001)
         XCTAssertEqual([
-            SIMD3<Float>(0, stepSize, 0),
-            SIMD3<Float>(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
+            simd_float3(0, stepSize, 0),
+            simd_float3(-stepSize * 1.0/sqrt(2), stepSize + stepSize * 1.0/sqrt(2), 0)],
                        pen.branch().points,
                        accuracy: 0.0001)
 

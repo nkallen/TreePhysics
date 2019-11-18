@@ -2,13 +2,13 @@ import Foundation
 import simd
 
 protocol HasPosition {
-    var position: SIMD3<Float> { get }
+    var position: simd_float3 { get }
 }
 
 final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
     let cellSize: Float
 
-    private var storage: [SIMD3<Int>:Set<T>] = [:]
+    private var storage: [simd_int3:Set<T>] = [:]
 
     init(cellSize: Float) {
         self.cellSize = cellSize
@@ -31,13 +31,13 @@ final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
 
     // returns a FlattenedSequence for performance reasons (since it can be constructed without
     // copying (unlike an array)
-    func elements(near position: SIMD3<Float>) -> FlattenSequence<[Set<T>]> {
+    func elements(near position: simd_float3) -> FlattenSequence<[Set<T>]> {
         var result: [Set<T>] = []
         let key = self.key(for: position)
         for i in -1...1 {
             for j in -1...1 {
                 for k in -1...1 {
-                    let offset = SIMD3<Int>(i, j, k)
+                    let offset = simd_int3(i, j, k)
                     if let set = storage[key &+ offset] {
                         result.append(set)
                     }
@@ -47,7 +47,7 @@ final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
         return result.joined()
     }
 
-    private func key(for position: SIMD3<Float>) -> SIMD3<Int> {
-        return SIMD3<Int>(floor(position / cellSize))
+    private func key(for position: simd_float3) -> simd_int3 {
+        return simd_int3(floor(position / cellSize))
     }
 }

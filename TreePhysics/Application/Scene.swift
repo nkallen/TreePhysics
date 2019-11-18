@@ -82,7 +82,7 @@ class Scene: NSObject {
 //        cpuSimulator.add(field: attractorField)
 //        metalSimulator.add(field: attractorField)
 
-        let windField = WindField(windVelocity: SIMD3<Float>(1,0,1)*15)
+        let windField = WindField(windVelocity: simd_float3(1,0,1)*15)
         world.add(field: windField)
         world.add(field: gravityField)
     }
@@ -96,7 +96,7 @@ var done: Bool = false
 extension Scene: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
 //                let pov = renderer.pointOfView!
-//        pov.simdPosition = SIMD3<Float>(
+//        pov.simdPosition = simd_float3(
 //            radius * sinf(Float(start.timeIntervalSinceNow)),
 //            1,
 //            radius * cosf(Float(start.timeIntervalSinceNow)))

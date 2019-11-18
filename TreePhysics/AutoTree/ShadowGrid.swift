@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 public protocol AutoTreeShadowGrid: class {
-    subscript(position: SIMD3<Float>) -> Float { get set }
+    subscript(position: simd_float3) -> Float { get set }
 }
 
 extension AutoTree {
@@ -19,7 +19,7 @@ extension AutoTree {
             self.storage = [Float](repeating: 0, count: size*size*size)
         }
 
-        public subscript(position: SIMD3<Float>) -> Float {
+        public subscript(position: simd_float3) -> Float {
             get {
                 let key = self.key(for: position)
                 guard key.x < size && key.y < size && key.z < size else { return 0 }
@@ -39,7 +39,7 @@ extension AutoTree {
                     while p <= q {
                         var s = -q
                         while s <= q {
-                            let offset = SIMD3<Int>(p,-q,s)
+                            let offset = simd_int3(p,-q,s)
                             let decayedDelta = delta * pow(config.shadowDecayFactor, Float(q))
                             let k = key &+ offset
                             storage[k.x*size*size + k.y*size + k.z] += decayedDelta
@@ -52,8 +52,8 @@ extension AutoTree {
             }
         }
 
-        private func key(for position: SIMD3<Float>) -> SIMD3<Int> {
-            let cell = SIMD3<Int>(floor(position / config.internodeLength)) &+ size / 2
+        private func key(for position: simd_float3) -> simd_int3 {
+            let cell = simd_int3(floor(position / config.internodeLength)) &+ size / 2
             return cell
         }
 

@@ -5,13 +5,13 @@ public final class RigidBodyPen: Pen {
     public typealias T = ArticulatedRigidBody
 
     private var parentBranch: ArticulatedRigidBody
-    private var start: SIMD3<Float>? = nil
+    private var start: simd_float3? = nil
 
     public init(parent: ArticulatedRigidBody) {
         self.parentBranch = parent
     }
 
-    public func start(at: SIMD3<Float>, orientation: simd_quatf, thickness: Float) {
+    public func start(at: simd_float3, orientation: simd_quatf, thickness: Float) {
         start = at
     }
 

@@ -9,10 +9,10 @@ public final class AttractorField: PhysicsField {
 
     public override init() {
         super.init()
-        self.halfExtent = SIMD3<Float>(1, 1, 1)
+        self.halfExtent = simd_float3(1, 1, 1)
     }
 
-    override func force(rigidBody: RigidBody, time: TimeInterval) -> SIMD3<Float> {
+    override func force(rigidBody: RigidBody, time: TimeInterval) -> simd_float3 {
         let delta = self.position - rigidBody.centerOfMass
         let distance = length(delta)
         if (distance > 0) {
@@ -21,11 +21,11 @@ public final class AttractorField: PhysicsField {
             let force = direction * a * powf(.e, -sqr(distance - b)/(2*c))
             return force
         } else {
-            return SIMD3<Float>(repeating: 0)
+            return simd_float3(repeating: 0)
         }
     }
 
-    public func torque(rigidBody: RigidBody, time: TimeInterval) -> SIMD3<Float>? {
+    public func torque(rigidBody: RigidBody, time: TimeInterval) -> simd_float3? {
         return nil
     }
 }

@@ -14,7 +14,7 @@ extension AutoTree {
         let config: Config
 
         private(set) var generation = 0
-        private(set) var attractionPoints: Set<SIMD3<Float>> = []
+        private(set) var attractionPoints: Set<simd_float3> = []
         private let hash: LocalitySensitiveHash<Bud>
         private let shadowGrid: ShadowGrid
         private var root: Parent!
@@ -49,7 +49,7 @@ extension AutoTree {
             add(parent as Node)
         }
 
-        public func addAttractionPoints(_ points: [SIMD3<Float>]) {
+        public func addAttractionPoints(_ points: [simd_float3]) {
             self.attractionPoints.formUnion(points)
         }
 
@@ -103,8 +103,8 @@ extension AutoTree {
             return vigors
         }
 
-        internal func selectBudsWithSpace() -> [Bud:Set<SIMD3<Float>>] {
-            var selectedBuds: [Bud:Set<SIMD3<Float>>] = [:]
+        internal func selectBudsWithSpace() -> [Bud:Set<simd_float3>] {
+            var selectedBuds: [Bud:Set<simd_float3>] = [:]
             for point in attractionPoints {
                 var closestBud: Bud?
                 var closestDistance = Float.infinity
@@ -134,7 +134,7 @@ extension AutoTree {
             return selectedBuds
         }
 
-        internal func growShoots(selectedBuds: [Bud:Set<SIMD3<Float>>], vigors: [Node:Float], maxVigor: Float) {
+        internal func growShoots(selectedBuds: [Bud:Set<simd_float3>], vigors: [Node:Float], maxVigor: Float) {
             guard selectedBuds.count > 0 else { return }
 
             for (bud, points) in selectedBuds {

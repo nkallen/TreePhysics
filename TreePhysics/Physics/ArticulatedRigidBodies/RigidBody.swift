@@ -30,18 +30,18 @@ public class RigidBody {
     let localInertiaTensor: float3x3 // relative to the center of mass
     let shape: Shape?
 
-    var force: SIMD3<Float> = .zero
-    var torque: SIMD3<Float> = .zero
+    var force: simd_float3 = .zero
+    var torque: simd_float3 = .zero
 
     // State attributes that vary as a function of the simulation
-    public var centerOfMass: SIMD3<Float>
+    public var centerOfMass: simd_float3
     public var orientation: simd_quatf
-    var velocity: SIMD3<Float>
-    var acceleration: SIMD3<Float>
+    var velocity: simd_float3
+    var acceleration: simd_float3
     var inertiaTensor: float3x3
-    var angularVelocity: SIMD3<Float>
-    var angularAcceleration: SIMD3<Float>
-    var angularMomentum: SIMD3<Float>
+    var angularVelocity: simd_float3
+    var angularAcceleration: simd_float3
+    var angularMomentum: simd_float3
 
     public var node: SCNNode
 
@@ -66,7 +66,7 @@ public class RigidBody {
         self.node = node
     }
 
-    func apply(force: SIMD3<Float>, torque: SIMD3<Float> = .zero) {
+    func apply(force: simd_float3, torque: simd_float3 = .zero) {
         self.force += force
         self.torque += torque
     }
