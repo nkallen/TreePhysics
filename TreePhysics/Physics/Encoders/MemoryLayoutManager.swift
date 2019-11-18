@@ -105,7 +105,7 @@ public final class MemoryLayoutManager {
                 for rigidBody in climbers + [rigidBody] {
                     let id = index[rigidBody]!
 
-                    mass[id] = Half(rigidBody.mass)
+                    mass[id] = max(.leastNormalMagnitude, Half(rigidBody.mass))
                     pivot[id] = packed_half3(rigidBody.pivot)
                     localPivot[id] = packed_half3(rigidBody.localPivot)
                     force[id] = packed_half3(rigidBody.force)
