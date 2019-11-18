@@ -126,41 +126,39 @@ updateCompositeBodies(
             const int id = lowerBound + gid;
             const uchar childCount = bodies.childCount[id];
             const uchar childIndex = bodies.childIndex[id];
-            const ushort parentId = bodies.parentId[id];
+            const ushort parentId  = bodies.parentId[id];
             
-            const float parentMass = (float)bodies.mass[id];
-            const float3 parentForce = (float3)bodies.force[id];
-            const float3 parentTorque = (float3)bodies.torque[id];
+            const float parentMass          = (float)bodies.mass[id];
+            const float3 parentForce        = (float3)bodies.force[id];
+            const float3 parentTorque       = (float3)bodies.torque[id];
             const float3 parentCenterOfMass = (float3)bodies.centerOfMass[id];
-            const float3 parentPivot = (float3)bodies.pivot[id];
+            const float3 parentPivot        = (float3)bodies.pivot[id];
             
-            float totalMass = parentMass;
-            float3 totalForce = parentForce;
-            float3 totalTorque = parentTorque;
+            float totalMass          = parentMass;
+            float3 totalForce        = parentForce;
+            float3 totalTorque       = parentTorque;
             float3 totalCenterOfMass = parentCenterOfMass;
 
             float3x3 totalInertiaTensor = float3x3_from_inertiaTensor(bodies.inertiaTensor[id]);
 
             // Step 1: Accumulate children
             for (uchar j = 0; j < childCount; j++) {
-                const int nextId = previousLowerBound + j * delta + gid;
+                const int childId = previousLowerBound + j * delta + gid;
 
-                const float nextMass = (float)children.mass[nextId];
-                const float3 nextForce = (float3)children.force[nextId];
-                const float3 nextCenterOfMass = (float3)children.centerOfMass[nextId];
-
-                float3x3 nextInertiaTensor = float3x3_from_inertiaTensor(children.inertiaTensor[nextId]);
+                const float childMass = (float)children.mass[childId];
+                const float3 childForce = (float3)children.force[childId];
+                const float3 childCenterOfMass = (float3)children.centerOfMass[childId];
+                float3x3 childInertiaTensor = float3x3_from_inertiaTensor(children.inertiaTensor[childId]);
 
                 const float prevTotalMass = totalMass;
                 const float3 previousCenterOfMass = totalCenterOfMass;
 
-                totalForce += nextForce;
-                totalTorque += cross((float3)children.pivot[nextId] - parentPivot, nextForce) + (float3)children.torque[nextId];
-                totalMass += nextMass;
-                totalCenterOfMass = (prevTotalMass * previousCenterOfMass + nextMass * nextCenterOfMass) / totalMass;
+                totalForce += childForce;
+                totalTorque += cross((float3)children.pivot[childId] - parentPivot, childForce) + (float3)children.torque[childId];
+                totalMass += childMass;
+                totalCenterOfMass = (prevTotalMass * previousCenterOfMass + childMass * childCenterOfMass) / totalMass;
                 totalInertiaTensor -= prevTotalMass * sqr(skew(previousCenterOfMass - totalCenterOfMass));
-
-                totalInertiaTensor += nextInertiaTensor - nextMass * sqr(skew(nextCenterOfMass - totalCenterOfMass));
+                totalInertiaTensor += childInertiaTensor - childMass * sqr(skew(childCenterOfMass - totalCenterOfMass));
             }
             
             jointSpace(id, out, (quatf)bodies.rotation[id], totalMass, totalTorque, totalCenterOfMass, parentPivot, totalInertiaTensor);

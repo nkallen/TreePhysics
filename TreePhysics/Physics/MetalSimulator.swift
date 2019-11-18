@@ -43,8 +43,8 @@ public final class MetalSimulator {
 //            applyPhysicsFields.encode(commandBuffer: commandBuffer, field: field)
 //        }
         updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
-//        updateJoints.encode(commandBuffer: commandBuffer, at: Float(time))
-//        updateRigidBodies.encode(commandBuffer: commandBuffer)
+        updateJoints.encode(commandBuffer: commandBuffer, at: Float(time))
+        updateRigidBodies.encode(commandBuffer: commandBuffer)
 //        resetForces.encode(commandBuffer: commandBuffer)
     }
 }

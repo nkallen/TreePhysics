@@ -19,7 +19,7 @@ class GameViewController: UIViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]////[!"&FFFFFFFA]////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
         let configuration = InterpreterConfig(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
@@ -54,9 +54,7 @@ class GameViewController: UIViewController {
         captureDescriptor.captureObject = self.device
         do {
             try captureManager.startCapture(with: captureDescriptor)
-        }
-        catch
-        {
+        } catch {
             fatalError("error when trying to capture: \(error)")
         }
     }
@@ -74,6 +72,7 @@ extension GameViewController: SCNSceneRendererDelegate {
         simulator.encode(commandBuffer: commandBuffer, at: 1/60)
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
+        check()
 
         print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)
     }
