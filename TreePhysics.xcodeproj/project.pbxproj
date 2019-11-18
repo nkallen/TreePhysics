@@ -22,6 +22,8 @@
 		9E1223C1236453BC00692A72 /* MemoryLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1223BF2364539200692A72 /* MemoryLayoutManager.swift */; };
 		9E1490CB2334E49500FED681 /* Noise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1490CA2334E49500FED681 /* Noise.swift */; };
 		9E1C70FA230C802700DA9929 /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
+		9E1D92B92382DBEF0012CC81 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
+		9E1D92BA2382DBFC0012CC81 /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
 		9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E27B86022FA39920030664E /* RigidBodyTests.swift */; };
 		9E3351C122F83DDF00FDC3D6 /* MetalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */; };
 		9E34C484232911C6008C7353 /* TreePhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E34C482232911C6008C7353 /* TreePhysics.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -58,8 +60,6 @@
 		9E9D4B7022F37244007DCF49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9E9D4B7522F37244007DCF49 /* CPUSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */; };
 		9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
-		9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
-		9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
 		9E9D4B8322F37244007DCF49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
 		9E9D4B8422F37244007DCF49 /* NOTES in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBCB22E1078200535997 /* NOTES */; };
 		9E9D4B9122F37789007DCF49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B8D22F372E4007DCF49 /* Main.storyboard */; };
@@ -873,6 +873,7 @@
 				9E1168A1237C334F00922AAA /* SharedBuffersMetalDevice.swift in Sources */,
 				9EF29FC92374391000AF72FC /* Half.c in Sources */,
 				9EF46F232362439A00AEC82F /* UpdateCompositeBodies.metal in Sources */,
+				9E1D92B92382DBEF0012CC81 /* CylinderPen.swift in Sources */,
 				9EF46F27236243A600AEC82F /* Print.metal in Sources */,
 				9EAA0D36237C972C00FC9B81 /* Visualization.swift in Sources */,
 				9EF46F13236241B400AEC82F /* MetalKernalEncoder.swift in Sources */,
@@ -901,6 +902,7 @@
 				9EF46F12236241A500AEC82F /* UpdateCompositeBodies.swift in Sources */,
 				9EF46F26236243A300AEC82F /* Math.metal in Sources */,
 				9EF46F1B2362425600AEC82F /* PhysicsField.swift in Sources */,
+				9E1D92BA2382DBFC0012CC81 /* SkinningPen.swift in Sources */,
 				9EF46F222362439700AEC82F /* ApplyPhysicsFields.metal in Sources */,
 				9E8BF7502368511D00797FD7 /* UpdateJoints.swift in Sources */,
 				9EF46F28236243AF00AEC82F /* Debug.metal in Sources */,
@@ -928,9 +930,7 @@
 				9EF46F202362439100AEC82F /* ResetForces.metal in Sources */,
 				9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */,
 				9E0674E4230AD24C0044C3C4 /* UpdateRigidBodies.metal in Sources */,
-				9E9D4B7922F37244007DCF49 /* CylinderPen.swift in Sources */,
 				9E0674EC230ADBE40044C3C4 /* ApplyPhysicsFields.swift in Sources */,
-				9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */,
 				9E0674E3230AD2490044C3C4 /* Math.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

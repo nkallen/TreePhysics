@@ -21,8 +21,8 @@ public final class RigidBodyPen: Pen {
         let newBranch = Tree.internode(length: distance, radius: sqrt(thickness / .pi), density: 750)
 
         let worldPosition = start - parentBranch.pivot
-        let localPosition = parentBranch.rotation.inverse.act(worldPosition)
-        _ = parentBranch.add(newBranch, rotation: parentBranch.rotation.inverse * orientation, position: localPosition)
+        let localPosition = parentBranch.orientation.inverse.act(worldPosition)
+        _ = parentBranch.add(newBranch, orientation: parentBranch.orientation.inverse * orientation, position: localPosition)
 
         self.start = start + distance * orientation.heading
         self.parentBranch = newBranch
@@ -36,9 +36,9 @@ public final class RigidBodyPen: Pen {
         let newLeaf = Tree.leaf(length: scale, density: 500)
 
         let worldPosition = start - parentBranch.pivot
-        let localPosition = parentBranch.rotation.inverse.act(worldPosition)
-        let localOrientation = parentBranch.rotation.inverse * orientation
-        _ = parentBranch.add(newLeaf, rotation: localOrientation, position: localPosition)
+        let localPosition = parentBranch.orientation.inverse.act(worldPosition)
+        let localOrientation = parentBranch.orientation.inverse * orientation
+        _ = parentBranch.add(newLeaf, orientation: localOrientation, position: localPosition)
 
         return newLeaf
     }

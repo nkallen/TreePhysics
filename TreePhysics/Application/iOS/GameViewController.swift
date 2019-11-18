@@ -17,8 +17,10 @@ class GameViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         self.root = ArticulatedRigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
+        let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 5)
+        let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]////[!"&FFFFFFFA]////[!"&FFFFFFFA]"#)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
         let configuration = InterpreterConfig(
 //            randomScale: 0.4,
@@ -27,7 +29,7 @@ class GameViewController: UIViewController {
             thicknessScale: 0.7,
             stepSize: 0.3,
             stepSizeScale: 0.9)
-        let interpreter = Interpreter(configuration: configuration, pen: rigidBodyPen)
+        let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
 
         self.device = MTLCreateSystemDefaultDevice()!
@@ -38,6 +40,20 @@ class GameViewController: UIViewController {
         self.simulator = MetalSimulator(device: device, mem: mem)
         print("Total nodes:", mem.rigidBodies.count)
 
+//        let vectorCount = cylinderPen.branchGeometry.sources.first(where: { $0.semantic == .vertex })!.vectorCount
+//        var inversePositions: [simd_float3] = []
+//        var inverseOrientations: [simd_quatf] = []
+//        var boneIndices: [UInt16] = Array(repeating: 0, count: vectorCount)
+//
+//        for (vertexIndices, rigidBody) in skinningPen.branchBones.bones {
+//            inversePositions.append(-rigidBody.centerOfMass)
+//            inverseOrientations.append(rigidBody.orientation.inverse)
+//            let rigidBodyIndex = mem.rigidBodies.index[rigidBody]!
+//            for vertexIndex in vertexIndices {
+//                boneIndices[Int(vertexIndex)] = UInt16(rigidBodyIndex)
+//            }
+//        }
+
         scnView.delegate = self
         let scene = SCNScene()
         scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.1))
@@ -45,7 +61,13 @@ class GameViewController: UIViewController {
         scnView.allowsCameraControl = true
         scnView.backgroundColor = .gray
 
-        triggerProgrammaticCapture()
+
+        scene.rootNode.addChildNode(skinningPen.node())
+
+        scnView.scene?.rootNode.addChildNode(skinningPen.node())
+        scnView.scene?.rootNode.addChildNode(skinningPen.skeleton)
+
+//        triggerProgrammaticCapture()
     }
 
     func triggerProgrammaticCapture() {
@@ -72,7 +94,14 @@ extension GameViewController: SCNSceneRendererDelegate {
         simulator.encode(commandBuffer: commandBuffer, at: 1/60)
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
-        check()
+//        check()
+
+
+        for rigidBody in world.rigidBodiesUnordered {
+            let id = mem.rigidBodies.index[rigidBody]!
+            rigidBody.node.simdPosition = simd_float3(mem.rigidBodies.pivot[id])
+            rigidBody.node.simdOrientation = simd_quatf(mem.rigidBodies.orientation[id])
+        }
 
         print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)
     }
@@ -121,25 +150,5 @@ extension GameViewController {
                 self.simulator.debug.print(id - range.lowerBound)
             }
         }
-
-        //        print("=============== \(id) -- \(self.mem.rigidBodies.index[self.world.rigidBodiesLevelOrder[id]])")
-        //        print(self.world.rigidBodiesLevelOrder[id].inertiaTensor)
-        //        print(float3x3(self.mem.rigidBodies.inertiaTensor[id]))
-        //
-        //        print(self.world.rigidBodiesLevelOrder[id].composite.inertiaTensor)
-        //        print(float3x3(self.mem.compositeBodies.inertiaTensor[id]))
-        //
-        //        print(self.world.rigidBodiesLevelOrder[id].composite.inertiaTensor.determinant)
-        //        print(float3x3(self.mem.compositeBodies.inertiaTensor[id]).determinant)
-        //
-        //        print(self.world.rigidBodiesLevelOrder[id].composite.inertiaTensor.cholesky)
-        //        print(float3x3(self.mem.compositeBodies.inertiaTensor[id]).cholesky)
-        //
-        //        print(self.world.rigidBodiesLevelOrder[id].composite.centerOfMass)
-        //        print(float3(self.mem.compositeBodies.centerOfMass[id]))
-        //
-        //        for child in self.world.rigidBodiesLevelOrder[id].children {
-        //            print(child.name, self.mem.rigidBodies.index[child])
-        //        }
     }
 }

@@ -23,8 +23,8 @@ final public class ArticulatedRigidBody: RigidBody {
         super.init(kind: kind, mass: mass, localInertiaTensor: localInertiaTensor, shape: shape, node: node)
     }
 
-    func add(_ child: ArticulatedRigidBody, rotation: simd_quatf = simd_quatf(angle: -.pi/4, axis: .z), position: SIMD3<Float> = .zero) -> Joint {
-        let joint = Joint(parent: self, child: child, localRotation: rotation, localPosition: position)
+    func add(_ child: ArticulatedRigidBody, orientation: simd_quatf = simd_quatf(angle: -.pi/4, axis: .z), position: SIMD3<Float> = .zero) -> Joint {
+        let joint = Joint(parent: self, child: child, localOrientation: orientation, localPosition: position)
         childJoints.append(joint)
         child.parentJoint = joint
         joint.updateTransform()
@@ -35,7 +35,7 @@ final public class ArticulatedRigidBody: RigidBody {
     override func apply(force: SIMD3<Float>, torque: SIMD3<Float> = .zero) {
         var torque = torque
         if parentJoint != nil {
-            torque += cross(rotation.act(-localPivot), force)
+            torque += cross(orientation.act(-localPivot), force)
         }
 
         super.apply(force: force, torque: torque)
@@ -45,16 +45,16 @@ final public class ArticulatedRigidBody: RigidBody {
         if let parentJoint = parentJoint {
             let sora = parentJoint.θ[0]
             assert(sora.isFinite)
-            let localRotation = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
+            let localorientation = simd_length(sora) < 10e-10 ? simd_quatf.identity : simd_quatf(angle: simd_length(sora), axis: normalize(sora))
 
-            self.rotation = (parentJoint.rotation * localRotation).normalized
+            self.orientation = (parentJoint.orientation * localorientation).normalized
             self.pivot = parentJoint.position
 
-            self.inertiaTensor = float3x3(rotation) * localInertiaTensor * float3x3(rotation).transpose
-            self.centerOfMass = self.pivot + rotation.act(-localPivot)
+            self.inertiaTensor = float3x3(orientation) * localInertiaTensor * float3x3(orientation).transpose
+            self.centerOfMass = self.pivot + orientation.act(-localPivot)
         }
 
-        self.pivot = centerOfMass + rotation.act(localPivot)
+        self.pivot = centerOfMass + orientation.act(localPivot)
 
         super.updateTransform()
     }

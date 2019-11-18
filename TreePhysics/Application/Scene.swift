@@ -61,7 +61,7 @@ class Scene: NSObject {
         let mem = MemoryLayoutManager(device: device, root: root)
         
         scene.rootNode.addChildNode(skinningPen.node())
-//        scene.rootNode.addChildNode(skinningPen.skeleton)
+        scene.rootNode.addChildNode(skinningPen.skeleton)
 
         scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.25))
 
@@ -110,6 +110,9 @@ extension Scene: SCNSceneRendererDelegate {
         commandBuffer.addCompletedHandler { [unowned self] _ in
             let metalSimulator = self.metalSimulator
             DispatchQueue.main.async {
+                scene.rootNode.addChildNode(skinningPen.node())
+                scene.rootNode.addChildNode(skinningPen.skeleton)
+
 //                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
 //
 //                for i in 0..<(metalSimulator.rigidBodies.count-1) {

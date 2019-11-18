@@ -35,7 +35,7 @@ public class RigidBody {
 
     // State attributes that vary as a function of the simulation
     public var centerOfMass: SIMD3<Float>
-    public var rotation: simd_quatf
+    public var orientation: simd_quatf
     var velocity: SIMD3<Float>
     var acceleration: SIMD3<Float>
     var inertiaTensor: float3x3
@@ -55,15 +55,13 @@ public class RigidBody {
         self.shape = shape
 
         self.centerOfMass = .zero
-        self.rotation = simd_quatf.identity
+        self.orientation = simd_quatf.identity
         self.velocity = .zero
         self.acceleration = .zero
         self.angularVelocity = .zero
         self.angularAcceleration = .zero
         self.angularMomentum = .zero
         self.inertiaTensor = localInertiaTensor
-
-        self.rotation = simd_quatf.identity
 
         self.node = node
     }
@@ -80,12 +78,12 @@ public class RigidBody {
 
     func updateTransform() {
         node.simdPosition = self.centerOfMass
-        node.simdOrientation = self.rotation
+        node.simdOrientation = self.orientation
     }
 
     var isFinite: Bool {
         return
-            rotation.isFinite &&
+            orientation.isFinite &&
             inertiaTensor.isFinite &&
             angularVelocity.isFinite &&
             angularAcceleration.isFinite &&

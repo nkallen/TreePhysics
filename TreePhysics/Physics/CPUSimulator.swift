@@ -182,13 +182,13 @@ public final class CPUSimulator {
         rigidBody.updateTransform()
         assert(rigidBody.isFinite)
 
-        rigidBody.angularVelocity = parentRigidBody.angularVelocity + parentJoint.rotation.act(parentJoint.θ[1])
-        rigidBody.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.rotation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.skew * rigidBody.angularVelocity
+        rigidBody.angularVelocity = parentRigidBody.angularVelocity + parentJoint.orientation.act(parentJoint.θ[1])
+        rigidBody.angularAcceleration = parentRigidBody.angularAcceleration + parentJoint.orientation.act(parentJoint.θ[2]) + parentRigidBody.angularVelocity.skew * rigidBody.angularVelocity
 
         rigidBody.velocity = parentRigidBody.velocity
-        rigidBody.velocity += parentRigidBody.angularVelocity.skew * parentRigidBody.rotation.act(parentJoint.localPosition)
-        rigidBody.velocity -= rigidBody.angularVelocity.skew * rigidBody.rotation.act(rigidBody.localPivot)
-        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.skew + sqr(rigidBody.angularVelocity.skew)) * rigidBody.rotation.act(rigidBody.localPivot)
+        rigidBody.velocity += parentRigidBody.angularVelocity.skew * parentRigidBody.orientation.act(parentJoint.localPosition)
+        rigidBody.velocity -= rigidBody.angularVelocity.skew * rigidBody.orientation.act(rigidBody.localPivot)
+        rigidBody.acceleration = parentJoint.acceleration - (rigidBody.angularAcceleration.skew + sqr(rigidBody.angularVelocity.skew)) * rigidBody.orientation.act(rigidBody.localPivot)
     }
 
     private func updateArticulatedBody(joint: Joint, parentRigidBody: RigidBody) {
@@ -226,10 +226,10 @@ public final class CPUSimulator {
 
         rigidBody.centerOfMass = rigidBody.centerOfMass + time * rigidBody.velocity
         let angularVelocityQuat = simd_quatf(real: 0, imag: rigidBody.angularVelocity)
-        rigidBody.rotation = rigidBody.rotation + time/2 * angularVelocityQuat * rigidBody.rotation
-        rigidBody.rotation = rigidBody.rotation.normalized
+        rigidBody.orientation = rigidBody.orientation + time/2 * angularVelocityQuat * rigidBody.orientation
+        rigidBody.orientation = rigidBody.orientation.normalized
 
-        rigidBody.inertiaTensor = float3x3(rigidBody.rotation) * rigidBody.localInertiaTensor * float3x3(rigidBody.rotation).transpose
+        rigidBody.inertiaTensor = float3x3(rigidBody.orientation) * rigidBody.localInertiaTensor * float3x3(rigidBody.orientation).transpose
 
         rigidBody.updateTransform()
         

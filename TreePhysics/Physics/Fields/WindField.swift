@@ -25,12 +25,12 @@ public final class WindField: PhysicsField {
 
         switch shape {
         case let .internode(area: area, length: _, radius: _):
-            let normal = rigidBody.rotation.heading
+            let normal = rigidBody.orientation.heading
             let relativeVelocity_normal = relativeVelocity - dot(relativeVelocity, normal) * normal
             let result = branchScale * airDensity * area * length(relativeVelocity_normal) * relativeVelocity_normal
             return result
         case let .leaf(area: area):
-            let normal = rigidBody.rotation.up
+            let normal = rigidBody.orientation.up
             let relativeVelocity_normal: SIMD3<Float> = dot(relativeVelocity, normal) * normal
             let relativeVelocity_tangential: SIMD3<Float> = relativeVelocity - relativeVelocity_normal
             let lift: SIMD3<Float> = leafScale * airDensity * area * length(relativeVelocity) * relativeVelocity_normal
@@ -47,7 +47,7 @@ public final class WindField: PhysicsField {
         case .internode:
             return .zero
         case let .leaf(area: area):
-            let normal = rigidBody.rotation.up
+            let normal = rigidBody.orientation.up
 
             let windVelocity = self.windVelocity(for: rigidBody, at: time)
             let relativeVelocity: SIMD3<Float> = windVelocity - rigidBody.velocity

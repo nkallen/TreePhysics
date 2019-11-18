@@ -52,14 +52,14 @@ extension UpdateRigidBodies {
                 mem.rigidBodies.localPivotBuffer,
                 mem.rigidBodies.localInertiaTensorBuffer,
                 mem.rigidBodies.localJointPositionBuffer,
-                mem.rigidBodies.localJointRotationBuffer,
+                mem.rigidBodies.localJointOrientationBuffer,
                 mem.joints.thetaBuffer,
 
                 mem.rigidBodies.pivotBuffer,
                 mem.rigidBodies.centerOfMassBuffer,
                 mem.rigidBodies.inertiaTensorBuffer,
-                mem.rigidBodies.rotationBuffer,
-                mem.rigidBodies.jointRotationBuffer,
+                mem.rigidBodies.orientationBuffer,
+                mem.rigidBodies.jointOrientationBuffer,
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 

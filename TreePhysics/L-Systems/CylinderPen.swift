@@ -117,10 +117,12 @@ public final class CylinderPen<I>: Pen where I: FixedWidthInteger {
     func node() -> SCNNode {
         let parent = SCNNode()
         let leaves = SCNNode(geometry: leafGeometry.geometry)
-        leaves.geometry?.firstMaterial!.diffuse.contents = NSColor(red: 1, green: 0.718, blue: 0.773, alpha: 0.9)
+        leaves.geometry?.firstMaterial!.diffuse.contents = Color(red: 1, green: 0.718, blue: 0.773, alpha: 0.9)
         let branches = SCNNode(geometry: branchGeometry.geometry)
 
-        branches.geometry!.firstMaterial! = material!
+        if let material = material {
+            branches.geometry!.firstMaterial = material
+        }
         parent.addChildNode(leaves)
         parent.addChildNode(branches)
         return parent

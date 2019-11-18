@@ -6,28 +6,28 @@ public final class Joint {
     unowned let parentRigidBody: ArticulatedRigidBody
     public let childRigidBody: ArticulatedRigidBody
 
-    let localRotation: simd_quatf
+    let localOrientation: simd_quatf
     let localPosition: SIMD3<Float>
     var position: SIMD3<Float>
-    var rotation: simd_quatf
-    var inverseRotation: simd_quatf
-    var acceleration: SIMD3<Float>    // NOTE: θ[0] is the xyz rotation of the joint; θ[1] is the angular velocity, etc.
+    var orientation: simd_quatf
+    var inverseOrientation: simd_quatf
+    var acceleration: SIMD3<Float>    // NOTE: θ[0] is the xyz orientation of the joint; θ[1] is the angular velocity, etc.
     var θ: float3x3
 
     var stiffness: Float
     var torqueThreshold: Float
     var damping: Float
 
-    init(parent: ArticulatedRigidBody, child: ArticulatedRigidBody, localRotation: simd_quatf, localPosition: SIMD3<Float>) {
+    init(parent: ArticulatedRigidBody, child: ArticulatedRigidBody, localOrientation: simd_quatf, localPosition: SIMD3<Float>) {
         self.parentRigidBody = parent
         self.childRigidBody = child
 
-        self.localRotation = localRotation
+        self.localOrientation = localOrientation
         self.localPosition = localPosition
 
         self.position = localPosition
-        self.rotation = localRotation
-        self.inverseRotation = localRotation.inverse.normalized
+        self.orientation = localOrientation
+        self.inverseOrientation = localOrientation.inverse.normalized
         self.acceleration = .zero
         self.θ = float3x3(0)
 
@@ -45,27 +45,27 @@ public final class Joint {
     }
 
     func updateTransform() {
-        self.rotation = (parentRigidBody.rotation * localRotation).normalized
-        self.position = parentRigidBody.pivot + parentRigidBody.rotation.act(localPosition)
-        self.inverseRotation = rotation.inverse.normalized
+        self.orientation = (parentRigidBody.orientation * localOrientation).normalized
+        self.position = parentRigidBody.pivot + parentRigidBody.orientation.act(localPosition)
+        self.inverseOrientation = orientation.inverse.normalized
 
-        assert(rotation.isFinite)
+        assert(orientation.isFinite)
         assert(position.isFinite)
-        assert(inverseRotation.isFinite)
+        assert(inverseOrientation.isFinite)
 
         self.acceleration = parentRigidBody.acceleration +
-            (parentRigidBody.angularAcceleration.skew + sqr(parentRigidBody.angularVelocity.skew)) * parentRigidBody.rotation.act(localPosition)
+            (parentRigidBody.angularAcceleration.skew + sqr(parentRigidBody.angularVelocity.skew)) * parentRigidBody.orientation.act(localPosition)
     }
 
     func rotate(tensor: float3x3) -> float3x3 {
-        return float3x3(inverseRotation) * tensor * float3x3(inverseRotation).transpose
+        return float3x3(inverseOrientation) * tensor * float3x3(inverseOrientation).transpose
     }
 
     func rotate(vector: SIMD3<Float>) -> SIMD3<Float> {
-        return inverseRotation.act(vector)
+        return inverseOrientation.act(vector)
     }
 
     var isFinite: Bool {
-        return rotation.isFinite && position.isFinite && acceleration.isFinite
+        return orientation.isFinite && position.isFinite && acceleration.isFinite
     }
 }

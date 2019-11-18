@@ -76,17 +76,14 @@ final class BoneBuilder<I> where I: FixedWidthInteger {
         return bone
     }
 
-    func node(for builder: GeometryBuilder<I>) -> SCNNode {
-        guard !bones.isEmpty else { return SCNNode() }
-
+    func skinner(for builder: GeometryBuilder<I>) -> SCNSkinner {
         var boneNodes: [SCNNode] = []
         var boneInverseBindTransforms: [NSValue] = []
         let vectorCount = builder.sources.first!.vectorCount // FIXME should select by semantic
         var boneWeights: [Float] = Array(repeating: 1.0, count: vectorCount)
         var boneIndices: [I] = Array(repeating: 0, count: vectorCount)
 
-        for (boneIndex, bone) in bones.enumerated() {
-            let (vertexIndices, rigidBody) = bone
+        for (boneIndex, (vertexIndices, rigidBody)) in bones.enumerated() {
             let node = rigidBody.node
             boneNodes.append(node)
             boneInverseBindTransforms.append(NSValue(scnMatrix4: SCNMatrix4Invert(node.worldTransform)))
@@ -101,10 +98,14 @@ final class BoneBuilder<I> where I: FixedWidthInteger {
         let boneWeightsGeometrySource = SCNGeometrySource(data: boneWeightsData, semantic: .boneWeights, vectorCount: boneWeights.count, usesFloatComponents: true, componentsPerVector: 1, bytesPerComponent: MemoryLayout<Float>.size, dataOffset: 0, dataStride: MemoryLayout<Float>.size)
         let boneIndicesGeometrySource = SCNGeometrySource(data: boneIndicesData, semantic: .boneIndices, vectorCount: boneIndices.count, usesFloatComponents: false, componentsPerVector: 1, bytesPerComponent: MemoryLayout<I>.size, dataOffset: 0, dataStride: MemoryLayout<I>.size)
 
-        let skinner = SCNSkinner(baseGeometry: builder.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
+        return SCNSkinner(baseGeometry: builder.geometry, bones: boneNodes, boneInverseBindTransforms: boneInverseBindTransforms, boneWeights: boneWeightsGeometrySource, boneIndices: boneIndicesGeometrySource)
+    }
+
+    func node(for builder: GeometryBuilder<I>) -> SCNNode {
+        guard !bones.isEmpty else { return SCNNode() }
 
         let node = SCNNode(geometry: builder.geometry)
-        node.skinner = skinner
+        node.skinner = skinner(for: builder)
 
         return node
     }

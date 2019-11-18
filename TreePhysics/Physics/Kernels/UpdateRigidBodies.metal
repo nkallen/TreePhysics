@@ -78,7 +78,7 @@ updateRigidBodies(
             const quatf jointRotation = quat_multiply(parentRotation, localJointRotation);
             float3 pivot = parentPivot + quat_act(parentRotation, localJointPosition);
 
-            const quatf localRotation = length(theta) < 10e-10 ? quatf(0,0,0,1) :  quat_from_axis_angle(normalize(theta), length(theta));
+            const quatf localRotation = length(theta) < 10e-10 ? quatf(0,0,0,1) : quat_from_axis_angle(normalize(theta), length(theta));
             const quatf rotation = normalize(quat_multiply(jointRotation, localRotation));
 
             const float3x3 R = float3x3_from_quat(rotation);

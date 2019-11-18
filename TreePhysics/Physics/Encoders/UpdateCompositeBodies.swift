@@ -59,7 +59,7 @@ extension UpdateCompositeBodies {
                 mem.rigidBodies.torqueBuffer,
                 mem.rigidBodies.centerOfMassBuffer,
                 mem.rigidBodies.inertiaTensorBuffer,
-                mem.rigidBodies.jointRotationBuffer,
+                mem.rigidBodies.jointOrientationBuffer,
 
                 mem.compositeBodies.massBuffer,
                 mem.compositeBodies.forceBuffer,
