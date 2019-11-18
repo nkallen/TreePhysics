@@ -78,12 +78,5 @@ extension GameViewController: SCNSceneRendererDelegate {
         commandBuffer.waitUntilCompleted()
 
         print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)
-
-        print("id: 0, theta: \(mem.joints[1][0])")
-        print("id: 0, x: \(mem.rigidBodies[1])")
-
-        if !mem.rigidBodies[1].isFinite {
-            self.captureScope.end()
-        }
     }
 }

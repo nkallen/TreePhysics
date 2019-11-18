@@ -91,22 +91,30 @@ class UpdateCompositeBodiesTests: XCTestCase {
         self.updateRigidBodies = UpdateRigidBodies(device: device, memoryLayoutManager: mem)
     }
 
-    func testUpdateCompositeBodiesChecksum() {
+    func testUpdateCompositeBodies() {
         let expect = expectation(description: "wait")
 
         let commandBuffer = commandQueue.makeCommandBuffer()!
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.addCompletedHandler { _ in
-            let root_composite = self.mem.compositeBodies[0]!
+            let b1_θ = self.mem.joints[self.mem.rigidBodies.index[self.b1]!]
+            let b0_θ = self.mem.joints[self.mem.rigidBodies.index[self.b0]!]
 
             // torque
-            let r_b1 = self.b1.centerOfMass - self.b0.pivot
-            XCTAssertEqual(simd_float3(root_composite.torque), cross(r_b1, self.force), accuracy: 0.0001)
+            XCTAssertEqual(b1_θ.torque, self.b1.parentJoint!.rotate(vector: self.b1.torque), accuracy: 0.0001)
+            XCTAssertEqual(b0_θ.torque, self.b0.parentJoint!.rotate(vector: self.b1.torque + cross(self.b1.pivot - self.b0.pivot, self.b1.force)), accuracy: 0.0001)
 
             // inertia tensor
-            var b1_inertiaTensor = self.b0.inertiaTensor - self.b0.mass * sqr((self.b0.centerOfMass - simd_float3(root_composite.centerOfMass)).skew)
-            b1_inertiaTensor += self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - root_composite.centerOfMass).skew)
-            XCTAssertEqual(root_composite.inertiaTensor, b1_inertiaTensor, accuracy: 0.001)
+            let b1_θ_inertiaTensor = self.b1.parentJoint!.rotate(tensor: self.b1.inertiaTensor) - self.b1.mass * sqr(
+                self.b1.parentJoint!.rotate(vector: self.b1.centerOfMass - self.b1.pivot).skew)
+            XCTAssertEqual(b1_θ.inertiaTensor, b1_θ_inertiaTensor, accuracy: 0.0001)
+
+            let b0_θ_mass = self.b1.mass + self.b0.mass
+            let b0_θ_centerOfMass = (self.b1.centerOfMass + self.b0.centerOfMass) / 2
+            var b0_θ_inertiaTensor = self.b0.inertiaTensor - self.b0.mass * sqr((self.b0.centerOfMass - b0_θ_centerOfMass).skew)
+            b0_θ_inertiaTensor += self.b1.inertiaTensor - self.b1.mass * sqr((self.b1.centerOfMass - b0_θ_centerOfMass).skew)
+            b0_θ_inertiaTensor = self.b0.parentJoint!.rotate(tensor: b0_θ_inertiaTensor) - b0_θ_mass * sqr(self.b0.parentJoint!.rotate(vector: b0_θ_centerOfMass - self.b0.pivot).skew)
+            XCTAssertEqual(b0_θ.inertiaTensor, b0_θ_inertiaTensor, accuracy: 0.001)
 
             expect.fulfill()
         }
@@ -138,7 +146,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
                         simd_float3(0,0,θ[1]),
                         simd_float3(0,0,θ[2])
                     ),
-                    b1_θ, accuracy: 0.0001)
+                    b1_θ.theta, accuracy: 0.0001)
             }
 
             do {
@@ -159,7 +167,7 @@ class UpdateCompositeBodiesTests: XCTestCase {
                         SIMD3<Float>(0,0,θ[1]),
                         SIMD3<Float>(0,0,θ[2])
                     ),
-                    b0_θ, accuracy: 0.0001)
+                    b0_θ.theta, accuracy: 0.0001)
             }
 
             expect.fulfill()

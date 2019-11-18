@@ -4,17 +4,22 @@ import UIKit
 
 class GameViewController: UIViewController {
     var root: ArticulatedRigidBody!
-    var device: MTLDevice!
-    var mem: MemoryLayoutManager!
+    var world: PhysicsWorld!
 
     var captureScope: MTLCaptureScope!
+    var commandQueue: MTLCommandQueue!
+    var captureManager: MTLCaptureManager!
+
+    var device: MTLDevice!
+    var mem: MemoryLayoutManager!
+    var simulator: MetalSimulator!
 
     override func viewDidAppear(_ animated: Bool) {
         self.root = ArticulatedRigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
 
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FA]////[!"&FA]////[!"&FA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 1)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]////[!"&FFFFFFFA]////[!"&FFFFFFFA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
         let configuration = InterpreterConfig(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
@@ -26,75 +31,106 @@ class GameViewController: UIViewController {
         interpreter.interpret(lSystem)
 
         self.device = MTLCreateSystemDefaultDevice()!
-
-        //        let root2 = ArticulatedRigidBody.static()
-        //        let b0 = Tree.internode(length: 1, radius: 1)
-        //        let b1 = Tree.internode(length: 1, radius: 1)
-        //        let b0joint = root2.add(b0, rotation: .identity, position: .zero)
-        //        b0joint.stiffness = 1
-        //        b0joint.torqueThreshold = .infinity
-        //        b0joint.damping = 1
-        //
-        //        let b1Joint = b0.add(b1, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
-        //        b1Joint.stiffness = 1
-        //        b1Joint.torqueThreshold = .infinity
-        //        b1Joint.damping = 1
-        //        let force = simd_float3(1, 0, 0) // world coordinates
-        //
-        //        b1.apply(force: force)
-
-        self.mem = MemoryLayoutManager(device: SharedBuffersMTLDevice(device), root: root)
+        self.commandQueue = device.makeCommandQueue()!
+        self.mem = MemoryLayoutManager(device: device, root: root)
+        self.world = PhysicsWorld()
+        self.world.add(rigidBody: root)
+        self.simulator = MetalSimulator(device: device, mem: mem)
         print("Total nodes:", mem.rigidBodies.count)
 
         scnView.delegate = self
         let scene = SCNScene()
-        scene.rootNode.addChildNode(SCNNode(geometry: SCNSphere(radius: 0.1)))
+        scene.rootNode.addChildNode(createAxesNode(quiverLength: 1, quiverThickness: 0.1))
         scnView.scene = scene
+        scnView.allowsCameraControl = true
+        scnView.backgroundColor = .gray
 
-        self.captureScope = MTLCaptureManager.shared().makeCaptureScope(device: MTLCreateSystemDefaultDevice()!)
-        triggerProgrammaticCaptureScope()
+        //        triggerProgrammaticCapture()
+    }
+
+    func triggerProgrammaticCapture() {
+        let captureManager = MTLCaptureManager.shared()
+        let captureDescriptor = MTLCaptureDescriptor()
+        captureDescriptor.captureObject = self.device
+        do {
+            try captureManager.startCapture(with: captureDescriptor)
+        }
+        catch
+        {
+            fatalError("error when trying to capture: \(error)")
+        }
     }
 
     var scnView: SCNView {
         return self.view as! SCNView
-    }
-
-    func triggerProgrammaticCaptureScope() {
-        print("triggerProgrammaticCaptureScope")
-        let captureManager = MTLCaptureManager.shared()
-        let captureDescriptor = MTLCaptureDescriptor()
-        captureDescriptor.captureObject = captureScope
-        do {
-            try captureManager.startCapture(with:captureDescriptor)
-        } catch {
-            fatalError("error when trying to capture: \(error)")
-        }
     }
 }
 
 extension GameViewController: SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         let commandQueue = device.makeCommandQueue()!
-
-        print("beginning capture scope")
-        captureScope.begin()
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
-        UpdateCompositeBodies(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer)
-        UpdateJoints(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer, at: 1/60)
-        UpdateRigidBodies(memoryLayoutManager: mem).encode(commandBuffer: commandBuffer)
+        simulator.encode(commandBuffer: commandBuffer, at: 1/60)
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
 
         print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)
+    }
+}
 
-        for id in 1..<4 {
-            print("id: \(id), theta: \(mem.joints[id][0])")
-            print("id: \(id), x: \(mem.rigidBodies[id])")
+extension GameViewController {
+    func check() {
+        let cs = CPUSimulator(world: self.world)
+        cs.updateCompositeBodies()
 
-            if !mem.joints[id].isFinite || !mem.rigidBodies[id].isValid {
-                self.captureScope.end()
+        self.mem.assertValid(otherwise: { error in
+            //            let captureManager = MTLCaptureManager.shared()
+            for (i, r) in world.rigidBodiesLevelOrder.enumerated() {
+                print(i, r.composite.inertiaTensor)
+                print(i, float3x3(mem.joints.inertiaTensor[i]))
+            }
+            fatalError()
+            //            captureManager.stopCapture()
+        })
+    }
+
+    func trace(_ id: Int, indent: String = "") {
+        let body = world.rigidBodiesLevelOrder[id]
+        for child in body.children {
+            let i = mem.rigidBodies.index[child]!
+            print(indent, i, world.rigidBodiesLevelOrder[i].composite.inertiaTensor)
+            print(indent, i, float3x3(mem.joints.inertiaTensor[i]))
+            trace(i, indent: indent + "  ")
+            print("====")
+        }
+    }
+
+    func inspect(_ id: Int) {
+        for range in self.mem.rigidBodies.ranges {
+            if range.contains(id) {
+                self.simulator.debug.print(id - range.lowerBound)
             }
         }
+
+        //        print("=============== \(id) -- \(self.mem.rigidBodies.index[self.world.rigidBodiesLevelOrder[id]])")
+        //        print(self.world.rigidBodiesLevelOrder[id].inertiaTensor)
+        //        print(float3x3(self.mem.rigidBodies.inertiaTensor[id]))
+        //
+        //        print(self.world.rigidBodiesLevelOrder[id].composite.inertiaTensor)
+        //        print(float3x3(self.mem.compositeBodies.inertiaTensor[id]))
+        //
+        //        print(self.world.rigidBodiesLevelOrder[id].composite.inertiaTensor.determinant)
+        //        print(float3x3(self.mem.compositeBodies.inertiaTensor[id]).determinant)
+        //
+        //        print(self.world.rigidBodiesLevelOrder[id].composite.inertiaTensor.cholesky)
+        //        print(float3x3(self.mem.compositeBodies.inertiaTensor[id]).cholesky)
+        //
+        //        print(self.world.rigidBodiesLevelOrder[id].composite.centerOfMass)
+        //        print(float3(self.mem.compositeBodies.centerOfMass[id]))
+        //
+        //        for child in self.world.rigidBodiesLevelOrder[id].children {
+        //            print(child.name, self.mem.rigidBodies.index[child])
+        //        }
     }
 }

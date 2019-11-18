@@ -47,6 +47,9 @@ class MTLCommandBufferProxy: NSObject, MTLCommandBuffer {
     func present(_ drawable: MTLDrawable, afterMinimumDuration presentationTime: CFTimeInterval) {
         underlying.present(drawable, afterMinimumDuration: presentationTime)
     }
+    func resourceStateCommandEncoder() -> MTLResourceStateCommandEncoder? {
+        return underlying.resourceStateCommandEncoder()
+    }
     #endif
 
     @available(OSX 10.15, *)
@@ -261,10 +264,6 @@ class MTLComputeCommandEncoderProxy: NSObject, MTLComputeCommandEncoder {
     }
 
     #if os(iOS)
-    func resourceStateCommandEncoder() -> MTLResourceStateCommandEncoder? {
-        underlying.resourceStateCommandEncoder()
-    }
-
     func setImageblockWidth(_ width: Int, height: Int) {
         underlying.setImageblockWidth(width, height: height)
     }

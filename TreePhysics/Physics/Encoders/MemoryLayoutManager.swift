@@ -3,11 +3,16 @@ import simd
 import MetalKit
 import ShaderTypes
 
+extension half {
+    static let leastNormalMagnitude: half = Half(0x1.0p-14)
+}
+
 public final class MemoryLayoutManager {
     public class RigidBodies {
         let index: [RigidBody:Int]
         let ranges: [Range<Int>]
         let maxClimberCount: Int
+        let maxChildCount: Int
         let count: Int
         let childCountBuffer, childIndexBuffer, parentIdBuffer, climberCountBuffer, massBuffer, pivotBuffer, localPivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, rotationBuffer, inertiaTensorBuffer, localInertiaTensorBuffer, jointDampingBuffer, jointStiffnessBuffer, localJointPositionBuffer, localJointRotationBuffer, jointRotationBuffer: MTLBuffer
 
@@ -20,11 +25,13 @@ public final class MemoryLayoutManager {
 
             // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
             var maxClimberCount = 0
+            var maxChildCount = 0
             for level in levels {
                 for unitOfWork in level {
                     index[unitOfWork.rigidBody] = id
                     id += 1
                     maxClimberCount = max(maxClimberCount, unitOfWork.climbers.count)
+                    maxChildCount = max(maxChildCount, unitOfWork.rigidBody.childJoints.count)
                 }
 
                 let range = offset..<(offset+level.count)
@@ -33,6 +40,7 @@ public final class MemoryLayoutManager {
             }
             self.ranges = ranges
             self.maxClimberCount = maxClimberCount
+            self.maxChildCount = maxChildCount
 
             for level in levels {
                 for unitOfWork in level {
@@ -70,7 +78,7 @@ public final class MemoryLayoutManager {
             let childIndex = childIndexBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
             let parentId = parentIdBuffer.contents().bindMemory(to: UInt16.self, capacity: count)
             let climberCount = climberCountBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
-            let mass = massBuffer.contents().bindMemory(to: UInt16.self, capacity: count)
+            let mass = massBuffer.contents().bindMemory(to: half.self, capacity: count)
             let pivot = pivotBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let localPivot = localPivotBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let force = forceBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
@@ -79,15 +87,14 @@ public final class MemoryLayoutManager {
             let rotation = rotationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
             let inertiaTensor = inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
             let localInertiaTensor = localInertiaTensorBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
-            let jointDamping = jointDampingBuffer.contents().bindMemory(to: UInt16.self, capacity: count)
-            let jointStiffness = jointStiffnessBuffer.contents().bindMemory(to: UInt16.self, capacity: count)
+            let jointDamping = jointDampingBuffer.contents().bindMemory(to: half.self, capacity: count)
+            let jointStiffness = jointStiffnessBuffer.contents().bindMemory(to: half.self, capacity: count)
             let localJointPosition = localJointPositionBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let localJointRotation = localJointRotationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
             let jointRotation = jointRotationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
 
             // Step 3: Store data into the buffer
             func store(childIndex _childIndex: Int, parentId _parentId: Int, rigidBody: ArticulatedRigidBody, climbers: [ArticulatedRigidBody]) {
-                assert(_parentId < UInt16.max)
                 let id = index[rigidBody]!
 
                 childCount[id] = UInt8(rigidBody.childJoints.count)
@@ -108,8 +115,8 @@ public final class MemoryLayoutManager {
                     inertiaTensor[id] = InertiaTensor(rigidBody.inertiaTensor)
                     localInertiaTensor[id] = packed_float3(rigidBody.localInertiaTensor.diagonal)
                     if let parentJoint = rigidBody.parentJoint {
-                        jointDamping[id] = Half(parentJoint.damping)
-                        jointStiffness[id] = Half(parentJoint.stiffness)
+                        jointDamping[id] = max(.leastNormalMagnitude, Half(parentJoint.damping))
+                        jointStiffness[id] = max(.leastNormalMagnitude, Half(parentJoint.stiffness))
                         jointRotation[id] = simd_quath(parentJoint.rotation)
                         localJointPosition[id] = packed_half3(parentJoint.localPosition)
                         localJointRotation[id] = simd_quath(parentJoint.localRotation)
@@ -124,24 +131,24 @@ public final class MemoryLayoutManager {
             }
 
             // Step 4: Allocated the private buffers
-            self.childCountBuffer = device.makeBuffer(length: childCountBuffer.length, options: [.storageModePrivate])!
-            self.childIndexBuffer = device.makeBuffer(length: childIndexBuffer.length, options: [.storageModePrivate])!
-            self.parentIdBuffer = device.makeBuffer(length: parentIdBuffer.length, options: [.storageModePrivate])!
-            self.climberCountBuffer = device.makeBuffer(length: climberCountBuffer.length, options: [.storageModePrivate])!
-            self.massBuffer = device.makeBuffer(length: massBuffer.length, options: [.storageModePrivate])!
-            self.pivotBuffer = device.makeBuffer(length: pivotBuffer.length, options: [.storageModePrivate])!
-            self.localPivotBuffer = device.makeBuffer(length: localPivotBuffer.length, options: [.storageModePrivate])!
-            self.forceBuffer = device.makeBuffer(length: forceBuffer.length, options: [.storageModePrivate])!
-            self.torqueBuffer = device.makeBuffer(length: torqueBuffer.length, options: [.storageModePrivate])!
-            self.centerOfMassBuffer = device.makeBuffer(length: centerOfMassBuffer.length, options: [.storageModePrivate])!
-            self.rotationBuffer = device.makeBuffer(length: rotationBuffer.length, options: [.storageModePrivate])!
-            self.inertiaTensorBuffer = device.makeBuffer(length: inertiaTensorBuffer.length, options: [.storageModePrivate])!
-            self.localInertiaTensorBuffer = device.makeBuffer(length: localInertiaTensorBuffer.length, options: [.storageModePrivate])!
-            self.jointDampingBuffer = device.makeBuffer(length: jointDampingBuffer.length, options: [.storageModePrivate])!
-            self.jointStiffnessBuffer = device.makeBuffer(length: jointStiffnessBuffer.length, options: [.storageModePrivate])!
-            self.localJointPositionBuffer = device.makeBuffer(length: localJointPositionBuffer.length, options: [.storageModePrivate])!
-            self.localJointRotationBuffer = device.makeBuffer(length: localJointRotationBuffer.length, options: [.storageModePrivate])!
-            self.jointRotationBuffer = device.makeBuffer(length: jointRotationBuffer.length, options: [.storageModePrivate])!
+            self.childCountBuffer = device.makeBuffer(length: childCountBuffer.length, options: [.storageModeShared])!
+            self.childIndexBuffer = device.makeBuffer(length: childIndexBuffer.length, options: [.storageModeShared])!
+            self.parentIdBuffer = device.makeBuffer(length: parentIdBuffer.length, options: [.storageModeShared])!
+            self.climberCountBuffer = device.makeBuffer(length: climberCountBuffer.length, options: [.storageModeShared])!
+            self.massBuffer = device.makeBuffer(length: massBuffer.length, options: [.storageModeShared])!
+            self.pivotBuffer = device.makeBuffer(length: pivotBuffer.length, options: [.storageModeShared])!
+            self.localPivotBuffer = device.makeBuffer(length: localPivotBuffer.length, options: [.storageModeShared])!
+            self.forceBuffer = device.makeBuffer(length: forceBuffer.length, options: [.storageModeShared])!
+            self.torqueBuffer = device.makeBuffer(length: torqueBuffer.length, options: [.storageModeShared])!
+            self.centerOfMassBuffer = device.makeBuffer(length: centerOfMassBuffer.length, options: [.storageModeShared])!
+            self.rotationBuffer = device.makeBuffer(length: rotationBuffer.length, options: [.storageModeShared])!
+            self.inertiaTensorBuffer = device.makeBuffer(length: inertiaTensorBuffer.length, options: [.storageModeShared])!
+            self.localInertiaTensorBuffer = device.makeBuffer(length: localInertiaTensorBuffer.length, options: [.storageModeShared])!
+            self.jointDampingBuffer = device.makeBuffer(length: jointDampingBuffer.length, options: [.storageModeShared])!
+            self.jointStiffnessBuffer = device.makeBuffer(length: jointStiffnessBuffer.length, options: [.storageModeShared])!
+            self.localJointPositionBuffer = device.makeBuffer(length: localJointPositionBuffer.length, options: [.storageModeShared])!
+            self.localJointRotationBuffer = device.makeBuffer(length: localJointRotationBuffer.length, options: [.storageModeShared])!
+            self.jointRotationBuffer = device.makeBuffer(length: jointRotationBuffer.length, options: [.storageModeShared])!
 
             // Step 5: Blit (copy) from the shared to private buffers
             let commandQueue = device.makeCommandQueue()!
@@ -174,20 +181,23 @@ public final class MemoryLayoutManager {
     }
 
     class CompositeBodies {
-        let count: Int
-        let ranges: [Range<Int>]
+        let maxChildCount: Int
         let massBuffer, forceBuffer, torqueBuffer, pivotBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
 
-        init(device: MTLDevice, count: Int, ranges: [Range<Int>]) {
-            self.count = count
-            self.ranges = ranges
+        init(device: MTLDevice, maxChildCount: Int, ranges: [Range<Int>]) {
+            self.maxChildCount = maxChildCount
 
-            self.massBuffer = device.makeBuffer(length: count * MemoryLayout<half>.stride, options: [.storageModePrivate])!
-            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModePrivate])!
-            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModePrivate])!
-            self.pivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModePrivate])!
-            self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModePrivate])!
-            self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModePrivate])!
+            var count = 0
+            for range in ranges[0..<ranges.count-1] {
+                count += maxChildCount * range.count
+            }
+
+            self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
+            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.pivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
         }
     }
 
@@ -197,9 +207,9 @@ public final class MemoryLayoutManager {
 
         init(device: MTLDevice, count: Int) {
             self.count = count
-            self.thetaBuffer = device.makeBuffer(length: 3 * count * MemoryLayout<packed_half3>.stride, options: [.storageModePrivate])!
-            self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModePrivate])!
-            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModePrivate])!
+            self.thetaBuffer = device.makeBuffer(length: 3 * count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
+            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
         }
     }
 
@@ -211,8 +221,27 @@ public final class MemoryLayoutManager {
 
     public init(device: MTLDevice, root: ArticulatedRigidBody) {
         self.rigidBodies = RigidBodies(device: device, root: root)
-        self.compositeBodies = CompositeBodies(device: device, count: rigidBodies.count, ranges: rigidBodies.ranges)
+        self.compositeBodies = CompositeBodies(device: device, maxChildCount: rigidBodies.maxChildCount, ranges: rigidBodies.ranges)
         self.joints = Joints(device: device, count: rigidBodies.count)
+    }
+
+    func assertValid(otherwise: ((String) -> ()) = { fatalError($0) }) {
+        for id in 1..<rigidBodies.count {
+            var `break`: String? = nil
+            joints[id].assertValid { e in
+                `break` = e
+            }
+            rigidBodies[id].assertValid { e in
+                `break` = e
+            }
+            if let `break` = `break` {
+                print("Assertion failed for Joint[\(id)]=\(joints[id])")
+                print("Assertion failed for RigidBody[\(id)]=\(rigidBodies[id])")
+                otherwise(`break`)
+
+                break
+            }
+        }
     }
 }
 
@@ -223,19 +252,12 @@ extension MemoryLayoutManager.RigidBodies {
         let rotation: simd_quatf
         let inertiaTensor: float3x3
 
-        var isFinite: Bool {
-            return
-                pivot.isFinite &&
-                centerOfMass.isFinite &&
-                rotation.isFinite &&
-                inertiaTensor.isFinite
-        }
-
-        var isValid: Bool {
-            return
-                isFinite &&
-                    inertiaTensor.determinant != 0
-
+        func assertValid(otherwise: ((String) -> ())) {
+            assert(pivot.isFinite, otherwise: otherwise)
+            assert(centerOfMass.isFinite, otherwise: otherwise)
+            assert(rotation.isFinite, otherwise: otherwise)
+            assert(inertiaTensor.isFinite, otherwise: otherwise)
+            assert(inertiaTensor.determinant > 0, otherwise: otherwise)
         }
     }
 
@@ -252,56 +274,55 @@ extension MemoryLayoutManager.RigidBodies {
         return self[id]
     }
 
-    private var pivot: UnsafeMutablePointer<packed_half3> {
+    var mass: UnsafeMutablePointer<Float> {
+        massBuffer.contents().bindMemory(to: Float.self, capacity: count)
+    }
+
+    var pivot: UnsafeMutablePointer<packed_half3> {
         pivotBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
     }
-    private var centerOfMass: UnsafeMutablePointer<packed_half3> {
+    var centerOfMass: UnsafeMutablePointer<packed_half3> {
         centerOfMassBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
     }
-    private var rotation: UnsafeMutablePointer<simd_quath> {
+    var rotation: UnsafeMutablePointer<simd_quath> {
         rotationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
     }
-    private var inertiaTensor: UnsafeMutablePointer<InertiaTensor> {
-        inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
-    }
-}
-
-extension MemoryLayoutManager.CompositeBodies {
-    subscript(id: Int) -> CompositeBody? {
-        return CompositeBody(
-            mass: Float(mass[id]),
-            inertiaTensor: float3x3(inertiaTensor[id]),
-            force: simd_float3(force[id]),
-            torque: simd_float3(torque[id]),
-            centerOfMass: simd_float3(centerOfMass[id]))
-    }
-
-    private var mass: UnsafeMutablePointer<half> {
-        return massBuffer.contents().bindMemory(to: half.self, capacity: count)
-    }
-    private var force: UnsafeMutablePointer<packed_half3> {
-        return forceBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-    }
-    private var torque: UnsafeMutablePointer<packed_half3> {
-        return torqueBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-    }
-    private var centerOfMass: UnsafeMutablePointer<packed_half3> {
-        return centerOfMassBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-    }
-    private var inertiaTensor: UnsafeMutablePointer<InertiaTensor> {
+    var inertiaTensor: UnsafeMutablePointer<InertiaTensor> {
         inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
     }
 }
 
 extension MemoryLayoutManager.Joints {
-    subscript(id: Int) -> simd_float3x3 {
-        return simd_float3x3(
-            simd_float3(theta[count*0+id]),
-            simd_float3(theta[count*1+id]),
-            simd_float3(theta[count*2+id]))
+    struct Struct {
+        let torque: simd_float3
+        let inertiaTensor: float3x3
+        let theta: float3x3
+
+        func assertValid(otherwise: ((String) -> ())) {
+            assert(torque.isFinite, "Bad joint torque: \(torque)", otherwise: otherwise)
+            assert(theta.isFinite, "Bad joint theta: \(theta)", otherwise: otherwise)
+            assert(inertiaTensor.isFinite && inertiaTensor.determinant > 0, "Bad inertiaTensor: \(inertiaTensor) \(inertiaTensor.isFinite) \(inertiaTensor.determinant)", otherwise: otherwise)
+            assert(inertiaTensor.cholesky.isFinite, "Bad cholesky for inertia tensor \(inertiaTensor) and determinant \(inertiaTensor.determinant)", otherwise: otherwise)
+        }
     }
 
-    private var theta: UnsafeMutablePointer<packed_half3> {
+    subscript(id: Int) -> Struct {
+        return Struct(
+            torque: simd_float3(torque[id]),
+            inertiaTensor: float3x3(inertiaTensor[id]),
+            theta: simd_float3x3(
+                simd_float3(theta[count*0+id]),
+                simd_float3(theta[count*1+id]),
+                simd_float3(theta[count*2+id])))
+    }
+
+    var theta: UnsafeMutablePointer<packed_half3> {
         return thetaBuffer.contents().bindMemory(to: packed_half3.self, capacity: count*3)
+    }
+    var inertiaTensor: UnsafeMutablePointer<InertiaTensor> {
+        inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
+    }
+    var torque: UnsafeMutablePointer<packed_half3> {
+        return torqueBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
     }
 }

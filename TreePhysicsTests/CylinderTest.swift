@@ -31,12 +31,12 @@ class CylinderPenTests: XCTestCase {
 
     func testIndices() {
         XCTAssertEqual([
-            0,3,1,
-            4,
-            2,
+            0,4,1,
             5,
-            0,
+            2,
+            6,
             3,
+            7,
             ], pen.branchGeometry.indices)
     }
 }

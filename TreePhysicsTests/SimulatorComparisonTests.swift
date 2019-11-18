@@ -3,6 +3,7 @@ import XCTest
 import simd
 import ShaderTypes
 
+/*
 class SimulatorComparisonTests: XCTestCase {
     var device: MTLDevice!, commandQueue: MTLCommandQueue!
     var compositeBodiesBuffer, jointsBuffer, rigidBodiesBuffer: MTLBuffer!
@@ -87,3 +88,4 @@ class SimulatorComparisonTests: XCTestCase {
          */
     }
 }
+*/

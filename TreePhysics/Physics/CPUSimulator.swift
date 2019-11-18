@@ -55,32 +55,25 @@ public final class CPUSimulator {
             composite.mass = rigidBody.mass
             composite.force = rigidBody.force
             composite.torque = rigidBody.torque
-            composite.centerOfMass = rigidBody.mass * rigidBody.centerOfMass
+            composite.centerOfMass = rigidBody.centerOfMass
+            composite.inertiaTensor = rigidBody.inertiaTensor
 
             for childJoint in rigidBody.childJoints {
                 let childRigidBody = childJoint.childRigidBody
                 let childComposite = childRigidBody.composite
 
+                let prevMass = composite.mass
                 composite.mass += childComposite.mass
                 composite.force += childComposite.force
 
                 composite.torque +=
                     cross(childJoint.position - rigidBody.pivot, childComposite.force) + childComposite.torque
 
-                composite.centerOfMass += childComposite.mass * childComposite.centerOfMass
-            }
-            composite.centerOfMass /= composite.mass
+                let prevCenterOfMass = composite.centerOfMass
+                composite.centerOfMass = (prevMass * composite.centerOfMass + childComposite.mass * childComposite.centerOfMass) / composite.mass
 
-            composite.inertiaTensor = rigidBody.inertiaTensor -
-                rigidBody.mass * sqr((rigidBody.centerOfMass - composite.centerOfMass).skew)
-
-            for childJoint in rigidBody.childJoints {
-                let childRigidBody = childJoint.childRigidBody
-                let childComposite = childRigidBody.composite
-
-                // using the parallel axis theorem I' = I + md^2, but with tensors:
-                composite.inertiaTensor += childComposite.inertiaTensor -
-                    childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).skew)
+                composite.inertiaTensor -= prevMass * sqr((prevCenterOfMass - composite.centerOfMass).skew)
+                composite.inertiaTensor += childComposite.inertiaTensor - childComposite.mass * sqr((childComposite.centerOfMass - composite.centerOfMass).skew)
             }
         }
     }

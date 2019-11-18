@@ -175,7 +175,7 @@ class CPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b0.composite.force, b1.force + b0.force)
 
         XCTAssertEqual(b1.composite.torque, b1.torque)
-        XCTAssertEqual(b0.composite.torque, cross(b1.centerOfMass, force))
+        XCTAssertEqual(b0.composite.torque, b1.torque + cross(b1.pivot - b0.pivot, force))
 
         XCTAssertEqual(b1.composite.centerOfMass, b1.centerOfMass)
         XCTAssertEqual(b0.composite.centerOfMass, (b1.centerOfMass + b0.centerOfMass) / 2)

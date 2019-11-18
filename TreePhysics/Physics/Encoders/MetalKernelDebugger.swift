@@ -2,20 +2,27 @@ import Foundation
 import MetalKit
 import ShaderTypes
 
+//device char * buf [[ buffer(BufferIndexDebug) ]],
+//constant uint * len [[ buffer(BufferIndexDebugLength) ]],
+//                      uint gid [[ thread_position_in_grid ]],
+//                      uint size [[ threads_per_grid ]])
+//{
+//Debug debug = Debug(buf, *len, gid, size);
+
 class KernelDebugger {
     let stringBuffer: MTLBuffer
     var count: Int? = nil
     let label: String
 
     init(device: MTLDevice, length: Int = 1024 * 1024, label: String = "") {
-        self.stringBuffer = device.makeBuffer(length: length, options: [.storageModeShared])!
+        self.stringBuffer = device.makeBuffer(length: MemoryLayout<CChar>.stride * length, options: [.storageModeShared])!
         self.label = label
     }
 
     func encode(commandEncoder: MTLComputeCommandEncoder) {
         commandEncoder.setBuffer(stringBuffer, offset: 0, index: BufferIndex.debug.rawValue)
-        var length = stringBuffer.allocatedSize
-        commandEncoder.setBytes(&length, length: MemoryLayout<Int>.stride, index: BufferIndex.debugLength.rawValue)
+        var length = UInt(stringBuffer.length)
+        commandEncoder.setBytes(&length, length: MemoryLayout<UInt>.stride, index: BufferIndex.debugLength.rawValue)
     }
 
     func wrap(_ commandBuffer: MTLCommandBuffer) -> MTLCommandBuffer {
@@ -25,11 +32,11 @@ class KernelDebugger {
     var strings: [String] {
         guard let count = count else { return [] }
 
-        var pointer = UnsafeMutableRawPointer(stringBuffer.contents()).bindMemory(to: CChar.self, capacity: stringBuffer.allocatedSize)
+        var pointer = stringBuffer.contents().bindMemory(to: CChar.self, capacity: stringBuffer.length)
         var result: [String] = []
         for _ in 0..<count {
             result.append(String(cString: pointer))
-            pointer = pointer.advanced(by: stringBuffer.allocatedSize / count)
+            pointer = pointer.advanced(by: stringBuffer.length / count)
         }
 
         return result
@@ -39,11 +46,15 @@ class KernelDebugger {
         guard let count = count else { return }
 
         for i in 0..<count {
-            let string = strings[i]
-            let lines = string.split { $0.isNewline }
-            for line in lines {
-                Swift.print("\(label)[\(i)]: ", line)
-            }
+            print(i)
+        }
+    }
+
+    func print(_ i: Int) {
+        let string = strings[i]
+        let lines = string.split { $0.isNewline }
+        for line in lines {
+            Swift.print("\(label)[\(i)]: ", line)
         }
     }
 }

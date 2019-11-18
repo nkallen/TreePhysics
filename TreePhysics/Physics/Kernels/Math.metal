@@ -45,8 +45,8 @@ cholesky(matrix<T, 3, 3> A)
 
     // Factorize A
     T l00 = rsqrt(a00);
-    T l01 = a01/l00;
-    T l02 = a02/l00;
+    T l01 = a01*l00;
+    T l02 = a02*l00;
 
     T l11 = sqrt(a11 - sqr(l01));
     T l12 = (a12 - l02 * l01) / l11;
@@ -54,7 +54,7 @@ cholesky(matrix<T, 3, 3> A)
     T l22 = sqrt(a22 - sqr(l02) - sqr(l12));
 
     // Store L into memory
-    L[0][0] = l00;
+    L[0][0] = a00*l00;
     L[0][1] = l01; L[1][1] = l11;
     L[0][2] = l02; L[1][2] = l12; L[2][2] = l22;
 
@@ -478,4 +478,12 @@ inline InertiaTensor inertiaTensor_from_float3x3(float3x3 x) {
     packed_float3 diag = packed_float3(x[0][0], x[1][1], x[2][2]);
     packed_float3 ltr  = packed_float3(x[0][1], x[0][2], x[1][2]);
     return {.diag = diag, .ltr = ltr};
+}
+
+inline void
+swap(thread uint &a, thread uint &b)
+{
+    uint tmp = a;
+    a = b;
+    b = tmp;
 }

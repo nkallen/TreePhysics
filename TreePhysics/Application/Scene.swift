@@ -58,6 +58,7 @@ class Scene: NSObject {
         let world = PhysicsWorld()
         self.cpuSimulator = CPUSimulator(world: world)
         world.add(rigidBody: root)
+        let mem = MemoryLayoutManager(device: device, root: root)
         
         scene.rootNode.addChildNode(skinningPen.node())
 //        scene.rootNode.addChildNode(skinningPen.skeleton)
@@ -75,11 +76,11 @@ class Scene: NSObject {
         self.attractorField = attractorField
         self.attractor = attractor
 
-        self.metalSimulator = MetalSimulator(device: device, root: root)
+        self.metalSimulator = MetalSimulator(device: device, mem: mem)
 
 //        cpuSimulator.add(field: gravityField)
 //        cpuSimulator.add(field: attractorField)
-        metalSimulator.add(field: attractorField)
+//        metalSimulator.add(field: attractorField)
 
         let windField = WindField(windVelocity: SIMD3<Float>(1,0,1)*15)
         world.add(field: windField)

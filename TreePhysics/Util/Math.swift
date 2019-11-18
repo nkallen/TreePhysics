@@ -401,7 +401,6 @@ extension float3x3 {
         self[1,0] = Float(x.ltr.x)
         self[2,0] = Float(x.ltr.y)
         self[2,1] = Float(x.ltr.z)
-
     }
 }
 

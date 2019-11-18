@@ -47,13 +47,13 @@
 		9E4946C72344AB080036B7EC /* AutoTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C62344AB080036B7EC /* AutoTree.swift */; };
 		9E4946C92344AB230036B7EC /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C82344AB230036B7EC /* Node.swift */; };
 		9E4946CB2344B7240036B7EC /* AutoTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946CA2344B7240036B7EC /* AutoTreeTests.swift */; };
+		9E4C7239237EF1AC00645574 /* MetalKernelDebugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */; };
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
 		9E80B3E6231FF74F00A700CF /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */; };
 		9E8BF7502368511D00797FD7 /* UpdateJoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJoints.swift */; };
 		9E8BF75223685AB200797FD7 /* Diagonalize.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8BF75123685AB200797FD7 /* Diagonalize.metal */; };
 		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
-		9E8F7120230D87C200583AAE /* MetalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711E230D87C200583AAE /* MetalSimulator.swift */; };
 		9E9C1E8222E86BC10030DB0E /* RewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9C1E8122E86BC10030DB0E /* RewriterTests.swift */; };
 		9E9D4B7022F37244007DCF49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9E9D4B7522F37244007DCF49 /* CPUSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */; };
@@ -69,6 +69,9 @@
 		9E9D4B9A22F44123007DCF49 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9922F44123007DCF49 /* Info.plist */; };
 		9EA52EC5234F4A4200463E51 /* Check.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA52EC4234F4A4200463E51 /* Check.swift */; };
 		9EA52EC7234F573000463E51 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA52EC6234F573000463E51 /* Config.swift */; };
+		9EAA0D35237C931600FC9B81 /* MetalSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711E230D87C200583AAE /* MetalSimulator.swift */; };
+		9EAA0D36237C972C00FC9B81 /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
+		9EAA0D37237D64BD00FC9B81 /* Check.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA52EC4234F4A4200463E51 /* Check.swift */; };
 		9EAA8C0A232923D2002E9260 /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
 		9EAA8C0C232923FD002E9260 /* MetalKernalEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernalEncoder.swift */; };
 		9EAA8C0D23292401002E9260 /* ResetForces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */; };
@@ -110,6 +113,7 @@
 		9EE0BD6B236B2B78000A8AB3 /* Eigensolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 9EE0BD6A236B2B78000A8AB3 /* Eigensolver.c */; };
 		9EE0BD6D236B2C23000A8AB3 /* Eigensolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 9EE0BD6A236B2B78000A8AB3 /* Eigensolver.c */; };
 		9EE3F923237C13A200E86D81 /* SharedBuffersMetalDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE3F922237C13A200E86D81 /* SharedBuffersMetalDevice.swift */; };
+		9EE4DF98237ECFA90030F4FD /* CPUSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2159C22E1D1B000B1C6FC /* CPUSimulator.swift */; };
 		9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9EE7EBA422DDDC6C00535997 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA322DDDC6C00535997 /* GameViewController.swift */; };
 		9EE7EBA822DDDC6E00535997 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA722DDDC6E00535997 /* Assets.xcassets */; };
@@ -870,20 +874,25 @@
 				9EF29FC92374391000AF72FC /* Half.c in Sources */,
 				9EF46F232362439A00AEC82F /* UpdateCompositeBodies.metal in Sources */,
 				9EF46F27236243A600AEC82F /* Print.metal in Sources */,
+				9EAA0D36237C972C00FC9B81 /* Visualization.swift in Sources */,
 				9EF46F13236241B400AEC82F /* MetalKernalEncoder.swift in Sources */,
 				9EF46F0F2362418D00AEC82F /* RigidBodyPen.swift in Sources */,
 				9EF46F15236241EC00AEC82F /* Joint.swift in Sources */,
 				9E40A0D82362515700C8D39C /* GameViewController.swift in Sources */,
+				9E4C7239237EF1AC00645574 /* MetalKernelDebugger.swift in Sources */,
 				9EE0BD6D236B2C23000A8AB3 /* Eigensolver.c in Sources */,
 				9E075112237B005000A8107B /* UpdateRigidBodies.swift in Sources */,
 				9EF46F1F2362439000AEC82F /* ResetForces.metal in Sources */,
 				9EF46F25236243A000AEC82F /* UpdateRigidBodies.metal in Sources */,
 				9E40A0DA2362519100C8D39C /* AppDelegate.swift in Sources */,
 				9EF46F192362422E00AEC82F /* CompositeBody.swift in Sources */,
+				9EAA0D35237C931600FC9B81 /* MetalSimulator.swift in Sources */,
 				9EF46F182362420E00AEC82F /* Pen.swift in Sources */,
 				9EF46F112362419C00AEC82F /* Turtle.swift in Sources */,
 				9EF46F1A2362424900AEC82F /* PhysicsWorld.swift in Sources */,
+				9EE4DF98237ECFA90030F4FD /* CPUSimulator.swift in Sources */,
 				9EF46F242362439D00AEC82F /* UpdateJoints.metal in Sources */,
+				9EAA0D37237D64BD00FC9B81 /* Check.swift in Sources */,
 				9EF46F102362419400AEC82F /* Rewriter.swift in Sources */,
 				9E1223C1236453BC00692A72 /* MemoryLayoutManager.swift in Sources */,
 				9E40A0D92362517900C8D39C /* main.swift in Sources */,
@@ -923,7 +932,6 @@
 				9E0674EC230ADBE40044C3C4 /* ApplyPhysicsFields.swift in Sources */,
 				9E9D4B7B22F37244007DCF49 /* SkinningPen.swift in Sources */,
 				9E0674E3230AD2490044C3C4 /* Math.metal in Sources */,
-				9E8F7120230D87C200583AAE /* MetalSimulator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,3 +28,10 @@ struct check {
         precondition(x)
     }
 }
+
+public func assert(_ condition: @autoclosure () -> Bool, _ message: @autoclosure () -> String = String(), file: StaticString = #file, line: UInt = #line, otherwise: (String) -> ()) {
+    if !condition() {
+        print("Assertion Failure: \(message()) at \(file):\(line)")
+        otherwise(message())
+    }
+}
