@@ -172,10 +172,8 @@ updateCompositeBodies(
             children.pivot[oid] = (half3)parentPivot;
             children.centerOfMass[oid] = (half3)totalCenterOfMass;
             children.inertiaTensor[oid] = inertiaTensor_from_float3x3(totalInertiaTensor);
-
-            previousLowerBound = lowerBound;
         }
+        previousLowerBound = lowerBound;
         threadgroup_barrier(mem_flags::mem_device);
-
     }
 }

@@ -23,7 +23,6 @@ struct UpdateRigidBodiesOut {
     device InertiaTensor *inertiaTensor;
 };
 
-
 kernel void
 updateRigidBodies(
                   device ushort   *in_parentId,
@@ -96,10 +95,9 @@ updateRigidBodies(
             out.inertiaTensor[id] = inertiaTensor_from_float3x3(inertiaTensor);
             out.rotation[id] = (quath)rotation;
             out.jointRotation[id] = (quath)jointRotation;
-
-            previousLowerBound = lowerBound;
-            lowerBound += delta;
         }
+        previousLowerBound = lowerBound;
+        lowerBound += delta;
         threadgroup_barrier(mem_flags::mem_device);
     }
 }

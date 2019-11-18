@@ -19,9 +19,9 @@ class GameViewController: UIViewController {
         let rigidBodyPen = RigidBodyPen(parent: root)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]////[!"&FFFFFFFA]////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
         let configuration = InterpreterConfig(
-            randomScale: 0.4,
+//            randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,
             thicknessScale: 0.7,
@@ -45,7 +45,7 @@ class GameViewController: UIViewController {
         scnView.allowsCameraControl = true
         scnView.backgroundColor = .gray
 
-        //        triggerProgrammaticCapture()
+        triggerProgrammaticCapture()
     }
 
     func triggerProgrammaticCapture() {
@@ -83,14 +83,24 @@ extension GameViewController {
         let cs = CPUSimulator(world: self.world)
         cs.updateCompositeBodies()
 
-        self.mem.assertValid(otherwise: { error in
-            //            let captureManager = MTLCaptureManager.shared()
-            for (i, r) in world.rigidBodiesLevelOrder.enumerated() {
-                print(i, r.composite.inertiaTensor)
-                print(i, float3x3(mem.joints.inertiaTensor[i]))
+        self.mem.assertValid(otherwise: { id, error in
+            let captureManager = MTLCaptureManager.shared()
+            print(self.mem.rigidBodies.ranges)
+            print(error)
+            for range in mem.rigidBodies.ranges {
+                if range.contains(id) {
+                    print("Error in range: ", range, id - range.lowerBound)
+                }
             }
-            fatalError()
-            //            captureManager.stopCapture()
+
+
+//            trace(id)
+//            for (i, r) in world.rigidBodiesLevelOrder.enumerated() {
+//                print(i, r.composite.inertiaTensor)
+//                print(i, float3x3(mem.joints.inertiaTensor[i]))
+//            }
+//            fatalError()
+            captureManager.stopCapture()
         })
     }
 

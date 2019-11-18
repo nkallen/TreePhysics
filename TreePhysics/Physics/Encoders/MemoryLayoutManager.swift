@@ -225,7 +225,7 @@ public final class MemoryLayoutManager {
         self.joints = Joints(device: device, count: rigidBodies.count)
     }
 
-    func assertValid(otherwise: ((String) -> ()) = { fatalError($0) }) {
+    func assertValid(otherwise: ((Int, String) -> ()) = { (_, msg) in fatalError(msg) }) {
         for id in 1..<rigidBodies.count {
             var `break`: String? = nil
             joints[id].assertValid { e in
@@ -237,7 +237,7 @@ public final class MemoryLayoutManager {
             if let `break` = `break` {
                 print("Assertion failed for Joint[\(id)]=\(joints[id])")
                 print("Assertion failed for RigidBody[\(id)]=\(rigidBodies[id])")
-                otherwise(`break`)
+                otherwise(id, `break`)
 
                 break
             }
