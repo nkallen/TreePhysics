@@ -8,7 +8,7 @@ extension half {
 }
 
 public final class MemoryLayoutManager {
-    public class RigidBodies {
+    final class RigidBodies {
         let index: [RigidBody:Int]
         let ranges: [Range<Int>]
         let maxClimberCount: Int
@@ -180,7 +180,7 @@ public final class MemoryLayoutManager {
         }
     }
 
-    class CompositeBodies {
+    final class CompositeBodies {
         let maxChildCount: Int
         let massBuffer, forceBuffer, torqueBuffer, pivotBuffer, centerOfMassBuffer, inertiaTensorBuffer: MTLBuffer
 
@@ -201,7 +201,7 @@ public final class MemoryLayoutManager {
         }
     }
 
-    public class Joints {
+    final class Joints {
         let count: Int
         let inertiaTensorBuffer, torqueBuffer, thetaBuffer: MTLBuffer
 
@@ -213,16 +213,51 @@ public final class MemoryLayoutManager {
         }
     }
 
-    class PhysicsFields {}
+    final class PhysicsFields {
+        let device: MTLDevice
+        let count: Int
+        let physicsFieldBuffer: MTLBuffer
+
+        init(device: MTLDevice, fields: [PhysicsField]) {
+            self.device = device
+            self.count = 1
+
+            let physicsFieldBuffer = device.makeBuffer(length: count * MemoryLayout<PhysicsFieldStruct>.stride, options: [.storageModeShared])!
+
+            let physicsField = physicsFieldBuffer.contents().bindMemory(to: PhysicsFieldStruct.self, capacity: count)
+
+            var s = PhysicsFieldStruct()
+            s.position = packed_half3(float3(0,0,0))
+            s.halfExtent = packed_half3(float3(100,100,100))
+            s.gravity = GravityField(g: packed_half3(simd_float3(0.0,-10.0,0.0)))
+            s.type = .gravity
+            physicsField[0] = s
+
+            self.physicsFieldBuffer = device.makeBuffer(length: physicsFieldBuffer.length, options: [.storageModeShared])!
+
+            let commandQueue = device.makeCommandQueue()!
+            let commandBuffer = commandQueue.makeCommandBuffer()!
+            let blitCommandEncoder = commandBuffer.makeBlitCommandEncoder()!
+
+            blitCommandEncoder.copy(from: physicsFieldBuffer, sourceOffset: 0, to: self.physicsFieldBuffer, destinationOffset: 0, size: physicsFieldBuffer.length)
+
+            blitCommandEncoder.endEncoding()
+            commandBuffer.commit()
+            commandBuffer.waitUntilCompleted()
+
+        }
+    }
 
     let rigidBodies: RigidBodies
     let compositeBodies: CompositeBodies
     let joints: Joints
+    let physicsFields: PhysicsFields
 
     public init(device: MTLDevice, root: ArticulatedRigidBody) {
         self.rigidBodies = RigidBodies(device: device, root: root)
         self.compositeBodies = CompositeBodies(device: device, maxChildCount: rigidBodies.maxChildCount, ranges: rigidBodies.ranges)
         self.joints = Joints(device: device, count: rigidBodies.count)
+        self.physicsFields = PhysicsFields(device: device, fields: [])
     }
 
     func assertValid(otherwise: ((Int, String) -> ()) = { (_, msg) in fatalError(msg) }) {

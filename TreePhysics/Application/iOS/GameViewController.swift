@@ -17,11 +17,11 @@ class GameViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         self.root = ArticulatedRigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
-        let cylinderPen = CylinderPen<UInt32>(radialSegmentCount: 8)
+        let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 8)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
         let configuration = InterpreterConfig(
 //            randomScale: 0.4,
             angle: 18 * .pi / 180,
@@ -95,7 +95,6 @@ extension GameViewController: SCNSceneRendererDelegate {
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
 //        check()
-
 
         for rigidBody in world.rigidBodiesUnordered {
             let id = mem.rigidBodies.index[rigidBody]!

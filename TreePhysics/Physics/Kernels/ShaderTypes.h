@@ -38,50 +38,43 @@ typedef NS_ENUM(NSInteger, ThreadGroupIndex)
 typedef NS_ENUM(NSInteger, FunctionConstantIndex)
 {
     FunctionConstantIndexRangeCount = 0,
-    FunctionConstantIndexBeta = 1,
-    FunctionConstantIndexPrintMaxLen = 10,
+    FunctionConstantIndexPhysicsFieldCount = 1,
+};
+
+typedef NS_ENUM(NSInteger, PhysicsFieldType)
+{
+    PhysicsFieldTypeGravity = 0,
+    PhysicsFieldTypeWind = 1,
+    PhysicsFieldTypeAttractor = 2,
 };
 
 typedef struct {
-    vector_float3 pivot;
-    float mass;
-    matrix_float3x3 inertiaTensor;
-    vector_float3 force;
-    vector_float3 torque;
-    vector_float3 centerOfMass;
-} CompositeBodyStruct;
+    packed_half3 g;
+} GravityField;
 
 typedef struct {
-    // const:
-    int parentId;
-    int childIds[3]; // Q: if we do level order, can we just do like climberOffset
-    int climberOffset;
-    ushort childCount;
-    ushort climberCount;
-
-    float mass;
-    matrix_float3x3 localInertiaTensor;
-
-    float jointStiffness;
-    matrix_float3x3 jointLocalRotation;
-
-    vector_float3 pivot;
-    vector_float3 localPivot;
-    matrix_float3x3 rotation;
-    matrix_float3x3 inertiaTensor;
-    vector_float3 centerOfMass;
-
-    vector_float3 force;
-    vector_float3 torque;
-} RigidBodyStruct;
+    packed_half3 windVelocity;
+    half airResistanceMultiplier;
+    half phi;
+    half leafScale;
+    half branchScale;
+    half airDensity;
+    half normal2tangentialDragCoefficientRatio;
+} WindField;
 
 typedef struct {
-    matrix_float3x3 θ;
-} JointStruct;
+    packed_half3 position;
+    packed_half3 halfExtent;
+    union {
+        GravityField gravity;
+        WindField wind;
+    };
+    PhysicsFieldType type;
 
-typedef struct {
-    vector_float3 position;
-    vector_float3 halfExtent;
+#ifdef __METAL_VERSION__
+    bool appliesTo(half3 centerOfMass);
+    metal::half2x3 apply(half mass);
+#endif
 } PhysicsFieldStruct;
 
 typedef struct {

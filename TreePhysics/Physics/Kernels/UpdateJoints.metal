@@ -39,22 +39,23 @@ update(
     float3x3 A = L_inverse * (float3x3(in.stiffness[id])) * L_transpose_inverse;
 
     quatf q = diagonalize(A);
-    float3x3 X = float3x3_from_quat(q); // eigenvectors
-    A = A * X;
-    float3 Λ = float3(dot(X[0], A[0]),
-                      dot(X[1], A[1]),
-                      dot(X[2], A[2]));
+    float3x3 Eigenvectors = float3x3_from_quat(q);
+    // Eigenvalues are the diagonal entries of transpose(Eigenvectors) * A * Eigenvectors:
+    A = A * Eigenvectors;
+    float3 Λ = float3(dot(Eigenvectors[0], A[0]),
+                      dot(Eigenvectors[1], A[1]),
+                      dot(Eigenvectors[2], A[2]));
 
     // 2. Now we can restate the differential equation in terms of other (diagonal)
     // values: Θ'' + βΛΘ' + ΛΘ = U^T τ, where Θ = U^(-1) θ
 
-    float3x3 U = L_transpose_inverse * X;
+    float3x3 U = L_transpose_inverse * Eigenvectors;
     float3x3 U_inverse = inverse(U);
 
     float3 torque_diagonal = transpose(U) * torque_jointSpace;
-    float3 angle = float3(0);//(float3)in.theta[id*1];
+    float3 angle = (float3)in.theta[id*1];
     float3 θ_diagonal_0 = U_inverse * angle;
-    float3 angularVelocity = float3(0);//(float3)in.theta[id*2];
+    float3 angularVelocity = (float3)in.theta[id*2];
     float3 θ_ddt_diagonal_0 = U_inverse * angularVelocity;
     float damping = in.damping[id];
 

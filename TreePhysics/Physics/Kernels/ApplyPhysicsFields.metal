@@ -4,55 +4,45 @@
 
 using namespace metal;
 
-constant float a = 0.05;
-constant float b = 0.01;
-constant float c = 0.1;
+constant int fieldCount [[ function_constant(FunctionConstantIndexPhysicsFieldCount) ]];
 
-inline bool
-physicsField_applies(
-                     PhysicsFieldStruct physicsField,
-                     RigidBodyStruct rigidBody)
-{
-    float3 halfExtent = physicsField.halfExtent;
-    
-    if (halfExtent.x < 0 || halfExtent.y < 0 || halfExtent.z < 0) return false;
-
-    bool3 all = (rigidBody.centerOfMass >= physicsField.position - halfExtent && rigidBody.centerOfMass <= physicsField.position + halfExtent);
-    return all.x == true && all.y == true && all.z == true;
+bool PhysicsFieldStruct::appliesTo(half3 centerOfMass) {
+    half3 rel = metal::abs(position - centerOfMass);
+    return rel.x <= halfExtent.x && rel.y <= halfExtent.y && rel.z <= halfExtent.z;
 }
 
-inline RigidBodyStruct
-rigidBody_applyForce(
-                     RigidBodyStruct rigidBody,
-                     float3 force,
-                     float3 torque)
-{
-    rigidBody.force += force;
-    rigidBody.torque += torque;
-
-    // FIXME (if parentId != nil ... then             torque += cross(rotation.act(-localPivot), force)
-    
-    return rigidBody;
+half2x3 PhysicsFieldStruct::apply(half mass) {
+    half3 force, torque;
+    force = torque = half3(0);
+    switch (type) {
+        case PhysicsFieldTypeAttractor:
+            break;
+        case PhysicsFieldTypeGravity:
+            force = mass * gravity.g;
+            break;
+        case PhysicsFieldTypeWind:
+            break;
+    }
+    return half2x3(force, torque);
 }
 
 kernel void
 applyPhysicsFields(
-                   constant PhysicsFieldStruct & physicsField [[ buffer(BufferIndexPhysicsField) ]],
-                   device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
+                   constant PhysicsFieldStruct * fields,
+                   device half           *in_mass,
+                   device packed_half3   *in_centerOfMass,
+                   device packed_half3   *out_force,
+                   device packed_half3   *out_torque,
+                   constant float * time,
                    uint gid [[ thread_position_in_grid ]])
 {
-    RigidBodyStruct rigidBody = rigidBodies[gid];
-    
-    if (physicsField_applies(physicsField, rigidBody)) {
-        float3 delta = physicsField.position - rigidBody.centerOfMass;
-        float distance = length(delta);
-        if (distance > 0) {
-            float3 direction = normalize(delta);
-
-            // NOTE: this is a bell-shaped curve, so objects very far and very near are weakly affected
-            float3 force = direction * a * pow(M_E_F, -sqr(distance - b)/(2*c));
-            rigidBody = rigidBody_applyForce(rigidBody, force, 0.5);
-            rigidBodies[gid] = rigidBody;
+    half2x3 result = half2x3(0);
+    for (int i = 0; i < fieldCount; i++) {
+        PhysicsFieldStruct field = fields[i];
+        if (field.appliesTo(in_centerOfMass[gid])) {
+            result += field.apply(in_mass[gid]);
         }
     }
+    out_force[gid] = result[0];
+    out_torque[gid] = result[1];
 }
