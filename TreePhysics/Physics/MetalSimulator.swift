@@ -26,9 +26,11 @@ public final class MetalSimulator {
     }
 
     public func encode(commandBuffer: MTLCommandBuffer, at time: TimeInterval) {
+        commandBuffer.pushDebugGroup("MetalSimulator")
         applyPhysicsFields.encode(commandBuffer: commandBuffer, at: Float(time))
         updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
         updateJoints.encode(commandBuffer: commandBuffer, at: Float(time))
         updateRigidBodies.encode(commandBuffer: commandBuffer)
+        commandBuffer.popDebugGroup()
     }
 }

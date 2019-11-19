@@ -13,6 +13,7 @@ class GameViewController: UIViewController {
     var device: MTLDevice!
     var mem: MemoryLayoutManager!
     var simulator: MetalSimulator!
+    var cpuSimulator: CPUSimulator!
 
     override func viewDidAppear(_ animated: Bool) {
         self.root = ArticulatedRigidBody.static()
@@ -21,9 +22,9 @@ class GameViewController: UIViewController {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
         let configuration = InterpreterConfig(
-//            randomScale: 0.4,
+            randomScale: 0.4,
             angle: 18 * .pi / 180,
             thickness: 0.002*0.002*Float.pi,
             thicknessScale: 0.7,
@@ -35,9 +36,12 @@ class GameViewController: UIViewController {
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
         self.mem = MemoryLayoutManager(device: device, root: root)
+        let gravity = GravityField(simd_float3(0,-10,0))
         self.world = PhysicsWorld()
+        world.add(field: gravity)
         self.world.add(rigidBody: root)
         self.simulator = MetalSimulator(device: device, mem: mem)
+        self.cpuSimulator = CPUSimulator(world: world)
         print("Total nodes:", mem.rigidBodies.count)
 
 //        let vectorCount = cylinderPen.branchGeometry.sources.first(where: { $0.semantic == .vertex })!.vectorCount
@@ -91,15 +95,18 @@ extension GameViewController: SCNSceneRendererDelegate {
         let commandQueue = device.makeCommandQueue()!
         let commandBuffer = commandQueue.makeCommandBuffer()!
 
-        simulator.encode(commandBuffer: commandBuffer, at: 1/60)
+        simulator.encode(commandBuffer: commandBuffer, at: 1.0/60)
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
 //        check()
+//        cpuSimulator.update(at: 1.0/60)
 
-        for rigidBody in world.rigidBodiesUnordered {
-            let id = mem.rigidBodies.index[rigidBody]!
-            rigidBody.node.simdPosition = simd_float3(mem.rigidBodies.pivot[id])
-            rigidBody.node.simdOrientation = simd_quatf(mem.rigidBodies.orientation[id])
+        DispatchQueue.main.async {
+            for rigidBody in self.world.rigidBodiesUnordered {
+                let id = self.mem.rigidBodies.index[rigidBody]!
+                rigidBody.node.simdPosition = simd_float3(self.mem.rigidBodies.centerOfMass[id])
+                rigidBody.node.simdOrientation = simd_quatf(self.mem.rigidBodies.orientation[id])
+            }
         }
 
         print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)

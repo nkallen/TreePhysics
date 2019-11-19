@@ -229,7 +229,7 @@ public final class MemoryLayoutManager {
             var s = PhysicsFieldStruct()
             s.position = packed_half3(float3(0,0,0))
             s.halfExtent = packed_half3(float3(100,100,100))
-            s.gravity = GravityField(g: packed_half3(simd_float3(0.0,-10.0,0.0)))
+            s.gravity = ShaderTypes.GravityField(g: packed_half3(simd_float3(0.0,-10.0,0.0)))
             s.type = .gravity
             physicsField[0] = s
 

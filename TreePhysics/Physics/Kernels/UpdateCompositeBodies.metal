@@ -83,7 +83,7 @@ updateCompositeBodies(
                       device packed_half3 *out_torque,
                       device InertiaTensor *out_inertiaTensor,
 
-                      constant uint * upperBound,
+                      constant uint & upperBound,
                       constant ushort * deltas,
 
                       uint gid [[ thread_position_in_grid ]],
@@ -117,7 +117,7 @@ updateCompositeBodies(
         .torque = out_torque,
     };
     
-    uint previousLowerBound = *upperBound;
+    uint previousLowerBound = upperBound;
     for (ushort i = 0; i < rangeCount - 1; i++) {
         ushort delta = deltas[i];
         const uint lowerBound = previousLowerBound - delta;

@@ -16,6 +16,7 @@ struct UpdateJointsIn {
 inline float3x3
 update(
        uint id,
+       uint tpg,
        UpdateJointsIn in,
        float time)
 {
@@ -53,9 +54,9 @@ update(
     float3x3 U_inverse = inverse(U);
 
     float3 torque_diagonal = transpose(U) * torque_jointSpace;
-    float3 angle = (float3)in.theta[id*1];
+    float3 angle = (float3)in.theta[tpg*0+id];
     float3 θ_diagonal_0 = U_inverse * angle;
-    float3 angularVelocity = (float3)in.theta[id*2];
+    float3 angularVelocity = (float3)in.theta[tpg*1+id];
     float3 θ_ddt_diagonal_0 = U_inverse * angularVelocity;
     float damping = in.damping[id];
 
@@ -80,7 +81,7 @@ updateJoints(
              device packed_half3 *joint_torque,
              device InertiaTensor *joint_inertiaTensor,
 
-             constant float * time,
+             constant float & time,
              uint gid [[ thread_position_in_grid ]],
              uint tpg [[ threads_per_grid ]])
 {
@@ -91,7 +92,7 @@ updateJoints(
         .torque = joint_torque,
         .inertiaTensor = joint_inertiaTensor,
     };
-    float3x3 theta = gid == 0 ? float3x3(0) : update(gid, in, *time);
+    float3x3 theta = gid == 0 ? float3x3(0) : update(gid, tpg, in, time);
     joint_theta[tpg*0+gid] = (packed_half3)theta[0];
     joint_theta[tpg*1+gid] = (packed_half3)theta[1];
     joint_theta[tpg*2+gid] = (packed_half3)theta[2];

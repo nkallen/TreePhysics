@@ -54,6 +54,7 @@
 		9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */; };
 		9E8255E123840D5B00FBB49F /* ResetForces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */; };
 		9E8255E223842EED00FBB49F /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
+		9E8255E3238462E500FBB49F /* GravityField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE86412332717C0037EA92 /* GravityField.swift */; };
 		9E8BF7502368511D00797FD7 /* UpdateJoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJoints.swift */; };
 		9E8BF75223685AB200797FD7 /* Diagonalize.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8BF75123685AB200797FD7 /* Diagonalize.metal */; };
 		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
@@ -883,6 +884,7 @@
 				9EF46F15236241EC00AEC82F /* Joint.swift in Sources */,
 				9E40A0D82362515700C8D39C /* GameViewController.swift in Sources */,
 				9E4C7239237EF1AC00645574 /* MetalKernelDebugger.swift in Sources */,
+				9E8255E3238462E500FBB49F /* GravityField.swift in Sources */,
 				9EE0BD6D236B2C23000A8AB3 /* Eigensolver.c in Sources */,
 				9E075112237B005000A8107B /* UpdateRigidBodies.swift in Sources */,
 				9EF46F1F2362439000AEC82F /* ResetForces.metal in Sources */,
