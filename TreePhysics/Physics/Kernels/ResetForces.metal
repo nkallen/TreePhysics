@@ -3,16 +3,12 @@
 
 using namespace metal;
 
-//constant bool med_quality_defined = is_function_constant_defined(med_quality);
-
 kernel void
 resetForces(
-            device RigidBodyStruct * rigidBodies [[ buffer(BufferIndexRigidBodies) ]],
+            device packed_half3   *force,
+            device packed_half3   *torque,
             uint gid [[ thread_position_in_grid ]])
 {
-    RigidBodyStruct rigidBody = rigidBodies[gid];
-
-    rigidBody.force = float3(0);
-    rigidBody.torque = float3(0);
-    rigidBodies[gid] = rigidBody;
+    force[gid] = packed_half3(0);
+    torque[gid] = packed_half3(0);
 }

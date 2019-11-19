@@ -10,7 +10,7 @@ public final class MetalSimulator {
     private let updateCompositeBodies: UpdateCompositeBodies
     private let updateJoints: UpdateJoints
     private let updateRigidBodies: UpdateRigidBodies
-//    private let resetForces: ResetForces
+    private let resetForces: ResetForces
 //    private let applyPhysicsFields: ApplyPhysicsFields
 
 //    private var fields: [PhysicsFieldStructConvertible] = []
@@ -25,6 +25,7 @@ public final class MetalSimulator {
         self.debug = KernelDebugger(device: device, length: mem.rigidBodies.ranges.last!.count * 4096)
 
         self.mem = mem
+        self.resetForces = ResetForces(memoryLayoutManager: mem)
         self.updateCompositeBodies = UpdateCompositeBodies(memoryLayoutManager: mem)
         self.updateJoints = UpdateJoints(memoryLayoutManager: mem)
         self.updateRigidBodies = UpdateRigidBodies(memoryLayoutManager: mem)
@@ -45,6 +46,6 @@ public final class MetalSimulator {
         updateCompositeBodies.encode(commandBuffer: debug.wrap(commandBuffer))
         updateJoints.encode(commandBuffer: commandBuffer, at: Float(time))
         updateRigidBodies.encode(commandBuffer: commandBuffer)
-//        resetForces.encode(commandBuffer: commandBuffer)
+        resetForces.encode(commandBuffer: commandBuffer)
     }
 }

@@ -53,6 +53,7 @@
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
 		9E80B3E6231FF74F00A700CF /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */; };
+		9E8255E123840D5B00FBB49F /* ResetForces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */; };
 		9E8BF7502368511D00797FD7 /* UpdateJoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJoints.swift */; };
 		9E8BF75223685AB200797FD7 /* Diagonalize.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8BF75123685AB200797FD7 /* Diagonalize.metal */; };
 		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
@@ -910,6 +911,7 @@
 				9EF46F14236241E600AEC82F /* RigidBody.swift in Sources */,
 				9E1168A2237C335A00922AAA /* MetalProxy.swift in Sources */,
 				9EF46F16236241F300AEC82F /* Math.swift in Sources */,
+				9E8255E123840D5B00FBB49F /* ResetForces.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

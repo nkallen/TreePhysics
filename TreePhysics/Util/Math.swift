@@ -166,7 +166,7 @@ extension SIMD3 where Scalar == Float {
 
 extension SIMD4 where Scalar == Float {
     init(_ float3: simd_float3, _ w: Float) {
-        self = simd_float4ç(float3.x, float3.y, float3.z, w)
+        self = simd_float4(float3.x, float3.y, float3.z, w)
     }
 
     var xyz: simd_float3 {
