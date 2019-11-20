@@ -60,6 +60,10 @@ extension UpdateRigidBodies {
                 mem.rigidBodies.inertiaTensorBuffer,
                 mem.rigidBodies.orientationBuffer,
                 mem.rigidBodies.jointOrientationBuffer,
+                mem.rigidBodies.velocityBuffer,
+                mem.rigidBodies.angularVelocityBuffer,
+                mem.rigidBodies.accelerationBuffer,
+                mem.rigidBodies.angularAccelerationBuffer,
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 

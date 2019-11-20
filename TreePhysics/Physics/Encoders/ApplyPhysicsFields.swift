@@ -39,6 +39,7 @@ final class ApplyPhysicsFields: MetalKernelEncoder {
 
 extension ApplyPhysicsFields {
     class ArgumentEncoder {
+        private var clock: Float = 0
         let mem: MemoryLayoutManager
 
         init(memoryLayoutManager: MemoryLayoutManager) {
@@ -48,15 +49,21 @@ extension ApplyPhysicsFields {
         func encode(commandEncoder: MTLComputeCommandEncoder, at time: Float) {
             let bufs = [
                 mem.physicsFields.physicsFieldBuffer,
+
                 mem.rigidBodies.massBuffer,
                 mem.rigidBodies.centerOfMassBuffer,
+                mem.rigidBodies.orientationBuffer,
+                mem.rigidBodies.velocityBuffer,
+                mem.rigidBodies.areaBuffer,
+
                 mem.rigidBodies.forceBuffer,
                 mem.rigidBodies.torqueBuffer,
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 
-            var time = time
-            commandEncoder.setBytes(&time, length: MemoryLayout<Float>.size, index: bufs.count)
+            commandEncoder.setBytes(&clock, length: MemoryLayout<Float>.size, index: bufs.count)
+
+            clock += time
         }
     }
 }

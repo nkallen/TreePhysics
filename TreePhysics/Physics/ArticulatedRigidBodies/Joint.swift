@@ -11,8 +11,8 @@ public final class Joint {
     var position: simd_float3
     var orientation: simd_quatf
     var inverseOrientation: simd_quatf
-    var acceleration: simd_float3    // NOTE: θ[0] is the xyz orientation of the joint; θ[1] is the angular velocity, etc.
-    var θ: float3x3
+    var acceleration: simd_float3
+    var θ: float3x3 // NOTE: θ[0] is the xyz orientation of the joint; θ[1] is the angular velocity, etc.
 
     var stiffness: Float
     var torqueThreshold: Float

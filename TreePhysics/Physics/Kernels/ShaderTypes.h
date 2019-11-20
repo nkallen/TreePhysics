@@ -45,7 +45,6 @@ typedef NS_ENUM(NSInteger, PhysicsFieldType)
 {
     PhysicsFieldTypeGravity = 0,
     PhysicsFieldTypeWind = 1,
-    PhysicsFieldTypeAttractor = 2,
 };
 
 typedef struct {
@@ -70,11 +69,6 @@ typedef struct {
         WindField wind;
     };
     PhysicsFieldType type;
-
-#ifdef __METAL_VERSION__
-    bool appliesTo(half3 centerOfMass);
-    metal::half2x3 apply(half mass);
-#endif
 } PhysicsField;
 
 typedef struct {
