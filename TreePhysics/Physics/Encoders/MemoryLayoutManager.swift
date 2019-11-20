@@ -226,12 +226,30 @@ public final class MemoryLayoutManager {
 
             let physicsField = physicsFieldBuffer.contents().bindMemory(to: ShaderTypes.PhysicsField.self, capacity: count)
 
-            var s = ShaderTypes.PhysicsField()
-            s.position = packed_half3(simd_float3(0,0,0))
-            s.halfExtent = packed_half3(simd_float3(100,100,100))
-            s.gravity = ShaderTypes.GravityField(g: packed_half3(simd_float3(0.0,-10.0,0.0)))
-            s.type = .gravity
-            physicsField[0] = s
+            for (i, field) in fields.enumerated() {
+                var shaderField = ShaderTypes.PhysicsField()
+                shaderField.position = packed_half3(field.position)
+                shaderField.halfExtent = packed_half3(field.halfExtent)
+                switch field {
+                case let windField as WindField:
+                    shaderField.type = .wind
+                    let wind = ShaderTypes.WindField(
+                        windVelocity: packed_half3(windField.windVelocity),
+                        airResistanceMultiplier: Half(windField.airResistanceMultiplier),
+                        phi: Half(windField.phi),
+                        leafScale: Half(windField.leafScale),
+                        branchScale: Half(windField.branchScale),
+                        airDensity: Half(windField.airDensity),
+                        normal2tangentialDragCoefficientRatio: Half(windField.normal2tangentialDragCoefficientRatio))
+                    shaderField.wind = wind
+                case let gravityField as GravityField:
+                    shaderField.type = .gravity
+                    let gravity = ShaderTypes.GravityField(g: packed_half3(gravityField.g))
+                    shaderField.gravity = gravity
+                default: fatalError("Unsupported Field Type: \(type(of: shaderField))")
+                }
+                physicsField[i] = shaderField
+            }
 
             self.physicsFieldBuffer = device.makeBuffer(length: physicsFieldBuffer.length, options: [.storageModeShared])!
 
@@ -253,11 +271,11 @@ public final class MemoryLayoutManager {
     let joints: Joints
     let physicsFields: PhysicsFields
 
-    public init(device: MTLDevice, root: ArticulatedRigidBody) {
+    public init(device: MTLDevice, root: ArticulatedRigidBody, fields: [PhysicsField]) {
         self.rigidBodies = RigidBodies(device: device, root: root)
         self.compositeBodies = CompositeBodies(device: device, maxChildCount: rigidBodies.maxChildCount, ranges: rigidBodies.ranges)
         self.joints = Joints(device: device, count: rigidBodies.count)
-        self.physicsFields = PhysicsFields(device: device, fields: [])
+        self.physicsFields = PhysicsFields(device: device, fields: fields)
     }
 
     func assertValid(otherwise: ((Int, String) -> ()) = { (_, msg) in fatalError(msg) }) {

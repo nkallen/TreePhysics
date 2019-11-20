@@ -22,7 +22,7 @@ class GameViewController: UIViewController {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
         let configuration = InterpreterConfig(
             randomScale: 0.4,
             angle: 18 * .pi / 180,
@@ -35,28 +35,13 @@ class GameViewController: UIViewController {
 
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
-        self.mem = MemoryLayoutManager(device: device, root: root)
         let gravity = GravityField(simd_float3(0,-10,0))
         self.world = PhysicsWorld()
         world.add(field: gravity)
         self.world.add(rigidBody: root)
+        self.mem = MemoryLayoutManager(device: device, root: root, fields: [gravity])
         self.simulator = MetalSimulator(device: device, mem: mem)
         self.cpuSimulator = CPUSimulator(world: world)
-        print("Total nodes:", mem.rigidBodies.count)
-
-//        let vectorCount = cylinderPen.branchGeometry.sources.first(where: { $0.semantic == .vertex })!.vectorCount
-//        var inversePositions: [simd_float3] = []
-//        var inverseOrientations: [simd_quatf] = []
-//        var boneIndices: [UInt16] = Array(repeating: 0, count: vectorCount)
-//
-//        for (vertexIndices, rigidBody) in skinningPen.branchBones.bones {
-//            inversePositions.append(-rigidBody.centerOfMass)
-//            inverseOrientations.append(rigidBody.orientation.inverse)
-//            let rigidBodyIndex = mem.rigidBodies.index[rigidBody]!
-//            for vertexIndex in vertexIndices {
-//                boneIndices[Int(vertexIndex)] = UInt16(rigidBodyIndex)
-//            }
-//        }
 
         scnView.delegate = self
         let scene = SCNScene()

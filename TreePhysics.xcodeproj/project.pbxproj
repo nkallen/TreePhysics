@@ -55,6 +55,8 @@
 		9E8255E123840D5B00FBB49F /* ResetForces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */; };
 		9E8255E223842EED00FBB49F /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
 		9E8255E3238462E500FBB49F /* GravityField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE86412332717C0037EA92 /* GravityField.swift */; };
+		9E84AFC023855D81008919A8 /* WindField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE8645233271BF0037EA92 /* WindField.swift */; };
+		9E84AFC123855DED008919A8 /* Noise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1490CA2334E49500FED681 /* Noise.swift */; };
 		9E8BF7502368511D00797FD7 /* UpdateJoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJoints.swift */; };
 		9E8BF75223685AB200797FD7 /* Diagonalize.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E8BF75123685AB200797FD7 /* Diagonalize.metal */; };
 		9E8F711D230D86C000583AAE /* SimulatorComparisonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F711C230D86C000583AAE /* SimulatorComparisonTests.swift */; };
@@ -872,6 +874,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E84AFC023855D81008919A8 /* WindField.swift in Sources */,
 				9E1168A1237C334F00922AAA /* SharedBuffersMetalDevice.swift in Sources */,
 				9EF29FC92374391000AF72FC /* Half.c in Sources */,
 				9EF46F232362439A00AEC82F /* UpdateCompositeBodies.metal in Sources */,
@@ -902,6 +905,7 @@
 				9E1223C1236453BC00692A72 /* MemoryLayoutManager.swift in Sources */,
 				9E40A0D92362517900C8D39C /* main.swift in Sources */,
 				9EF46F0E2362418600AEC82F /* ArticulatedRigidBody.swift in Sources */,
+				9E84AFC123855DED008919A8 /* Noise.swift in Sources */,
 				9EF46F17236241FD00AEC82F /* Tree.swift in Sources */,
 				9EF46F12236241A500AEC82F /* UpdateCompositeBodies.swift in Sources */,
 				9EF46F26236243A300AEC82F /* Math.metal in Sources */,
