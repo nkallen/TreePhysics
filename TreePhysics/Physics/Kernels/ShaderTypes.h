@@ -75,7 +75,7 @@ typedef struct {
     bool appliesTo(half3 centerOfMass);
     metal::half2x3 apply(half mass);
 #endif
-} PhysicsFieldStruct;
+} PhysicsField;
 
 typedef struct {
     packed_float3 diag;

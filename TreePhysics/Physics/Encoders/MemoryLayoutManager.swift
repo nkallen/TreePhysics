@@ -222,13 +222,13 @@ public final class MemoryLayoutManager {
             self.device = device
             self.count = 1
 
-            let physicsFieldBuffer = device.makeBuffer(length: count * MemoryLayout<PhysicsFieldStruct>.stride, options: [.storageModeShared])!
+            let physicsFieldBuffer = device.makeBuffer(length: count * MemoryLayout<ShaderTypes.PhysicsField>.stride, options: [.storageModeShared])!
 
-            let physicsField = physicsFieldBuffer.contents().bindMemory(to: PhysicsFieldStruct.self, capacity: count)
+            let physicsField = physicsFieldBuffer.contents().bindMemory(to: ShaderTypes.PhysicsField.self, capacity: count)
 
-            var s = PhysicsFieldStruct()
-            s.position = packed_half3(float3(0,0,0))
-            s.halfExtent = packed_half3(float3(100,100,100))
+            var s = ShaderTypes.PhysicsField()
+            s.position = packed_half3(simd_float3(0,0,0))
+            s.halfExtent = packed_half3(simd_float3(100,100,100))
             s.gravity = ShaderTypes.GravityField(g: packed_half3(simd_float3(0.0,-10.0,0.0)))
             s.type = .gravity
             physicsField[0] = s

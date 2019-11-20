@@ -27,7 +27,3 @@ public class PhysicsField {
         rigidBody.apply(force: force, torque: torque)
     }
 }
-
-public protocol PhysicsFieldStructConvertible {
-    var `struct`: PhysicsFieldStruct { get }
-}

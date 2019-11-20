@@ -6,12 +6,12 @@ using namespace metal;
 
 constant int fieldCount [[ function_constant(FunctionConstantIndexPhysicsFieldCount) ]];
 
-bool PhysicsFieldStruct::appliesTo(half3 centerOfMass) {
+bool PhysicsField::appliesTo(half3 centerOfMass) {
     half3 rel = metal::abs(position - centerOfMass);
     return rel.x <= halfExtent.x && rel.y <= halfExtent.y && rel.z <= halfExtent.z;
 }
 
-half2x3 PhysicsFieldStruct::apply(half mass) {
+half2x3 PhysicsField::apply(half mass) {
     half3 force, torque;
     force = torque = half3(0);
     switch (type) {
@@ -28,7 +28,7 @@ half2x3 PhysicsFieldStruct::apply(half mass) {
 
 kernel void
 applyPhysicsFields(
-                   constant PhysicsFieldStruct * fields,
+                   constant PhysicsField *fields,
                    device half           *in_mass,
                    device packed_half3   *in_centerOfMass,
                    device packed_half3   *out_force,
@@ -38,7 +38,7 @@ applyPhysicsFields(
 {
     half2x3 result = half2x3(0);
     for (int i = 0; i < fieldCount; i++) {
-        PhysicsFieldStruct field = fields[i];
+        PhysicsField field = fields[i];
         if (field.appliesTo(in_centerOfMass[gid])) {
             result += field.apply(in_mass[gid]);
         }
