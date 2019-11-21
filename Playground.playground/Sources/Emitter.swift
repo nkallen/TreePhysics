@@ -31,12 +31,12 @@ public class Emitter {
 
         let leaf = Tree.leaf(length: 1, density: 500)
         let seed = 1 + total
-        leaf.rotation =
+        leaf.orientation =
             simd_quatf(angle: noise.random(seed + 0) * 2 * .pi, axis: .x) *
             simd_quatf(angle: noise.random(seed + 1) * 2 * .pi, axis: .y) *
             simd_quatf(angle: noise.random(seed + 2) * 2 * .pi, axis: .z)
 
-        leaf.rotation = leaf.rotation.normalized
+        leaf.orientation = leaf.orientation.normalized
         leaf.updateTransform()
 
         particles[count] = (leaf, Date())

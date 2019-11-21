@@ -22,21 +22,21 @@ class GameViewController: UIViewController {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 3)
         let configuration = InterpreterConfig(
             //            randomScale: 0.4,
-            angle: 18 * .pi / 180,
-            thickness: 0.02*0.02*Float.pi,
-            thicknessScale: 0.7,
-            stepSize: 0.3,
-            stepSizeScale: 0.9)
+            angle: .pi / 8,
+            thickness: 0.002*0.002*Float.pi,
+//            thicknessScale: 0.7,
+            stepSize: 0.4,
+            stepSizeScale: 0.8)
         let interpreter = Interpreter(configuration: configuration, pen: skinningPen)
         interpreter.interpret(lSystem)
         
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
         let gravity = GravityField(simd_float3(0,-0.1,0))
-        let wind = WindField()
+        let wind = WindField(windVelocity: simd_float3(13,0,13))
         self.world = PhysicsWorld()
         world.add(field: wind)
         self.world.add(rigidBody: root)

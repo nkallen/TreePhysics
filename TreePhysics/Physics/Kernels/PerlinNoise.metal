@@ -38,10 +38,9 @@ inline PerlinNoise::PerlinNoise(float frequency, int octaves, float persistence,
 
 inline float PerlinNoise::value(float2 st) {
     float value = 0.0;
+    float amplitude = 1;
 
     for (int i = 0; i < octaves; i++) {
-        float amplitude = 1;
-
         value += amplitude * noise(frequency*st+seed);
         st *= lacunarity;
         amplitude *= persistence;

@@ -26,12 +26,12 @@ half2x3 apply(const GravityField gravity, const float3 centerOfMass, const Apply
 }
 
 half2x3 apply(const WindField wind, const float3 centerOfMass, const ApplyPhysicsFieldsIn in, const uint id, const float time) {
-    PerlinNoise intensity = PerlinNoise(1, 4, 0.75, 200, 0);
-    PerlinNoise turn = PerlinNoise(1, 2, 0.75, 0.75, 0);
+    PerlinNoise intensity = PerlinNoise(2, 4, 0.75, 2.5, 0);
+    PerlinNoise turn = PerlinNoise(1, 2, 0.5, 2, 0);
 
     float3 windVelocity = (float3)wind.windVelocity;
-    windVelocity = quat_act(quaternion(0, 1, 0, turn.value(float2(centerOfMass.xy + time))), windVelocity);
-    windVelocity *= 0.3*intensity.value(time);
+    windVelocity = quat_act(normalize(quaternion(0, 1, 0, turn.value(float2(centerOfMass.xy + time)))), windVelocity);
+    windVelocity *= intensity.value(centerOfMass.xy + time);
 
     const float3 relativeVelocity = windVelocity - (float3)in.velocity[id];
     const float3 normal = quat_heading((quatf)in.orientation[id]);
