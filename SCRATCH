@@ -1,15 +1,35 @@
 
-        {
-            float3 pos = 0.f;
-            for (int i = 0; i < MAX_BONE_INFLUENCES; ++i) {
-                float weight = 1.f;
-                int idx = int(in.skinningJoints[i]) * 3;
-                float4x4 jointMatrix = float4x4(scn_node.skinningJointMatrices[idx],
-                                                scn_node.skinningJointMatrices[idx+1],
-                                                scn_node.skinningJointMatrices[idx+2],
-                                                float4(0., 0., 0., 1.));
+// In order to reduce the likelihood of overflow, instead of calculating c1*pow(e,r1*t) (where
+// sometimes r1 is very large), we can calculate the equivalent c1*pow(pow(e,t),r1) =
+// pow(pow(c1,1/r1),r1)*pow(pow(e,t),r1) = pow(pow(c1,1/r1)*pow(e,t),r1). Since
+// pow(c1,1/r1)*pow(e,t) tends to be much smaller than e, this seems to work?
 
-                pos += (_geometry.position * jointMatrix).xyz * weight;
-            }
+T c1per1t = pow(pow(c1,1.0/r1)*pow(M_E_F,t),r1);
+T c2per1t = pow(pow(c2,1.0/r1)*pow(M_E_F,t),r1);
 
-            _geometry.position.xyz = pos;
+switch (differentialSolution.type) {
+    case QuadraticSolutionTypeComplex:
+        y = c1per1t*cos(r2*t) + c2per1t*sin(r2*t) + k;
+        y_ddt = r1*c1per1t*cos(r2*t) - r2*c1per1t*sin(r2*t) +
+        r1*c2per1t*sin(r2*t) + r2*c2per1t*cos(r2*t);
+        y_d2dt = r1*r1*c1per1t*cos(r2*t) - r2*r1*c1per1t*sin(r2*t) -
+        (r1*r2*c1per1t*sin(r2*t) + r2*r2*c1per1t*cos(r2*t)) +
+        r1*r1*c2per1t*sin(r2*t) + r2*r1*c2per1t*cos(r2*t) +
+        r1*r2*c2per1t*cos(r2*t) - r2*r2*c2per1t*sin(r2*t);
+        break;
+    case QuadraticSolutionTypeReal:
+        y = c1per1t + t*c2per1t + k;
+        y_ddt = r1*c1per1t +
+        c2per1t + r1*t*c2per1t;
+        y_d2dt = r1*r1*c1per1t +
+        r1*c2per1t +
+        r1*c2per1t + r1*r1*t*c2per1t;
+        break;
+    case QuadraticSolutionTypeRealDistinct:
+        T c2per2t = pow(pow(c2,1/r2)*pow(M_E_F,t),r2);
+
+        y = c1per1t + c2per2t + k;
+        y_ddt = r1*c1per1t + r2*c2per2t;
+        y_d2dt = r1*r1*c1per1t + r2*r2*c2per2t;
+        break;
+}
