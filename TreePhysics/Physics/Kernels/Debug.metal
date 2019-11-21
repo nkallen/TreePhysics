@@ -2,8 +2,7 @@
 #include "Print.metal"
 using namespace metal;
 
-class Debug
-{
+class Debug {
 private:
     device char *buf;
     size_t idx = 0U;

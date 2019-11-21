@@ -1,6 +1,7 @@
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 #import "Math.metal"
+#import "PerlinNoise.metal"
 
 using namespace metal;
 
@@ -14,32 +15,35 @@ struct ApplyPhysicsFieldsIn {
     device half *area;
 };
 
-bool appliesTo(const PhysicsField field, const half3 centerOfMass) {
-    const half3 rel = metal::abs(field.position - centerOfMass);
+bool appliesTo(const PhysicsField field, const float3 centerOfMass) {
+    const float3 rel = metal::abs((float3)field.position - centerOfMass);
     return rel.x <= field.halfExtent.x && rel.y <= field.halfExtent.y && rel.z <= field.halfExtent.z;
 }
 
-half2x3 apply(const GravityField gravity, const ApplyPhysicsFieldsIn in, const uint id, const float time) {
+half2x3 apply(const GravityField gravity, const float3 centerOfMass, const ApplyPhysicsFieldsIn in, const uint id, const float time) {
     half3 force = in.mass[id] * gravity.g;
     return half2x3(force, half3(0));
 }
 
-half2x3 apply(const WindField wind, const ApplyPhysicsFieldsIn in, const uint id, const float time) {
-    half3 relativeVelocity = (abs(sin(time*10)))*wind.windVelocity - in.velocity[id];
-    half3 normal = (half3)quat_heading((quatf)in.orientation[id]);
-    half3 relativeVelocity_normal = relativeVelocity - dot(relativeVelocity, normal) * normal;
-    half3 force = wind.branchScale * wind.airDensity * in.area[id] * length(relativeVelocity_normal) * relativeVelocity_normal;
-    return half2x3(force, half3(0));
+half2x3 apply(const WindField wind, const float3 centerOfMass, const ApplyPhysicsFieldsIn in, const uint id, const float time) {
+    PerlinNoise noise = PerlinNoise(1, 5, 0.75, 2, 0);
+    float3 windVelocity = (float3)wind.windVelocity * noise.value(centerOfMass.xy + time);
+
+    float3 relativeVelocity = windVelocity - (float3)in.velocity[id];
+    float3 normal = quat_heading((quatf)in.orientation[id]);
+    float3 relativeVelocity_normal = relativeVelocity - dot(relativeVelocity, normal) * normal;
+    float3 force = wind.branchScale * wind.airDensity * in.area[id] * length(relativeVelocity_normal) * relativeVelocity_normal;
+    return half2x3((half3)force, half3(0));
 }
 
-half2x3 apply(const PhysicsField field, const ApplyPhysicsFieldsIn in, const uint id, const float time) {
+half2x3 apply(const PhysicsField field, const float3 centerOfMass, const ApplyPhysicsFieldsIn in, const uint id, const float time) {
     half2x3 result;
     switch (field.type) {
         case PhysicsFieldTypeGravity:
-            result = apply(field.gravity, in, id, time);
+            result = apply(field.gravity, centerOfMass, in, id, time);
             break;
         case PhysicsFieldTypeWind:
-            result = apply(field.wind, in, id, time);
+            result = apply(field.wind, centerOfMass, in, id, time);
             break;
     }
     return result;
@@ -71,8 +75,9 @@ applyPhysicsFields(
     half2x3 result = half2x3(0);
     for (int i = 0; i < fieldCount; i++) {
         const PhysicsField field = fields[i];
-        if (appliesTo(field, in_centerOfMass[gid])) {
-            result += apply(field, in, gid, time);
+        float3 centerOfMass = (float3)in.centerOfMass[gid];
+        if (appliesTo(field, centerOfMass)) {
+            result += apply(field, centerOfMass, in, gid, time);
         }
     }
     out_force[gid] = result[0];

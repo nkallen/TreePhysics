@@ -43,6 +43,8 @@
 		9E40A0D92362517900C8D39C /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC922E0F27900535997 /* main.swift */; };
 		9E40A0DA2362519100C8D39C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBA122DDDC6C00535997 /* AppDelegate.swift */; };
 		9E461B3722E704BD008AB788 /* CylinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3622E704BD008AB788 /* CylinderTest.swift */; };
+		9E49303B2386A7C400864046 /* PerlinNoise.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E49303A2386A7C400864046 /* PerlinNoise.metal */; };
+		9E49303C2386A91900864046 /* PerlinNoise.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E49303A2386A7C400864046 /* PerlinNoise.metal */; };
 		9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */; };
 		9E4946C42344A10E0036B7EC /* LocalitySensitiveHashTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */; };
 		9E4946C72344AB080036B7EC /* AutoTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E4946C62344AB080036B7EC /* AutoTree.swift */; };
@@ -214,6 +216,8 @@
 		9E461B3222E5E025008AB788 /* Pen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pen.swift; sourceTree = "<group>"; };
 		9E461B3422E7017F008AB788 /* CylinderPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderPen.swift; sourceTree = "<group>"; };
 		9E461B3622E704BD008AB788 /* CylinderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderTest.swift; sourceTree = "<group>"; };
+		9E4930392386A7BA00864046 /* PerlinNoise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PerlinNoise.h; sourceTree = "<group>"; };
+		9E49303A2386A7C400864046 /* PerlinNoise.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = PerlinNoise.metal; sourceTree = "<group>"; };
 		9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHash.swift; sourceTree = "<group>"; };
 		9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHashTests.swift; sourceTree = "<group>"; };
 		9E4946C62344AB080036B7EC /* AutoTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoTree.swift; sourceTree = "<group>"; };
@@ -372,6 +376,8 @@
 				9EF29FC62374391000AF72FC /* Half.c */,
 				9EF29FC52374391000AF72FC /* Half.h */,
 				9E58CF1323784B78002FA7F1 /* JacobianSweep.h */,
+				9E4930392386A7BA00864046 /* PerlinNoise.h */,
+				9E49303A2386A7C400864046 /* PerlinNoise.metal */,
 			);
 			path = Kernels;
 			sourceTree = "<group>";
@@ -860,6 +866,7 @@
 				9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */,
 				9E34C48923291204008C7353 /* Pen.swift in Sources */,
 				9EAA8C0D23292401002E9260 /* ResetForces.swift in Sources */,
+				9E49303B2386A7C400864046 /* PerlinNoise.metal in Sources */,
 				9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */,
 				9EAA8C1423292430002E9260 /* PhysicsField.swift in Sources */,
 				9EAA8C1023292411002E9260 /* UpdateJoints.swift in Sources */,
@@ -892,6 +899,7 @@
 				9E075112237B005000A8107B /* UpdateRigidBodies.swift in Sources */,
 				9EF46F1F2362439000AEC82F /* ResetForces.metal in Sources */,
 				9EF46F25236243A000AEC82F /* UpdateRigidBodies.metal in Sources */,
+				9E49303C2386A91900864046 /* PerlinNoise.metal in Sources */,
 				9E40A0DA2362519100C8D39C /* AppDelegate.swift in Sources */,
 				9EF46F192362422E00AEC82F /* CompositeBody.swift in Sources */,
 				9EAA0D35237C931600FC9B81 /* MetalSimulator.swift in Sources */,
