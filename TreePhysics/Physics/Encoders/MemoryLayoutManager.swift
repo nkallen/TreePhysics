@@ -247,7 +247,7 @@ public final class MemoryLayoutManager {
 
         init(device: MTLDevice, fields: [PhysicsField]) {
             self.device = device
-            self.count = 1
+            self.count = fields.count
 
             let physicsFieldBuffer = device.makeBuffer(length: count * MemoryLayout<ShaderTypes.PhysicsField>.stride, options: [.storageModeShared])!
 
