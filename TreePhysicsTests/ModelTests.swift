@@ -18,7 +18,7 @@ class ModelTests: XCTestCase {
     func test2DCaseIsSameAsPlanar3DCase() {
         let root = ArticulatedRigidBody.static()
         let rigidBody = Tree.internode(length: 1, radius: 1, density: 1)
-        let parentJoint = root.add(rigidBody, rotation: .identity, position: .zero)
+        let parentJoint = root.add(rigidBody, orientation: .identity, position: .zero)
 
         // 1. The 2D setup:
         let momentOfInertia_jointSpace = rigidBody.momentOfInertia! + rigidBody.mass * sqr(distance(rigidBody.centerOfMass, parentJoint.position))
@@ -58,6 +58,11 @@ class ModelTests: XCTestCase {
         XCTAssertEqual(.zero, θ.transpose[0])
         XCTAssertEqual(.zero, θ.transpose[1])
         XCTAssertEqual(expectedZ, θ.transpose[2], accuracy: 0.0001)
+    }
+
+    func testFoo() {
+        print(evaluateDifferential(a: 1, b: -7660.101, c: -382923.25, g: 0, y_0: 0, y_ddt_0: 0, at: 0.017))
+
     }
 }
 

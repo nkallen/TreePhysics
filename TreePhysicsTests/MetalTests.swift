@@ -73,19 +73,19 @@ class UpdateCompositeBodiesTests: XCTestCase {
         let root = ArticulatedRigidBody.static()
         b0 = Tree.internode(length: 1, radius: 1)
         b1 = Tree.internode(length: 1, radius: 1)
-        let b0joint = root.add(b0, rotation: .identity, position: .zero)
+        let b0joint = root.add(b0, orientation: .identity, position: .zero)
         b0joint.stiffness = 1
         b0joint.torqueThreshold = .infinity
         b0joint.damping = 1
 
-        let b1Joint = b0.add(b1, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
+        let b1Joint = b0.add(b1, orientation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
         b1Joint.stiffness = 1
         b1Joint.torqueThreshold = .infinity
         b1Joint.damping = 1
 
         b1.apply(force: force)
 
-        self.mem = MemoryLayoutManager(device: device, root: root)
+        self.mem = MemoryLayoutManager(device: device, root: root, fields: [])
         self.updateCompositeBodies = UpdateCompositeBodies(device: device, memoryLayoutManager: mem)
         self.updateJoints = UpdateJoints(device: device, memoryLayoutManager: mem)
         self.updateRigidBodies = UpdateRigidBodies(device: device, memoryLayoutManager: mem)
@@ -196,13 +196,13 @@ class UpdateCompositeBodiesTests: XCTestCase {
                 let torque = cross(self.b1.centerOfMass - self.b0.pivot, self.force)
                 let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
-                let rotation = simd_quatf(angle: θ[0], axis: .z)
+                let orientation = simd_quatf(angle: θ[0], axis: .z)
                 XCTAssertEqual(
-                    self.b0.pivot + rotation.act(simd_float3(0, 0.5, 0)),
+                    self.b0.pivot + orientation.act(simd_float3(0, 0.5, 0)),
                     self.b0.centerOfMass, accuracy: 0.0001)
                 XCTAssertEqual(
-                    rotation,
-                    self.mem.rigidBodies[self.b0].rotation, accuracy: 0.0001)
+                    orientation,
+                    self.mem.rigidBodies[self.b0].orientation, accuracy: 0.0001)
             }
 
             do {
@@ -212,13 +212,13 @@ class UpdateCompositeBodiesTests: XCTestCase {
                     self.b1.mass * sqr(distance(self.b1.centerOfMass, self.b1.pivot))
                 let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: self.b1.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
-                let rotation = simd_quatf(angle: θ[0], axis: .z)
+                let orientation = simd_quatf(angle: θ[0], axis: .z)
                 XCTAssertEqual(
-                    self.b1.pivot + (joint.rotation * rotation).normalized.act(simd_float3(0, 0.5, 0)),
+                    self.b1.pivot + (joint.orientation * orientation).normalized.act(simd_float3(0, 0.5, 0)),
                     self.b1.centerOfMass, accuracy: 0.0001)
                 XCTAssertEqual(
-                    (joint.rotation * rotation).normalized,
-                    self.mem.rigidBodies[self.b1].rotation, accuracy: 0.001)
+                    (joint.orientation * orientation).normalized,
+                    self.mem.rigidBodies[self.b1].orientation, accuracy: 0.001)
             }
 
             expect.fulfill()

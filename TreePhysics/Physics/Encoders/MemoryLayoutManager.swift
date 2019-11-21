@@ -391,9 +391,9 @@ extension MemoryLayoutManager.Joints {
             torque: simd_float3(torque[id]),
             inertiaTensor: float3x3(inertiaTensor[id]),
             theta: simd_float3x3(
-                simd_float3(theta[count*0+id]),
-                simd_float3(theta[count*1+id]),
-                simd_float3(theta[count*2+id])))
+                simd_float3(theta[id*3+0]),
+                simd_float3(theta[id*3+1]),
+                simd_float3(theta[id*3+2])))
     }
 
     var theta: UnsafeMutablePointer<packed_half3> {

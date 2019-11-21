@@ -20,7 +20,7 @@ class SimpleCPUSimulatorTests: XCTestCase {
 
         let root = ArticulatedRigidBody.static()
         b0 = Tree.internode(length: 1, radius: 1)
-        joint = root.add(b0, rotation: .identity, position: .zero)
+        joint = root.add(b0, orientation: .identity, position: .zero)
         joint.stiffness = 1
         joint.torqueThreshold = .infinity
         joint.damping = 1
@@ -30,7 +30,7 @@ class SimpleCPUSimulatorTests: XCTestCase {
         world.add(rigidBody: root)
 
         b0.apply(force: force)
-        self.forceAppliedPosition = b0.pivot + b0.rotation.act(simd_float3(0, 1/2, 0))
+        self.forceAppliedPosition = b0.pivot + b0.orientation.act(simd_float3(0, 1/2, 0))
     }
 
     func testPreconditions() {
@@ -40,7 +40,7 @@ class SimpleCPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b0.force, force)
         XCTAssertEqual(b0.torque, cross(forceAppliedPosition, force))
         XCTAssertEqual(b0.torque, cross(forceAppliedPosition - b0.pivot, force), accuracy: 0.0001)
-        XCTAssertEqual(float3x3(b0.rotation.normalized) * b0.inertiaTensor * float3x3(b0.rotation.normalized).transpose,
+        XCTAssertEqual(float3x3(b0.orientation.normalized) * b0.inertiaTensor * float3x3(b0.orientation.normalized).transpose,
                        float3x3(diagonal: simd_float3(
                         1.0/4 + 1.0/12,
                         1.0/2,
@@ -88,18 +88,18 @@ class SimpleCPUSimulatorTests: XCTestCase {
             b0.composite.mass * sqr(distance(b0.composite.centerOfMass, joint.position))
         let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b0.composite.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
-        let rotation = simd_quatf(angle: θ[0], axis: .z)
+        let orientation = simd_quatf(angle: θ[0], axis: .z)
         XCTAssertEqual(
-            rotation.act(simd_float3(0, 0.5, 0)),
+            orientation.act(simd_float3(0, 0.5, 0)),
             b0.centerOfMass, accuracy: 0.0001)
         XCTAssertEqual(
-            rotation,
-            b0.rotation, accuracy: 0.0001)
+            orientation,
+            b0.orientation, accuracy: 0.0001)
     }
 }
 
 /*
- The second simplest test: One vertical node with a child at rotation -π/4 and a force applied in the x direction.
+ The second simplest test: One vertical node with a child at orientation -π/4 and a force applied in the x direction.
  */
 class CPUSimulatorTests: XCTestCase {
     var simulator: CPUSimulator!
@@ -115,12 +115,12 @@ class CPUSimulatorTests: XCTestCase {
         let root = ArticulatedRigidBody.static()
         b0 = Tree.internode(length: 1, radius: 1)
         b1 = Tree.internode(length: 1, radius: 1)
-        let b0joint = root.add(b0, rotation: .identity, position: .zero)
+        let b0joint = root.add(b0, orientation: .identity, position: .zero)
         b0joint.stiffness = 1
         b0joint.torqueThreshold = .infinity
         b0joint.damping = 1
 
-        let b1Joint = b0.add(b1, rotation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
+        let b1Joint = b0.add(b1, orientation: simd_quatf(angle: -.pi/4, axis: .z), position: simd_float3(0,1,0))
         b1Joint.stiffness = 1
         b1Joint.torqueThreshold = .infinity
         b1Joint.damping = 1
@@ -130,7 +130,7 @@ class CPUSimulatorTests: XCTestCase {
         world.add(rigidBody: root)
 
         b1.apply(force: force)
-        self.forceAppliedPosition = b1.rotation.act(simd_float3(0, 1/2, 0))
+        self.forceAppliedPosition = b1.orientation.act(simd_float3(0, 1/2, 0))
     }
 
     func testPreconditions() {
@@ -139,7 +139,7 @@ class CPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b0.mass, 1)
         XCTAssertEqual(b0.force, .zero)
         XCTAssertEqual(b0.torque, .zero)
-        XCTAssertEqual(float3x3(b0.rotation).transpose * b0.inertiaTensor * float3x3(b0.rotation),
+        XCTAssertEqual(float3x3(b0.orientation).transpose * b0.inertiaTensor * float3x3(b0.orientation),
                        float3x3(diagonal: simd_float3(
                         1.0/4 + 1.0/12,
                         1.0/2,
@@ -150,11 +150,11 @@ class CPUSimulatorTests: XCTestCase {
         XCTAssertEqual(b0.parentJoint!.damping, 1)
 
         XCTAssertEqual(b1.pivot, simd_float3(0,1,0))
-        XCTAssertEqual(b1.centerOfMass, b1.pivot + b1.rotation.act(simd_float3(0,1/2,0)), accuracy: 0.0001)
+        XCTAssertEqual(b1.centerOfMass, b1.pivot + b1.orientation.act(simd_float3(0,1/2,0)), accuracy: 0.0001)
         XCTAssertEqual(b1.mass, 1)
         XCTAssertEqual(b1.force, force)
         XCTAssertEqual(b1.torque, cross(forceAppliedPosition, force))
-        XCTAssertEqual(float3x3(b1.rotation).transpose * b1.inertiaTensor * float3x3(b1.rotation),
+        XCTAssertEqual(float3x3(b1.orientation).transpose * b1.inertiaTensor * float3x3(b1.orientation),
                        float3x3(diagonal: simd_float3(
                         1.0/4 + 1.0/12,
                         1.0/2,
@@ -244,13 +244,13 @@ class CPUSimulatorTests: XCTestCase {
             let torque = cross(b1.centerOfMass - b0.pivot, force)
             let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
-            let rotation = simd_quatf(angle: θ[0], axis: .z)
+            let orientation = simd_quatf(angle: θ[0], axis: .z)
             XCTAssertEqual(
-                b0.pivot + rotation.act(simd_float3(0, 0.5, 0)),
+                b0.pivot + orientation.act(simd_float3(0, 0.5, 0)),
                 b0.centerOfMass, accuracy: 0.0001)
             XCTAssertEqual(
-                rotation,
-                b0.rotation, accuracy: 0.0001)
+                orientation,
+                b0.orientation, accuracy: 0.0001)
         }
 
         do {
@@ -260,13 +260,13 @@ class CPUSimulatorTests: XCTestCase {
                 b1.mass * sqr(distance(b1.centerOfMass, b1.pivot))
             let θ = evaluateDifferential(a: compositeInertiaRelativeToJoint, b: joint.damping * joint.stiffness, c: joint.stiffness, g: b1.torque.z, y_0: 0, y_ddt_0: 0, at: Float(delta))
 
-            let rotation = simd_quatf(angle: θ[0], axis: .z)
+            let orientation = simd_quatf(angle: θ[0], axis: .z)
             XCTAssertEqual(
-                b1.pivot + (joint.rotation * rotation).normalized.act(simd_float3(0, 0.5, 0)),
+                b1.pivot + (joint.orientation * orientation).normalized.act(simd_float3(0, 0.5, 0)),
                 b1.centerOfMass, accuracy: 0.0001)
             XCTAssertEqual(
-                (joint.rotation * rotation).normalized,
-                b1.rotation, accuracy: 0.0001)
+                (joint.orientation * orientation).normalized,
+                b1.orientation, accuracy: 0.0001)
         }
     }
 

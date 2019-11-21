@@ -29,11 +29,3 @@ public final class AttractorField: PhysicsField {
         return nil
     }
 }
-
-extension AttractorField: PhysicsFieldStructConvertible {
-    public var `struct`: PhysicsFieldStruct {
-        return PhysicsFieldStruct(
-            position: position,
-            halfExtent: halfExtent)
-    }
-}

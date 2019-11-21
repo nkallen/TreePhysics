@@ -29,7 +29,7 @@ class GameViewController: NSViewController {
 
         self.device = SharedBuffersMTLDevice(MTLCreateSystemDefaultDevice()!)
 
-        self.mem = MemoryLayoutManager(device: device, root: root)
+        self.mem = MemoryLayoutManager(device: device, root: root, fields: [])
         print("Total nodes:", mem.rigidBodies.count)
 
         scnView.delegate = self

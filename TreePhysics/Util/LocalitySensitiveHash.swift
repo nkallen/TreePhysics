@@ -37,7 +37,7 @@ final class LocalitySensitiveHash<T> where T: HasPosition, T: Hashable {
         for i in -1...1 {
             for j in -1...1 {
                 for k in -1...1 {
-                    let offset = simd_int3(i, j, k)
+                    let offset = simd_int3(Int32(i), Int32(j), Int32(k))
                     if let set = storage[key &+ offset] {
                         result.append(set)
                     }

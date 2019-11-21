@@ -22,11 +22,11 @@ class GameViewController: UIViewController {
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
 
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 5)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
         let configuration = InterpreterConfig(
-            randomScale: 0.4,
+//            randomScale: 0.4,
             angle: 18 * .pi / 180,
-            thickness: 0.002*0.002*Float.pi,
+            thickness: 0.02*0.02*Float.pi,
             thicknessScale: 0.7,
             stepSize: 0.3,
             stepSizeScale: 0.9)
@@ -38,7 +38,7 @@ class GameViewController: UIViewController {
         let gravity = GravityField(simd_float3(0,-10,0))
         let wind = WindField()
         self.world = PhysicsWorld()
-        world.add(field: gravity)
+        world.add(field: wind)
         self.world.add(rigidBody: root)
         self.mem = MemoryLayoutManager(device: device, root: root, fields: [wind])
         self.simulator = MetalSimulator(device: device, mem: mem)
@@ -87,7 +87,7 @@ extension GameViewController: SCNSceneRendererDelegate {
 //        check()
 //        cpuSimulator.update(at: 1.0/60)
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.sync {
             for rigidBody in self.world.rigidBodiesUnordered {
                 let id = self.mem.rigidBodies.index[rigidBody]!
                 rigidBody.node.simdPosition = simd_float3(self.mem.rigidBodies.centerOfMass[id])
@@ -115,13 +115,15 @@ extension GameViewController {
             }
 
 
-//            trace(id)
+            trace(id)
 //            for (i, r) in world.rigidBodiesLevelOrder.enumerated() {
 //                print(i, r.composite.inertiaTensor)
 //                print(i, float3x3(mem.joints.inertiaTensor[i]))
 //            }
 //            fatalError()
-            captureManager.stopCapture()
+            DispatchQueue.main.sync {
+                captureManager.stopCapture()
+            }
         })
     }
 

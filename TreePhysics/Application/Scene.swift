@@ -1,6 +1,5 @@
 import Foundation
 import SceneKit
-import ShaderTypes
 import TreePhysics
 
 class Scene: NSObject {
@@ -58,7 +57,7 @@ class Scene: NSObject {
         let world = PhysicsWorld()
         self.cpuSimulator = CPUSimulator(world: world)
         world.add(rigidBody: root)
-        let mem = MemoryLayoutManager(device: device, root: root)
+        let mem = MemoryLayoutManager(device: device, root: root, fields: [])
         
         scene.rootNode.addChildNode(skinningPen.node())
         scene.rootNode.addChildNode(skinningPen.skeleton)
@@ -110,8 +109,8 @@ extension Scene: SCNSceneRendererDelegate {
         commandBuffer.addCompletedHandler { [unowned self] _ in
             let metalSimulator = self.metalSimulator
             DispatchQueue.main.async {
-                scene.rootNode.addChildNode(skinningPen.node())
-                scene.rootNode.addChildNode(skinningPen.skeleton)
+//                scene.rootNode.addChildNode(skinningPen.node())
+//                scene.rootNode.addChildNode(skinningPen.skeleton)
 
 //                let rigidBodies = UnsafeMutableRawPointer(metalSimulator.rigidBodiesBuffer.contents()).bindMemory(to: RigidBodyStruct.self, capacity: metalSimulator.rigidBodies.count)
 //

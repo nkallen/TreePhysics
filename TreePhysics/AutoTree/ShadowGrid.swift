@@ -39,7 +39,7 @@ extension AutoTree {
                     while p <= q {
                         var s = -q
                         while s <= q {
-                            let offset = simd_int3(p,-q,s)
+                            let offset = SIMD3<Int>(p,-q,s)
                             let decayedDelta = delta * pow(config.shadowDecayFactor, Float(q))
                             let k = key &+ offset
                             storage[k.x*size*size + k.y*size + k.z] += decayedDelta
@@ -52,8 +52,9 @@ extension AutoTree {
             }
         }
 
-        private func key(for position: simd_float3) -> simd_int3 {
-            let cell = simd_int3(floor(position / config.internodeLength)) &+ size / 2
+        private func key(for position: simd_float3) -> SIMD3<Int> {
+            var cell = SIMD3<Int>(floor(position / config.internodeLength))
+            cell = cell &+ size / 2
             return cell
         }
 

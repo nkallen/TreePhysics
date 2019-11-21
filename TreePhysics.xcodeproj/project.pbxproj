@@ -1100,6 +1100,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MTL_FAST_MATH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1124,6 +1125,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

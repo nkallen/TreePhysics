@@ -15,9 +15,9 @@ struct UpdateJointsIn {
 
 inline float3x3
 update(
-       uint id,
-       UpdateJointsIn in,
-       float time)
+       const uint id,
+       const UpdateJointsIn in,
+       const float time)
 {
     float3x3 inertiaTensor_jointSpace = float3x3_from_inertiaTensor(in.inertiaTensor[id]);
     float3 torque_jointSpace = (float3)in.torque[id];
@@ -90,7 +90,7 @@ updateJoints(
         .torque = joint_torque,
         .inertiaTensor = joint_inertiaTensor,
     };
-    float3x3 theta = gid == 0 ? float3x3(0) : update(gid, in, time);
+    const float3x3 theta = gid == 0 ? float3x3(0) : update(gid, in, time);
     joint_theta[gid*3+0] = (packed_half3)theta[0];
     joint_theta[gid*3+1] = (packed_half3)theta[1];
     joint_theta[gid*3+2] = (packed_half3)theta[2];
