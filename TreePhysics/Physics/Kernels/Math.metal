@@ -432,6 +432,10 @@ inline float3 quat_heading(quatf q) {
     return quat_act(q, float3(0,1,0));
 }
 
+inline float3 quat_up(quatf q) {
+    return quat_act(q, float3(0,0,1));
+}
+
 inline float3x3 float3x3_from_quat(quatf q) {
     float xx = q.x * q.x;
     float xy = q.x * q.y;

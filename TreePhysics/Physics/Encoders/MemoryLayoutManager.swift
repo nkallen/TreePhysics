@@ -13,8 +13,9 @@ public final class MemoryLayoutManager {
         let ranges: [Range<Int>]
         let maxClimberCount: Int
         let maxChildCount: Int
+        let maxRangeWidth: Int
         let count: Int
-        let childCountBuffer, childIndexBuffer, parentIdBuffer, climberCountBuffer, massBuffer, pivotBuffer, localPivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, orientationBuffer, inertiaTensorBuffer, localInertiaTensorBuffer, jointDampingBuffer, jointStiffnessBuffer, localJointPositionBuffer, localJointOrientationBuffer, jointOrientationBuffer, velocityBuffer, angularVelocityBuffer, accelerationBuffer, angularAccelerationBuffer, areaBuffer: MTLBuffer
+        let childCountBuffer, childIndexBuffer, parentIdBuffer, climberCountBuffer, massBuffer, pivotBuffer, localPivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, orientationBuffer, inertiaTensorBuffer, localInertiaTensorBuffer, jointDampingBuffer, jointStiffnessBuffer, localJointPositionBuffer, localJointOrientationBuffer, jointOrientationBuffer, velocityBuffer, angularVelocityBuffer, accelerationBuffer, angularAccelerationBuffer, areaBuffer, shapeBuffer: MTLBuffer
 
         init(device: MTLDevice, root: ArticulatedRigidBody) {
             var ranges: [Range<Int>] = []
@@ -26,6 +27,7 @@ public final class MemoryLayoutManager {
             // Step 1: Determine the buffer memory layout (i.e., the index and the ranges of work)
             var maxClimberCount = 0
             var maxChildCount = 0
+            var maxRangeWidth = 0
             for level in levels {
                 for unitOfWork in level {
                     index[unitOfWork.rigidBody] = id
@@ -36,11 +38,13 @@ public final class MemoryLayoutManager {
 
                 let range = offset..<(offset+level.count)
                 ranges.append(range)
+                maxRangeWidth = max(maxRangeWidth, level.count)
                 offset += level.count
             }
             self.ranges = ranges
             self.maxClimberCount = maxClimberCount
             self.maxChildCount = maxChildCount
+            self.maxRangeWidth = maxRangeWidth
 
             for level in levels {
                 for unitOfWork in level {
@@ -78,6 +82,7 @@ public final class MemoryLayoutManager {
             let accelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             let angularAccelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             let areaBuffer = device.makeBuffer(length: count * MemoryLayout<half>.stride, options: [.storageModeShared])!
+            let shapeBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
 
             let childCount = childCountBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
             let childIndex = childIndexBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
@@ -102,6 +107,7 @@ public final class MemoryLayoutManager {
             let acceleration = accelerationBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let angularAcceleration = angularAccelerationBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let area = areaBuffer.contents().bindMemory(to: half.self, capacity: count)
+            let shape = shapeBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
 
             // Step 3: Store data into the buffer
             func store(childIndex cid: Int, parentId pid: Int, rigidBody: ArticulatedRigidBody, climbers: [ArticulatedRigidBody]) {
@@ -126,8 +132,10 @@ public final class MemoryLayoutManager {
                     localInertiaTensor[id] = packed_float3(rigidBody.localInertiaTensor.diagonal)
                     switch rigidBody.shape {
                     case let .internode(area: a, length: _, radius: _):
+                        shape[id] = ShapeType.internode.rawValue
                         area[id] = Half(a)
                     case let .leaf(area: a):
+                        shape[id] = ShapeType.leaf.rawValue
                         area[id] = Half(a)
                     case nil: ()
                     }
@@ -171,6 +179,7 @@ public final class MemoryLayoutManager {
             self.accelerationBuffer = device.makeBuffer(length: accelerationBuffer.length, options: [.storageModeShared])!
             self.angularAccelerationBuffer = device.makeBuffer(length: angularAccelerationBuffer.length, options: [.storageModeShared])!
             self.areaBuffer = device.makeBuffer(length: areaBuffer.length, options: [.storageModeShared])!
+            self.shapeBuffer = device.makeBuffer(length: shapeBuffer.length, options: [.storageModeShared])!
 
             // Step 5: Blit (copy) from the shared to private buffers
             let commandQueue = device.makeCommandQueue()!
@@ -200,6 +209,7 @@ public final class MemoryLayoutManager {
             blitCommandEncoder.copy(from: accelerationBuffer, sourceOffset: 0, to: self.accelerationBuffer, destinationOffset: 0, size: accelerationBuffer.length)
             blitCommandEncoder.copy(from: angularAccelerationBuffer, sourceOffset: 0, to: self.angularAccelerationBuffer, destinationOffset: 0, size: angularAccelerationBuffer.length)
             blitCommandEncoder.copy(from: areaBuffer, sourceOffset: 0, to: self.areaBuffer, destinationOffset: 0, size: areaBuffer.length)
+            blitCommandEncoder.copy(from: shapeBuffer, sourceOffset: 0, to: self.shapeBuffer, destinationOffset: 0, size: shapeBuffer.length)
 
             blitCommandEncoder.endEncoding()
             commandBuffer.commit()

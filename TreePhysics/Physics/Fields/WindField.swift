@@ -5,7 +5,7 @@ import ShaderTypes
 public final class WindField: PhysicsField {
     let windVelocity: simd_float3
     public var airResistanceMultiplier: Float = 4
-    public var phi: Float = .pi/8
+    public var phi: Float = 0.5
     let leafScale: Float = 1
     let airDensity: Float = 0.1
     let normal2tangentialDragCoefficientRatio: Float = 100
@@ -51,7 +51,7 @@ public final class WindField: PhysicsField {
 
             let windVelocity = self.windVelocity(for: rigidBody, at: time)
             let relativeVelocity: simd_float3 = windVelocity - rigidBody.velocity
-            let k: Float = leafScale * airDensity * area / 2 * sqrt(area / .pi) * dot(relativeVelocity, normal)
+            let k: Float = leafScale * airDensity * (area / 2) * sqrt(area / .pi) * dot(relativeVelocity, normal)
             var torque: simd_float3 = k * cross(normal, relativeVelocity * cos(phi) + cross(normal, relativeVelocity * sin(phi)))
             torque -= airResistanceMultiplier * rigidBody.inertiaTensor * rigidBody.angularVelocity
 

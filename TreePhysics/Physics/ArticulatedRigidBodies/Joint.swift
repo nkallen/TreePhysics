@@ -34,9 +34,9 @@ public final class Joint {
         // FIXME
         switch child.shape {
         case .leaf:
-            self.stiffness = 0.1
+            self.stiffness = 0.2
             self.torqueThreshold = 0.30
-            self.damping = Tree.β
+            self.damping = Tree.β * 2
         case .internode, nil:
             self.stiffness = Tree.K
             self.torqueThreshold = Float.infinity

@@ -24,12 +24,10 @@ public final class UpdateRigidBodies: MetalKernelEncoder {
         commandEncoder.label  = "Update Rigid Bodies"
         argumentEncoder.encode(commandEncoder: commandEncoder)
 
-        let maxWidth = argumentEncoder.mem.rigidBodies.ranges.last!.count
-
         let threadGroupWidth = computePipelineState.maxTotalThreadsPerThreadgroup
         let threadsPerThreadgroup = MTLSizeMake(threadGroupWidth, 1, 1)
         let threadsPerGrid = MTLSize(
-            width: maxWidth,
+            width: argumentEncoder.mem.rigidBodies.maxRangeWidth,
             height: 1,
             depth: 1)
 

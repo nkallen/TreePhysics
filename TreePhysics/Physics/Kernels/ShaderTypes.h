@@ -47,6 +47,12 @@ typedef NS_ENUM(NSInteger, PhysicsFieldType)
     PhysicsFieldTypeWind = 1,
 };
 
+typedef NS_ENUM(uint8_t, ShapeType)
+{
+    ShapeTypeInternode = 0,
+    ShapeTypeLeaf = 1,
+};
+
 typedef struct {
     packed_half3 g;
 } GravityField;

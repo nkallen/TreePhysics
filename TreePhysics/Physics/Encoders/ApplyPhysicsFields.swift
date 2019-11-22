@@ -52,9 +52,11 @@ extension ApplyPhysicsFields {
 
                 mem.rigidBodies.massBuffer,
                 mem.rigidBodies.centerOfMassBuffer,
+                mem.rigidBodies.localPivotBuffer,
                 mem.rigidBodies.orientationBuffer,
                 mem.rigidBodies.velocityBuffer,
                 mem.rigidBodies.areaBuffer,
+                mem.rigidBodies.shapeBuffer,
 
                 mem.rigidBodies.forceBuffer,
                 mem.rigidBodies.torqueBuffer,
