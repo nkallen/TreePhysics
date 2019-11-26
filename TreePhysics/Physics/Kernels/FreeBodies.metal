@@ -5,7 +5,9 @@ using namespace metal;
 
 struct arguments {
     command_buffer        cmd_buffer;
+    device uint           *toBeFreedIndex;
     device uint           *freeIndex;
+    device atomic_uint    &freeBodyCount;
     device ushort         *firstChildId;
     device uint           *parentId;
     device uchar          *childIndex;
@@ -15,12 +17,12 @@ struct arguments {
 kernel void
 encodeFreeBodies(
                  device arguments      &args,
-                 device uint           &freeBodyCount,
+                 device uint           &toBeFreedCount,
                  uint gid [[ thread_position_in_grid ]])
 {
     compute_command cmd(args.cmd_buffer, gid);
-    cmd.concurrent_dispatch_threads(uint3(freeBodyCount, 1, 1), uint3(1024, 1, 1));
-    freeBodyCount = 0;
+    cmd.concurrent_dispatch_threads(uint3(toBeFreedCount, 1, 1), uint3(1024, 1, 1));
+    toBeFreedCount = 0;
 }
 
 
@@ -29,9 +31,12 @@ freeBodies(
            device arguments      &args,
            uint gid [[ thread_position_in_grid ]])
 {
-    const uint id = args.freeIndex[gid];
+    const uint id = args.toBeFreedIndex[gid];
     const uint parentId = args.parentId[id];
     const uchar childIndex = args.childIndex[id];
+
+    uint freeBodyId = atomic_fetch_add_explicit(&args.freeBodyCount, 1, memory_order_relaxed);
+    args.freeIndex[freeBodyId] = id;
 
     const uint firstChildId = id - childIndex;
     const uint lastChildId = firstChildId + parentId;

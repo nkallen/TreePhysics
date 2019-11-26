@@ -72,7 +72,9 @@ extension FreeBodies {
             argumentEncoder.setIndirectCommandBuffer(icb, index: 0)
 
             let bufs = [
+                mem.freeBodies.toBeFreedIndexBuffer,
                 mem.freeBodies.indexBuffer,
+                mem.freeBodies.countBuffer,
                 mem.rigidBodies.firstChildIdBuffer,
                 mem.rigidBodies.parentIdBuffer,
                 mem.rigidBodies.childIndexBuffer,
@@ -80,7 +82,7 @@ extension FreeBodies {
             ]
             argumentEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 1..<bufs.count+1)
             commandEncoder.setBuffer(buffer, offset: 0, index: 0)
-            commandEncoder.setBuffer(mem.freeBodies.countBuffer, offset: 0, index: 1)
+            commandEncoder.setBuffer(mem.freeBodies.toBeFreedCountBuffer, offset: 0, index: 1)
             commandEncoder.useResource(icb, usage: .read)
             commandEncoder.useResources(bufs, usage: .write)
         }

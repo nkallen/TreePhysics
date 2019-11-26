@@ -95,7 +95,7 @@ updateCompositeBodies(
                       device packed_half3   *free_torque,
                       device InertiaTensor  *free_inertiaTensor,
 
-                      device atomic_uint    &free_bodyCount,
+                      device atomic_uint    &toBeFreedCount,
 
                       constant uint         &upperBound,
                       constant ushort       *deltas,
@@ -196,7 +196,7 @@ updateCompositeBodies(
                 children.centerOfMass[oid] = (half3)totalCenterOfMass;
 
                 if (length_squared(totalTorque) > sqr(5)) {
-                    uint freeBodyId = atomic_fetch_add_explicit(&free_bodyCount, 1, memory_order_relaxed);
+                    uint freeBodyId = atomic_fetch_add_explicit(&toBeFreedCount, 1, memory_order_relaxed);
                     free.index[freeBodyId] = id;
                 }
             } else {

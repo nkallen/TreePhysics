@@ -68,12 +68,12 @@ extension UpdateCompositeBodies {
                 mem.joints.torqueBuffer,
                 mem.joints.inertiaTensorBuffer,
 
-                mem.freeBodies.indexBuffer,
+                mem.freeBodies.toBeFreedIndexBuffer,
                 mem.freeBodies.massBuffer,
                 mem.freeBodies.forceBuffer,
                 mem.freeBodies.torqueBuffer,
                 mem.freeBodies.inertiaTensorBuffer,
-                mem.freeBodies.countBuffer,
+                mem.freeBodies.toBeFreedCountBuffer,
             ]
             commandEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 0..<bufs.count)
 

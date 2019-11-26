@@ -256,10 +256,12 @@ public final class MemoryLayoutManager {
     }
 
     final class FreeBodies {
-        let countBuffer, indexBuffer, massBuffer, forceBuffer, torqueBuffer, inertiaTensorBuffer: MTLBuffer
+        let toBeFreedCountBuffer, countBuffer, toBeFreedIndexBuffer, indexBuffer, massBuffer, forceBuffer, torqueBuffer, inertiaTensorBuffer: MTLBuffer
 
         init(device: MTLDevice, count: Int) {
+            self.toBeFreedCountBuffer = device.makeBuffer(length: 1 * MemoryLayout<UInt32>.stride, options: [.storageModeShared])!
             self.countBuffer = device.makeBuffer(length: 1 * MemoryLayout<UInt32>.stride, options: [.storageModeShared])!
+            self.toBeFreedIndexBuffer = device.makeBuffer(length: count * MemoryLayout<UInt32>.stride, options: [.storageModeShared])!
             self.indexBuffer = device.makeBuffer(length: count * MemoryLayout<UInt32>.stride, options: [.storageModeShared])!
             self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
             self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
