@@ -19,8 +19,7 @@ typedef struct {
 typedef struct {
     device uchar *childCount;
     device uchar *childIndex;
-    device ushort *parentId;
-    device uchar *climberCount;
+    device uint *parentId;
 
     device half *mass;
     device packed_half3 *force;
@@ -30,6 +29,14 @@ typedef struct {
     device InertiaTensor *inertiaTensor;
     device quath *rotation;
 } Bodies;
+
+typedef struct {
+    device uint *index;
+    device half *mass;
+    device packed_half3 *force;
+    device packed_half3 *torque;
+    device InertiaTensor *inertiaTensor;
+} Free;
 
 typedef struct {
     device InertiaTensor *inertiaTensor;
@@ -62,8 +69,7 @@ kernel void
 updateCompositeBodies(
                       device uchar          *in_childCount,
                       device uchar          *in_childIndex,
-                      device ushort         *in_parentId,
-                      device uchar          *in_climberCount,
+                      device uint           *in_parentId,
                       device half           *in_mass,
                       device packed_half3   *in_pivot,
                       device packed_half3   *in_force,
@@ -78,16 +84,23 @@ updateCompositeBodies(
                       device packed_half3   *child_torque,
                       device packed_half3   *child_pivot,
                       device packed_half3   *child_centerOfMass,
-                      device InertiaTensor *child_inertiaTensor,
+                      device InertiaTensor  *child_inertiaTensor,
                       
-                      device packed_half3 *out_torque,
-                      device InertiaTensor *out_inertiaTensor,
+                      device packed_half3   *out_torque,
+                      device InertiaTensor  *out_inertiaTensor,
 
-                      constant uint & upperBound,
-                      constant ushort * deltas,
+                      device uint           *free_index,
+                      device half           *free_mass,
+                      device packed_half3   *free_force,
+                      device packed_half3   *free_torque,
+                      device InertiaTensor  *free_inertiaTensor,
 
-                      uint gid [[ thread_position_in_grid ]],
-                      uint size [[ threads_per_grid ]])
+                      device atomic_uint    &free_bodyCount,
+
+                      constant uint         &upperBound,
+                      constant ushort       *deltas,
+
+                      uint gid [[ thread_position_in_grid ]])
 {
     Children children = {
         .mass = child_mass,
@@ -102,7 +115,6 @@ updateCompositeBodies(
         .childCount = in_childCount,
         .childIndex = in_childIndex,
         .parentId = in_parentId,
-        .climberCount = in_climberCount,
         .mass = in_mass,
         .pivot = in_pivot,
         .force = in_force,
@@ -111,6 +123,14 @@ updateCompositeBodies(
         .rotation = in_rotation,
         .inertiaTensor = in_inertiaTensor,
     };
+
+    Free free = {
+        .index = free_index,
+        .mass = free_mass,
+        .force = free_force,
+        .torque = free_torque,
+        .inertiaTensor = free_inertiaTensor,
+    };
     
     Out out = {
         .inertiaTensor = out_inertiaTensor,
@@ -118,15 +138,15 @@ updateCompositeBodies(
     };
     
     uint previousLowerBound = upperBound;
-    for (ushort i = 0; i < rangeCount - 1; i++) {
+    for (ushort i = 0; i < rangeCount; i++) {
         ushort delta = deltas[i];
         const uint lowerBound = previousLowerBound - delta;
 
         if (gid < delta) {
             const int id = lowerBound + gid;
-            const uchar childCount = bodies.childCount[id];
+            uchar childCount = bodies.childCount[id];
             const uchar childIndex = bodies.childIndex[id];
-            const ushort parentId  = bodies.parentId[id];
+            uint parentId  = bodies.parentId[id];
             
             const float parentMass          = (float)bodies.mass[id];
             const float3 parentForce        = (float3)bodies.force[id];
@@ -134,10 +154,10 @@ updateCompositeBodies(
             const float3 parentCenterOfMass = (float3)bodies.centerOfMass[id];
             const float3 parentPivot        = (float3)bodies.pivot[id];
             
-            float totalMass          = parentMass;
-            float3 totalForce        = parentForce;
-            float3 totalTorque       = parentTorque;
-            float3 totalCenterOfMass = parentCenterOfMass;
+            float totalMass                 = parentMass;
+            float3 totalForce               = parentForce;
+            float3 totalTorque              = parentTorque;
+            float3 totalCenterOfMass        = parentCenterOfMass;
 
             float3x3 totalInertiaTensor = float3x3_from_inertiaTensor(bodies.inertiaTensor[id]);
 
@@ -147,6 +167,7 @@ updateCompositeBodies(
 
                 const float childMass = (float)children.mass[childId];
                 const float3 childForce = (float3)children.force[childId];
+                const float3 childTorque = (float3)children.torque[childId];
                 const float3 childCenterOfMass = (float3)children.centerOfMass[childId];
                 float3x3 childInertiaTensor = float3x3_from_inertiaTensor(children.inertiaTensor[childId]);
 
@@ -154,24 +175,36 @@ updateCompositeBodies(
                 const float3 previousCenterOfMass = totalCenterOfMass;
 
                 totalForce += childForce;
-                totalTorque += cross((float3)children.pivot[childId] - parentPivot, childForce) + (float3)children.torque[childId];
+                totalTorque += cross((float3)children.pivot[childId] - parentPivot, childForce) + childTorque;
                 totalMass += childMass;
                 totalCenterOfMass = (prevTotalMass * previousCenterOfMass + childMass * childCenterOfMass) / totalMass;
                 totalInertiaTensor -= prevTotalMass * sqr(skew(previousCenterOfMass - totalCenterOfMass));
                 totalInertiaTensor += childInertiaTensor - childMass * sqr(skew(childCenterOfMass - totalCenterOfMass));
             }
-            
+
             jointSpace(id, out, (quatf)bodies.rotation[id], totalMass, totalTorque, totalCenterOfMass, parentPivot, totalInertiaTensor);
 
             // Step 2: Store (intermediate) result for computation at the next level
             const ushort nextDelta = deltas[i+1];
-            const uint oid = lowerBound + childIndex * nextDelta + parentId;
-            children.mass[oid] = (half)totalMass;
-            children.force[oid] = (half3)totalForce;
-            children.torque[oid] = (half3)totalTorque;
-            children.pivot[oid] = (half3)parentPivot;
-            children.centerOfMass[oid] = (half3)totalCenterOfMass;
-            children.inertiaTensor[oid] = inertiaTensor_from_float3x3(totalInertiaTensor);
+            if (parentId != NO_PARENT) {
+                const uint oid = childIndex * nextDelta + parentId;
+                children.mass[oid] = (half)totalMass;
+                children.force[oid] = (half3)totalForce;
+                children.torque[oid] = (half3)totalTorque;
+                children.inertiaTensor[oid] = inertiaTensor_from_float3x3(totalInertiaTensor);
+                children.pivot[oid] = (half3)parentPivot;
+                children.centerOfMass[oid] = (half3)totalCenterOfMass;
+
+                if (length_squared(totalTorque) > sqr(5)) {
+                    uint freeBodyId = atomic_fetch_add_explicit(&free_bodyCount, 1, memory_order_relaxed);
+                    free.index[freeBodyId] = id;
+                }
+            } else {
+                free.mass[id] = (half)totalMass;
+                free.force[id] = (half3)totalForce;
+                free.torque[id] = (half3)totalTorque;
+                free.inertiaTensor[id] = inertiaTensor_from_float3x3(totalInertiaTensor);
+            }
         }
         previousLowerBound = lowerBound;
         threadgroup_barrier(mem_flags::mem_device);

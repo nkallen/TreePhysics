@@ -12,6 +12,8 @@
 
 #include <simd/simd.h>
 
+#define NO_PARENT 0xffffffff
+
 typedef NS_ENUM(NSInteger, BufferIndex)
 {
     BufferIndexRigidBodies = 0,

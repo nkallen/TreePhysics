@@ -7,7 +7,7 @@ using namespace metal;
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
 
 struct UpdateRigidBodiesIn {
-    device ushort *parentId;
+    device uint *parentId;
     device packed_half3 *localPivot;
     device packed_float3 *localInertiaTensor;
     device packed_half3 *theta;
@@ -29,7 +29,7 @@ struct UpdateRigidBodiesOut {
 
 kernel void
 updateRigidBodies(
-                  device ushort        *in_parentId,
+                  device uint        *in_parentId,
                   device packed_half3  *in_localPivot,
                   device packed_float3 *in_localInertiaTensor,
                   device packed_half3  *in_localJointPosition,
@@ -71,58 +71,60 @@ updateRigidBodies(
 
     uint previousLowerBound = 0;
     uint lowerBound = deltas[0];
-    for (int i = 1; i < rangeCount; i++) {
+    for (int i = 0; i < rangeCount; i++) {
         ushort delta = deltas[i];
 
         if (gid < delta) {
             const int id = lowerBound + gid;
-            const ushort parentId = previousLowerBound + in.parentId[id];
-            const float3 parentPivot = (float3)out.pivot[parentId];
-            const quatf parentOrientation = (quatf)out.orientation[parentId];
+            const uint parentId = in.parentId[id];
+            if (parentId != NO_PARENT) {
+                const float3 parentPivot = (float3)out.pivot[parentId];
+                const quatf parentOrientation = (quatf)out.orientation[parentId];
 
-            const quatf localJointOrientation = (quatf)in.localJointOrientation[id];
-            const float3 localJointPosition = (float3)in.localJointPosition[id];
+                const quatf localJointOrientation = (quatf)in.localJointOrientation[id];
+                const float3 localJointPosition = (float3)in.localJointPosition[id];
 
-            const packed_float3 localInertiaTensor = in.localInertiaTensor[id];
-            const float3 localPivot = (float3)in.localPivot[id];
-            const float3 angle = (float3)in.theta[id*3+0];
+                const packed_float3 localInertiaTensor = in.localInertiaTensor[id];
+                const float3 localPivot = (float3)in.localPivot[id];
+                const float3 angle = (float3)in.theta[id*3+0];
 
-            const quatf jointOrientation = quat_multiply(parentOrientation, localJointOrientation);
-            float3 pivot = parentPivot + quat_act(parentOrientation, localJointPosition);
+                const quatf jointOrientation = quat_multiply(parentOrientation, localJointOrientation);
+                float3 pivot = parentPivot + quat_act(parentOrientation, localJointPosition);
 
-            const quatf localOrientation = length(angle) < 10e-10 ? quatf(0,0,0,1) : quat_from_axis_angle(normalize(angle), length(angle));
-            const quatf orientation = normalize(quat_multiply(jointOrientation, localOrientation));
+                const quatf localOrientation = length(angle) < 10e-10 ? quatf(0,0,0,1) : quat_from_axis_angle(normalize(angle), length(angle));
+                const quatf orientation = normalize(quat_multiply(jointOrientation, localOrientation));
 
-            const float3x3 R = float3x3_from_quat(orientation);
+                const float3x3 R = float3x3_from_quat(orientation);
 
-            float3x3 IRt = R;
-            IRt[0] *= localInertiaTensor.x;
-            IRt[1] *= localInertiaTensor.y;
-            IRt[2] *= localInertiaTensor.z;
-            IRt = transpose(IRt);
-            const float3x3 inertiaTensor = R * IRt; // R * InertiaTensor * R^T
-            const float3 centerOfMass = pivot + quat_act(orientation, -localPivot);
+                float3x3 IRt = R;
+                IRt[0] *= localInertiaTensor.x;
+                IRt[1] *= localInertiaTensor.y;
+                IRt[2] *= localInertiaTensor.z;
+                IRt = transpose(IRt);
+                const float3x3 inertiaTensor = R * IRt; // R * InertiaTensor * R^T
+                const float3 centerOfMass = pivot + quat_act(orientation, -localPivot);
 
-            const float3 parentAngularVelocity = (float3)out.angularVelocity[parentId];
-            const float3 parentAngularAcceleration = (float3)out.angularAcceleration[parentId];
-            const float3 angularVelocity = parentAngularVelocity + quat_act(jointOrientation, (float3)in.theta[parentId*3+1]);
-            const float3 angularAcceleration = (float3)out.angularAcceleration[parentId] + quat_act(localJointOrientation, (float3)in.theta[id*3+2]) + skew(parentAngularVelocity) * angularVelocity;
+                const float3 parentAngularVelocity = (float3)out.angularVelocity[parentId];
+                const float3 parentAngularAcceleration = (float3)out.angularAcceleration[parentId];
+                const float3 angularVelocity = parentAngularVelocity + quat_act(jointOrientation, (float3)in.theta[parentId*3+1]);
+                const float3 angularAcceleration = (float3)out.angularAcceleration[parentId] + quat_act(localJointOrientation, (float3)in.theta[id*3+2]) + skew(parentAngularVelocity) * angularVelocity;
 
-            float3 velocity = (float3)out.velocity[parentId];
-            velocity += skew(parentAngularVelocity) * quat_act(parentOrientation, localJointPosition);
-            velocity -= skew(angularVelocity) * quat_act(orientation, localPivot);
-            float3 acceleration = (float3)out.acceleration[parentId] + (skew(parentAngularAcceleration) + sqr(skew(parentAngularVelocity))) * quat_act(parentOrientation, localJointPosition);
-            acceleration -= (skew(angularAcceleration) + sqr(skew(angularVelocity))) * quat_act(orientation, localPivot);
+                float3 velocity = (float3)out.velocity[parentId];
+                velocity += skew(parentAngularVelocity) * quat_act(parentOrientation, localJointPosition);
+                velocity -= skew(angularVelocity) * quat_act(orientation, localPivot);
+                float3 acceleration = (float3)out.acceleration[parentId] + (skew(parentAngularAcceleration) + sqr(skew(parentAngularVelocity))) * quat_act(parentOrientation, localJointPosition);
+                acceleration -= (skew(angularAcceleration) + sqr(skew(angularVelocity))) * quat_act(orientation, localPivot);
 
-            out.pivot[id] = (packed_half3)pivot;
-            out.centerOfMass[id] = (packed_half3)centerOfMass;
-            out.inertiaTensor[id] = inertiaTensor_from_float3x3(inertiaTensor);
-            out.orientation[id] = (quath)orientation;
-            out.jointOrientation[id] = (quath)jointOrientation;
-            out.velocity[id] = (packed_half3)velocity;
-            out.angularVelocity[id] = (packed_half3)angularVelocity;
-            out.acceleration[id] = (packed_half3)acceleration;
-            out.angularAcceleration[id] = (packed_half3)angularAcceleration;
+                out.pivot[id] = (packed_half3)pivot;
+                out.centerOfMass[id] = (packed_half3)centerOfMass;
+                out.inertiaTensor[id] = inertiaTensor_from_float3x3(inertiaTensor);
+                out.orientation[id] = (quath)orientation;
+                out.jointOrientation[id] = (quath)jointOrientation;
+                out.velocity[id] = (packed_half3)velocity;
+                out.angularVelocity[id] = (packed_half3)angularVelocity;
+                out.acceleration[id] = (packed_half3)acceleration;
+                out.angularAcceleration[id] = (packed_half3)angularAcceleration;
+            }
         }
         previousLowerBound = lowerBound;
         lowerBound += delta;

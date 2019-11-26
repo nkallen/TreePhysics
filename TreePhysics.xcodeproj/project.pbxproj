@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		9E036B1C22E4F4A700229235 /* TurtleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1B22E4F4A700229235 /* TurtleTests.swift */; };
-		9E0674DF230AD22F0044C3C4 /* ResetForces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */; };
 		9E0674E1230AD2420044C3C4 /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
 		9E0674E2230AD2450044C3C4 /* UpdateJoints.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A922FC468700198166 /* UpdateJoints.metal */; };
 		9E0674E3230AD2490044C3C4 /* Math.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801AB22FC483B00198166 /* Math.metal */; };
@@ -54,7 +53,6 @@
 		9E56C94222E76C340095C8AC /* SkinnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94122E76C340095C8AC /* SkinnerTest.swift */; };
 		9E80B3E6231FF74F00A700CF /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9E8107E523478DEF003B144D /* MDLMesh+Vertices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8107E423478DEF003B144D /* MDLMesh+Vertices.swift */; };
-		9E8255E123840D5B00FBB49F /* ResetForces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */; };
 		9E8255E223842EED00FBB49F /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
 		9E8255E3238462E500FBB49F /* GravityField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE86412332717C0037EA92 /* GravityField.swift */; };
 		9E84AFC023855D81008919A8 /* WindField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE8645233271BF0037EA92 /* WindField.swift */; };
@@ -80,7 +78,6 @@
 		9EAA0D37237D64BD00FC9B81 /* Check.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA52EC4234F4A4200463E51 /* Check.swift */; };
 		9EAA8C0A232923D2002E9260 /* ApplyPhysicsFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */; };
 		9EAA8C0C232923FD002E9260 /* MetalKernalEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A522FC451E00198166 /* MetalKernalEncoder.swift */; };
-		9EAA8C0D23292401002E9260 /* ResetForces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */; };
 		9EAA8C0E23292408002E9260 /* UpdateCompositeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */; };
 		9EAA8C0F2329240C002E9260 /* UpdateRigidBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */; };
 		9EAA8C1023292411002E9260 /* UpdateJoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A322FC450D00198166 /* UpdateJoints.swift */; };
@@ -92,7 +89,6 @@
 		9EAA8C1823292444002E9260 /* Visualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57566823184C9C0036F68B /* Visualization.swift */; };
 		9EAA8C19232925E3002E9260 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9322F438FA007DCF49 /* Scene.swift */; };
 		9EAAAB65234B448B00157B45 /* GrowthSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAAAB64234B448B00157B45 /* GrowthSimulator.swift */; };
-		9EAE862C232A67170037EA92 /* ResetForces.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DA230ACFB10044C3C4 /* ResetForces.metal */; };
 		9EAE862D232A671B0037EA92 /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
 		9EAE862E232A671E0037EA92 /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
 		9EAE862F232A67210037EA92 /* UpdateJoints.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A922FC468700198166 /* UpdateJoints.metal */; };
@@ -112,6 +108,10 @@
 		9EAE8646233271BF0037EA92 /* WindField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EAE8645233271BF0037EA92 /* WindField.swift */; };
 		9EC6A4E8234C9B4900E43FE9 /* ShadowGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */; };
 		9EC88E25231989930049737D /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC88E24231989930049737D /* ModelTests.swift */; };
+		9EC8A1EE238C072700CA0F3B /* FreeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EC8A1ED238C072700CA0F3B /* FreeBodies.metal */; };
+		9EC8A1EF238C08D400CA0F3B /* FreeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EC8A1ED238C072700CA0F3B /* FreeBodies.metal */; };
+		9EC8A1F1238C577000CA0F3B /* FreeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC8A1F0238C577000CA0F3B /* FreeBodies.swift */; };
+		9EC8A1F2238C5B4500CA0F3B /* FreeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC8A1F0238C577000CA0F3B /* FreeBodies.swift */; };
 		9ED324F72361A6C9002D1DA2 /* MetalKernelDebugger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */; };
 		9ED86B2223704AA300A0913A /* df64_qf128.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9ED86B2123704AA300A0913A /* df64_qf128.pdf */; };
 		9ED86B2423704ABE00A0913A /* RobustEigenSymmetric3x3.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9ED86B2323704ABE00A0913A /* RobustEigenSymmetric3x3.pdf */; };
@@ -147,9 +147,6 @@
 		9EF46F1A2362424900AEC82F /* PhysicsWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39374A233B803100AE1897 /* PhysicsWorld.swift */; };
 		9EF46F1B2362425600AEC82F /* PhysicsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B6522F313D0007DCF49 /* PhysicsField.swift */; };
 		9EF46F1C2362426300AEC82F /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
-		9EF46F1F2362439000AEC82F /* ResetForces.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DA230ACFB10044C3C4 /* ResetForces.metal */; };
-		9EF46F202362439100AEC82F /* ResetForces.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DA230ACFB10044C3C4 /* ResetForces.metal */; };
-		9EF46F212362439200AEC82F /* ResetForces.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674DA230ACFB10044C3C4 /* ResetForces.metal */; };
 		9EF46F222362439700AEC82F /* ApplyPhysicsFields.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */; };
 		9EF46F232362439A00AEC82F /* UpdateCompositeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */; };
 		9EF46F242362439D00AEC82F /* UpdateJoints.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EE801A922FC468700198166 /* UpdateJoints.metal */; };
@@ -193,8 +190,6 @@
 /* Begin PBXFileReference section */
 		9E036B1B22E4F4A700229235 /* TurtleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurtleTests.swift; sourceTree = "<group>"; };
 		9E036B1E22E4F58600229235 /* Turtle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turtle.swift; sourceTree = "<group>"; };
-		9E0674DA230ACFB10044C3C4 /* ResetForces.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ResetForces.metal; sourceTree = "<group>"; };
-		9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetForces.swift; sourceTree = "<group>"; };
 		9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ApplyPhysicsFields.metal; sourceTree = "<group>"; };
 		9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplyPhysicsFields.swift; sourceTree = "<group>"; };
 		9E08F85F2316FEC700D48ADD /* sensors-11-08536.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "sensors-11-08536.pdf"; sourceTree = "<group>"; };
@@ -274,6 +269,8 @@
 		9EC6A4E6234C999100E43FE9 /* TreeSketch.SBM2012.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = TreeSketch.SBM2012.pdf; sourceTree = "<group>"; };
 		9EC6A4E7234C9B4900E43FE9 /* ShadowGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowGrid.swift; sourceTree = "<group>"; };
 		9EC88E24231989930049737D /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
+		9EC8A1ED238C072700CA0F3B /* FreeBodies.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = FreeBodies.metal; sourceTree = "<group>"; };
+		9EC8A1F0238C577000CA0F3B /* FreeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeBodies.swift; sourceTree = "<group>"; };
 		9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalKernelDebugger.swift; sourceTree = "<group>"; };
 		9ED86B2123704AA300A0913A /* df64_qf128.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = df64_qf128.pdf; sourceTree = "<group>"; };
 		9ED86B2323704ABE00A0913A /* RobustEigenSymmetric3x3.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = RobustEigenSymmetric3x3.pdf; sourceTree = "<group>"; };
@@ -362,7 +359,6 @@
 		9E0674DC230ACFC90044C3C4 /* Kernels */ = {
 			isa = PBXGroup;
 			children = (
-				9E0674DA230ACFB10044C3C4 /* ResetForces.metal */,
 				9E0674E7230AD4590044C3C4 /* ApplyPhysicsFields.metal */,
 				9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */,
 				9EE801A922FC468700198166 /* UpdateJoints.metal */,
@@ -378,6 +374,7 @@
 				9E58CF1323784B78002FA7F1 /* JacobianSweep.h */,
 				9E4930392386A7BA00864046 /* PerlinNoise.h */,
 				9E49303A2386A7C400864046 /* PerlinNoise.metal */,
+				9EC8A1ED238C072700CA0F3B /* FreeBodies.metal */,
 			);
 			path = Kernels;
 			sourceTree = "<group>";
@@ -386,7 +383,6 @@
 			isa = PBXGroup;
 			children = (
 				9EE801A522FC451E00198166 /* MetalKernalEncoder.swift */,
-				9E0674DD230AD0DE0044C3C4 /* ResetForces.swift */,
 				9E0674E9230AD8290044C3C4 /* ApplyPhysicsFields.swift */,
 				9EE724FF22F84CCE000D0A2F /* UpdateCompositeBodies.swift */,
 				9E31BE9522FDABE800AF908B /* UpdateRigidBodies.swift */,
@@ -394,6 +390,7 @@
 				9ED324F62361A6C9002D1DA2 /* MetalKernelDebugger.swift */,
 				9E1223BF2364539200692A72 /* MemoryLayoutManager.swift */,
 				9EE3F922237C13A200E86D81 /* SharedBuffersMetalDevice.swift */,
+				9EC8A1F0238C577000CA0F3B /* FreeBodies.swift */,
 			);
 			path = Encoders;
 			sourceTree = "<group>";
@@ -835,7 +832,6 @@
 				9EC6A4E8234C9B4900E43FE9 /* ShadowGrid.swift in Sources */,
 				9EE3F923237C13A200E86D81 /* SharedBuffersMetalDevice.swift in Sources */,
 				9EA52EC5234F4A4200463E51 /* Check.swift in Sources */,
-				9EAE862C232A67170037EA92 /* ResetForces.metal in Sources */,
 				9EAE862E232A671E0037EA92 /* UpdateCompositeBodies.metal in Sources */,
 				9EAE862F232A67210037EA92 /* UpdateJoints.metal in Sources */,
 				9EAE8646233271BF0037EA92 /* WindField.swift in Sources */,
@@ -847,6 +843,7 @@
 				9EAE8633232A67330037EA92 /* Debug.metal in Sources */,
 				9EF3361F233C1AEF005F0C29 /* ArticulatedRigidBody.swift in Sources */,
 				9EAAAB65234B448B00157B45 /* GrowthSimulator.swift in Sources */,
+				9EC8A1EE238C072700CA0F3B /* FreeBodies.metal in Sources */,
 				9E34C48C2329120F008C7353 /* SkinningPen.swift in Sources */,
 				9E34C48D23291213008C7353 /* Rewriter.swift in Sources */,
 				9EAA8C0F2329240C002E9260 /* UpdateRigidBodies.swift in Sources */,
@@ -865,11 +862,11 @@
 				9E4946C72344AB080036B7EC /* AutoTree.swift in Sources */,
 				9E4946C223449FDE0036B7EC /* LocalitySensitiveHash.swift in Sources */,
 				9E34C48923291204008C7353 /* Pen.swift in Sources */,
-				9EAA8C0D23292401002E9260 /* ResetForces.swift in Sources */,
 				9E49303B2386A7C400864046 /* PerlinNoise.metal in Sources */,
 				9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */,
 				9EAA8C1423292430002E9260 /* PhysicsField.swift in Sources */,
 				9EAA8C1023292411002E9260 /* UpdateJoints.swift in Sources */,
+				9EC8A1F1238C577000CA0F3B /* FreeBodies.swift in Sources */,
 				9ED324F72361A6C9002D1DA2 /* MetalKernelDebugger.swift in Sources */,
 				9EF29FC82374391000AF72FC /* Half.c in Sources */,
 				9EAA8C1723292440002E9260 /* PrettyPrint.swift in Sources */,
@@ -897,8 +894,8 @@
 				9E8255E3238462E500FBB49F /* GravityField.swift in Sources */,
 				9EE0BD6D236B2C23000A8AB3 /* Eigensolver.c in Sources */,
 				9E075112237B005000A8107B /* UpdateRigidBodies.swift in Sources */,
-				9EF46F1F2362439000AEC82F /* ResetForces.metal in Sources */,
 				9EF46F25236243A000AEC82F /* UpdateRigidBodies.metal in Sources */,
+				9EC8A1F2238C5B4500CA0F3B /* FreeBodies.swift in Sources */,
 				9E49303C2386A91900864046 /* PerlinNoise.metal in Sources */,
 				9E40A0DA2362519100C8D39C /* AppDelegate.swift in Sources */,
 				9EF46F192362422E00AEC82F /* CompositeBody.swift in Sources */,
@@ -913,6 +910,7 @@
 				9E1223C1236453BC00692A72 /* MemoryLayoutManager.swift in Sources */,
 				9E40A0D92362517900C8D39C /* main.swift in Sources */,
 				9EF46F0E2362418600AEC82F /* ArticulatedRigidBody.swift in Sources */,
+				9EC8A1EF238C08D400CA0F3B /* FreeBodies.metal in Sources */,
 				9E84AFC123855DED008919A8 /* Noise.swift in Sources */,
 				9EF46F17236241FD00AEC82F /* Tree.swift in Sources */,
 				9EF46F12236241A500AEC82F /* UpdateCompositeBodies.swift in Sources */,
@@ -926,7 +924,6 @@
 				9EF46F14236241E600AEC82F /* RigidBody.swift in Sources */,
 				9E1168A2237C335A00922AAA /* MetalProxy.swift in Sources */,
 				9EF46F16236241F300AEC82F /* Math.swift in Sources */,
-				9E8255E123840D5B00FBB49F /* ResetForces.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -943,8 +940,6 @@
 				9E9D4B7522F37244007DCF49 /* CPUSimulator.swift in Sources */,
 				9E9D4B9722F43D43007DCF49 /* GameViewController.swift in Sources */,
 				9E0674E5230AD24E0044C3C4 /* Print.metal in Sources */,
-				9E0674DF230AD22F0044C3C4 /* ResetForces.swift in Sources */,
-				9EF46F202362439100AEC82F /* ResetForces.metal in Sources */,
 				9E9D4B7822F37244007DCF49 /* AppDelegate.swift in Sources */,
 				9E0674E4230AD24C0044C3C4 /* UpdateRigidBodies.metal in Sources */,
 				9E0674E3230AD2490044C3C4 /* Math.metal in Sources */,
@@ -966,7 +961,6 @@
 				9EE7EBA222DDDC6C00535997 /* AppDelegate.swift in Sources */,
 				9EAE863A232A67FE0037EA92 /* Math.metal in Sources */,
 				9EAE863B232A68010037EA92 /* Print.metal in Sources */,
-				9EF46F212362439200AEC82F /* ResetForces.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1108,7 +1102,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MTL_FAST_MATH = NO;
+				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1133,7 +1127,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = NO;
+				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nk.TreePhysics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

@@ -52,8 +52,6 @@ class GameViewController: UIViewController {
         scnView.backgroundColor = .gray
         
         
-        scene.rootNode.addChildNode(skinningPen.node())
-        
         scnView.scene?.rootNode.addChildNode(skinningPen.node())
         //        scnView.scene?.rootNode.addChildNode(skinningPen.skeleton)
         
@@ -141,7 +139,7 @@ extension GameViewController {
     func inspect(_ id: Int) {
         for range in self.mem.rigidBodies.ranges {
             if range.contains(id) {
-                self.simulator.debug.print(id - range.lowerBound)
+                self.simulator.debug?.print(id - range.lowerBound)
             }
         }
     }

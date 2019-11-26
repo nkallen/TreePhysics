@@ -115,6 +115,7 @@ extension ArticulatedRigidBody {
         var result: [[UnitOfWork]] = []
         func nextLevel(_ level: [UnitOfWork]) -> [UnitOfWork] {
             var result: [UnitOfWork] = []
+            var firstChildId = 0
             for (parentId, item) in level.enumerated() {
                 for (childIndex, child) in item.rigidBody.children.enumerated() {
                     var climbers: [ArticulatedRigidBody] = [child]
@@ -125,10 +126,12 @@ extension ArticulatedRigidBody {
                     }
                     result.append(UnitOfWork(
                         childCount: child.childJoints.count,
+                        firstChildId: firstChildId,
                         childIndex: childIndex,
                         parentId: parentId,
                         rigidBody: child,
                         climbers: []))
+                    firstChildId += child.childJoints.count
                 }
             }
             return result.sorted()
@@ -136,8 +139,9 @@ extension ArticulatedRigidBody {
         var current = [
             UnitOfWork(
                 childCount: childJoints.count,
+                firstChildId: nil,
                 childIndex: 0,
-                parentId: 0,
+                parentId: -1,
                 rigidBody: self,
                 climbers: [])]
         while true {
@@ -152,6 +156,7 @@ extension ArticulatedRigidBody {
 
 struct UnitOfWork {
     let childCount: Int
+    let firstChildId: Int?
     let childIndex: Int
     let parentId: Int
     let rigidBody: ArticulatedRigidBody
@@ -160,8 +165,8 @@ struct UnitOfWork {
 
 extension UnitOfWork: Comparable {
     static func < (lhs: UnitOfWork, rhs: UnitOfWork) -> Bool {
-        return lhs.childCount < rhs.childCount &&
-            lhs.childIndex < rhs.childIndex &&
-            lhs.parentId < rhs.parentId
+        return
+            lhs.parentId < rhs.parentId &&
+            lhs.childIndex < rhs.childIndex
     }
 }
