@@ -15,7 +15,7 @@ public final class MemoryLayoutManager {
         let maxChildCount: Int
         let maxRangeWidth: Int
         let count: Int
-        let childCountBuffer, firstChildIdBuffer, childIndexBuffer, parentIdBuffer, climberCountBuffer, massBuffer, pivotBuffer, localPivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, orientationBuffer, inertiaTensorBuffer, localInertiaTensorBuffer, jointDampingBuffer, jointStiffnessBuffer, localJointPositionBuffer, localJointOrientationBuffer, jointOrientationBuffer, velocityBuffer, angularVelocityBuffer, accelerationBuffer, angularAccelerationBuffer, areaBuffer, shapeBuffer: MTLBuffer
+        let childCountBuffer, firstChildIdBuffer, childIndexBuffer, parentIdBuffer, climberCountBuffer, massBuffer, pivotBuffer, localPivotBuffer, forceBuffer, torqueBuffer, centerOfMassBuffer, orientationBuffer, inertiaTensorBuffer, localInertiaTensorBuffer, jointDampingBuffer, jointStiffnessBuffer, localJointPositionBuffer, localJointOrientationBuffer, jointOrientationBuffer, velocityBuffer, angularVelocityBuffer, accelerationBuffer, angularAccelerationBuffer, angularMomentumBuffer, areaBuffer, shapeBuffer: MTLBuffer
 
         init(device: MTLDevice, root: ArticulatedRigidBody) {
             var ranges: [Range<Int>] = []
@@ -82,6 +82,7 @@ public final class MemoryLayoutManager {
             let angularVelocityBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             let accelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             let angularAccelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            let angularMomentumBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             let areaBuffer = device.makeBuffer(length: count * MemoryLayout<half>.stride, options: [.storageModeShared])!
             let shapeBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
 
@@ -108,6 +109,7 @@ public final class MemoryLayoutManager {
             let angularVelocity = angularVelocityBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let acceleration = accelerationBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let angularAcceleration = angularAccelerationBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+            let angularMomentum = angularMomentumBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
             let area = areaBuffer.contents().bindMemory(to: half.self, capacity: count)
             let shape = shapeBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
 
@@ -194,6 +196,7 @@ public final class MemoryLayoutManager {
             self.angularVelocityBuffer = device.makeBuffer(length: angularVelocityBuffer.length, options: [.storageModeShared])!
             self.accelerationBuffer = device.makeBuffer(length: accelerationBuffer.length, options: [.storageModeShared])!
             self.angularAccelerationBuffer = device.makeBuffer(length: angularAccelerationBuffer.length, options: [.storageModeShared])!
+            self.angularMomentumBuffer = device.makeBuffer(length: angularMomentumBuffer.length, options: [.storageModeShared])!
             self.areaBuffer = device.makeBuffer(length: areaBuffer.length, options: [.storageModeShared])!
             self.shapeBuffer = device.makeBuffer(length: shapeBuffer.length, options: [.storageModeShared])!
 
@@ -225,6 +228,7 @@ public final class MemoryLayoutManager {
             blitCommandEncoder.copy(from: angularVelocityBuffer, sourceOffset: 0, to: self.angularVelocityBuffer, destinationOffset: 0, size: angularVelocityBuffer.length)
             blitCommandEncoder.copy(from: accelerationBuffer, sourceOffset: 0, to: self.accelerationBuffer, destinationOffset: 0, size: accelerationBuffer.length)
             blitCommandEncoder.copy(from: angularAccelerationBuffer, sourceOffset: 0, to: self.angularAccelerationBuffer, destinationOffset: 0, size: angularAccelerationBuffer.length)
+            blitCommandEncoder.copy(from: angularMomentumBuffer, sourceOffset: 0, to: self.angularMomentumBuffer, destinationOffset: 0, size: angularMomentumBuffer.length)
             blitCommandEncoder.copy(from: areaBuffer, sourceOffset: 0, to: self.areaBuffer, destinationOffset: 0, size: areaBuffer.length)
             blitCommandEncoder.copy(from: shapeBuffer, sourceOffset: 0, to: self.shapeBuffer, destinationOffset: 0, size: shapeBuffer.length)
 

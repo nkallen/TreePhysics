@@ -37,6 +37,9 @@
 		9E34C49223291277008C7353 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EE7EBC322E08E4000535997 /* Math.swift */; };
 		9E34C4932329127C008C7353 /* Diagonalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEC11E122EA50920078BBFD /* Diagonalization.swift */; };
 		9E35D263238D7A8900EBBAD0 /* UpdateFreeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E35D262238D7A8900EBBAD0 /* UpdateFreeBodies.metal */; };
+		9E35D264238D7DD200EBBAD0 /* UpdateFreeBodies.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E35D262238D7A8900EBBAD0 /* UpdateFreeBodies.metal */; };
+		9E35D266238DB9B300EBBAD0 /* UpdateFreeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35D265238DB9B300EBBAD0 /* UpdateFreeBodies.swift */; };
+		9E35D267238DBC0800EBBAD0 /* UpdateFreeBodies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E35D265238DB9B300EBBAD0 /* UpdateFreeBodies.swift */; };
 		9E39374B233B803100AE1897 /* PhysicsWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E39374A233B803100AE1897 /* PhysicsWorld.swift */; };
 		9E40A0D72362515000C8D39C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E9D4B8D22F372E4007DCF49 /* Main.storyboard */; };
 		9E40A0D82362515700C8D39C /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E9D4B9522F43CAE007DCF49 /* GameViewController.swift */; };
@@ -209,6 +212,7 @@
 		9E34C482232911C6008C7353 /* TreePhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TreePhysics.h; sourceTree = "<group>"; };
 		9E34C483232911C6008C7353 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E35D262238D7A8900EBBAD0 /* UpdateFreeBodies.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UpdateFreeBodies.metal; sourceTree = "<group>"; };
+		9E35D265238DB9B300EBBAD0 /* UpdateFreeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateFreeBodies.swift; sourceTree = "<group>"; };
 		9E39374A233B803100AE1897 /* PhysicsWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsWorld.swift; sourceTree = "<group>"; };
 		9E461B3222E5E025008AB788 /* Pen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pen.swift; sourceTree = "<group>"; };
 		9E461B3422E7017F008AB788 /* CylinderPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderPen.swift; sourceTree = "<group>"; };
@@ -394,6 +398,7 @@
 				9E1223BF2364539200692A72 /* MemoryLayoutManager.swift */,
 				9EE3F922237C13A200E86D81 /* SharedBuffersMetalDevice.swift */,
 				9EC8A1F0238C577000CA0F3B /* FreeBodies.swift */,
+				9E35D265238DB9B300EBBAD0 /* UpdateFreeBodies.swift */,
 			);
 			path = Encoders;
 			sourceTree = "<group>";
@@ -847,6 +852,7 @@
 				9EAE8633232A67330037EA92 /* Debug.metal in Sources */,
 				9EF3361F233C1AEF005F0C29 /* ArticulatedRigidBody.swift in Sources */,
 				9EAAAB65234B448B00157B45 /* GrowthSimulator.swift in Sources */,
+				9E35D266238DB9B300EBBAD0 /* UpdateFreeBodies.swift in Sources */,
 				9EC8A1EE238C072700CA0F3B /* FreeBodies.metal in Sources */,
 				9E34C48C2329120F008C7353 /* SkinningPen.swift in Sources */,
 				9E34C48D23291213008C7353 /* Rewriter.swift in Sources */,
@@ -926,7 +932,9 @@
 				9EF46F28236243AF00AEC82F /* Debug.metal in Sources */,
 				9EF46F1C2362426300AEC82F /* Diagonalization.swift in Sources */,
 				9EF46F14236241E600AEC82F /* RigidBody.swift in Sources */,
+				9E35D267238DBC0800EBBAD0 /* UpdateFreeBodies.swift in Sources */,
 				9E1168A2237C335A00922AAA /* MetalProxy.swift in Sources */,
+				9E35D264238D7DD200EBBAD0 /* UpdateFreeBodies.metal in Sources */,
 				9EF46F16236241F300AEC82F /* Math.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

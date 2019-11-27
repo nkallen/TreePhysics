@@ -14,7 +14,7 @@ struct ApplyPhysicsFieldsIn {
     device quath *orientation;
     device packed_half3 *velocity;
     device half *area;
-    device uchar *shape;
+    device ShapeType *shape;
 };
 
 bool appliesTo(const PhysicsField field, const float3 centerOfMass) {
@@ -89,7 +89,7 @@ applyPhysicsFields(
                    device quath          *in_orientation,
                    device packed_half3   *in_velocity,
                    device half           *in_area,
-                   device uchar          *in_shape,
+                   device ShapeType      *in_shape,
 
                    device packed_half3   *out_force,
                    device packed_half3   *out_torque,

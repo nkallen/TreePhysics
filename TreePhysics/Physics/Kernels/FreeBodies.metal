@@ -6,7 +6,7 @@ using namespace metal;
 struct arguments {
     command_buffer        cmd_buffer;
     device uint           *toBeFreedIndex;
-    device uint           *freeIndex;
+    device uint           *freeBodyIndex;
     device atomic_uint    &freeBodyCount;
     device ushort         *firstChildId;
     device uint           *parentId;
@@ -36,7 +36,7 @@ freeBodies(
     const uchar childIndex = args.childIndex[id];
 
     uint freeBodyId = atomic_fetch_add_explicit(&args.freeBodyCount, 1, memory_order_relaxed);
-    args.freeIndex[freeBodyId] = id;
+    args.freeBodyIndex[freeBodyId] = id;
 
     const uint firstChildId = id - childIndex;
     const uint lastChildId = firstChildId + parentId;

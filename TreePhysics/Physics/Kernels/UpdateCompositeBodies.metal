@@ -28,6 +28,7 @@ typedef struct {
     device packed_half3 *pivot;
     device InertiaTensor *inertiaTensor;
     device quath *rotation;
+    device ShapeType *shape;
 } Bodies;
 
 typedef struct {
@@ -76,9 +77,9 @@ updateCompositeBodies(
                       device packed_half3   *in_torque,
                       device packed_half3   *in_centerOfMass,
                       device InertiaTensor  *in_inertiaTensor,
-                      
                       device quath          *in_rotation,
-                      
+                      device ShapeType      *in_shape,
+
                       device half           *child_mass,
                       device packed_half3   *child_force,
                       device packed_half3   *child_torque,
@@ -122,6 +123,7 @@ updateCompositeBodies(
         .centerOfMass = in_centerOfMass,
         .rotation = in_rotation,
         .inertiaTensor = in_inertiaTensor,
+        .shape = in_shape,
     };
 
     Free free = {
@@ -138,7 +140,7 @@ updateCompositeBodies(
     };
     
     uint previousLowerBound = upperBound;
-    for (ushort i = 0; i < rangeCount; i++) {
+    for (ushort i = 0; i < rangeCount - 1; i++) {
         ushort delta = deltas[i];
         const uint lowerBound = previousLowerBound - delta;
 
@@ -148,18 +150,20 @@ updateCompositeBodies(
             const uchar childIndex = bodies.childIndex[id];
             uint parentId  = bodies.parentId[id];
             
-            const float parentMass          = (float)bodies.mass[id];
-            const float3 parentForce        = (float3)bodies.force[id];
-            const float3 parentTorque       = (float3)bodies.torque[id];
-            const float3 parentCenterOfMass = (float3)bodies.centerOfMass[id];
-            const float3 parentPivot        = (float3)bodies.pivot[id];
-            
+            const float parentMass             = (float)bodies.mass[id];
+            const float3 parentForce           = (float3)bodies.force[id];
+            const float3 parentTorque          = (float3)bodies.torque[id];
+            const float3 parentCenterOfMass    = (float3)bodies.centerOfMass[id];
+            const float3 parentPivot           = (float3)bodies.pivot[id];
+            const float3x3 parentInertiaTensor = float3x3_from_inertiaTensor(bodies.inertiaTensor[id]);
+            const ShapeType parentShape        = bodies.shape[id];
+
             float totalMass                 = parentMass;
             float3 totalForce               = parentForce;
             float3 totalTorque              = parentTorque;
             float3 totalCenterOfMass        = parentCenterOfMass;
 
-            float3x3 totalInertiaTensor = float3x3_from_inertiaTensor(bodies.inertiaTensor[id]);
+            float3x3 totalInertiaTensor = parentInertiaTensor;
 
             // Step 1: Accumulate children
             for (uchar j = 0; j < childCount; j++) {
@@ -195,13 +199,13 @@ updateCompositeBodies(
                 children.pivot[oid] = (half3)parentPivot;
                 children.centerOfMass[oid] = (half3)totalCenterOfMass;
 
-                if (length_squared(totalTorque) > sqr(5)) {
+                if (parentShape == ShapeTypeLeaf && length_squared(totalTorque) > sqr(0.3)) {
                     uint freeBodyId = atomic_fetch_add_explicit(&toBeFreedCount, 1, memory_order_relaxed);
                     free.index[freeBodyId] = id;
                 }
             } else {
-                free.mass[id] = (half)totalMass;
-                free.force[id] = (half3)totalForce;
+                free.mass[id]   = (half)totalMass;
+                free.force[id]  = (half3)totalForce;
                 free.torque[id] = (half3)totalTorque;
                 free.inertiaTensor[id] = inertiaTensor_from_float3x3(totalInertiaTensor);
             }
