@@ -36,7 +36,7 @@ class GameViewController: UIViewController {
         self.device = MTLCreateSystemDefaultDevice()!
         self.commandQueue = device.makeCommandQueue()!
         let gravity = GravityField(simd_float3(0,-0.1,0))
-        let wind = WindField(windVelocity: simd_float3(1,0.1,1)*5)
+        let wind = WindField(windVelocity: simd_float3(2,0,7) * 0.5)
         self.world = PhysicsWorld()
         world.add(field: wind)
         self.world.add(rigidBody: root)

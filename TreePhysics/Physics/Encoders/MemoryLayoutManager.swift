@@ -200,6 +200,33 @@ public final class MemoryLayoutManager {
             self.areaBuffer = device.makeBuffer(length: areaBuffer.length, options: [.storageModeShared])!
             self.shapeBuffer = device.makeBuffer(length: shapeBuffer.length, options: [.storageModeShared])!
 
+            self.childCountBuffer.label = "Child count"
+            self.firstChildIdBuffer.label = "First child id"
+            self.childIndexBuffer.label = "Child index"
+            self.parentIdBuffer.label = "Parent id"
+            self.climberCountBuffer.label = "Climber count"
+            self.massBuffer.label = "Mass"
+            self.pivotBuffer.label = "Pivot"
+            self.localPivotBuffer.label = "Local pivot"
+            self.forceBuffer.label = "Force"
+            self.torqueBuffer.label = "Torque"
+            self.centerOfMassBuffer.label = "Center of mass"
+            self.orientationBuffer.label = "Orientation"
+            self.inertiaTensorBuffer.label = "Inertia tensor"
+            self.localInertiaTensorBuffer.label = "Local inertia tensor"
+            self.jointDampingBuffer.label = "Joint damping"
+            self.jointStiffnessBuffer.label = "Joint stiffness"
+            self.localJointPositionBuffer.label = "Local joint position"
+            self.localJointOrientationBuffer.label = "Local joint orientation"
+            self.jointOrientationBuffer.label = "Joint orientation"
+            self.velocityBuffer.label = "Velocity"
+            self.angularVelocityBuffer.label = "Angular velocity"
+            self.accelerationBuffer.label = "Acceleration"
+            self.angularAccelerationBuffer.label = "Angular acceleration"
+            self.angularMomentumBuffer.label = "Angular momentum"
+            self.areaBuffer.label = "Area"
+            self.shapeBuffer.label = "Shape"
+
             // Step 5: Blit (copy) from the shared to private buffers
             let commandQueue = device.makeCommandQueue()!
             let commandBuffer = commandQueue.makeCommandBuffer()!
@@ -256,7 +283,15 @@ public final class MemoryLayoutManager {
             self.pivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
+
+            self.massBuffer.label = "Composite mass"
+            self.forceBuffer.label = "Composite force"
+            self.torqueBuffer.label = "Composite torque"
+            self.pivotBuffer.label = "Composite pivot"
+            self.centerOfMassBuffer.label = "Composite center of mass"
+            self.inertiaTensorBuffer.label = "Composite inertia tensor"
         }
+
     }
 
     final class FreeBodies {
@@ -271,6 +306,15 @@ public final class MemoryLayoutManager {
             self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
+
+            self.toBeFreedCountBuffer.label = "Bodies to be freed"
+            self.countBuffer.label = "Free body count"
+            self.toBeFreedIndexBuffer.label = "Bodies to be freed index"
+            self.indexBuffer.label = "Free body index"
+            self.massBuffer.label = "Free body mass"
+            self.forceBuffer.label = "Free body force"
+            self.torqueBuffer.label = "Free body torque"
+            self.inertiaTensorBuffer.label = "Free body inertia tensor"
         }
     }
 
@@ -283,6 +327,10 @@ public final class MemoryLayoutManager {
             self.thetaBuffer = device.makeBuffer(length: 3 * count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
             self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
             self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+
+            self.thetaBuffer.label = "Joint theta"
+            self.inertiaTensorBuffer.label = "Joint inertia tensor"
+            self.torqueBuffer.label = "Joint torque buffer"
         }
     }
 
@@ -325,6 +373,7 @@ public final class MemoryLayoutManager {
             }
 
             self.physicsFieldBuffer = device.makeBuffer(length: physicsFieldBuffer.length, options: [.storageModeShared])!
+            self.physicsFieldBuffer.label = "Physics field"
 
             let commandQueue = device.makeCommandQueue()!
             let commandBuffer = commandQueue.makeCommandBuffer()!

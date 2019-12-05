@@ -90,8 +90,8 @@ extension UpdateFreeBodies {
             ]
             argumentEncoder.setBuffers(bufs, offsets: [Int](repeating: 0, count: bufs.count), range: 1..<bufs.count+1)
             commandEncoder.setBuffer(buffer, offset: 0, index: 0)
-//            var time = time
-//            commandEncoder.setBytes(&time, length: MemoryLayout<Float>.size, index: 1)
+            var time = time
+            commandEncoder.setBytes(&time, length: MemoryLayout<Float>.size, index: 1)
 
             commandEncoder.useResource(icb, usage: .read)
             commandEncoder.useResources(bufs, usage: .write)

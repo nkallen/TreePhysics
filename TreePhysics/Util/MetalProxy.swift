@@ -47,8 +47,8 @@ class MTLCommandBufferProxy: NSObject, MTLCommandBuffer {
     func present(_ drawable: MTLDrawable, afterMinimumDuration presentationTime: CFTimeInterval) {
         underlying.present(drawable, afterMinimumDuration: presentationTime)
     }
-    func resourceStateCommandEncoder() -> MTLResourceStateCommandEncoder? {
-        return underlying.resourceStateCommandEncoder()
+    func makeResourceStateCommandEncoder() -> MTLResourceStateCommandEncoder? {
+        return underlying.makeResourceStateCommandEncoder()
     }
     #endif
 

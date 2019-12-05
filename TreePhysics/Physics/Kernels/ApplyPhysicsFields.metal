@@ -10,9 +10,11 @@ constant int fieldCount [[ function_constant(FunctionConstantIndexPhysicsFieldCo
 struct ApplyPhysicsFieldsIn {
     device half *mass;
     device packed_half3 *centerOfMass;
+    device InertiaTensor *inertiaTensor;
     device packed_half3 *localPivot;
     device quath *orientation;
     device packed_half3 *velocity;
+    device packed_half3 *angularVelocity;
     device half *area;
     device ShapeType *shape;
 };
@@ -52,14 +54,13 @@ float2x3 apply(const WindField wind, const float3 centerOfMass, const ApplyPhysi
             relativeVelocity_normal = dot(relativeVelocity, normal) * normal;
             float3 relativeVelocity_tangential = relativeVelocity - relativeVelocity_normal;
             float3 lift = wind.leafScale * wind.airDensity * area * length(relativeVelocity) * relativeVelocity_normal;
-            float k = wind.airResistanceMultiplier * in.mass[id];
-            float3 drag = k * (relativeVelocity_normal + relativeVelocity_tangential / wind.normal2tangentialDragCoefficientRatio);
+            float3 drag = (float)wind.airResistanceMultiplier * (float)in.mass[id] * (relativeVelocity_normal + relativeVelocity_tangential / wind.normal2tangentialDragCoefficientRatio);
             force = lift + drag;
 
-            float l = wind.leafScale * wind.airDensity * (area / 2) * sqrt(area / M_PI_F) * dot(relativeVelocity, normal);
-            float c;
-            float s = sincos(wind.phi, c);
+            float l = wind.leafScale * wind.airDensity * (area / 2) * sqrt(area) / sqrt(M_PI_F) * dot(relativeVelocity, normal);
+            float c, s = sincos(wind.phi, c);
             torque = l * cross(normal, relativeVelocity * c + cross(normal, relativeVelocity * s));
+            torque -= (float3)wind.airResistanceMultiplier * float3x3_from_inertiaTensor(in.inertiaTensor[id]) * (float3)in.angularVelocity[id];
 
             break;
     }
@@ -85,9 +86,11 @@ applyPhysicsFields(
 
                    device half           *in_mass,
                    device packed_half3   *in_centerOfMass,
+                   device InertiaTensor  *in_inertiaTensor,
                    device packed_half3   *in_localPivot,
                    device quath          *in_orientation,
                    device packed_half3   *in_velocity,
+                   device packed_half3   *in_angularVelocity,
                    device half           *in_area,
                    device ShapeType      *in_shape,
 
@@ -100,9 +103,11 @@ applyPhysicsFields(
     ApplyPhysicsFieldsIn in = {
         .mass = in_mass,
         .centerOfMass = in_centerOfMass,
+        .inertiaTensor = in_inertiaTensor,
         .localPivot = in_localPivot,
         .orientation = in_orientation,
         .velocity = in_velocity,
+        .angularVelocity = in_angularVelocity,
         .area = in_area,
         .shape = in_shape,
     };

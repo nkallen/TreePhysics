@@ -253,13 +253,15 @@ evaluateDifferential(DifferentialSolution<T> differentialSolution, T t)
 
     switch (differentialSolution.type) {
         case QuadraticSolutionTypeComplex:
-            y = c1*pe1*cos(r2*t) + c2*pe1*sin(r2*t) + k;
-            y_ddt = r1*c1*pe1*cos(r2*t) - r2*c1*pe1*sin(r2*t) +
-            r1*c2*pe1*sin(r2*t) + r2*c2*pe1*cos(r2*t);
-            y_d2dt = r1*r1*c1*pe1*cos(r2*t) - r2*r1*c1*pe1*sin(r2*t) -
-            (r1*r2*c1*pe1*sin(r2*t) + r2*r2*c1*pe1*cos(r2*t)) +
-            r1*r1*c2*pe1*sin(r2*t) + r2*r1*c2*pe1*cos(r2*t) +
-            r1*r2*c2*pe1*cos(r2*t) - r2*r2*c2*pe1*sin(r2*t);
+            T cs, sn;
+            sn = sincos(r2*t, cs);
+            y = c1*pe1*cs + c2*pe1*sn + k;
+            y_ddt = r1*c1*pe1*cs - r2*c1*pe1*sn +
+            r1*c2*pe1*sn + r2*c2*pe1*cs;
+            y_d2dt = r1*r1*c1*pe1*cs - r2*r1*c1*pe1*sn -
+            (r1*r2*c1*pe1*sn + r2*r2*c1*pe1*cs) +
+            r1*r1*c2*pe1*sn + r2*r1*c2*pe1*cs +
+            r1*r2*c2*pe1*cs - r2*r2*c2*pe1*sn;
             break;
         case QuadraticSolutionTypeReal:
             y = c1*pe1 + c2*t*pe1 + k;
@@ -462,6 +464,12 @@ inline float3x3 float3x3_from_quat(quatf q) {
     return float3x3(m00, m10, m20,
                     m01, m11, m21,
                     m02, m12, m22);
+}
+
+inline float3x3 quat_rotateTensor(quatf q, float3 t) {
+    float3x3 r = float3x3_from_quat(q);
+
+    return r * transpose(float3x3(t.x * r[0], t.y * r[1], t.z * r[2]));
 }
 
 inline float3x3 float3x3_from_inertiaTensor(InertiaTensor t) {
