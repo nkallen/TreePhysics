@@ -199,7 +199,7 @@ updateCompositeBodies(
                 children.pivot[oid] = (half3)parentPivot;
                 children.centerOfMass[oid] = (half3)totalCenterOfMass;
 
-                if (parentShape == ShapeTypeLeaf && length_squared(totalTorque) > sqr(0.2)) {
+                if (parentShape == ShapeTypeLeaf && length_squared(totalTorque) > sqr(0.5)) {
                     uint freeBodyId = atomic_fetch_add_explicit(&toBeFreedCount, 1, memory_order_relaxed);
                     free.index[freeBodyId] = id;
                 }

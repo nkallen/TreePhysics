@@ -308,7 +308,8 @@ inline quatf quat_identity() {
 
 inline quatf quat_from_axis_angle(float3 axis, float radians) {
     float t = radians * 0.5;
-    return quatf(axis.x * sin(t), axis.y * sin(t), axis.z * sin(t), cos(t));
+    float c, s = sincos(t, c);
+    return quatf(axis.x * s, axis.y * s, axis.z * s, c);
 }
 
 inline quatf quat_from_euler(float3 euler) {

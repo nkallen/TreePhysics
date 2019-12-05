@@ -50,6 +50,7 @@ extension ApplyPhysicsFields {
             let bufs = [
                 mem.physicsFields.physicsFieldBuffer,
 
+                mem.rigidBodies.parentIdBuffer,
                 mem.rigidBodies.massBuffer,
                 mem.rigidBodies.centerOfMassBuffer,
                 mem.rigidBodies.inertiaTensorBuffer,

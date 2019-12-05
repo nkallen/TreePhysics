@@ -43,7 +43,7 @@ typedef NS_ENUM(NSInteger, FunctionConstantIndex)
     FunctionConstantIndexPhysicsFieldCount = 1,
 };
 
-typedef NS_ENUM(NSInteger, PhysicsFieldType)
+typedef NS_ENUM(uint8_t, PhysicsFieldType)
 {
     PhysicsFieldTypeGravity = 0,
     PhysicsFieldTypeWind = 1,

@@ -428,6 +428,8 @@ extension MemoryLayoutManager.RigidBodies {
         let centerOfMass: simd_float3
         let orientation: simd_quatf
         let inertiaTensor: float3x3
+        let force: simd_float3
+        let torque: simd_float3
 
         func assertValid(otherwise: ((String) -> ())) {
             assert(pivot.isFinite, otherwise: otherwise)
@@ -443,7 +445,9 @@ extension MemoryLayoutManager.RigidBodies {
             pivot: simd_float3(pivot[id]),
             centerOfMass: simd_float3(centerOfMass[id]),
             orientation: simd_quatf(orientation[id]),
-            inertiaTensor: float3x3(inertiaTensor[id]))
+            inertiaTensor: float3x3(inertiaTensor[id]),
+            force: simd_float3(force[id]),
+            torque: simd_float3(torque[id]))
     }
 
     subscript(rigidBody: RigidBody) -> Struct {
@@ -454,7 +458,6 @@ extension MemoryLayoutManager.RigidBodies {
     var mass: UnsafeMutablePointer<Float> {
         massBuffer.contents().bindMemory(to: Float.self, capacity: count)
     }
-
     var pivot: UnsafeMutablePointer<packed_half3> {
         pivotBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
     }
@@ -466,6 +469,12 @@ extension MemoryLayoutManager.RigidBodies {
     }
     var inertiaTensor: UnsafeMutablePointer<InertiaTensor> {
         inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
+    }
+    var force: UnsafeMutablePointer<packed_half3> {
+        forceBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+    }
+    var torque: UnsafeMutablePointer<packed_half3> {
+        torqueBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
     }
 }
 
