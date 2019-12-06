@@ -56,22 +56,22 @@ typedef NS_ENUM(uint8_t, ShapeType)
 };
 
 typedef struct {
-    packed_half3 g;
+    packed_float3 g;
 } GravityField;
 
 typedef struct {
-    packed_half3 windVelocity;
-    half airResistanceMultiplier;
-    half phi;
-    half leafScale;
-    half branchScale;
-    half airDensity;
-    half normal2tangentialDragCoefficientRatio;
+    packed_float3 windVelocity;
+    float airResistanceMultiplier;
+    float phi;
+    float leafScale;
+    float branchScale;
+    float airDensity;
+    float normal2tangentialDragCoefficientRatio;
 } WindField;
 
 typedef struct {
-    packed_half3 position;
-    packed_half3 halfExtent;
+    packed_float3 position;
+    packed_float3 halfExtent;
     union {
         GravityField gravity;
         WindField wind;

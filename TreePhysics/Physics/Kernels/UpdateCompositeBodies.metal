@@ -8,11 +8,11 @@ using namespace metal;
 constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]];
 
 typedef struct {
-    device half *mass;
-    device packed_half3 *force;
-    device packed_half3 *torque;
-    device packed_half3 *pivot;
-    device packed_half3 *centerOfMass;
+    device float *mass;
+    device packed_float3 *force;
+    device packed_float3 *torque;
+    device packed_float3 *pivot;
+    device packed_float3 *centerOfMass;
     device InertiaTensor *inertiaTensor;
 } Children;
 
@@ -21,11 +21,11 @@ typedef struct {
     device uchar *childIndex;
     device uint *parentId;
 
-    device half *mass;
-    device packed_half3 *force;
-    device packed_half3 *torque;
-    device packed_half3 *centerOfMass;
-    device packed_half3 *pivot;
+    device float *mass;
+    device packed_float3 *force;
+    device packed_float3 *torque;
+    device packed_float3 *centerOfMass;
+    device packed_float3 *pivot;
     device InertiaTensor *inertiaTensor;
     device quath *jointOrientation;
     device ShapeType *shape;
@@ -33,15 +33,15 @@ typedef struct {
 
 typedef struct {
     device uint *index;
-    device half *mass;
-    device packed_half3 *force;
-    device packed_half3 *torque;
+    device float *mass;
+    device packed_float3 *force;
+    device packed_float3 *torque;
     device InertiaTensor *inertiaTensor;
 } Free;
 
 typedef struct {
     device InertiaTensor *inertiaTensor;
-    device packed_half3 *torque;
+    device packed_float3 *torque;
 } Out;
 
 inline void
@@ -63,7 +63,7 @@ jointSpace(
     float3 torque_jointSpace = quat_act(inverseRotation, torque);
     
     out.inertiaTensor[id] = inertiaTensor_from_float3x3(inertiaTensor_jointSpace);
-    out.torque[id] = (packed_half3)torque_jointSpace;
+    out.torque[id] = (packed_float3)torque_jointSpace;
 }
 
 kernel void
@@ -71,29 +71,29 @@ updateCompositeBodies(
                       device uchar          *in_childCount,
                       device uchar          *in_childIndex,
                       device uint           *in_parentId,
-                      device half           *in_mass,
-                      device packed_half3   *in_pivot,
-                      device packed_half3   *in_force,
-                      device packed_half3   *in_torque,
-                      device packed_half3   *in_centerOfMass,
+                      device float           *in_mass,
+                      device packed_float3   *in_pivot,
+                      device packed_float3   *in_force,
+                      device packed_float3   *in_torque,
+                      device packed_float3   *in_centerOfMass,
                       device InertiaTensor  *in_inertiaTensor,
                       device quath          *in_jointOrientation,
                       device ShapeType      *in_shape,
 
-                      device half           *child_mass,
-                      device packed_half3   *child_force,
-                      device packed_half3   *child_torque,
-                      device packed_half3   *child_pivot,
-                      device packed_half3   *child_centerOfMass,
+                      device float           *child_mass,
+                      device packed_float3   *child_force,
+                      device packed_float3   *child_torque,
+                      device packed_float3   *child_pivot,
+                      device packed_float3   *child_centerOfMass,
                       device InertiaTensor  *child_inertiaTensor,
                       
-                      device packed_half3   *out_torque,
+                      device packed_float3   *out_torque,
                       device InertiaTensor  *out_inertiaTensor,
 
                       device uint           *free_index,
-                      device half           *free_mass,
-                      device packed_half3   *free_force,
-                      device packed_half3   *free_torque,
+                      device float           *free_mass,
+                      device packed_float3   *free_force,
+                      device packed_float3   *free_torque,
                       device InertiaTensor  *free_inertiaTensor,
 
                       device atomic_uint    &toBeFreedCount,
@@ -192,21 +192,21 @@ updateCompositeBodies(
             const ushort nextDelta = deltas[i+1];
             if (parentId != NO_PARENT) {
                 const uint oid = childIndex * nextDelta + parentId;
-                children.mass[oid] = (half)totalMass;
-                children.force[oid] = (half3)totalForce;
-                children.torque[oid] = (half3)totalTorque;
+                children.mass[oid] = (float)totalMass;
+                children.force[oid] = (float3)totalForce;
+                children.torque[oid] = (float3)totalTorque;
                 children.inertiaTensor[oid] = inertiaTensor_from_float3x3(totalInertiaTensor);
-                children.pivot[oid] = (half3)parentPivot;
-                children.centerOfMass[oid] = (half3)totalCenterOfMass;
+                children.pivot[oid] = (float3)parentPivot;
+                children.centerOfMass[oid] = (float3)totalCenterOfMass;
 
                 if (parentShape == ShapeTypeLeaf && length_squared(totalTorque) > sqr(110.5)) {
                     uint freeBodyId = atomic_fetch_add_explicit(&toBeFreedCount, 1, memory_order_relaxed);
                     free.index[freeBodyId] = id;
                 }
             } else {
-                free.mass[id]   = (half)totalMass;
-                free.force[id]  = (half3)totalForce;
-                free.torque[id] = (half3)totalTorque;
+                free.mass[id]   = (float)totalMass;
+                free.force[id]  = (float3)totalForce;
+                free.torque[id] = (float3)totalTorque;
                 free.inertiaTensor[id] = inertiaTensor_from_float3x3(totalInertiaTensor);
             }
         }

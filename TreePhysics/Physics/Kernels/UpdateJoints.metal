@@ -6,10 +6,10 @@
 using namespace metal;
 
 struct UpdateJointsIn {
-    device packed_half3 *theta;
-    device half *stiffness;
-    device half *damping;
-    device packed_half3 *torque;
+    device packed_float3 *theta;
+    device float *stiffness;
+    device float *damping;
+    device packed_float3 *torque;
     device InertiaTensor *inertiaTensor;
 };
 
@@ -73,11 +73,11 @@ update(
 
 kernel void
 updateJoints(
-             device packed_half3 *joint_theta,
-             device half *joint_stiffness,
-             device half *joint_damping,
+             device packed_float3 *joint_theta,
+             device float *joint_stiffness,
+             device float *joint_damping,
 
-             device packed_half3 *joint_torque,
+             device packed_float3 *joint_torque,
              device InertiaTensor *joint_inertiaTensor,
 
              constant float & time,
@@ -91,7 +91,7 @@ updateJoints(
         .inertiaTensor = joint_inertiaTensor,
     };
     const float3x3 theta = gid == 0 ? float3x3(0) : update(gid, in, time);
-    joint_theta[gid*3+0] = (packed_half3)theta[0];
-    joint_theta[gid*3+1] = (packed_half3)theta[1];
-    joint_theta[gid*3+2] = (packed_half3)theta[2];
+    joint_theta[gid*3+0] = (packed_float3)theta[0];
+    joint_theta[gid*3+1] = (packed_float3)theta[1];
+    joint_theta[gid*3+2] = (packed_float3)theta[2];
 }

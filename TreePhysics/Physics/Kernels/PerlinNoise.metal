@@ -12,8 +12,8 @@ inline float random(float2 st) {
 // Based on Morgan McGuire @morgan3d
 // https://www.shadertoy.com/view/4dS3Wd
 inline float noise(const float2 st) {
-    const float2 i = floor(st);
-    const float2 f = fract(st);
+    float2 i;
+    const float2 f = modf(st, i);
 
     // Four corners in 2D of a tile
     const float a = random(i);

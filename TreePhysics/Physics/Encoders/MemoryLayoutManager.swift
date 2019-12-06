@@ -64,26 +64,26 @@ public final class MemoryLayoutManager {
             let childIndexBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
             let parentIdBuffer = device.makeBuffer(length: count * MemoryLayout<UInt32>.stride, options: [.storageModeShared])!
             let climberCountBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
-            let massBuffer = device.makeBuffer(length: count * MemoryLayout<half>.stride, options: [.storageModeShared])!
-            let pivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let localPivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let orientationBuffer = device.makeBuffer(length: count * MemoryLayout<simd_quath>.stride, options: [.storageModeShared])!
+            let massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
+            let pivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let localPivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let orientationBuffer = device.makeBuffer(length: count * MemoryLayout<simd_quatf>.stride, options: [.storageModeShared])!
             let inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
             let localInertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
-            let jointDampingBuffer = device.makeBuffer(length: count * MemoryLayout<half>.stride, options: [.storageModeShared])!
-            let jointStiffnessBuffer = device.makeBuffer(length: count * MemoryLayout<half>.stride, options: [.storageModeShared])!
-            let localJointPositionBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            let jointDampingBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
+            let jointStiffnessBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
+            let localJointPositionBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
             let localJointOrientationBuffer = device.makeBuffer(length: count * MemoryLayout<simd_quath>.stride, options: [.storageModeShared])!
             let jointOrientationBuffer = device.makeBuffer(length: count * MemoryLayout<simd_quath>.stride, options: [.storageModeShared])!
-            let velocityBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let angularVelocityBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let accelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let angularAccelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let angularMomentumBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            let areaBuffer = device.makeBuffer(length: count * MemoryLayout<half>.stride, options: [.storageModeShared])!
+            let velocityBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let angularVelocityBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let accelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let angularAccelerationBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let angularMomentumBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            let areaBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
             let shapeBuffer = device.makeBuffer(length: count * MemoryLayout<UInt8>.stride, options: [.storageModeShared])!
 
             let childCount = childCountBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
@@ -91,26 +91,26 @@ public final class MemoryLayoutManager {
             let childIndex = childIndexBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
             let parentId = parentIdBuffer.contents().bindMemory(to: UInt32.self, capacity: count)
             let climberCount = climberCountBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
-            let mass = massBuffer.contents().bindMemory(to: half.self, capacity: count)
-            let pivot = pivotBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let localPivot = localPivotBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let force = forceBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let torque = torqueBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let centerOfMass = centerOfMassBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let orientation = orientationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
+            let mass = massBuffer.contents().bindMemory(to: Float.self, capacity: count)
+            let pivot = pivotBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let localPivot = localPivotBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let force = forceBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let torque = torqueBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let centerOfMass = centerOfMassBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let orientation = orientationBuffer.contents().bindMemory(to: simd_quatf.self, capacity: count)
             let inertiaTensor = inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
             let localInertiaTensor = localInertiaTensorBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
-            let jointDamping = jointDampingBuffer.contents().bindMemory(to: half.self, capacity: count)
-            let jointStiffness = jointStiffnessBuffer.contents().bindMemory(to: half.self, capacity: count)
-            let localJointPosition = localJointPositionBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+            let jointDamping = jointDampingBuffer.contents().bindMemory(to: Float.self, capacity: count)
+            let jointStiffness = jointStiffnessBuffer.contents().bindMemory(to: Float.self, capacity: count)
+            let localJointPosition = localJointPositionBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
             let localJointOrientation = localJointOrientationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
             let jointOrientation = jointOrientationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
-            let velocity = velocityBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let angularVelocity = angularVelocityBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let acceleration = accelerationBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let angularAcceleration = angularAccelerationBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let angularMomentum = angularMomentumBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
-            let area = areaBuffer.contents().bindMemory(to: half.self, capacity: count)
+            let velocity = velocityBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let angularVelocity = angularVelocityBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let acceleration = accelerationBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let angularAcceleration = angularAccelerationBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let angularMomentum = angularMomentumBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
+            let area = areaBuffer.contents().bindMemory(to: Float.self, capacity: count)
             let shape = shapeBuffer.contents().bindMemory(to: UInt8.self, capacity: count)
 
             // Step 3: Store data into the buffer
@@ -138,29 +138,29 @@ public final class MemoryLayoutManager {
                 for rigidBody in climbers + [rigidBody] {
                     let id = index[rigidBody]!
 
-                    mass[id] = max(.leastNormalMagnitude, Half(rigidBody.mass))
-                    pivot[id] = packed_half3(rigidBody.pivot)
-                    localPivot[id] = packed_half3(rigidBody.localPivot)
-                    force[id] = packed_half3(rigidBody.force)
-                    torque[id] = packed_half3(rigidBody.torque)
-                    centerOfMass[id] = packed_half3(rigidBody.centerOfMass)
-                    orientation[id] = simd_quath(rigidBody.orientation)
+                    mass[id] = max(.leastNormalMagnitude, Float(rigidBody.mass))
+                    pivot[id] = packed_float3(rigidBody.pivot)
+                    localPivot[id] = packed_float3(rigidBody.localPivot)
+                    force[id] = packed_float3(rigidBody.force)
+                    torque[id] = packed_float3(rigidBody.torque)
+                    centerOfMass[id] = packed_float3(rigidBody.centerOfMass)
+                    orientation[id] = rigidBody.orientation
                     inertiaTensor[id] = InertiaTensor(rigidBody.inertiaTensor)
                     localInertiaTensor[id] = packed_float3(rigidBody.localInertiaTensor.diagonal)
                     switch rigidBody.shape {
                     case let .internode(area: a, length: _, radius: _):
                         shape[id] = ShapeType.internode.rawValue
-                        area[id] = Half(a)
+                        area[id] = Float(a)
                     case let .leaf(area: a):
                         shape[id] = ShapeType.leaf.rawValue
-                        area[id] = Half(a)
+                        area[id] = Float(a)
                     case nil: ()
                     }
                     if let parentJoint = rigidBody.parentJoint {
-                        jointDamping[id] = max(.leastNormalMagnitude, Half(parentJoint.damping))
-                        jointStiffness[id] = max(.leastNormalMagnitude, Half(parentJoint.stiffness))
+                        jointDamping[id] = max(.leastNormalMagnitude, Float(parentJoint.damping))
+                        jointStiffness[id] = max(.leastNormalMagnitude, Float(parentJoint.stiffness))
                         jointOrientation[id] = simd_quath(parentJoint.orientation)
-                        localJointPosition[id] = packed_half3(parentJoint.localPosition)
+                        localJointPosition[id] = packed_float3(parentJoint.localPosition)
                         localJointOrientation[id] = simd_quath(parentJoint.localOrientation)
                     }
                 }
@@ -278,10 +278,10 @@ public final class MemoryLayoutManager {
             }
 
             self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
-            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            self.pivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            self.pivotBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            self.centerOfMassBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
             self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
 
             self.massBuffer.label = "Composite mass"
@@ -303,8 +303,8 @@ public final class MemoryLayoutManager {
             self.toBeFreedIndexBuffer = device.makeBuffer(length: count * MemoryLayout<UInt32>.stride, options: [.storageModeShared])!
             self.indexBuffer = device.makeBuffer(length: count * MemoryLayout<UInt32>.stride, options: [.storageModeShared])!
             self.massBuffer = device.makeBuffer(length: count * MemoryLayout<Float>.stride, options: [.storageModeShared])!
-            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
-            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.forceBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
+            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
             self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
 
             self.toBeFreedCountBuffer.label = "Bodies to be freed"
@@ -324,9 +324,9 @@ public final class MemoryLayoutManager {
 
         init(device: MTLDevice, count: Int) {
             self.count = count
-            self.thetaBuffer = device.makeBuffer(length: 3 * count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.thetaBuffer = device.makeBuffer(length: 3 * count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
             self.inertiaTensorBuffer = device.makeBuffer(length: count * MemoryLayout<InertiaTensor>.stride, options: [.storageModeShared])!
-            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_half3>.stride, options: [.storageModeShared])!
+            self.torqueBuffer = device.makeBuffer(length: count * MemoryLayout<packed_float3>.stride, options: [.storageModeShared])!
 
             self.thetaBuffer.label = "Joint theta"
             self.inertiaTensorBuffer.label = "Joint inertia tensor"
@@ -349,23 +349,23 @@ public final class MemoryLayoutManager {
 
             for (i, field) in fields.enumerated() {
                 var shaderField = ShaderTypes.PhysicsField()
-                shaderField.position = packed_half3(field.position)
-                shaderField.halfExtent = packed_half3(field.halfExtent)
+                shaderField.position = packed_float3(field.position)
+                shaderField.halfExtent = packed_float3(field.halfExtent)
                 switch field {
                 case let windField as WindField:
                     shaderField.type = .wind
                     let wind = ShaderTypes.WindField(
-                        windVelocity: packed_half3(windField.windVelocity),
-                        airResistanceMultiplier: Half(windField.airResistanceMultiplier),
-                        phi: Half(windField.phi),
-                        leafScale: Half(windField.leafScale),
-                        branchScale: Half(windField.branchScale),
-                        airDensity: Half(windField.airDensity),
-                        normal2tangentialDragCoefficientRatio: Half(windField.normal2tangentialDragCoefficientRatio))
+                        windVelocity: packed_float3(windField.windVelocity),
+                        airResistanceMultiplier: Float(windField.airResistanceMultiplier),
+                        phi: Float(windField.phi),
+                        leafScale: Float(windField.leafScale),
+                        branchScale: Float(windField.branchScale),
+                        airDensity: Float(windField.airDensity),
+                        normal2tangentialDragCoefficientRatio: Float(windField.normal2tangentialDragCoefficientRatio))
                     shaderField.wind = wind
                 case let gravityField as GravityField:
                     shaderField.type = .gravity
-                    let gravity = ShaderTypes.GravityField(g: packed_half3(gravityField.g))
+                    let gravity = ShaderTypes.GravityField(g: packed_float3(gravityField.g))
                     shaderField.gravity = gravity
                 default: fatalError("Unsupported Field Type: \(type(of: shaderField))")
                 }
@@ -444,7 +444,7 @@ extension MemoryLayoutManager.RigidBodies {
         return Struct(
             pivot: simd_float3(pivot[id]),
             centerOfMass: simd_float3(centerOfMass[id]),
-            orientation: simd_quatf(orientation[id]),
+            orientation: orientation[id],
             inertiaTensor: float3x3(inertiaTensor[id]),
             force: simd_float3(force[id]),
             torque: simd_float3(torque[id]))
@@ -458,23 +458,23 @@ extension MemoryLayoutManager.RigidBodies {
     var mass: UnsafeMutablePointer<Float> {
         massBuffer.contents().bindMemory(to: Float.self, capacity: count)
     }
-    var pivot: UnsafeMutablePointer<packed_half3> {
-        pivotBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+    var pivot: UnsafeMutablePointer<packed_float3> {
+        pivotBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
     }
-    var centerOfMass: UnsafeMutablePointer<packed_half3> {
-        centerOfMassBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+    var centerOfMass: UnsafeMutablePointer<packed_float3> {
+        centerOfMassBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
     }
-    var orientation: UnsafeMutablePointer<simd_quath> {
-        orientationBuffer.contents().bindMemory(to: simd_quath.self, capacity: count)
+    var orientation: UnsafeMutablePointer<simd_quatf> {
+        orientationBuffer.contents().bindMemory(to: simd_quatf.self, capacity: count)
     }
     var inertiaTensor: UnsafeMutablePointer<InertiaTensor> {
         inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
     }
-    var force: UnsafeMutablePointer<packed_half3> {
-        forceBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+    var force: UnsafeMutablePointer<packed_float3> {
+        forceBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
     }
-    var torque: UnsafeMutablePointer<packed_half3> {
-        torqueBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+    var torque: UnsafeMutablePointer<packed_float3> {
+        torqueBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
     }
 }
 
@@ -502,13 +502,13 @@ extension MemoryLayoutManager.Joints {
                 simd_float3(theta[id*3+2])))
     }
 
-    var theta: UnsafeMutablePointer<packed_half3> {
-        return thetaBuffer.contents().bindMemory(to: packed_half3.self, capacity: count*3)
+    var theta: UnsafeMutablePointer<packed_float3> {
+        return thetaBuffer.contents().bindMemory(to: packed_float3.self, capacity: count*3)
     }
     var inertiaTensor: UnsafeMutablePointer<InertiaTensor> {
         inertiaTensorBuffer.contents().bindMemory(to: InertiaTensor.self, capacity: count)
     }
-    var torque: UnsafeMutablePointer<packed_half3> {
-        return torqueBuffer.contents().bindMemory(to: packed_half3.self, capacity: count)
+    var torque: UnsafeMutablePointer<packed_float3> {
+        return torqueBuffer.contents().bindMemory(to: packed_float3.self, capacity: count)
     }
 }

@@ -9,14 +9,14 @@ constant int fieldCount [[ function_constant(FunctionConstantIndexPhysicsFieldCo
 
 struct ApplyPhysicsFieldsIn {
     device uint *parentId;
-    device half *mass;
-    device packed_half3 *centerOfMass;
+    device float *mass;
+    device packed_float3 *centerOfMass;
     device InertiaTensor *inertiaTensor;
-    device packed_half3 *localPivot;
-    device quath *orientation;
-    device packed_half3 *velocity;
-    device packed_half3 *angularVelocity;
-    device half *area;
+    device packed_float3 *localPivot;
+    device quatf *orientation;
+    device packed_float3 *velocity;
+    device packed_float3 *angularVelocity;
+    device float *area;
     device ShapeType *shape;
 };
 
@@ -90,18 +90,18 @@ applyPhysicsFields(
                    constant PhysicsField *fields,
 
                    device uint           *in_parentId,
-                   device half           *in_mass,
-                   device packed_half3   *in_centerOfMass,
+                   device float           *in_mass,
+                   device packed_float3   *in_centerOfMass,
                    device InertiaTensor  *in_inertiaTensor,
-                   device packed_half3   *in_localPivot,
-                   device quath          *in_orientation,
-                   device packed_half3   *in_velocity,
-                   device packed_half3   *in_angularVelocity,
-                   device half           *in_area,
+                   device packed_float3   *in_localPivot,
+                   device quatf          *in_orientation,
+                   device packed_float3   *in_velocity,
+                   device packed_float3   *in_angularVelocity,
+                   device float           *in_area,
                    device ShapeType      *in_shape,
 
-                   device packed_half3   *out_force,
-                   device packed_half3   *out_torque,
+                   device packed_float3   *out_force,
+                   device packed_float3   *out_torque,
 
                    constant float & time,
                    const uint gid [[ thread_position_in_grid ]])
@@ -135,6 +135,6 @@ applyPhysicsFields(
             }
         }
     }
-    out_force[gid] = (packed_half3)result[0];
-    out_torque[gid] = (packed_half3)result[1];
+    out_force[gid] = (packed_float3)result[0];
+    out_torque[gid] = (packed_float3)result[1];
 }

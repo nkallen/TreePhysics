@@ -218,7 +218,7 @@
 		9E461B3422E7017F008AB788 /* CylinderPen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderPen.swift; sourceTree = "<group>"; };
 		9E461B3622E704BD008AB788 /* CylinderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CylinderTest.swift; sourceTree = "<group>"; };
 		9E4930392386A7BA00864046 /* PerlinNoise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PerlinNoise.h; sourceTree = "<group>"; };
-		9E49303A2386A7C400864046 /* PerlinNoise.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = PerlinNoise.metal; sourceTree = "<group>"; };
+		9E49303A2386A7C400864046 /* PerlinNoise.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = PerlinNoise.metal; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.metal; };
 		9E4946C123449FDE0036B7EC /* LocalitySensitiveHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHash.swift; sourceTree = "<group>"; };
 		9E4946C32344A10E0036B7EC /* LocalitySensitiveHashTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalitySensitiveHashTests.swift; sourceTree = "<group>"; };
 		9E4946C62344AB080036B7EC /* AutoTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoTree.swift; sourceTree = "<group>"; };

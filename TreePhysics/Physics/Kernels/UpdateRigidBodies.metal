@@ -8,43 +8,43 @@ constant int rangeCount [[ function_constant(FunctionConstantIndexRangeCount) ]]
 
 struct UpdateRigidBodiesIn {
     device uint *parentId;
-    device packed_half3 *localPivot;
+    device packed_float3 *localPivot;
     device packed_float3 *localInertiaTensor;
-    device packed_half3 *theta;
+    device packed_float3 *theta;
     device quath *localJointOrientation;
-    device packed_half3 *localJointPosition;
+    device packed_float3 *localJointPosition;
 };
 
 struct UpdateRigidBodiesOut {
-    device packed_half3 *pivot;
-    device packed_half3 *centerOfMass;
-    device quath *orientation;
+    device packed_float3 *pivot;
+    device packed_float3 *centerOfMass;
+    device quatf *orientation;
     device quath *jointOrientation;
     device InertiaTensor *inertiaTensor;
-    device packed_half3 *velocity;
-    device packed_half3 *angularVelocity;
-    device packed_half3 *acceleration;
-    device packed_half3 *angularAcceleration;
+    device packed_float3 *velocity;
+    device packed_float3 *angularVelocity;
+    device packed_float3 *acceleration;
+    device packed_float3 *angularAcceleration;
 };
 
 kernel void
 updateRigidBodies(
                   device uint        *in_parentId,
-                  device packed_half3  *in_localPivot,
+                  device packed_float3  *in_localPivot,
                   device packed_float3 *in_localInertiaTensor,
-                  device packed_half3  *in_localJointPosition,
+                  device packed_float3  *in_localJointPosition,
                   device quath         *in_localJointOrientation,
-                  device packed_half3  *in_theta,
+                  device packed_float3  *in_theta,
 
-                  device packed_half3  *out_pivot,
-                  device packed_half3  *out_centerOfMass,
+                  device packed_float3  *out_pivot,
+                  device packed_float3  *out_centerOfMass,
                   device InertiaTensor *out_inertiaTensor,
-                  device quath         *out_orientation,
+                  device quatf         *out_orientation,
                   device quath         *out_jointOrientation,
-                  device packed_half3  *out_velocity,
-                  device packed_half3  *out_angularVelocity,
-                  device packed_half3  *out_acceleration,
-                  device packed_half3  *out_angularAcceleration,
+                  device packed_float3  *out_velocity,
+                  device packed_float3  *out_angularVelocity,
+                  device packed_float3  *out_acceleration,
+                  device packed_float3  *out_angularAcceleration,
 
                   constant ushort * deltas,
                   uint gid [[ thread_position_in_grid ]])
@@ -91,7 +91,8 @@ updateRigidBodies(
                 const quatf jointOrientation = quat_multiply(parentOrientation, localJointOrientation);
                 float3 pivot = parentPivot + quat_act(parentOrientation, localJointPosition);
 
-                const quatf localOrientation = length(angle) < 10e-10 ? quatf(0,0,0,1) : quat_from_axis_angle(normalize(angle), length(angle));
+                const float l = length(angle);
+                const quatf localOrientation = length(angle) < 10e-10 ? quatf(0,0,0,1) : quat_from_axis_angle(angle / l, l);
                 const quatf orientation = normalize(quat_multiply(jointOrientation, localOrientation));
 
                 const float3x3 R = float3x3_from_quat(orientation);
@@ -115,15 +116,15 @@ updateRigidBodies(
                 float3 acceleration = (float3)out.acceleration[parentId] + (skew(parentAngularAcceleration) + sqr(skew(parentAngularVelocity))) * quat_act(parentOrientation, localJointPosition);
                 acceleration -= (skew(angularAcceleration) + sqr(skew(angularVelocity))) * quat_act(orientation, localPivot);
 
-                out.pivot[id] = (packed_half3)pivot;
-                out.centerOfMass[id] = (packed_half3)centerOfMass;
+                out.pivot[id] = (packed_float3)pivot;
+                out.centerOfMass[id] = (packed_float3)centerOfMass;
                 out.inertiaTensor[id] = inertiaTensor_from_float3x3(inertiaTensor);
-                out.orientation[id] = (quath)orientation;
+                out.orientation[id] = (quatf)orientation;
                 out.jointOrientation[id] = (quath)jointOrientation; // FIXME, can we use localOrientation instead?
-                out.velocity[id] = (packed_half3)velocity;
-                out.angularVelocity[id] = (packed_half3)angularVelocity;
-                out.acceleration[id] = (packed_half3)acceleration;
-                out.angularAcceleration[id] = (packed_half3)angularAcceleration;
+                out.velocity[id] = (packed_float3)velocity;
+                out.angularVelocity[id] = (packed_float3)angularVelocity;
+                out.acceleration[id] = (packed_float3)acceleration;
+                out.angularAcceleration[id] = (packed_float3)angularAcceleration;
             }
         }
         previousLowerBound = lowerBound;

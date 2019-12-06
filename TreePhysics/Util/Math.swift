@@ -384,6 +384,10 @@ extension simd_float3 {
     init(_ v: packed_half3) {
         self.init(Float(v.x), Float(v.y), Float(v.z))
     }
+
+    init(_ v: packed_float3) {
+        self.init(Float(v.x), Float(v.y), Float(v.z))
+    }
 }
 
 extension float3x3 {

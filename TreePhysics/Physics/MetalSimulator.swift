@@ -36,8 +36,8 @@ public final class MetalSimulator {
         updateCompositeBodies.encode(commandBuffer: commandBuffer)
         updateJoints.encode(commandBuffer: commandBuffer, at: time)
         updateRigidBodies.encode(commandBuffer: commandBuffer)
-        updateFreeBodies.encode(commandBuffer: commandBuffer, at: time)
-        freeBodies.encode(commandBuffer: commandBuffer)
+//        updateFreeBodies.encode(commandBuffer: commandBuffer, at: time)
+//        freeBodies.encode(commandBuffer: commandBuffer)
         commandBuffer.popDebugGroup()
     }
 }

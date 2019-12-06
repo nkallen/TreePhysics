@@ -18,11 +18,11 @@ class GameViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         self.root = ArticulatedRigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
-        let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3)
+        let cylinderPen = CylinderPen<UInt32>(radialSegmentCount: 3)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
         let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 9)
         let configuration = InterpreterConfig(
             //            randomScale: 0.4,
             angle: .pi / 8,
@@ -85,13 +85,13 @@ extension GameViewController: SCNSceneRendererDelegate {
         //        check()
         //        cpuSimulator.update(at: 1.0/60)
         
-        SCNTransaction.begin()
-        for rigidBody in self.world.rigidBodiesUnordered {
-            let id = self.mem.rigidBodies.index[rigidBody]!
-            rigidBody.node.simdPosition = simd_float3(self.mem.rigidBodies.centerOfMass[id])
-            rigidBody.node.simdOrientation = simd_quatf(self.mem.rigidBodies.orientation[id])
-        }
-        SCNTransaction.commit()
+//        SCNTransaction.begin()
+//        for rigidBody in self.world.rigidBodiesUnordered {
+//            let id = self.mem.rigidBodies.index[rigidBody]!
+//            rigidBody.node.simdPosition = simd_float3(self.mem.rigidBodies.centerOfMass[id])
+//            rigidBody.node.simdOrientation = self.mem.rigidBodies.orientation[id]
+//        }
+//        SCNTransaction.commit()
         
         print(String.localizedStringWithFormat("%.2f ms", (commandBuffer.gpuEndTime - commandBuffer.gpuStartTime) * 1000), mem.rigidBodies.ranges)
     }
