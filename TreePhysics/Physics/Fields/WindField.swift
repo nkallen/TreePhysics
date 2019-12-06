@@ -7,13 +7,13 @@ public final class WindField: PhysicsField {
     public var airResistanceMultiplier: Float = 4
     public var phi: Float = 0.5
     let leafScale: Float = 1
-    let airDensity: Float = 1
+    let airDensity: Float = 0.1
     let normal2tangentialDragCoefficientRatio: Float = 100
     let branchScale: Float = 1
 
     let noise = Noise()
 
-    public init(windVelocity: simd_float3 = simd_float3(4,0,-3)*2) {
+    public init(windVelocity: simd_float3 = simd_float3(4,0,-3)) {
         self.windVelocity = windVelocity
     }
 

@@ -21,8 +21,8 @@ class GameViewController: UIViewController {
         let cylinderPen = CylinderPen<UInt16>(radialSegmentCount: 3)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA&&J]/////[!"&FFFFFFFA&&J]/////[!"&FFFFFFFA&&J]"#)
-        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 6)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
+        let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 4)
         let configuration = InterpreterConfig(
             //            randomScale: 0.4,
             angle: .pi / 8,
@@ -40,7 +40,7 @@ class GameViewController: UIViewController {
         self.world = PhysicsWorld()
         world.add(field: wind)
         self.world.add(rigidBody: root)
-        self.mem = MemoryLayoutManager(device: device, root: root, fields: [gravity, wind])
+        self.mem = MemoryLayoutManager(device: device, root: root, fields: [wind, gravity])
         self.simulator = MetalSimulator(device: device, mem: mem)
         self.cpuSimulator = CPUSimulator(world: world)
         

@@ -4,7 +4,7 @@ import SceneKit
 
 public class Tree {
     static let leafThickness: Float = 0.001
-    static let K: Float = 15000
+    static let K: Float = 200
     static let β: Float = 0.02
     static let maxAngle: Float = Float.pi / 3
     static let minAngle: Float = -Float.pi / 3

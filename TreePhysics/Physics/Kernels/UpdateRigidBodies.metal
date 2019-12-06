@@ -119,7 +119,7 @@ updateRigidBodies(
                 out.centerOfMass[id] = (packed_half3)centerOfMass;
                 out.inertiaTensor[id] = inertiaTensor_from_float3x3(inertiaTensor);
                 out.orientation[id] = (quath)orientation;
-                out.jointOrientation[id] = (quath)jointOrientation;
+                out.jointOrientation[id] = (quath)jointOrientation; // FIXME, can we use localOrientation instead?
                 out.velocity[id] = (packed_half3)velocity;
                 out.angularVelocity[id] = (packed_half3)angularVelocity;
                 out.acceleration[id] = (packed_half3)acceleration;

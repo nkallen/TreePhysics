@@ -27,7 +27,7 @@ typedef struct {
     device packed_half3 *centerOfMass;
     device packed_half3 *pivot;
     device InertiaTensor *inertiaTensor;
-    device quath *rotation;
+    device quath *jointOrientation;
     device ShapeType *shape;
 } Bodies;
 
@@ -48,15 +48,15 @@ inline void
 jointSpace(
            uint id,
            Out out,
-           quatf rotation,
+           quatf jointOrientation,
            float mass,
            float3 torque,
            float3 centerOfMass,
            float3 pivot,
            float3x3 inertiaTensor)
 {
-    float3x3 rotationMatrix = float3x3_from_quat(rotation);
-    quatf inverseRotation = quat_inverse(rotation);
+    float3x3 rotationMatrix = float3x3_from_quat(jointOrientation);
+    quatf inverseRotation = quat_inverse(jointOrientation);
     float3 pr = quat_act(inverseRotation, centerOfMass - pivot);
     float3x3 inertiaTensor_jointSpace = transpose(rotationMatrix) * inertiaTensor * rotationMatrix;
     inertiaTensor_jointSpace -= mass * sqr(skew(pr));
@@ -77,7 +77,7 @@ updateCompositeBodies(
                       device packed_half3   *in_torque,
                       device packed_half3   *in_centerOfMass,
                       device InertiaTensor  *in_inertiaTensor,
-                      device quath          *in_rotation,
+                      device quath          *in_jointOrientation,
                       device ShapeType      *in_shape,
 
                       device half           *child_mass,
@@ -121,7 +121,7 @@ updateCompositeBodies(
         .force = in_force,
         .torque = in_torque,
         .centerOfMass = in_centerOfMass,
-        .rotation = in_rotation,
+        .jointOrientation = in_jointOrientation,
         .inertiaTensor = in_inertiaTensor,
         .shape = in_shape,
     };
@@ -186,7 +186,7 @@ updateCompositeBodies(
                 totalInertiaTensor += childInertiaTensor - childMass * sqr(skew(childCenterOfMass - totalCenterOfMass));
             }
 
-            jointSpace(id, out, (quatf)bodies.rotation[id], totalMass, totalTorque, totalCenterOfMass, parentPivot, totalInertiaTensor);
+            jointSpace(id, out, (quatf)bodies.jointOrientation[id], totalMass, totalTorque, totalCenterOfMass, parentPivot, totalInertiaTensor);
 
             // Step 2: Store (intermediate) result for computation at the next level
             const ushort nextDelta = deltas[i+1];
@@ -199,7 +199,7 @@ updateCompositeBodies(
                 children.pivot[oid] = (half3)parentPivot;
                 children.centerOfMass[oid] = (half3)totalCenterOfMass;
 
-                if (parentShape == ShapeTypeLeaf && length_squared(totalTorque) > sqr(0.5)) {
+                if (parentShape == ShapeTypeLeaf && length_squared(totalTorque) > sqr(110.5)) {
                     uint freeBodyId = atomic_fetch_add_explicit(&toBeFreedCount, 1, memory_order_relaxed);
                     free.index[freeBodyId] = id;
                 }
