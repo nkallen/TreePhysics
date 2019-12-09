@@ -18,10 +18,10 @@ class GameViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         self.root = ArticulatedRigidBody.static()
         let rigidBodyPen = RigidBodyPen(parent: root)
-        let cylinderPen = CylinderPen<UInt32>(radialSegmentCount: 3)
+        let cylinderPen = CylinderPen<UInt32>(radialSegmentCount: 5)
         let skinningPen = SkinningPen(cylinderPen: cylinderPen, rigidBodyPen: rigidBodyPen)
         
-        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFA]/////[!"&FFFFFFFA]/////[!"&FFFFFFFA]"#)
+        let rule = Rewriter.Rule(symbol: "A", replacement: #"[!"&FFFFFFFAJ]/////[!"&FFFFFFFAJ]/////[!"&FFFFFFFAJ]"#)
         let lSystem = Rewriter.rewrite(premise: "A", rules: [rule], generations: 9)
         let configuration = InterpreterConfig(
             //            randomScale: 0.4,

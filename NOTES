@@ -1,83 +1,32 @@
-The biggest optimization for doing highly detailed trees is by analogy to tesselation;
 
-Let each RigidBody have a set (16) of turtle instructions: 16 bytes
-If we need any constants (step size, etc.), store 8 halfs => 32 bytes
+// sourcery: storage = private, soa
+struct RigidBody {
+    // sourcery: buffer = "tree"
+    let parentId: Int
+    // sourcery: buffer = "tree"
+    let childCount: Int
+    // sourcery: buffer = "tree"
+    let firstChild: Int
+    // sourcery: buffer = "tree"
+    let childIndex: Int
 
-For each updatCompositeBodies step (which is leaf to root order) replay the turtle commands (in reverse order in this step -- is that possible?) accumulating the force, torque, etc.
-
-Calculate the joint angles immediately -- there's no avoiding this, unfortunately.
-
-===
-
-let captureManager = MTLCaptureManager.shared()
-
-guard captureManager.supportsDestination(.gpuTraceDocument) else
-{
-print("Capture to a GPU tracefile is not supported")
-return
+    // sourcery: buffer = "physics"
+    let mass: Float
+    // sourcery: buffer = "physics"
+    let pivot: simd_float3
+    // sourcery: buffer = "physics"
+    let centerOfMass: simd_float3
 }
 
-let captureDescriptor = MTLCaptureDescriptor()
-captureDescriptor.captureObject = self.device
-captureDescriptor.destination = .gpuTraceDocument
-captureDescriptor.outputURL = self.traceURL
-
-==
-
-// Create myCaptureScope outside of your rendering loop.
-myCaptureScope?.begin()
-let commandBuffer = commandQueue.makeCommandBuffer()!
-// Do Metal work
-commandBuffer.commit()
-myCaptureScope?.end()
-
-
-====
-
-enum kind_en { knothing, kint, kfloat, kstring };
-struct value_st {
-enum kind_en kind;
-union {
-int n;     // when kint
-float f;   // when kfloat
-char* s;   // when kstring
-};
-};
-
-===
-
-
-static SIMD_NOINLINE simd_quatf simd_bezier(simd_quatf q0, simd_quatf q1, simd_quatf q2, simd_quatf q3, float t) {
-simd_quatf q01 = _simd_slerp_internal(q0, q1, t);
-simd_quatf q12 = _simd_slerp_internal(q1, q2, t);
-simd_quatf q23 = _simd_slerp_internal(q2, q3, t);
-simd_quatf q012 = _simd_slerp_internal(q01, q12, t);
-simd_quatf q123 = _simd_slerp_internal(q12, q23, t);
-return _simd_slerp_internal(q012, q123, t);
+struct CompositeBody {
+    let mass: Float
 }
 
-static SIMD_NOINLINE simd_quatf _simd_slerp_internal(simd_quatf q0, simd_quatf q1, float t) {
-float s = 1 - t;
-float a = _simd_angle(q0, q1);
-float r = simd_recip(_simd_sinc(a));
-return simd_normalize(simd_quaternion(_simd_sinc(s*a)*r*s*q0.vector + _simd_sinc(t*a)*r*t*q1.vector));
-}
+...
 
-===
-squisher:
-for rigidBody in rigidBodiesLevelOrder {
-if let parentJoint = rigidBody.parentJoint {
-parentJoint.updateTransform()
-let i: float3
-if length(parentJoint.rotation_local.imag) < 10e-10 {
-let j = simd_quatf(angle: .pi, axis: float3(1,0,0))
-i = j.angle * j.axis
-} else {
-let j = simd_quatf(angle: .pi, axis: float3(0,0,1)) * parentJoint.rotation_local.inverse
-i = j.angle * j.axis
-}
-parentJoint.θ[0] = i
-rigidBody.updateTransform()
-print("rb", rigidBody.translation)
-}
-}
+let rigidBodies = RigidBody.allocate(capacity: 10)
+rigidBodies.assign(from: [RigidBody])
+
+rigidBodies[10] -> RigidBoy
+
+rigidBodies.childCount[10] -> Int

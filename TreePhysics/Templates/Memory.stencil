@@ -1,0 +1,62 @@
+protocol Allocator {
+    associatedtype Pointee
+    static func allocate(capacity count: Int) -> UnsafeMutablePointer<Pointee>
+    func assign(from source: UnsafePointer<Pointee>, count: Int)
+}
+
+{% for type in types.implementing.Foo %}
+struct {{type.name}}Allocator: Allocator {
+    typealias Pointee {{type.name}}
+
+    {% for variable in type.storedVariables %}
+    let {{variable.name}}Buffer: MTLBuffer
+    {% endfor %}
+
+    {% for variable in type.storedVariables %}
+    let {{variable.name}}: UnsafeMutablePointer<{{variable.typeName}}>
+    {% endfor %}
+
+    static func allocate(capacity count: Int, with device: MTLDevice, options: MTLResourceOptions = []) -> Self {
+    {% for variable in type.storedVariables %}
+        self.{{variable.name}}Buffer = device.makeBuffer(length: count * MemoryLayout<{{variable.typeName}}>.stride, options: options)!
+    {% endfor %}
+    }
+
+    init(
+    {% for variable in type.storedVariables %}
+        {{variable.name}}Buffer: MTLBuffer,
+    {% endfor %}) {
+        {% for variable in type.storedVariables %}
+        self.{{variable.name}}Buffer = {{variable.name}}Buffer
+        {% endfor %}
+
+        {% for variable in type.storedVariables %}
+        self.{{variable.name}}Buffer.label = "{{type.name}}.{{variable.name}}"
+        {% endfor %}
+
+        {% for variable in type.storedVariables %}
+        self.{{variable.name}} = {{variable.name}}Buffer.contents().bindMemory(to: {{variable.typeName}}.self, capacity: count)
+        {% endfor %}
+    }
+
+    subscript(id: Int) -> {{type.name}} {
+        get {
+            return {{type.name}}(
+                {% for variable in type.storedVariables %}
+                {{variable.name}}: self.{{variable.name}}[id],
+                {% endfor %}
+            )
+        }
+
+        nonmutating set {
+
+        }
+    }
+
+    func assign(from other: Self, with: blitCommandEncoder: MTLBlitCommandEncoder) {
+        {% for variable in type.storedVariables %}
+        blitCommandEncoder.copy(from: other.{{variable.name}}Buffer, sourceOffset: 0, to: self.{{variable.name}}Buffer, destinationOffset: 0, size: other.{{variable.name}}Buffer.length)
+        {% endfor %}
+    }
+}
+{% endfor %}

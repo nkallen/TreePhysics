@@ -1,0 +1,6 @@
+{% for function in functions.kernels %}
+{% for constant in function.constants %}
+{{constant.name}} {{constant.type}} {{constant.index}} {{constant.required}}
+{% endfor %}
+{{function.name}} {{function.type}}
+{% endfor %}

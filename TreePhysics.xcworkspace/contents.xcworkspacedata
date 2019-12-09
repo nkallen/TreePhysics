@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:MetalHelper">
+   </FileRef>
+   <FileRef
       location = "container:TreePhysics.xcodeproj">
    </FileRef>
 </Workspace>
