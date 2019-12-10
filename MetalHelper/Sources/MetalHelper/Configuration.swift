@@ -171,11 +171,13 @@ struct Configuration {
     let templates: Paths
     let output: Output
     let args: [String:NSObject]
+    let constants: [String:NSObject]
 
-    init(metallib: Path, templates: Paths, output: Path, args: [String: NSObject]) {
+    init(metallib: Path, templates: Paths, output: Path, args: [String: NSObject], constants: [String: NSObject]) {
         self.metallib = metallib
         self.templates = templates
         self.output = Output(output, linkTo: nil)
         self.args = args
+        self.constants = constants
     }
 }

@@ -24,7 +24,6 @@
 		9E1D92BA2382DBFC0012CC81 /* SkinningPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E56C94C22E7929B0095C8AC /* SkinningPen.swift */; };
 		9E27B86122FA39920030664E /* RigidBodyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E27B86022FA39920030664E /* RigidBodyTests.swift */; };
 		9E3351C122F83DDF00FDC3D6 /* MetalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3351C022F83DDF00FDC3D6 /* MetalTests.swift */; };
-		9E34C484232911C6008C7353 /* TreePhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E34C482232911C6008C7353 /* TreePhysics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9E34C48823291201008C7353 /* Turtle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E036B1E22E4F58600229235 /* Turtle.swift */; };
 		9E34C48923291204008C7353 /* Pen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3222E5E025008AB788 /* Pen.swift */; };
 		9E34C48A23291207008C7353 /* CylinderPen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E461B3422E7017F008AB788 /* CylinderPen.swift */; };
@@ -211,8 +210,6 @@
 		9E3351C222F8417000FDC3D6 /* UpdateCompositeBodies.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UpdateCompositeBodies.metal; sourceTree = "<group>"; };
 		9E34C47A2329107A008C7353 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		9E34C480232911C6008C7353 /* TreePhysics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TreePhysics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9E34C482232911C6008C7353 /* TreePhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TreePhysics.h; sourceTree = "<group>"; };
-		9E34C483232911C6008C7353 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E35D262238D7A8900EBBAD0 /* UpdateFreeBodies.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UpdateFreeBodies.metal; sourceTree = "<group>"; };
 		9E35D265238DB9B300EBBAD0 /* UpdateFreeBodies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateFreeBodies.swift; sourceTree = "<group>"; };
 		9E39374A233B803100AE1897 /* PhysicsWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsWorld.swift; sourceTree = "<group>"; };
@@ -424,15 +421,6 @@
 			path = ProjectModule;
 			sourceTree = "<group>";
 		};
-		9E34C481232911C6008C7353 /* TreePhysics */ = {
-			isa = PBXGroup;
-			children = (
-				9E34C482232911C6008C7353 /* TreePhysics.h */,
-				9E34C483232911C6008C7353 /* Info.plist */,
-			);
-			path = TreePhysics;
-			sourceTree = "<group>";
-		};
 		9E4946C52344A9B60036B7EC /* AutoTree */ = {
 			isa = PBXGroup;
 			children = (
@@ -572,7 +560,6 @@
 				9EE7EBA022DDDC6C00535997 /* TreePhysics */,
 				9EE7EBBA22DE1AD100535997 /* TreePhysicsTests */,
 				9E1F427E23290694009E0E52 /* TreePhysics */,
-				9E34C481232911C6008C7353 /* TreePhysics */,
 				9EE7EB9F22DDDC6C00535997 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -652,7 +639,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E34C484232911C6008C7353 /* TreePhysics.h in Headers */,
 				9EF29FC72374391000AF72FC /* Half.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

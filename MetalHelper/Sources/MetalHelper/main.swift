@@ -4,6 +4,7 @@ import Commander
 import Logging
 import xcproj
 import MetalKit
+import SourceryFramework
 
 let log = Logger(label: "com.nk.MetalHelper")
 
@@ -64,16 +65,20 @@ command(
     Option<Path>("metallib", "", description: "Path to a metallib file."),
     VariadicOption<Path>("templates", description: "Path to templates. File or Directory."),
     Option<Path>("output", "", description: "Path to output. File or Directory. Default is current path."),
-    VariadicOption<String>("args", description: "Custom values to pass to templates.")
-) { watcherEnabled, metallib, templates, output, args in
+    VariadicOption<String>("args", description: "Custom values to pass to templates (--args arg1=value,arg2)."),
+    VariadicOption<String>("constants", description: "Default values for metal function constants (--constants c1=value,...).")
+) { watcherEnabled, metallib, templates, output, args, consts in
     do {
         let configuration: Configuration
         let args = args.joined(separator: ",")
-//        let arguments = AnnotationsParser.parse(line: args)
+        let consts = consts.joined(separator: ",")
+        let arguments = AnnotationsParser.parse(line: args)
+        let constants = AnnotationsParser.parse(line: consts)
         configuration = Configuration(metallib: metallib,
                                       templates: Paths(include: templates),
                                       output: output.string.isEmpty ? "." : output,
-                                      args: [:])
+                                      args: arguments,
+                                      constants: constants)
 
         configuration.validate()
 
@@ -81,7 +86,8 @@ command(
         let metalHelper = MetalHelper(
             device: MTLCreateSystemDefaultDevice()!,
             watcherEnabled: watcherEnabled,
-            arguments: configuration.args)
+            arguments: configuration.args,
+            constants: configuration.constants)
         if let keepAlive = try metalHelper.processFiles(
             configuration.metallib,
             usingTemplates: configuration.templates,

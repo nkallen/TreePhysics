@@ -513,23 +513,23 @@ extension MemoryLayoutManager.Joints {
     }
 }
 
-//
-//struct RigidBody2: Foo {
-//    // sourcery: buffer = "tree"
-//    let parentId: Int
-//    // sourcery: buffer = "tree"
-//    let childCount: Int
-//    // sourcery: buffer = "tree"
-//    let firstChild: Int
-//    // sourcery: buffer = "tree"
-//    let childIndex: Int
-//
-//    // sourcery: buffer = "physics"
-//    let mass: Float
-//    // sourcery: buffer = "physics"
-//    let pivot: simd_float3
-//    // sourcery: buffer = "physics"
-//    let centerOfMass: simd_float3
-//}
-//
-//protocol Foo {}
+
+struct RigidBody2: Foo {
+    // sourcery: buffer = "tree"
+    let parentId: Int
+    // sourcery: buffer = "tree"
+    let childCount: Int
+    // sourcery: buffer = "tree"
+    let firstChild: Int
+    // sourcery: buffer = "tree"
+    let childIndex: Int
+
+    // sourcery: buffer = "physics"
+    let mass: Float
+    // sourcery: buffer = "physics"
+    let pivot: simd_float3
+    // sourcery: buffer = "physics"
+    let centerOfMass: simd_float3
+}
+
+protocol Foo {}

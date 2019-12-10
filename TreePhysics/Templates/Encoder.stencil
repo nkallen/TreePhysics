@@ -2,5 +2,8 @@
 {% for constant in function.constants %}
 {{constant.name}} {{constant.type}} {{constant.index}} {{constant.required}}
 {% endfor %}
-{{function.name}} {{function.type}}
+{{function.name}} {{function.functionType}}
+{% for argument in function.arguments %}
+{{argument.name}} {{argument.type}}
+{% endfor %}
 {% endfor %}

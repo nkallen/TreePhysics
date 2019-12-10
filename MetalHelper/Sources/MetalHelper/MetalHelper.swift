@@ -14,6 +14,7 @@ class MetalHelper {
 
     fileprivate let watcherEnabled: Bool
     fileprivate let arguments: [String: NSObject]
+    fileprivate let constants: [String: NSObject]
 
     fileprivate var status = ""
     fileprivate var templatesPaths = Paths(include: [])
@@ -25,10 +26,11 @@ class MetalHelper {
 
     fileprivate let device: MTLDevice
 
-    init(device: MTLDevice, watcherEnabled: Bool = false, prune: Bool = false, arguments: [String: NSObject] = [:]) {
+    init(device: MTLDevice, watcherEnabled: Bool = false, prune: Bool = false, arguments: [String: NSObject] = [:], constants: [String: NSObject] = [:]) {
         self.device = device
         self.watcherEnabled = watcherEnabled
         self.arguments = arguments
+        self.constants = constants
         self.prune = prune
     }
 
@@ -37,7 +39,7 @@ class MetalHelper {
         self.outputPath = output
 
         let process: (Path) throws -> ParsingResult = { path in
-            let result = try self.parse(from: path, forceParse: forceParse)
+            let result = try self.parse(from: path, forceParse: forceParse, constants: self.constants)
 
             try self.generate(templatePaths: templatesPaths, output: output, parsingResult: result)
 
@@ -146,7 +148,7 @@ class MetalHelper {
 extension MetalHelper {
     typealias ParsingResult = Functions
 
-    fileprivate func parse(from filepath: Path, forceParse: [String] = []) throws -> ParsingResult {
+    fileprivate func parse(from filepath: Path, forceParse: [String] = [], constants: [String: NSObject] = [:]) throws -> ParsingResult {
         let library = try device.makeLibrary(filepath: filepath.string)
         var functions = [Function]()
 
@@ -155,37 +157,17 @@ extension MetalHelper {
                 throw MTLLibraryError(.functionNotFound)
             }
 
-            let constants: [FunctionConstant] = mtlFunction.functionConstantsDictionary.values.map {
-                return FunctionConstant(
-                    name: $0.name,
-                    type: Type(of: $0.type),
-                    index: $0.index,
-                    required: $0.required)
+            var mtlConstants = [MTLFunctionConstant]()
+            let  constantValues = MTLFunctionConstantValues()
+            for (_, const) in mtlFunction.functionConstantsDictionary {
+                mtlConstants.append(const)
+                var val = constants[const.name]
+                constantValues.setConstantValue(&val, type: const.type, withName: const.name)
             }
 
-            let type: String
-            switch mtlFunction.functionType {
-            case .fragment:
-                type = "fragment"
-            case .kernel:
-                type = "kernel"
-            case .vertex:
-                type = "vertex"
-            @unknown default:
-                fatalError()
-            }
+            let specialized = try library.makeFunction(name: functionName, constantValues: constantValues)
 
-            let stageInputAttributes = mtlFunction.stageInputAttributes?.map {
-                Attribute(
-                    name: $0.name,
-                    attributeIndex: $0.attributeIndex,
-                    attributeType: Type(of: $0.attributeType),
-                    isActive: $0.isActive,
-                    isPatchControlPointData: $0.isPatchControlPointData,
-                    isPatchData: $0.isPatchData)
-            }
-
-            functions.append(Function(name: functionName, type: type, constants: constants, stageInputAttributes: stageInputAttributes))
+            try functions.append(Function(specialized, constants: mtlConstants))
         }
         return Functions(functions: functions)
     }
